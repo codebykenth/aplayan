@@ -28,7 +28,7 @@ Aplayan is a free-to-maintain, privacy-first, web-based Job Application Tracker 
 ## Implementation Decisions
 
 ### Modules & Domain Architecture
-- **Authentication Module**: Utilizing Laravel Breeze with Inertia React for user authentication and session management.
+- **Authentication Module**: Utilizing Laravel Breeze with Inertia React for user authentication and session management. Enhanced with Google OAuth social login via Laravel Socialite, Email Verification for standard email registrations, and Forgot Password recovery flows.
 - **Service, Request, Policy & Resource Architecture**: Enforcing a strict OOP Domain Service Layer (`app/Services/`), Form Request validation (`app/Http/Requests/`), Authorization Policies (`app/Policies/`), and Eloquent API Resources (`app/Http/Resources/`). Controllers remain thin HTTP entry points.
   - `JobApplicationPolicy`: Enforces resource authorization (`$user->id === $jobApplication->user_id`), raising HTTP 403 Forbidden on illegal access.
   - `JobApplicationResource`: Explicitly transforms model attributes into structured JSON/Inertia prop shapes for frontend React components.

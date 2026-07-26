@@ -9,17 +9,18 @@ It helps users manage their job applications while providing intelligent insight
 - People applying to local companies, BPO/shared services, and remote/international roles
 
 ## Tech Stack
-- Backend: Laravel 13 (OOP + Domain Service Layer + Policies + API Resources)
+- Backend: Laravel 13 (OOP + Domain Service Layer + Policies + API Resources + Socialite)
 - Frontend: Inertia.js (v3) + React 19
 - UI: Tailwind CSS (v4) + shadcn/ui (Cards, Dialogs, Charts)
 - Database: MySQL / PostgreSQL (Vercel-compatible like Supabase/PlanetScale/Neon)
-- Auth: Laravel Breeze (React + Inertia)
+- Auth: Laravel Breeze (React + Inertia) + Laravel Socialite (Google OAuth)
 - AI Integration: Google Gemini API (`gemini-2.5-flash`)
 - Deployment Target: Vercel (Serverless PHP, zero-cost maintenance architecture)
 
 ## Architectural & Design Pattern
 We adhere strictly to a **Domain Service Layer Architecture with Policies & API Resources**:
-- **Git Commit Convention**: Follow Conventional Commits formatted with the ticket scope (e.g., `feat(01): ...`, `feat(02): ...`, `test(06): ...`, `fix(04): ...`).
+- **Authentication**: Email/Password with Email Verification, Forgot Password Recovery, plus Google OAuth via Laravel Socialite.
+- **Git Commit Convention**: Follow Conventional Commits formatted with the ticket scope (e.g., `feat(00): ...`, `feat(01): ...`, `feat(02): ...`, `test(06): ...`).
 - **Response Transformation**: Use `JobApplicationResource` (`app/Http/Resources/JobApplicationResource.php`) for all Inertia page props and response payloads.
 - **Authorization**: Resource access is authorized via `JobApplicationPolicy` (`Gate::authorize()`) and enforced at DB level using `$user->jobApplications()`.
 - **HTTP Layer**: Thin controllers in `app/Http/Controllers/` that delegate work to Services and wrap data in API Resources.
@@ -31,6 +32,7 @@ We adhere strictly to a **Domain Service Layer Architecture with Policies & API 
 
 ### User
 The authenticated account owner tracking their job hunt.
+- **Auth Methods**: Email/Password (with Email Verification & Forgot Password) or Google OAuth Social Sign-In.
 
 ### Job Application
 A record of a user's application to a specific job opening.
@@ -57,8 +59,9 @@ An independent AI-estimated salary range in Philippine Peso (₱) contextualized
 ---
 
 ## Decisions Log
+- **2026-07-26 - Full User Authentication Suite**: Standard email/password registration with email verification, forgot password reset, and Google OAuth social login via Laravel Socialite.
 - **2026-07-26 - Eloquent API Resources**: All Inertia page props and response payloads are transformed using `JobApplicationResource` (`app/Http/Resources/JobApplicationResource.php`) to decouple DB schema from frontend props.
-- **2026-07-26 - Git Commit Convention**: Standardized Conventional Commits with ticket scope (e.g. `feat(01): create migration`, `feat(02): add policy`).
+- **2026-07-26 - Git Commit Convention**: Standardized Conventional Commits with ticket scope (e.g. `feat(00): add google socialite`, `feat(01): create migration`).
 - **2026-07-26 - Dual-Layer Authorization & Policies**: Resource authorization enforced via `JobApplicationPolicy` in controllers/requests and user-scoped queries (`$user->jobApplications()`) in services.
 - **2026-07-26 - OOP Service Layer & Form Requests**: Form Requests (`app/Http/Requests/`) handle input validation; Domain Services (`app/Services/`) handle business logic; Controllers stay thin.
 - **2026-07-26 - Zero-Storage Ephemeral Resumes**: Resume files/text are processed in-memory during AI analysis and never persisted on disk or DB. Keeps application 100% free to maintain and eliminates privacy risks.
