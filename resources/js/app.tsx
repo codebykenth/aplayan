@@ -5,6 +5,16 @@ import { initTheme, subscribeToThemeChanges } from '@/hooks/use-theme';
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 
+function ThemeProvider({ children }: { children: ReactNode }) {
+    useEffect(() => {
+        initTheme();
+        const unsubscribe = subscribeToThemeChanges();
+        return unsubscribe;
+    }, []);
+
+    return children;
+}
+
 createInertiaApp({
     title: (title) => (title ? `${title} - ${appName}` : appName),
     progress: {
@@ -18,17 +28,7 @@ createInertiaApp({
         page.default.layout ??= (page: ReactNode) => <GuestLayout>{page}</GuestLayout>;
         return page;
     },
-    setup({ App, props }) {
-        function AppWithTheme() {
-            useEffect(() => {
-                initTheme();
-                const unsubscribe = subscribeToThemeChanges();
-                return unsubscribe;
-            }, []);
-
-            return <App {...props} />;
-        }
-
-        return <AppWithTheme />;
+    withApp(app) {
+        return <ThemeProvider>{app}</ThemeProvider>;
     },
 });

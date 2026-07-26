@@ -12,6 +12,7 @@ use App\Http\Controllers\JobApplicationController;
 use App\Http\Controllers\JobApplicationExportController;
 use App\Http\Controllers\JobApplicationImportController;
 use App\Http\Controllers\JobApplicationSalaryController;
+use App\Http\Controllers\OfferComparisonController;
 use App\Http\Controllers\SettingsController;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\Request;
@@ -61,6 +62,7 @@ Route::middleware('auth')->group(function () {
     })->middleware('throttle:6,1')->name('verification.send');
 
     Route::get('job-applications', [JobApplicationController::class, 'index'])->name('job-applications.index');
+    Route::get('job-applications/offers', OfferComparisonController::class)->name('job-applications.offers');
     Route::get('job-applications/export', JobApplicationExportController::class)->name('job-applications.export');
     Route::post('job-applications/import', JobApplicationImportController::class)->name('job-applications.import');
     Route::post('job-applications', [JobApplicationController::class, 'store'])->name('job-applications.store');

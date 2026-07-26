@@ -3,6 +3,7 @@
 namespace App\Http\Resources;
 
 use App\Services\JobApplicationService;
+use App\Services\PhilippineTaxCalculatorService;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -11,6 +12,14 @@ class JobApplicationResource extends JsonResource
     public function toArray(Request $request): array
     {
         $service = app(JobApplicationService::class);
+
+        $salary = $this->offered_salary ?? $this->expected_salary;
+
+        $taxBreakdown = null;
+        if ($salary !== null) {
+            $taxCalculator = app(PhilippineTaxCalculatorService::class);
+            $taxBreakdown = $taxCalculator->computeMonthlyNetPay((float) $salary);
+        }
 
         return [
             'id' => $this->id,
@@ -24,6 +33,7 @@ class JobApplicationResource extends JsonResource
             'date_applied' => $this->date_applied?->toDateString(),
             'expected_salary' => $this->expected_salary,
             'offered_salary' => $this->offered_salary,
+            'tax_breakdown' => $taxBreakdown,
             'notes' => $this->notes,
             'last_contacted_at' => $this->last_contacted_at?->toIso8601String(),
             'interview_date' => $this->interview_date?->toIso8601String(),

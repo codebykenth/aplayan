@@ -5,6 +5,19 @@ export interface JobApplicationActivity {
     created_at: string;
 }
 
+export interface TaxBreakdown {
+    monthly_gross: number;
+    sss: number;
+    philhealth: number;
+    pagibig: number;
+    bir_tax: number;
+    total_deductions: number;
+    monthly_net: number;
+    thirteenth_month: number;
+    annual_gross: number;
+    annual_net: number;
+}
+
 export interface JobApplication {
     id: number;
     user_id: number;
@@ -17,6 +30,7 @@ export interface JobApplication {
     date_applied: string | null;
     expected_salary: number | null;
     offered_salary: number | null;
+    tax_breakdown: TaxBreakdown | null;
     notes: string | null;
     last_contacted_at: string | null;
     interview_date: string | null;

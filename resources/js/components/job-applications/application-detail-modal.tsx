@@ -31,6 +31,7 @@ import {
     SelectValue,
 } from '@/components/ui/select';
 import { ActivityTimeline } from '@/components/job-applications/activity-timeline';
+import TaxBreakdownCard from '@/components/job-applications/tax-breakdown-card';
 import SaveAsTemplateDialog from '@/components/application-templates/save-as-template-dialog';
 import { JOB_APPLICATION_STATUSES, STATUS_COLORS } from '@/types/job-application';
 import type { JobApplication } from '@/types/job-application';
@@ -427,6 +428,10 @@ export default function ApplicationDetailModal({
                             </div>
                         )}
                     </div>
+
+                    {app.tax_breakdown && (
+                        <TaxBreakdownCard taxBreakdown={app.tax_breakdown} />
+                    )}
 
                     {app.job_url && (
                         <div className="flex flex-col gap-1">
