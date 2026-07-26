@@ -21,7 +21,15 @@ class JobApplicationService
 
     public function updateForUser(JobApplication $jobApplication, array $data): JobApplication
     {
+        $originalNotes = $jobApplication->notes;
         $jobApplication->update($data);
+
+        if (array_key_exists('notes', $data) && $data['notes'] !== $originalNotes) {
+            $jobApplication->activities()->create([
+                'type' => 'note',
+                'description' => 'Note updated',
+            ]);
+        }
 
         return $jobApplication;
     }
@@ -34,6 +42,11 @@ class JobApplicationService
     public function updateStatusForUser(JobApplication $jobApplication, JobApplicationStatus $status): JobApplication
     {
         $jobApplication->update(['status' => $status->value]);
+
+        $jobApplication->activities()->create([
+            'type' => 'status_update',
+            'description' => "Status changed to {$status->label()}",
+        ]);
 
         return $jobApplication;
     }

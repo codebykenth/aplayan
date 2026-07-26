@@ -21,7 +21,7 @@ class JobApplicationController extends Controller
     {
         $this->authorize('viewAny', JobApplication::class);
 
-        $applications = $this->service->listForUser(auth()->user());
+        $applications = $this->service->listForUser(auth()->user())->load('activities');
 
         return Inertia::render('job-applications/index', [
             'applications' => JobApplicationResource::collection($applications),
@@ -40,6 +40,8 @@ class JobApplicationController extends Controller
     public function show(JobApplication $jobApplication): JobApplicationResource
     {
         $this->authorize('view', $jobApplication);
+
+        $jobApplication->load('activities');
 
         return new JobApplicationResource($jobApplication);
     }

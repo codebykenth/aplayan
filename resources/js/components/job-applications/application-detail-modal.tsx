@@ -25,6 +25,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
+import { ActivityTimeline } from '@/components/job-applications/activity-timeline';
 import { JOB_APPLICATION_STATUSES, STATUS_COLORS } from '@/types/job-application';
 import type { JobApplication } from '@/types/job-application';
 import { status as updateStatus, aiMatch, aiSalary } from '@/routes/job-applications';
@@ -455,6 +456,9 @@ export default function ApplicationDetailModal({
                             </SelectContent>
                         </Select>
                     </div>
+                {app.activities && app.activities.length > 0 && (
+                        <ActivityTimeline activities={app.activities} />
+                    )}
                 </div>
 
                 <div className="-mx-4 -mb-4 mt-2 flex justify-end rounded-b-xl border-t bg-muted/50 p-4">

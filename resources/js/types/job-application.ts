@@ -1,3 +1,10 @@
+export interface JobApplicationActivity {
+    id: number;
+    type: string;
+    description: string;
+    created_at: string;
+}
+
 export interface JobApplication {
     id: number;
     user_id: number;
@@ -20,6 +27,7 @@ export interface JobApplication {
     ai_evaluated_at: string | null;
     created_at: string;
     updated_at: string;
+    activities: JobApplicationActivity[];
 }
 
 export type JobApplicationStatus =

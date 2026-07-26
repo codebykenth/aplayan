@@ -31,6 +31,12 @@ class JobApplicationResource extends JsonResource
             'ai_evaluated_at' => $this->ai_evaluated_at?->toIso8601String(),
             'created_at' => $this->created_at?->toIso8601String(),
             'updated_at' => $this->updated_at?->toIso8601String(),
+            'activities' => $this->activities->map(fn ($activity) => [
+                'id' => $activity->id,
+                'type' => $activity->type,
+                'description' => $activity->description,
+                'created_at' => $activity->created_at?->toIso8601String(),
+            ])->sortByDesc('created_at')->values(),
         ];
     }
 }
