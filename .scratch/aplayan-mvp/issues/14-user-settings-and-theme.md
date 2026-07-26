@@ -1,4 +1,4 @@
-# 13 — User Settings & Profile Management Page with Theme Controls
+# 14 — User Settings & Profile Management Page with Theme Controls
 
 **What to build:** Dedicated Settings page (`resources/js/pages/settings/index.tsx`) allowing users to manage profile information (name, avatar, default expected salary, job search preferences) and switch app theme settings (Light, Dark, System).
 
