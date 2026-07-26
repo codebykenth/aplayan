@@ -12,6 +12,7 @@ use App\Http\Controllers\JobApplicationController;
 use App\Http\Controllers\JobApplicationExportController;
 use App\Http\Controllers\JobApplicationImportController;
 use App\Http\Controllers\JobApplicationSalaryController;
+use App\Http\Controllers\SettingsController;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -72,6 +73,11 @@ Route::middleware('auth')->group(function () {
     Route::post('job-applications/{jobApplication}/follow-up-draft', [FollowUpEmailController::class, 'draft'])->name('job-applications.follow-up-draft');
     Route::post('job-applications/{jobApplication}/mark-as-contacted', [FollowUpEmailController::class, 'markAsContacted'])->name('job-applications.mark-as-contacted');
     Route::post('job-applications/{jobApplication}/interview-prep', [InterviewPrepController::class, 'generate'])->name('job-applications.interview-prep');
+
+    Route::get('settings', [SettingsController::class, 'index'])->name('settings.index');
+    Route::patch('settings/profile', [SettingsController::class, 'updateProfile'])->name('settings.profile.update');
+    Route::patch('settings/theme', [SettingsController::class, 'updateTheme'])->name('settings.theme.update');
+    Route::patch('settings/password', [SettingsController::class, 'updatePassword'])->name('settings.password.update');
 
     Route::get('templates', [ApplicationTemplateController::class, 'index'])->name('templates.index');
     Route::post('templates', [ApplicationTemplateController::class, 'store'])->name('templates.store');

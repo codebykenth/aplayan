@@ -20,11 +20,14 @@ use Illuminate\Support\Carbon;
  * @property string $password
  * @property string|null $google_id
  * @property string|null $avatar
+ * @property int|null $expected_salary
+ * @property array|null $job_search_preferences
+ * @property string $theme
  * @property string|null $remember_token
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  */
-#[Fillable(['name', 'email', 'password', 'google_id', 'avatar'])]
+#[Fillable(['name', 'email', 'password', 'google_id', 'avatar', 'expected_salary', 'job_search_preferences', 'theme'])]
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable implements MustVerifyEmail
 {
@@ -51,6 +54,8 @@ class User extends Authenticatable implements MustVerifyEmail
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'expected_salary' => 'integer',
+            'job_search_preferences' => 'array',
         ];
     }
 }
