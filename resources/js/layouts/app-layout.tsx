@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { Briefcase, ChevronLeft, ChevronRight, LayoutDashboard, LogOut, Menu, Settings } from 'lucide-react';
 
 const sidebarLinks = [
-    { href: '/', label: 'Dashboard', icon: LayoutDashboard },
+    { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
     { href: '/job-applications', label: 'Applications', icon: Briefcase },
     { href: '/settings', label: 'Settings', icon: Settings },
 ];
@@ -65,7 +65,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                 <div className="flex h-16 shrink-0 items-center border-b border-[#e3e3e0] px-4 dark:border-[#3E3E3A]">
                     {sidebarOpen && (
                         <>
-                            <Link href="/" className="text-lg font-semibold text-[#1b1b18] dark:text-[#EDEDEC]">
+<Link href="/dashboard" className="text-lg font-semibold text-[#1b1b18] dark:text-[#EDEDEC]">
                                 Aplayan
                             </Link>
                             <div className="flex-1" />

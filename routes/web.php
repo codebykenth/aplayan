@@ -3,6 +3,7 @@
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\SocialiteController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\JobApplicationAiController;
 use App\Http\Controllers\JobApplicationController;
 use App\Http\Controllers\JobApplicationSalaryController;
@@ -29,6 +30,8 @@ Route::middleware('guest')->group(function () {
 });
 
 Route::middleware('auth')->group(function () {
+    Route::get('dashboard', DashboardController::class)->name('dashboard');
+
     Route::post('logout', [AuthController::class, 'destroy'])->name('logout');
 
     Route::get('email/verify', function (Request $request) {
