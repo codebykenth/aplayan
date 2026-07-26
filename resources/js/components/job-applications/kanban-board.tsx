@@ -38,7 +38,7 @@ function Column({
     return (
         <div
             ref={setNodeRef}
-            className={`flex w-72 shrink-0 flex-col gap-3 rounded-xl border bg-card p-3 transition-shadow ${
+            className={`flex w-72 shrink-0 flex-col gap-3 rounded-xl border bg-card/70 p-3 backdrop-blur-md transition-shadow max-sm:w-full max-sm:shrink ${
                 isOver
                     ? 'border-primary shadow-lg shadow-primary/10'
                     : 'border-border'
@@ -90,17 +90,13 @@ function DraggableCard({
         useDraggable({ id: application.id.toString(), data: application });
 
     const style = transform
-        ? {
-              transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`,
-          }
+        ? { transform: `translate3d(${transform.x}px, ${transform.y}px, 0)` }
         : undefined;
 
     return (
         <div
             ref={setNodeRef}
             style={style}
-            {...listeners}
-            {...attributes}
             className={isDragging ? 'opacity-30' : ''}
         >
             <JobApplicationCard
@@ -108,6 +104,7 @@ function DraggableCard({
                 onView={onView}
                 onEdit={onEdit}
                 onDelete={onDelete}
+                dragHandleProps={{ ...listeners, ...attributes }}
             />
         </div>
     );
@@ -116,12 +113,12 @@ function DraggableCard({
 function KanbanCardOverlay({ application }: { application: JobApplication }) {
     return (
         <div className="rotate-3 opacity-90">
-            <div className="flex flex-col gap-3 rounded-xl border border-border bg-card p-4 shadow-xl">
-                <div className="flex min-w-0 flex-col gap-1">
+            <div className="flex flex-col gap-2 rounded-xl border border-border/50 bg-card/90 p-3 shadow-xl backdrop-blur-md">
+                <div className="flex min-w-0 flex-col gap-0.5">
                     <h3 className="truncate text-sm font-semibold text-card-foreground">
                         {application.job_title}
                     </h3>
-                    <p className="truncate text-sm text-muted-foreground">
+                    <p className="truncate text-xs text-muted-foreground">
                         {application.company_name}
                     </p>
                 </div>
@@ -213,7 +210,7 @@ export default function KanbanBoard({
             onDragStart={handleDragStart}
             onDragEnd={handleDragEnd}
         >
-            <div className="flex gap-4 overflow-x-auto pb-4">
+            <div className="flex gap-4 overflow-x-auto pb-4 max-sm:flex-col max-sm:overflow-x-visible">
                 {JOB_APPLICATION_STATUSES.map(({ value, label }) => (
                     <Column
                         key={value}
