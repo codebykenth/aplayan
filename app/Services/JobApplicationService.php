@@ -5,10 +5,15 @@ namespace App\Services;
 use App\Enums\JobApplicationStatus;
 use App\Models\JobApplication;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Support\Collection;
 
 class JobApplicationService
 {
+    private const int STALE_WARNING_THRESHOLD = 7;
+
+    private const int STALE_ALERT_THRESHOLD = 14;
+
     public function listForUser(User $user): Collection
     {
         return $user->jobApplications()->latest()->get();
@@ -49,5 +54,49 @@ class JobApplicationService
         ]);
 
         return $jobApplication;
+    }
+
+    public function markAsContacted(JobApplication $jobApplication): JobApplication
+    {
+        $jobApplication->update(['last_contacted_at' => now()]);
+
+        $jobApplication->activities()->create([
+            'type' => 'contacted',
+            'description' => 'Marked as contacted',
+        ]);
+
+        return $jobApplication;
+    }
+
+    public function stalenessLevel(JobApplication $jobApplication): ?string
+    {
+        if (! in_array($jobApplication->status, ['applied', 'interviewing'])) {
+            return null;
+        }
+
+        $daysSinceUpdate = $this->daysSinceLastUpdate($jobApplication);
+
+        if ($daysSinceUpdate >= self::STALE_ALERT_THRESHOLD) {
+            return 'alert';
+        }
+
+        if ($daysSinceUpdate >= self::STALE_WARNING_THRESHOLD) {
+            return 'warning';
+        }
+
+        return null;
+    }
+
+    public function daysSinceLastUpdate(JobApplication $jobApplication): int
+    {
+        $referenceDate = $jobApplication->last_contacted_at ?? $jobApplication->updated_at;
+
+        if ($referenceDate === null) {
+            return $jobApplication->created_at
+                ? abs(Carbon::now()->diffInDays($jobApplication->created_at))
+                : 0;
+        }
+
+        return abs(Carbon::now()->diffInDays($referenceDate));
     }
 }

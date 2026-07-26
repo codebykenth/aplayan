@@ -4,6 +4,7 @@ use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\SocialiteController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\FollowUpEmailController;
 use App\Http\Controllers\JobApplicationAiController;
 use App\Http\Controllers\JobApplicationController;
 use App\Http\Controllers\JobApplicationSalaryController;
@@ -62,4 +63,6 @@ Route::middleware('auth')->group(function () {
     Route::delete('job-applications/{jobApplication}', [JobApplicationController::class, 'destroy'])->name('job-applications.destroy');
     Route::post('job-applications/{jobApplication}/ai-match', [JobApplicationAiController::class, 'analyzeMatch'])->name('job-applications.ai-match');
     Route::post('job-applications/{jobApplication}/ai-salary', [JobApplicationSalaryController::class, 'checkSalary'])->name('job-applications.ai-salary');
+    Route::post('job-applications/{jobApplication}/follow-up-draft', [FollowUpEmailController::class, 'draft'])->name('job-applications.follow-up-draft');
+    Route::post('job-applications/{jobApplication}/mark-as-contacted', [FollowUpEmailController::class, 'markAsContacted'])->name('job-applications.mark-as-contacted');
 });

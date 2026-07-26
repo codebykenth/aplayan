@@ -142,26 +142,41 @@ export default function KanbanBoard({
         useState<JobApplication | null>(null);
     const [localApplications, setLocalApplications] = useState(applications);
     const [activeTab, setActiveTab] = useState<JobApplicationStatus>(
-        JOB_APPLICATION_STATUSES[0].value
+        JOB_APPLICATION_STATUSES[0].value,
     );
+    const [activeFilter, setActiveFilter] = useState<FilterOption>('all');
 
     useEffect(() => {
         setLocalApplications(applications);
     }, [applications]);
+
+    const needsAttention = (app: JobApplication): boolean => {
+        return (
+            (app.status === 'applied' || app.status === 'interviewing') &&
+            (app.staleness_level === 'warning' || app.staleness_level === 'alert')
+        );
+    };
+
+    const filteredApplications = useMemo(() => {
+        if (activeFilter === 'needs-attention') {
+            return localApplications.filter(needsAttention);
+        }
+        return localApplications;
+    }, [localApplications, activeFilter]);
 
     const grouped = useMemo(() => {
         const map = Object.fromEntries(
             JOB_APPLICATION_STATUSES.map((s) => [s.value, [] as JobApplication[]]),
         ) as Record<JobApplicationStatus, JobApplication[]>;
 
-        for (const app of localApplications) {
+        for (const app of filteredApplications) {
             if (app.status in map) {
                 map[app.status].push(app);
             }
         }
 
-        return map;
-    }, [localApplications]);
+            return map;
+    }, [filteredApplications]);
 
     const handleDragStart = useCallback((event: DragStartEvent) => {
         setActiveApplication(event.active.data.current as JobApplication);
@@ -238,6 +253,19 @@ export default function KanbanBoard({
                         </span>
                     </button>
                 ))}
+                <button
+                    type="button"
+                    onClick={() => setActiveFilter(
+                        activeFilter === 'needs-attention' ? 'all' : 'needs-attention',
+                    )}
+                    className={`flex items-center gap-2 whitespace-nowrap rounded-full px-4 py-2 text-sm font-medium transition-colors ${
+                        activeFilter === 'needs-attention'
+                            ? 'bg-primary text-primary-foreground'
+                            : 'bg-muted text-muted-foreground hover:bg-muted/80'
+                    }`}
+                >
+                    Needs Attention
+                </button>
             </div>
 
             <div className="flex flex-1 min-h-0 gap-4 overflow-x-auto pb-6 max-md:flex-col max-md:overflow-x-hidden">

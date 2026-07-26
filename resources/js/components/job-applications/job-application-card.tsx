@@ -30,6 +30,28 @@ function formatDate(date: string | null): string | null {
     });
 }
 
+function StalenessBadge({
+    level,
+    daysSinceUpdate,
+}: {
+    level: 'warning' | 'alert' | null;
+    daysSinceUpdate: number;
+}) {
+    if (level === null) return null;
+
+    return (
+        <span
+            className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-medium ${
+                level === 'alert'
+                    ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300'
+                    : 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300'
+            }`}
+        >
+            {level === 'alert' ? '🔴' : '⚠️'} {daysSinceUpdate}d
+        </span>
+    );
+}
+
 function ActionsDropdown({
     onEdit,
     onDelete,
@@ -169,6 +191,11 @@ export default function JobApplicationCard({
                 >
                     {application.status}
                 </Badge>
+
+                <StalenessBadge
+                    level={application.staleness_level}
+                    daysSinceUpdate={application.days_since_update}
+                />
 
                 <ActionsDropdown onEdit={onEdit} onDelete={onDelete} />
             </div>

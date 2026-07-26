@@ -29,6 +29,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property int|null $ai_salary_max
  * @property string|null $ai_salary_notes
  * @property Carbon|null $ai_evaluated_at
+ * @property Carbon|null $last_contacted_at
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  */
@@ -49,6 +50,7 @@ class JobApplication extends Model
         'expected_salary',
         'offered_salary',
         'notes',
+        'last_contacted_at',
         'ai_match_percentage',
         'ai_strengths',
         'ai_gaps',
@@ -70,6 +72,7 @@ class JobApplication extends Model
             'ai_salary_min' => 'integer',
             'ai_salary_max' => 'integer',
             'ai_evaluated_at' => 'datetime',
+            'last_contacted_at' => 'datetime',
         ];
     }
 

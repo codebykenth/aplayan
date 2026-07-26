@@ -59,6 +59,29 @@ PROMPT;
         return $this->extractJson($response, ['min_salary_php', 'max_salary_php', 'market_context']);
     }
 
+    public function generateFollowUpEmail(string $companyName, string $jobTitle, int $daysSinceContact, string $status): string
+    {
+        $prompt = <<<PROMPT
+You are a professional career coach helping a job seeker in the Philippines write a follow-up email after a job application.
+
+The applicant applied for a "{$jobTitle}" position at "{$companyName}" and it has been {$daysSinceContact} days since they last contacted the employer. The application status is "{$status}".
+
+Write a professional, concise follow-up email draft that:
+- Is polite and respectful of the employer's time
+- References the specific role and company
+- Mentions the elapsed time appropriately
+- Expresses continued interest and enthusiasm
+- Asks for an update on the application status
+- Is appropriate for the Philippine professional context
+
+Return ONLY the email draft text, no subject line or additional commentary. Keep it under 200 words.
+PROMPT;
+
+        $response = $this->sendRequest($prompt);
+
+        return $response['candidates'][0]['content']['parts'][0]['text'] ?? 'Unable to generate follow-up email.';
+    }
+
     private function client(): PendingRequest
     {
         return Http::timeout(self::TIMEOUT)

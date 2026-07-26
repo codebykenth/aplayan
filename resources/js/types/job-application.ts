@@ -18,6 +18,9 @@ export interface JobApplication {
     expected_salary: number | null;
     offered_salary: number | null;
     notes: string | null;
+    last_contacted_at: string | null;
+    staleness_level: 'warning' | 'alert' | null;
+    days_since_update: number;
     ai_match_percentage: number | null;
     ai_strengths: string[] | null;
     ai_gaps: string[] | null;

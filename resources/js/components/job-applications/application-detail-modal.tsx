@@ -9,6 +9,9 @@ import {
     LoaderIcon,
     CheckIcon,
     XIcon,
+    ClockIcon,
+    MailIcon,
+    CopyIcon,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -66,6 +69,10 @@ export default function ApplicationDetailModal({
     const [analyzeError, setAnalyzeError] = useState<string | null>(null);
     const [salaryChecking, setSalaryChecking] = useState(false);
     const [salaryError, setSalaryError] = useState<string | null>(null);
+    const [followUpDraft, setFollowUpDraft] = useState<string | null>(null);
+    const [followUpLoading, setFollowUpLoading] = useState(false);
+    const [followUpError, setFollowUpError] = useState<string | null>(null);
+    const [contacting, setContacting] = useState(false);
     const [localApplication, setLocalApplication] = useState<JobApplication | null>(null);
 
     useEffect(() => {
@@ -74,8 +81,77 @@ export default function ApplicationDetailModal({
             setResumeText('');
             setAnalyzeError(null);
             setSalaryError(null);
+            setFollowUpDraft(null);
+            setFollowUpError(null);
         }
     }, [application]);
+
+    const handleFetchFollowUpDraft = useCallback(async () => {
+        const app = localApplication ?? application;
+        if (!app) return;
+
+        setFollowUpLoading(true);
+        setFollowUpError(null);
+
+        try {
+            const response = await fetch(
+                `/job-applications/${app.id}/follow-up-draft`,
+                {
+                    method: 'POST',
+                    headers: {
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? '',
+                    },
+                },
+            );
+
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({}));
+                throw new Error(errorData.message || 'Failed to generate follow-up draft.');
+            }
+
+            const result = await response.json();
+            setFollowUpDraft(result.draft);
+        } catch (error) {
+            setFollowUpError(error instanceof Error ? error.message : 'An unexpected error occurred');
+        } finally {
+            setFollowUpLoading(false);
+        }
+    }, [localApplication, application]);
+
+    const handleMarkAsContacted = useCallback(async () => {
+        const app = localApplication ?? application;
+        if (!app) return;
+
+        setContacting(true);
+
+        try {
+            const response = await fetch(
+                `/job-applications/${app.id}/mark-as-contacted`,
+                {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? '',
+                    },
+                },
+            );
+
+            if (!response.ok) {
+                throw new Error('Failed to mark as contacted.');
+            }
+
+            const result = await response.json();
+            setLocalApplication(result.data);
+        } catch (error) {
+            setFollowUpError(
+                error instanceof Error ? error.message : 'An unexpected error occurred',
+            );
+        } finally {
+            setContacting(false);
+        }
+    }, [localApplication, application]);
 
     const handleStatusChange = useCallback(
         (newStatus: string | null) => {
@@ -432,7 +508,7 @@ export default function ApplicationDetailModal({
                         </Button>
                     </div>
 
-                    <div className="flex flex-col gap-1.5">
+                    <div className="flex flex-col gap-3 border-t border-border pt-4">
                         <span className="text-xs text-muted-foreground">
                             Status
                         </span>
@@ -455,6 +531,92 @@ export default function ApplicationDetailModal({
                                 ))}
                             </SelectContent>
                         </Select>
+                    </div>
+
+                    <div className="flex flex-col gap-3 border-t border-border pt-4">
+                        <div className="flex items-center justify-between">
+                            <span className="text-xs text-muted-foreground">
+                                Last Contacted
+                            </span>
+                            <Button
+                                onClick={handleMarkAsContacted}
+                                disabled={contacting}
+                                variant="outline"
+                                size="sm"
+                            >
+                                {contacting ? (
+                                    <>
+                                        <LoaderIcon className="size-3 animate-spin" />
+                                        Saving...
+                                    </>
+                                ) : (
+                                    <>
+                                        <ClockIcon className="size-3" />
+                                        Mark as Contacted
+                                    </>
+                                )}
+                            </Button>
+                        </div>
+                        {app.last_contacted_at && (
+                            <span className="text-xs text-muted-foreground">
+                                Last contacted:{' '}
+                                {new Date(app.last_contacted_at).toLocaleDateString('en-PH', {
+                                    year: 'numeric',
+                                    month: 'short',
+                                    day: 'numeric',
+                                })}
+                            </span>
+                        )}
+                    </div>
+
+                    <div className="flex flex-col gap-3 border-t border-border pt-4">
+                        <div className="flex items-center justify-between">
+                            <span className="text-xs text-muted-foreground">
+                                Follow-Up Draft
+                            </span>
+                            <Button
+                                onClick={handleFetchFollowUpDraft}
+                                disabled={followUpLoading}
+                                variant="outline"
+                                size="sm"
+                            >
+                                {followUpLoading ? (
+                                    <>
+                                        <LoaderIcon className="size-3 animate-spin" />
+                                        Generating...
+                                    </>
+                                ) : (
+                                    <>
+                                        <MailIcon className="size-3" />
+                                        Generate Draft
+                                    </>
+                                )}
+                            </Button>
+                        </div>
+                        {followUpError && (
+                            <p className="text-xs text-destructive">{followUpError}</p>
+                        )}
+                        {followUpDraft && (
+                            <div className="flex flex-col gap-1">
+                                <textarea
+                                    value={followUpDraft}
+                                    readOnly
+                                    rows={6}
+                                    className="w-full resize-none rounded-lg border border-input bg-transparent p-2 text-sm outline-none"
+                                />
+                                <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => {
+                                        navigator.clipboard.writeText(followUpDraft);
+                                    }}
+                                    className="self-end"
+                                >
+                                    <CopyIcon className="size-3" />
+                                    Copy to Clipboard
+                                </Button>
+                            </div>
+                        )}
                     </div>
                 {app.activities && app.activities.length > 0 && (
                         <ActivityTimeline activities={app.activities} />

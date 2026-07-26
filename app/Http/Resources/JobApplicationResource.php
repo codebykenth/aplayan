@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Services\JobApplicationService;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -9,6 +10,8 @@ class JobApplicationResource extends JsonResource
 {
     public function toArray(Request $request): array
     {
+        $service = app(JobApplicationService::class);
+
         return [
             'id' => $this->id,
             'user_id' => $this->user_id,
@@ -22,6 +25,9 @@ class JobApplicationResource extends JsonResource
             'expected_salary' => $this->expected_salary,
             'offered_salary' => $this->offered_salary,
             'notes' => $this->notes,
+            'last_contacted_at' => $this->last_contacted_at?->toIso8601String(),
+            'staleness_level' => $service->stalenessLevel($this->resource),
+            'days_since_update' => $service->daysSinceLastUpdate($this->resource),
             'ai_match_percentage' => $this->ai_match_percentage,
             'ai_strengths' => $this->ai_strengths,
             'ai_gaps' => $this->ai_gaps,
