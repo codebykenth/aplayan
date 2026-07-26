@@ -8,6 +8,7 @@ use App\Http\Requests\UpdateJobApplicationRequest;
 use App\Http\Requests\UpdateJobApplicationStatusRequest;
 use App\Http\Resources\JobApplicationResource;
 use App\Models\JobApplication;
+use App\Services\ApplicationTemplateService;
 use App\Services\JobApplicationService;
 use Illuminate\Http\RedirectResponse;
 use Inertia\Inertia;
@@ -15,16 +16,21 @@ use Inertia\Response;
 
 class JobApplicationController extends Controller
 {
-    public function __construct(private JobApplicationService $service) {}
+    public function __construct(
+        private JobApplicationService $service,
+        private ApplicationTemplateService $templateService,
+    ) {}
 
     public function index(): Response
     {
         $this->authorize('viewAny', JobApplication::class);
 
         $applications = $this->service->listForUser(auth()->user())->load('activities');
+        $templates = $this->templateService->listForUser(auth()->user());
 
         return Inertia::render('job-applications/index', [
             'applications' => JobApplicationResource::collection($applications),
+            'templates' => $templates,
         ]);
     }
 

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ApplicationTemplateController;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\SocialiteController;
@@ -71,4 +72,9 @@ Route::middleware('auth')->group(function () {
     Route::post('job-applications/{jobApplication}/follow-up-draft', [FollowUpEmailController::class, 'draft'])->name('job-applications.follow-up-draft');
     Route::post('job-applications/{jobApplication}/mark-as-contacted', [FollowUpEmailController::class, 'markAsContacted'])->name('job-applications.mark-as-contacted');
     Route::post('job-applications/{jobApplication}/interview-prep', [InterviewPrepController::class, 'generate'])->name('job-applications.interview-prep');
+
+    Route::get('templates', [ApplicationTemplateController::class, 'index'])->name('templates.index');
+    Route::post('templates', [ApplicationTemplateController::class, 'store'])->name('templates.store');
+    Route::match(['put', 'patch'], 'templates/{applicationTemplate}', [ApplicationTemplateController::class, 'update'])->name('templates.update');
+    Route::delete('templates/{applicationTemplate}', [ApplicationTemplateController::class, 'destroy'])->name('templates.destroy');
 });

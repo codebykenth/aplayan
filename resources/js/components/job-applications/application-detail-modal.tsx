@@ -13,6 +13,7 @@ import {
     ClockIcon,
     MailIcon,
     CopyIcon,
+    BookmarkIcon,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -30,6 +31,7 @@ import {
     SelectValue,
 } from '@/components/ui/select';
 import { ActivityTimeline } from '@/components/job-applications/activity-timeline';
+import SaveAsTemplateDialog from '@/components/application-templates/save-as-template-dialog';
 import { JOB_APPLICATION_STATUSES, STATUS_COLORS } from '@/types/job-application';
 import type { JobApplication } from '@/types/job-application';
 import { status as updateStatus, aiMatch, aiSalary } from '@/routes/job-applications';
@@ -79,6 +81,7 @@ export default function ApplicationDetailModal({
     const [notesSaving, setNotesSaving] = useState(false);
     const [notesError, setNotesError] = useState<string | null>(null);
     const [localApplication, setLocalApplication] = useState<JobApplication | null>(null);
+    const [templateDialogOpen, setTemplateDialogOpen] = useState(false);
 
     useEffect(() => {
         if (application) {
@@ -824,11 +827,21 @@ export default function ApplicationDetailModal({
                     )}
                 </div>
 
-                <div className="-mx-4 -mb-4 mt-2 flex justify-end rounded-b-xl border-t bg-muted/50 p-4">
+                <div className="-mx-4 -mb-4 mt-2 flex justify-between rounded-b-xl border-t bg-muted/50 p-4">
+                    <Button variant="ghost" size="sm" onClick={() => setTemplateDialogOpen(true)}>
+                        <BookmarkIcon className="size-3.5" />
+                        Save as Template
+                    </Button>
                     <Button variant="outline" onClick={onClose}>
                         Close
                     </Button>
                 </div>
+
+                <SaveAsTemplateDialog
+                    open={templateDialogOpen}
+                    onClose={() => setTemplateDialogOpen(false)}
+                    application={app}
+                />
             </DialogContent>
         </Dialog>
     );

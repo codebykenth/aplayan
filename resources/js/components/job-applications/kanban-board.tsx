@@ -16,6 +16,8 @@ import {
 import type { JobApplication, JobApplicationStatus } from '@/types/job-application';
 import { status as updateStatus } from '@/routes/job-applications';
 
+type FilterOption = 'all' | 'needs-attention';
+
 const COLUMN_IDS = JOB_APPLICATION_STATUSES.map((s) => s.value);
 
 function Column({

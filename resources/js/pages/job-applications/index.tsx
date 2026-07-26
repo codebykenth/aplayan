@@ -1,13 +1,15 @@
 import { Head, router, useForm } from '@inertiajs/react';
 import { useState, useMemo, useRef, useEffect, type ReactNode } from 'react';
-import { SearchIcon, PlusIcon, DownloadIcon, UploadIcon } from 'lucide-react';
+import { SearchIcon, PlusIcon, DownloadIcon, UploadIcon, ZapIcon } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import JobApplicationForm from '@/components/job-applications/job-application-form';
 import ApplicationDetailModal from '@/components/job-applications/application-detail-modal';
 import KanbanBoard from '@/components/job-applications/kanban-board';
+import QuickApplyDialog from '@/components/application-templates/quick-apply-dialog';
 import { STATUS_COLORS, JOB_APPLICATION_STATUSES } from '@/types/job-application';
 import type { JobApplication, JobApplicationStatus } from '@/types/job-application';
+import type { ApplicationTemplate } from '@/types/application-template';
 import { destroy as jobAppDestroy, exportMethod, importMethod } from '@/routes/job-applications';
 import AppLayout from '@/layouts/app-layout';
 
@@ -22,8 +24,10 @@ const STATUS_FILTERS: { value: FilterStatus; label: string }[] = [
 
 export default function JobApplicationsIndex({
     applications,
+    templates = [],
 }: {
     applications: { data: JobApplication[] } | JobApplication[];
+    templates?: ApplicationTemplate[];
 }) {
     const applicationList = Array.isArray(applications)
         ? applications
@@ -36,6 +40,7 @@ export default function JobApplicationsIndex({
         useState<JobApplication | null>(null);
     const [viewingApplication, setViewingApplication] =
         useState<JobApplication | null>(null);
+    const [quickApplyOpen, setQuickApplyOpen] = useState(false);
     const [exportOpen, setExportOpen] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
     const importForm = useForm<{ file: File | null }>({ file: null });
@@ -169,6 +174,12 @@ export default function JobApplicationsIndex({
                             onChange={handleImportChange}
                             className="hidden"
                         />
+                        {templates.length > 0 && (
+                            <Button variant="secondary" onClick={() => setQuickApplyOpen(true)}>
+                                <ZapIcon data-icon="inline-start" />
+                                Quick Apply
+                            </Button>
+                        )}
                         <Button onClick={openCreate}>
                             <PlusIcon data-icon="inline-start" />
                             New Application
@@ -246,6 +257,12 @@ export default function JobApplicationsIndex({
                     setEditingApplication(null);
                 }}
                 application={editingApplication}
+            />
+
+            <QuickApplyDialog
+                open={quickApplyOpen}
+                onClose={() => setQuickApplyOpen(false)}
+                templates={templates}
             />
         </>
     );
