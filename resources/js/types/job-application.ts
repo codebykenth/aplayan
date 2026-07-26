@@ -49,3 +49,11 @@ export const STATUS_COLORS: Record<JobApplicationStatus, string> = {
     rejected:
         'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300',
 };
+
+export interface ParsedJobUrl {
+    company_name: string | null;
+    job_title: string | null;
+    job_description: string | null;
+    location: string | null;
+    expected_salary: number | null;
+}

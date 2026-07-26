@@ -98,4 +98,28 @@ PROMPT;
 
         return Arr::only($parsed, $expectedKeys);
     }
+
+    public function parseJobPosting(string $jobUrl, string $pageContent): array
+    {
+        $truncated = mb_substr($pageContent, 0, 30000, 'UTF-8');
+
+        $prompt = <<<PROMPT
+You are a job posting parser. Given the page content below from {$jobUrl}, extract the job details.
+Return a JSON object with these exact keys:
+- company_name (string)
+- job_title (string)
+- job_description (string, the full job description)
+- location (string, or empty string if not found)
+- expected_salary (integer, annual salary in PHP, or 0 if not found)
+
+Page Content:
+{$truncated}
+PROMPT;
+
+        $response = $this->sendRequest($prompt);
+
+        return $this->extractJson($response, [
+            'company_name', 'job_title', 'job_description', 'location', 'expected_salary',
+        ]);
+    }
 }

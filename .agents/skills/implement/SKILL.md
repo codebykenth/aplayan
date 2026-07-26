@@ -12,4 +12,4 @@ Run typechecking regularly, single test files regularly, and the full test suite
 
 Once done, use /code-review to review the work.
 
-Commit your work to the current branch. Follow the git commit convention in CONTEXT.md (ticket-scoped format type(scope): description).6
+Commit your work to the current branch.

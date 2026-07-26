@@ -1,5 +1,6 @@
 import { useForm } from '@inertiajs/react';
-import { useEffect } from 'react';
+import { useCallback, useEffect, useState } from 'react';
+import { LoaderIcon, LinkIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
     Dialog,
@@ -19,8 +20,8 @@ import {
     SelectValue,
 } from '@/components/ui/select';
 import { JOB_APPLICATION_STATUSES } from '@/types/job-application';
-import type { JobApplication } from '@/types/job-application';
-import { store as jobAppStore, update as jobAppUpdate } from '@/routes/job-applications';
+import type { JobApplication, ParsedJobUrl } from '@/types/job-application';
+import { store as jobAppStore, update as jobAppUpdate, parseUrl as jobAppParseUrl } from '@/routes/job-applications';
 
 interface FormData {
     company_name: string;
@@ -65,6 +66,63 @@ export default function JobApplicationForm({
                     : '',
             notes: application?.notes ?? '',
         });
+
+    const [parsingUrl, setParsingUrl] = useState(false);
+    const [parseError, setParseError] = useState<string | null>(null);
+
+    const handleAutofill = useCallback(async () => {
+        const url = data.job_url.trim();
+        if (!url) return;
+
+        setParsingUrl(true);
+        setParseError(null);
+
+        try {
+            const response = await fetch(jobAppParseUrl.url(), {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN':
+                        document
+                            .querySelector('meta[name="csrf-token"]')
+                            ?.getAttribute('content') ?? '',
+                },
+                body: JSON.stringify({ job_url: url }),
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({}));
+                throw new Error(
+                    errorData.message ||
+                        'Failed to parse job URL. Please try again.',
+                );
+            }
+
+            const result: ParsedJobUrl = await response.json();
+
+            setData((prev) => ({
+                ...prev,
+                company_name: result.company_name ?? prev.company_name,
+                job_title: result.job_title ?? prev.job_title,
+                job_description:
+                    result.job_description ?? prev.job_description,
+                location: result.location ?? prev.location,
+                expected_salary:
+                    result.expected_salary != null
+                        ? String(result.expected_salary)
+                        : prev.expected_salary,
+            }));
+        } catch (error) {
+            setParseError(
+                error instanceof Error
+                    ? error.message
+                    : 'An unexpected error occurred',
+            );
+        } finally {
+            setParsingUrl(false);
+        }
+    }, [data.job_url, setData]);
 
     useEffect(() => {
         if (open && application) {
@@ -289,15 +347,38 @@ export default function JobApplicationForm({
                         <div className="grid grid-cols-2 gap-4">
                             <div className="flex flex-col gap-2">
                                 <Label htmlFor="job_url">Job URL</Label>
-                                <Input
-                                    id="job_url"
-                                    type="url"
-                                    value={data.job_url}
-                                    onChange={(e) =>
-                                        setData('job_url', e.target.value)
-                                    }
-                                    placeholder="https://example.com/job"
-                                />
+                                <div className="flex gap-2">
+                                    <Input
+                                        id="job_url"
+                                        type="url"
+                                        className="flex-1"
+                                        value={data.job_url}
+                                        onChange={(e) => {
+                                            setData('job_url', e.target.value);
+                                            setParseError(null);
+                                        }}
+                                        placeholder="https://example.com/job"
+                                    />
+                                    <Button
+                                        type="button"
+                                        variant="outline"
+                                        size="icon"
+                                        onClick={handleAutofill}
+                                        disabled={parsingUrl || !data.job_url.trim()}
+                                        title="Autofill from Link"
+                                    >
+                                        {parsingUrl ? (
+                                            <LoaderIcon className="size-4 animate-spin" />
+                                        ) : (
+                                            <LinkIcon className="size-4" />
+                                        )}
+                                    </Button>
+                                </div>
+                                {parseError && (
+                                    <p className="text-xs text-destructive">
+                                        {parseError}
+                                    </p>
+                                )}
                                 {errors.job_url && (
                                     <p className="text-xs text-destructive">
                                         {errors.job_url}
