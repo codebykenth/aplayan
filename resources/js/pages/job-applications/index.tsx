@@ -106,7 +106,7 @@ export default function JobApplicationsIndex({
                         />
                     </div>
 
-                    <div className="flex flex-wrap gap-1.5">
+                    <div className="hidden md:flex flex-wrap gap-1.5">
                         {STATUS_FILTERS.map(({ value, label }) => (
                             <button
                                 key={value}

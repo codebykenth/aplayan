@@ -240,7 +240,7 @@ export default function KanbanBoard({
                 ))}
             </div>
 
-            <div className="flex flex-1 min-h-0 gap-4 overflow-x-auto pb-2 max-md:flex-col max-md:overflow-x-hidden">
+            <div className="flex flex-1 min-h-0 gap-4 overflow-x-auto pb-6 max-md:flex-col max-md:overflow-x-hidden">
                 {JOB_APPLICATION_STATUSES.map(({ value, label }) => (
                     <div
                         key={value}

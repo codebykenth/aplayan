@@ -58,7 +58,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                         ? 'w-64 translate-x-0'
                         : sidebarOpen
                           ? 'w-64 max-md:-translate-x-full'
-                          : 'w-0 -translate-x-full md:w-16 md:translate-x-0'
+                          : 'w-64 -translate-x-full md:w-16 md:translate-x-0'
                 }`}
             >
                 {/* Sidebar header */}
