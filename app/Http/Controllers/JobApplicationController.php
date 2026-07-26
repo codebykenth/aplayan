@@ -7,20 +7,32 @@ use App\Http\Requests\UpdateJobApplicationRequest;
 use App\Http\Resources\JobApplicationResource;
 use App\Models\JobApplication;
 use App\Services\JobApplicationService;
-use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Http\RedirectResponse;
+use Inertia\Inertia;
+use Inertia\Response;
 
 class JobApplicationController extends Controller
 {
     public function __construct(private JobApplicationService $service) {}
 
-    public function index(): AnonymousResourceCollection
+    public function index(): Response
     {
         $this->authorize('viewAny', JobApplication::class);
 
         $applications = $this->service->listForUser(auth()->user());
 
-        return JobApplicationResource::collection($applications);
+        return Inertia::render('job-applications/index', [
+            'applications' => JobApplicationResource::collection($applications),
+        ]);
+    }
+
+    public function store(StoreJobApplicationRequest $request): RedirectResponse
+    {
+        $this->authorize('create', JobApplication::class);
+
+        $this->service->createForUser(auth()->user(), $request->validated());
+
+        return to_route('job-applications.index');
     }
 
     public function show(JobApplication $jobApplication): JobApplicationResource
@@ -30,30 +42,21 @@ class JobApplicationController extends Controller
         return new JobApplicationResource($jobApplication);
     }
 
-    public function store(StoreJobApplicationRequest $request): JobApplicationResource
-    {
-        $this->authorize('create', JobApplication::class);
-
-        $application = $this->service->createForUser(auth()->user(), $request->validated());
-
-        return new JobApplicationResource($application);
-    }
-
-    public function update(UpdateJobApplicationRequest $request, JobApplication $jobApplication): JobApplicationResource
+    public function update(UpdateJobApplicationRequest $request, JobApplication $jobApplication): RedirectResponse
     {
         $this->authorize('update', $jobApplication);
 
-        $application = $this->service->updateForUser($jobApplication, $request->validated());
+        $this->service->updateForUser($jobApplication, $request->validated());
 
-        return new JobApplicationResource($application);
+        return to_route('job-applications.index');
     }
 
-    public function destroy(JobApplication $jobApplication): JsonResponse
+    public function destroy(JobApplication $jobApplication): RedirectResponse
     {
         $this->authorize('delete', $jobApplication);
 
         $this->service->deleteForUser($jobApplication);
 
-        return response()->json(['message' => 'Deleted']);
+        return to_route('job-applications.index');
     }
 }
