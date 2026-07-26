@@ -145,14 +145,7 @@ export default function JobApplicationCard({
                 <button
                     type="button"
                     {...dragHandleProps}
-                    onPointerDown={(e) => {
-                        if (dragHandleProps?.onPointerDown) {
-                            (dragHandleProps.onPointerDown as (event: PointerEvent) => void)(e.nativeEvent);
-                        }
-                        e.stopPropagation();
-                    }}
                     onClick={(e) => e.stopPropagation()}
-                    onKeyDown={(e) => e.stopPropagation()}
                     className="mt-0.5 flex shrink-0 cursor-grab touch-none items-center justify-center rounded-md p-0.5 text-muted-foreground/50 opacity-0 transition-opacity hover:text-muted-foreground group-hover/card:opacity-100 active:cursor-grabbing focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                     aria-label="Drag to reorder"
                 >

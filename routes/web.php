@@ -3,6 +3,7 @@
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\SocialiteController;
+use App\Http\Controllers\JobApplicationAiController;
 use App\Http\Controllers\JobApplicationController;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\Request;
@@ -55,4 +56,5 @@ Route::middleware('auth')->group(function () {
     Route::match(['put', 'patch'], 'job-applications/{jobApplication}', [JobApplicationController::class, 'update'])->name('job-applications.update');
     Route::patch('job-applications/{jobApplication}/status', [JobApplicationController::class, 'updateStatus'])->name('job-applications.status');
     Route::delete('job-applications/{jobApplication}', [JobApplicationController::class, 'destroy'])->name('job-applications.destroy');
+    Route::post('job-applications/{jobApplication}/ai-match', [JobApplicationAiController::class, 'analyzeMatch'])->name('job-applications.ai-match');
 });
