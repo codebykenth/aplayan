@@ -108,7 +108,7 @@ it('sends the job description and resume text to Gemini', function () {
     });
 });
 
-it('handles Gemini API failure gracefully', function () {
+it('returns 503 when Gemini API fails', function () {
     Http::preventStrayRequests();
 
     Http::fake([
@@ -120,7 +120,8 @@ it('handles Gemini API failure gracefully', function () {
         ['resume_text' => 'My resume.'],
     );
 
-    $response->assertStatus(500);
+    $response->assertStatus(503);
+    expect($response->json('message'))->toBe('AI service is temporarily unavailable.');
 });
 
 it('works without job description (empty string fallback)', function () {

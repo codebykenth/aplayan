@@ -111,7 +111,7 @@ export default function ApplicationDetailModal({
 
             if (!response.ok) {
                 const errorData = await response.json().catch(() => ({}));
-                throw new Error(errorData.message || `Request failed with status ${response.status}`);
+                throw new Error(errorData.message || 'Analysis failed. Please try again.');
             }
 
             const result = await response.json();
@@ -249,7 +249,7 @@ export default function ApplicationDetailModal({
                     {app.ai_match_percentage !== null && (
                         <div className="flex flex-col gap-2">
                             <span className="text-xs text-muted-foreground">
-                                AI Resume Match
+                                Resume Match Score
                             </span>
                             <div className="flex items-center gap-3">
                                 <span
@@ -297,7 +297,7 @@ export default function ApplicationDetailModal({
 
                     <div className="flex flex-col gap-3 border-t border-border pt-4">
                         <span className="text-xs text-muted-foreground">
-                            AI Resume Match
+                            Run AI Resume Match
                         </span>
                         <textarea
                             value={resumeText}
@@ -306,6 +306,23 @@ export default function ApplicationDetailModal({
                             rows={4}
                             className="w-full resize-none rounded-lg border border-input bg-transparent p-2 text-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
                         />
+                        <label className="flex cursor-pointer items-center gap-2 text-sm text-muted-foreground hover:text-foreground">
+                            <input
+                                type="file"
+                                accept=".txt,.pdf"
+                                className="hidden"
+                                onChange={async (e) => {
+                                    const file = e.target.files?.[0];
+                                    if (!file) return;
+                                    const text = await file.text();
+                                    setResumeText(text);
+                                }}
+                            />
+                            <span className="rounded-md border border-input px-3 py-1.5 text-xs">
+                                Upload file
+                            </span>
+                            (.txt or .pdf, text will be extracted)
+                        </label>
                         {analyzeError && (
                             <p className="text-xs text-destructive">{analyzeError}</p>
                         )}
