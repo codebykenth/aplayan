@@ -27,7 +27,7 @@ import {
 } from '@/components/ui/select';
 import { JOB_APPLICATION_STATUSES, STATUS_COLORS } from '@/types/job-application';
 import type { JobApplication } from '@/types/job-application';
-import { status as updateStatus, aiMatch } from '@/routes/job-applications';
+import { status as updateStatus, aiMatch, aiSalary } from '@/routes/job-applications';
 
 function formatSalary(amount: number | null): string | null {
     if (amount === null) return null;
@@ -63,6 +63,8 @@ export default function ApplicationDetailModal({
     const [resumeText, setResumeText] = useState('');
     const [analyzing, setAnalyzing] = useState(false);
     const [analyzeError, setAnalyzeError] = useState<string | null>(null);
+    const [salaryChecking, setSalaryChecking] = useState(false);
+    const [salaryError, setSalaryError] = useState<string | null>(null);
     const [localApplication, setLocalApplication] = useState<JobApplication | null>(null);
 
     useEffect(() => {
@@ -70,6 +72,7 @@ export default function ApplicationDetailModal({
             setLocalApplication(application);
             setResumeText('');
             setAnalyzeError(null);
+            setSalaryError(null);
         }
     }, [application]);
 
@@ -133,6 +136,47 @@ export default function ApplicationDetailModal({
             setAnalyzing(false);
         }
     }, [localApplication, application, resumeText]);
+
+    const handleSalaryCheck = useCallback(async () => {
+        const app = localApplication ?? application;
+        if (!app) return;
+
+        setSalaryChecking(true);
+        setSalaryError(null);
+
+        try {
+            const response = await fetch(aiSalary.url(app.id), {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? '',
+                },
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({}));
+                throw new Error(errorData.message || 'Salary check failed. Please try again.');
+            }
+
+            const result = await response.json();
+
+            setLocalApplication((prev) => {
+                if (!prev) return prev;
+
+                return {
+                    ...prev,
+                    ai_salary_min: result.salary_min,
+                    ai_salary_max: result.salary_max,
+                    ai_salary_notes: result.salary_notes,
+                    ai_evaluated_at: result.evaluated_at,
+                };
+            });
+        } catch (error) {
+            setSalaryError(error instanceof Error ? error.message : 'An unexpected error occurred');
+        } finally {
+            setSalaryChecking(false);
+        }
+    }, [localApplication, application]);
 
     if (!application) return null;
 
@@ -295,6 +339,23 @@ export default function ApplicationDetailModal({
                         </div>
                     )}
 
+                    {app.ai_salary_min !== null && app.ai_salary_max !== null && (
+                        <div className="flex flex-col gap-2 rounded-lg border border-border bg-muted/30 p-3">
+                            <span className="flex items-center gap-1 text-xs text-muted-foreground">
+                                <PhilippinePesoIcon className="size-3.5" />
+                                AI Salary Estimate
+                            </span>
+                            <span className="text-lg font-semibold text-foreground">
+                                {formatSalary(app.ai_salary_min)} – {formatSalary(app.ai_salary_max)} / mo
+                            </span>
+                            {app.ai_salary_notes && (
+                                <p className="text-xs text-muted-foreground">
+                                    {app.ai_salary_notes}
+                                </p>
+                            )}
+                        </div>
+                    )}
+
                     <div className="flex flex-col gap-3 border-t border-border pt-4">
                         <span className="text-xs text-muted-foreground">
                             Run AI Resume Match
@@ -339,6 +400,32 @@ export default function ApplicationDetailModal({
                                 <>
                                     <SparklesIcon className="size-4" />
                                     Run AI Match
+                                </>
+                            )}
+                        </Button>
+                    </div>
+
+                    <div className="flex flex-col gap-3 border-t border-border pt-4">
+                        <span className="text-xs text-muted-foreground">
+                            Salary Reality Check (₱)
+                        </span>
+                        {salaryError && (
+                            <p className="text-xs text-destructive">{salaryError}</p>
+                        )}
+                        <Button
+                            onClick={handleSalaryCheck}
+                            disabled={salaryChecking}
+                            variant="outline"
+                        >
+                            {salaryChecking ? (
+                                <>
+                                    <LoaderIcon className="size-4 animate-spin" />
+                                    Checking...
+                                </>
+                            ) : (
+                                <>
+                                    <PhilippinePesoIcon className="size-4" />
+                                    Salary Reality Check (₱)
                                 </>
                             )}
                         </Button>
