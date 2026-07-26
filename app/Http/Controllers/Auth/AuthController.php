@@ -37,7 +37,7 @@ class AuthController extends Controller
 
         Auth::login($user);
 
-        return redirect()->intended(route('home', absolute: false));
+        return redirect()->intended(route('job-applications.index', absolute: false));
     }
 
     public function login(): Response
@@ -55,7 +55,7 @@ class AuthController extends Controller
         if (Auth::attempt($credentials, $request->boolean('remember'))) {
             $request->session()->regenerate();
 
-            return redirect()->intended(route('home', absolute: false));
+            return redirect()->intended(route('job-applications.index', absolute: false));
         }
 
         return back()->withErrors([

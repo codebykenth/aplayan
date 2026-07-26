@@ -21,8 +21,12 @@ const STATUS_FILTERS: { value: FilterStatus; label: string }[] = [
 export default function JobApplicationsIndex({
     applications,
 }: {
-    applications: JobApplication[];
+    applications: { data: JobApplication[] } | JobApplication[];
 }) {
+    const applicationList = Array.isArray(applications)
+        ? applications
+        : (applications?.data ?? []);
+
     const [search, setSearch] = useState('');
     const [statusFilter, setStatusFilter] = useState<FilterStatus>(ALL_STATUS);
     const [formOpen, setFormOpen] = useState(false);
@@ -30,7 +34,7 @@ export default function JobApplicationsIndex({
         useState<JobApplication | null>(null);
 
     const filtered = useMemo(() => {
-        return applications.filter((app) => {
+        return applicationList.filter((app) => {
             const matchesSearch =
                 !search ||
                 app.company_name
@@ -44,7 +48,7 @@ export default function JobApplicationsIndex({
 
             return matchesSearch && matchesStatus;
         });
-    }, [applications, search, statusFilter]);
+    }, [applicationList, search, statusFilter]);
 
     function openCreate() {
         setEditingApplication(null);
@@ -119,11 +123,11 @@ export default function JobApplicationsIndex({
                 {filtered.length === 0 ? (
                     <div className="flex flex-col items-center gap-2 py-16 text-center">
                         <p className="text-sm text-muted-foreground">
-                            {applications.length === 0
+                            {applicationList.length === 0
                                 ? 'No job applications yet.'
                                 : 'No applications match your filters.'}
                         </p>
-                        {applications.length === 0 && (
+                        {applicationList.length === 0 && (
                             <Button variant="outline" onClick={openCreate}>
                                 <PlusIcon data-icon="inline-start" />
                                 Add your first application

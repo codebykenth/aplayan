@@ -40,6 +40,6 @@ class SocialiteController extends Controller
 
         Auth::login($user);
 
-        return redirect()->intended(route('home', absolute: false));
+        return redirect()->intended(route('job-applications.index', absolute: false));
     }
 }

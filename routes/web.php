@@ -31,7 +31,7 @@ Route::middleware('auth')->group(function () {
 
     Route::get('email/verify', function (Request $request) {
         if ($request->user()?->hasVerifiedEmail()) {
-            return redirect()->intended(route('home', absolute: false));
+            return redirect()->intended(route('job-applications.index', absolute: false));
         }
 
         return Inertia::render('auth/verify-email');
@@ -40,7 +40,7 @@ Route::middleware('auth')->group(function () {
     Route::get('email/verify/{id}/{hash}', function (EmailVerificationRequest $request) {
         $request->fulfill();
 
-        return redirect()->intended(route('home', absolute: false));
+        return redirect()->intended(route('job-applications.index', absolute: false));
     })->middleware('signed')->name('verification.verify');
 
     Route::post('email/verification-notification', function (Request $request) {

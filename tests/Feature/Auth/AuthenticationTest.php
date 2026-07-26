@@ -25,7 +25,7 @@ it('registers a new user and dispatches Registered event', function () {
         'email' => 'test@example.com',
         'password' => 'Password123!',
         'password_confirmation' => 'Password123!',
-    ])->assertRedirect(route('home', absolute: false));
+    ])->assertRedirect(route('job-applications.index', absolute: false));
 
     $this->assertDatabaseHas('users', [
         'email' => 'test@example.com',
@@ -84,7 +84,7 @@ it('authenticates a user with valid credentials', function () {
     $this->post(route('login'), [
         'email' => 'test@example.com',
         'password' => 'password',
-    ])->assertRedirect(route('home', absolute: false));
+    ])->assertRedirect(route('job-applications.index', absolute: false));
 
     $this->assertAuthenticatedAs($user);
 });
@@ -119,7 +119,7 @@ it('redirects authenticated users away from guest pages', function () {
 
     $this->actingAs($user)
         ->get(route('login'))
-        ->assertRedirect(route('home', absolute: false));
+        ->assertRedirect(route('job-applications.index', absolute: false));
 });
 
 // Auth middleware
@@ -143,7 +143,7 @@ it('handles Google callback for a new user', function () {
     Socialite::shouldReceive('driver->user')->andReturn($googleUser);
 
     $this->get(route('google.callback'))
-        ->assertRedirect(route('home', absolute: false));
+        ->assertRedirect(route('job-applications.index', absolute: false));
 
     $this->assertDatabaseHas('users', [
         'email' => 'google@example.com',
@@ -171,7 +171,7 @@ it('links Google account to existing user by email', function () {
     Socialite::shouldReceive('driver->user')->andReturn($googleUser);
 
     $this->get(route('google.callback'))
-        ->assertRedirect(route('home', absolute: false));
+        ->assertRedirect(route('job-applications.index', absolute: false));
 
     $this->assertDatabaseHas('users', [
         'id' => $user->id,
