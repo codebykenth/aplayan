@@ -3,6 +3,7 @@ import { useCallback, useEffect, useState } from 'react';
 import {
     ExternalLinkIcon,
     CalendarIcon,
+    CalendarClockIcon,
     MapPinIcon,
     PhilippinePesoIcon,
     SparklesIcon,
@@ -73,6 +74,10 @@ export default function ApplicationDetailModal({
     const [followUpLoading, setFollowUpLoading] = useState(false);
     const [followUpError, setFollowUpError] = useState<string | null>(null);
     const [contacting, setContacting] = useState(false);
+    const [prepGenerating, setPrepGenerating] = useState(false);
+    const [prepError, setPrepError] = useState<string | null>(null);
+    const [notesSaving, setNotesSaving] = useState(false);
+    const [notesError, setNotesError] = useState<string | null>(null);
     const [localApplication, setLocalApplication] = useState<JobApplication | null>(null);
 
     useEffect(() => {
@@ -83,6 +88,8 @@ export default function ApplicationDetailModal({
             setSalaryError(null);
             setFollowUpDraft(null);
             setFollowUpError(null);
+            setPrepError(null);
+            setNotesError(null);
         }
     }, [application]);
 
@@ -255,6 +262,84 @@ export default function ApplicationDetailModal({
         }
     }, [localApplication, application]);
 
+    const handleGenerateInterviewPrep = useCallback(async () => {
+        const app = localApplication ?? application;
+        if (!app) return;
+
+        setPrepGenerating(true);
+        setPrepError(null);
+
+        try {
+            const response = await fetch(
+                `/job-applications/${app.id}/interview-prep`,
+                {
+                    method: 'POST',
+                    headers: {
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? '',
+                    },
+                },
+            );
+
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({}));
+                throw new Error(errorData.message || 'Failed to generate interview prep.');
+            }
+
+            const result = await response.json();
+
+            setLocalApplication((prev) => {
+                if (!prev) return prev;
+
+                return {
+                    ...prev,
+                    ai_interview_prep: {
+                        questions: result.questions,
+                        talking_points: result.talking_points,
+                        tips: result.tips,
+                    },
+                };
+            });
+        } catch (error) {
+            setPrepError(error instanceof Error ? error.message : 'An unexpected error occurred');
+        } finally {
+            setPrepGenerating(false);
+        }
+    }, [localApplication, application]);
+
+    const handleSaveInterviewNotes = useCallback(async () => {
+        const app = localApplication ?? application;
+        if (!app) return;
+
+        setNotesSaving(true);
+        setNotesError(null);
+
+        try {
+            const response = await fetch(
+                `/job-applications/${app.id}`,
+                {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? '',
+                    },
+                    body: JSON.stringify({
+                        interview_notes: app.interview_notes ?? '',
+                    }),
+                },
+            );
+
+            if (!response.ok) {
+                throw new Error('Failed to save interview notes.');
+            }
+        } catch (error) {
+            setNotesError(error instanceof Error ? error.message : 'An unexpected error occurred');
+        } finally {
+            setNotesSaving(false);
+        }
+    }, [localApplication, application]);
+
     if (!application) return null;
 
     const app = localApplication ?? application;
@@ -299,6 +384,18 @@ export default function ApplicationDetailModal({
                                 <span className="flex items-center gap-1 text-sm font-medium text-foreground">
                                     <CalendarIcon className="size-3.5 text-muted-foreground" />
                                     {formatDate(app.date_applied)}
+                                </span>
+                            </div>
+                        )}
+
+                        {app.interview_date && (
+                            <div className="flex flex-col gap-1">
+                                <span className="text-xs text-muted-foreground">
+                                    Interview Date
+                                </span>
+                                <span className="flex items-center gap-1 text-sm font-medium text-foreground">
+                                    <CalendarClockIcon className="size-3.5 text-muted-foreground" />
+                                    {formatDate(app.interview_date)}
                                 </span>
                             </div>
                         )}
@@ -618,7 +715,111 @@ export default function ApplicationDetailModal({
                             </div>
                         )}
                     </div>
-                {app.activities && app.activities.length > 0 && (
+
+                     <div className="flex flex-col gap-3 border-t border-border pt-4">
+                         <span className="text-xs text-muted-foreground">
+                             Interview Notes
+                         </span>
+                         <textarea
+                             value={app.interview_notes ?? ''}
+                             onChange={(e) => {
+                                 setLocalApplication((prev) => {
+                                     if (!prev) return prev;
+                                     return { ...prev, interview_notes: e.target.value };
+                                 });
+                             }}
+                             placeholder="Record interviewer names, questions asked, observations..."
+                             rows={4}
+                             className="w-full resize-none rounded-lg border border-input bg-transparent p-2 text-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
+                         />
+                         {notesError && (
+                             <p className="text-xs text-destructive">{notesError}</p>
+                         )}
+                         <Button
+                             onClick={handleSaveInterviewNotes}
+                             disabled={notesSaving}
+                             size="sm"
+                         >
+                             {notesSaving ? (
+                                 <>
+                                     <LoaderIcon className="size-3 animate-spin" />
+                                     Saving...
+                                 </>
+                             ) : (
+                                 'Save Notes'
+                             )}
+                         </Button>
+                     </div>
+
+                     <div className="flex flex-col gap-3 border-t border-border pt-4">
+                         <div className="flex items-center justify-between">
+                             <span className="text-xs text-muted-foreground">
+                                 Interview Prep
+                             </span>
+                             <Button
+                                 onClick={handleGenerateInterviewPrep}
+                                 disabled={prepGenerating}
+                                 variant="outline"
+                                 size="sm"
+                             >
+                                 {prepGenerating ? (
+                                     <>
+                                         <LoaderIcon className="size-3 animate-spin" />
+                                         Generating...
+                                     </>
+                                 ) : (
+                                     <>
+                                         <SparklesIcon className="size-3" />
+                                         Generate Interview Prep
+                                     </>
+                                 )}
+                             </Button>
+                         </div>
+                         {prepError && (
+                             <p className="text-xs text-destructive">{prepError}</p>
+                         )}
+                         {app.ai_interview_prep && (
+                             <div className="flex flex-col gap-3">
+                                 {app.ai_interview_prep.questions && app.ai_interview_prep.questions.length > 0 && (
+                                     <div className="flex flex-col gap-1">
+                                         <span className="text-xs font-medium text-foreground">
+                                           Questions
+                                         </span>
+                                         <ul className="list-disc list-inside text-xs text-muted-foreground">
+                                             {app.ai_interview_prep.questions.map((q, i) => (
+                                                 <li key={i}>{q}</li>
+                                             ))}
+                                         </ul>
+                                     </div>
+                                 )}
+                                 {app.ai_interview_prep.talking_points && app.ai_interview_prep.talking_points.length > 0 && (
+                                     <div className="flex flex-col gap-1">
+                                         <span className="text-xs font-medium text-foreground">
+                                           Talking Points
+                                         </span>
+                                         <ul className="list-disc list-inside text-xs text-muted-foreground">
+                                             {app.ai_interview_prep.talking_points.map((tp, i) => (
+                                                 <li key={i}>{tp}</li>
+                                             ))}
+                                         </ul>
+                                     </div>
+                                 )}
+                                 {app.ai_interview_prep.tips && app.ai_interview_prep.tips.length > 0 && (
+                                     <div className="flex flex-col gap-1">
+                                         <span className="text-xs font-medium text-foreground">
+                                           Tips
+                                         </span>
+                                         <ul className="list-disc list-inside text-xs text-muted-foreground">
+                                             {app.ai_interview_prep.tips.map((t, i) => (
+                                                 <li key={i}>{t}</li>
+                                             ))}
+                                         </ul>
+                                     </div>
+                                 )}
+                             </div>
+                         )}
+                     </div>
+                 {app.activities && app.activities.length > 0 && (
                         <ActivityTimeline activities={app.activities} />
                     )}
                 </div>

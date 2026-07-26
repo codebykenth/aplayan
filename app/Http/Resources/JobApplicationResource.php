@@ -26,6 +26,8 @@ class JobApplicationResource extends JsonResource
             'offered_salary' => $this->offered_salary,
             'notes' => $this->notes,
             'last_contacted_at' => $this->last_contacted_at?->toIso8601String(),
+            'interview_date' => $this->interview_date?->toIso8601String(),
+            'interview_notes' => $this->interview_notes,
             'staleness_level' => $service->stalenessLevel($this->resource),
             'days_since_update' => $service->daysSinceLastUpdate($this->resource),
             'ai_match_percentage' => $this->ai_match_percentage,
@@ -35,6 +37,7 @@ class JobApplicationResource extends JsonResource
             'ai_salary_max' => $this->ai_salary_max,
             'ai_salary_notes' => $this->ai_salary_notes,
             'ai_evaluated_at' => $this->ai_evaluated_at?->toIso8601String(),
+            'ai_interview_prep' => $this->ai_interview_prep,
             'created_at' => $this->created_at?->toIso8601String(),
             'updated_at' => $this->updated_at?->toIso8601String(),
             'activities' => $this->activities->map(fn ($activity) => [

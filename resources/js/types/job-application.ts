@@ -19,6 +19,8 @@ export interface JobApplication {
     offered_salary: number | null;
     notes: string | null;
     last_contacted_at: string | null;
+    interview_date: string | null;
+    interview_notes: string | null;
     staleness_level: 'warning' | 'alert' | null;
     days_since_update: number;
     ai_match_percentage: number | null;
@@ -28,6 +30,11 @@ export interface JobApplication {
     ai_salary_max: number | null;
     ai_salary_notes: string | null;
     ai_evaluated_at: string | null;
+    ai_interview_prep: {
+        questions: string[];
+        talking_points: string[];
+        tips: string[];
+    } | null;
     created_at: string;
     updated_at: string;
     activities: JobApplicationActivity[];

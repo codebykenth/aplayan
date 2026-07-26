@@ -82,6 +82,25 @@ PROMPT;
         return $response['candidates'][0]['content']['parts'][0]['text'] ?? 'Unable to generate follow-up email.';
     }
 
+    public function generateInterviewPrep(string $jobDescription): array
+    {
+        $prompt = <<<PROMPT
+You are an expert interview coach. Based on the following job description, generate interview preparation content.
+
+Return a JSON object with these exact keys:
+- questions (array of strings): common interview questions for this role
+- talking_points (array of strings): key points to highlight during the interview
+- tips (array of strings): tips for acing this specific type of interview
+
+Job Description:
+{$jobDescription}
+PROMPT;
+
+        $response = $this->sendRequest($prompt);
+
+        return $this->extractJson($response, ['questions', 'talking_points', 'tips']);
+    }
+
     private function client(): PendingRequest
     {
         return Http::timeout(self::TIMEOUT)

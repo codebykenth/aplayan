@@ -4,6 +4,7 @@ import {
     MoreVerticalIcon,
     PencilIcon,
     TrashIcon,
+    CalendarClockIcon,
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import type { JobApplication } from '@/types/job-application';
@@ -28,6 +29,37 @@ function formatDate(date: string | null): string | null {
         month: 'short',
         day: 'numeric',
     });
+}
+
+function InterviewCountdownBadge({
+    interviewDate,
+}: {
+    interviewDate: string;
+}) {
+    const [daysRemaining, setDaysRemaining] = useState<number | null>(null);
+
+    useEffect(() => {
+        const now = new Date();
+        const target = new Date(interviewDate);
+        const diffMs = target.getTime() - now.getTime();
+        const diffDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
+        setDaysRemaining(diffDays);
+    }, [interviewDate]);
+
+    if (daysRemaining === null || daysRemaining < 0) return null;
+
+    const label = daysRemaining === 0
+        ? 'Interview today'
+        : daysRemaining === 1
+          ? 'Interview in 1 day'
+          : `Interview in ${daysRemaining} days`;
+
+    return (
+        <span className="inline-flex items-center gap-1 rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-medium text-amber-700 dark:bg-amber-900/30 dark:text-amber-300">
+            <CalendarClockIcon className="size-3" />
+            {label}
+        </span>
+    );
 }
 
 function StalenessBadge({
@@ -191,6 +223,10 @@ export default function JobApplicationCard({
                 >
                     {application.status}
                 </Badge>
+
+                {application.status === 'interviewing' && application.interview_date && (
+                    <InterviewCountdownBadge interviewDate={application.interview_date} />
+                )}
 
                 <StalenessBadge
                     level={application.staleness_level}
