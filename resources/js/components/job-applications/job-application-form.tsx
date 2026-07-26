@@ -46,7 +46,7 @@ export default function JobApplicationForm({
 }) {
     const isEditing = !!application;
 
-    const { data, setData, post, put, processing, errors, reset, transform } =
+    const { data, setData, post, put, processing, errors, reset, transform, clearErrors } =
         useForm<FormData>({
             company_name: application?.company_name ?? '',
             job_title: application?.job_title ?? '',
@@ -56,12 +56,12 @@ export default function JobApplicationForm({
             status: application?.status ?? 'wishlist',
             date_applied: application?.date_applied ?? '',
             expected_salary:
-                application?.expected_salary !== null
-                    ? String(application!.expected_salary!)
+                application?.expected_salary != null
+                    ? String(application.expected_salary)
                     : '',
             offered_salary:
-                application?.offered_salary !== null
-                    ? String(application!.offered_salary!)
+                application?.offered_salary != null
+                    ? String(application.offered_salary)
                     : '',
             notes: application?.notes ?? '',
         });
@@ -77,11 +77,11 @@ export default function JobApplicationForm({
                 status: application.status,
                 date_applied: application.date_applied ?? '',
                 expected_salary:
-                    application.expected_salary !== null
+                    application?.expected_salary != null
                         ? String(application.expected_salary)
                         : '',
                 offered_salary:
-                    application.offered_salary !== null
+                    application?.offered_salary != null
                         ? String(application.offered_salary)
                         : '',
                 notes: application.notes ?? '',
@@ -91,6 +91,7 @@ export default function JobApplicationForm({
 
     function handleClose() {
         reset();
+        clearErrors();
         onClose();
     }
 
