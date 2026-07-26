@@ -29,8 +29,9 @@ Aplayan is a free-to-maintain, privacy-first, web-based Job Application Tracker 
 
 ### Modules & Domain Architecture
 - **Authentication Module**: Utilizing Laravel Breeze with Inertia React for user authentication and session management.
-- **Service, Request & Policy Architecture**: Enforcing a strict OOP Domain Service Layer (`app/Services/`), Form Request validation (`app/Http/Requests/`), and Authorization Policies (`app/Policies/`). Controllers remain thin HTTP entry points.
+- **Service, Request, Policy & Resource Architecture**: Enforcing a strict OOP Domain Service Layer (`app/Services/`), Form Request validation (`app/Http/Requests/`), Authorization Policies (`app/Policies/`), and Eloquent API Resources (`app/Http/Resources/`). Controllers remain thin HTTP entry points.
   - `JobApplicationPolicy`: Enforces resource authorization (`$user->id === $jobApplication->user_id`), raising HTTP 403 Forbidden on illegal access.
+  - `JobApplicationResource`: Explicitly transforms model attributes into structured JSON/Inertia prop shapes for frontend React components.
   - `JobApplicationService`: Encapsulates CRUD operations, user-scoped querying (`$user->jobApplications()`), and status updates.
   - `GeminiService`: Handles Google Gemini API (`gemini-2.5-flash`) prompt generation, HTTP submission, structured JSON parsing, and error fallbacks.
   - `DashboardMetricsService`: Computes statistical aggregations and 30-day application trend metrics.

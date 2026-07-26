@@ -9,7 +9,7 @@ It helps users manage their job applications while providing intelligent insight
 - People applying to local companies, BPO/shared services, and remote/international roles
 
 ## Tech Stack
-- Backend: Laravel 13 (OOP + Domain Service Layer + Policies)
+- Backend: Laravel 13 (OOP + Domain Service Layer + Policies + API Resources)
 - Frontend: Inertia.js (v3) + React 19
 - UI: Tailwind CSS (v4) + shadcn/ui (Cards, Dialogs, Charts)
 - Database: MySQL / PostgreSQL (Vercel-compatible like Supabase/PlanetScale/Neon)
@@ -18,10 +18,11 @@ It helps users manage their job applications while providing intelligent insight
 - Deployment Target: Vercel (Serverless PHP, zero-cost maintenance architecture)
 
 ## Architectural & Design Pattern
-We adhere strictly to a **Domain Service Layer Architecture with Policies**:
+We adhere strictly to a **Domain Service Layer Architecture with Policies & API Resources**:
 - **Git Commit Convention**: Follow Conventional Commits formatted with the ticket scope (e.g., `feat(01): ...`, `feat(02): ...`, `test(06): ...`, `fix(04): ...`).
+- **Response Transformation**: Use `JobApplicationResource` (`app/Http/Resources/JobApplicationResource.php`) for all Inertia page props and response payloads.
 - **Authorization**: Resource access is authorized via `JobApplicationPolicy` (`Gate::authorize()`) and enforced at DB level using `$user->jobApplications()`.
-- **HTTP Layer**: Thin controllers in `app/Http/Controllers/` that delegate work to Services.
+- **HTTP Layer**: Thin controllers in `app/Http/Controllers/` that delegate work to Services and wrap data in API Resources.
 - **Validation**: Dedicated Form Requests in `app/Http/Requests/` (no inline validation in controllers).
 - **Service Layer**: OOP domain services in `app/Services/` (`JobApplicationService`, `GeminiService`, `DashboardMetricsService`) encapsulating business logic, queries, and external AI integrations.
 - *Reference*: See `docs/adr/0001-service-layer-architecture.md`.
@@ -56,6 +57,7 @@ An independent AI-estimated salary range in Philippine Peso (₱) contextualized
 ---
 
 ## Decisions Log
+- **2026-07-26 - Eloquent API Resources**: All Inertia page props and response payloads are transformed using `JobApplicationResource` (`app/Http/Resources/JobApplicationResource.php`) to decouple DB schema from frontend props.
 - **2026-07-26 - Git Commit Convention**: Standardized Conventional Commits with ticket scope (e.g. `feat(01): create migration`, `feat(02): add policy`).
 - **2026-07-26 - Dual-Layer Authorization & Policies**: Resource authorization enforced via `JobApplicationPolicy` in controllers/requests and user-scoped queries (`$user->jobApplications()`) in services.
 - **2026-07-26 - OOP Service Layer & Form Requests**: Form Requests (`app/Http/Requests/`) handle input validation; Domain Services (`app/Services/`) handle business logic; Controllers stay thin.

@@ -25,6 +25,13 @@ it('lists only the authenticated users job applications', function () {
     $response->assertJsonCount(2, 'data');
     foreach ($response->json('data') as $item) {
         expect($item['user_id'])->toBe($this->user->id);
+        expect($item)->toHaveKeys([
+            'id', 'user_id', 'company_name', 'job_title', 'job_url', 'job_description',
+            'location', 'status', 'date_applied', 'expected_salary', 'offered_salary',
+            'notes', 'ai_match_percentage', 'ai_strengths', 'ai_gaps',
+            'ai_salary_min', 'ai_salary_max', 'ai_salary_notes', 'ai_evaluated_at',
+            'created_at', 'updated_at',
+        ]);
     }
 });
 
@@ -34,10 +41,17 @@ it('stores a new job application for the authenticated user', function () {
     $response = $this->actingAs($this->user)->postJson(route('job-applications.store'), $data);
 
     $response->assertSuccessful();
+    expect($response->json('data'))->toHaveKeys([
+        'id', 'user_id', 'company_name', 'job_title', 'job_url', 'job_description',
+        'location', 'status', 'date_applied', 'expected_salary', 'offered_salary',
+        'notes', 'ai_match_percentage', 'ai_strengths', 'ai_gaps',
+        'ai_salary_min', 'ai_salary_max', 'ai_salary_notes', 'ai_evaluated_at',
+        'created_at', 'updated_at',
+    ]);
+    expect($response->json('data.company_name'))->toBe($data['company_name']);
     $this->assertDatabaseHas('job_applications', [
         'id' => $response->json('data.id'),
         'user_id' => $this->user->id,
-        'company_name' => $data['company_name'],
     ]);
 });
 
@@ -126,4 +140,11 @@ it('shows a single job application owned by the user', function () {
 
     $response->assertSuccessful();
     expect($response->json('data.id'))->toBe($application->id);
+    expect($response->json('data'))->toHaveKeys([
+        'id', 'user_id', 'company_name', 'job_title', 'job_url', 'job_description',
+        'location', 'status', 'date_applied', 'expected_salary', 'offered_salary',
+        'notes', 'ai_match_percentage', 'ai_strengths', 'ai_gaps',
+        'ai_salary_min', 'ai_salary_max', 'ai_salary_notes', 'ai_evaluated_at',
+        'created_at', 'updated_at',
+    ]);
 });
