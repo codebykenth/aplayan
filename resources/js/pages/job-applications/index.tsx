@@ -1,5 +1,5 @@
 import { Head, router } from '@inertiajs/react';
-import { useState, useMemo } from 'react';
+import { useState, useMemo, type ReactNode } from 'react';
 import { SearchIcon, PlusIcon } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -8,6 +8,7 @@ import JobApplicationForm from '@/components/job-applications/job-application-fo
 import { STATUS_COLORS, JOB_APPLICATION_STATUSES } from '@/types/job-application';
 import type { JobApplication, JobApplicationStatus } from '@/types/job-application';
 import { destroy as jobAppDestroy } from '@/routes/job-applications';
+import AppLayout from '@/layouts/app-layout';
 
 const ALL_STATUS = 'all' as const;
 
@@ -159,3 +160,5 @@ export default function JobApplicationsIndex({
         </>
     );
 }
+
+JobApplicationsIndex.layout = (page: ReactNode) => <AppLayout>{page}</AppLayout>;

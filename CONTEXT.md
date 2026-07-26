@@ -8,10 +8,17 @@ It helps users manage their job applications while providing intelligent insight
 - Filipino job seekers (fresh graduates, career shifters, and professionals)
 - People applying to local companies, BPO/shared services, and remote/international roles
 
-## Tech Stack
+## Tech Stack & Layout Architecture
 - Backend: Laravel 13 (OOP + Domain Service Layer + Policies + API Resources + Socialite)
 - Frontend: Inertia.js (v3) + React 19
-- UI: Tailwind CSS (v4) + shadcn/ui (Cards, Dialogs, Charts)
+- UI Framework: Tailwind CSS (v4) + shadcn/ui
+- **Navigation Layout System**:
+  - **Authenticated Layout (`app-layout.tsx`)**: Left collapsible Sidebar Navigation (Dashboard, Applications, Settings) + User Profile footer & Logout trigger.
+  - **Guest Layout (`guest-layout.tsx`)**: Top Navigation bar (Logo, Features, Sign In, Register CTA).
+  - **Guest Landing Page (`welcome.tsx`)**: High-converting hero page showcasing AI Resume Match & Philippine Salary Reality Check.
+- **Visual Design Identity**: "Philippine Professional" Modern Glassmorphism
+  - Palette: Dark/light mode with curated HSL status tokens (`Wishlist`: Indigo, `Applied`: Sky, `Interviewing`: Amber, `Offer`: Emerald, `Rejected`: Rose).
+  - Cards & Layout: Subtle glassmorphism (`backdrop-blur-md`), smooth rounded borders, Philippine Peso (₱) badges, and hover micro-animations.
 - Database: MySQL / PostgreSQL (Vercel-compatible like Supabase/PlanetScale/Neon)
 - Auth: Laravel Breeze (React + Inertia) + Laravel Socialite (Google OAuth)
 - AI Integration: Google Gemini API (`gemini-2.5-flash`)
@@ -19,6 +26,7 @@ It helps users manage their job applications while providing intelligent insight
 
 ## Architectural & Design Pattern
 We adhere strictly to a **Domain Service Layer Architecture with Policies & API Resources**:
+- **Design Standard**: Enforce `frontend-design` skill guidelines — opinionated typography, glassmorphism cards, micro-interactions, and non-generic color palettes.
 - **Authentication**: Email/Password with Email Verification, Forgot Password Recovery, plus Google OAuth via Laravel Socialite.
 - **Git Commit Convention**: Follow Conventional Commits formatted with the ticket scope (e.g., `feat(00): ...`, `feat(01): ...`, `feat(02): ...`, `test(06): ...`).
 - **Response Transformation**: Use `JobApplicationResource` (`app/Http/Resources/JobApplicationResource.php`) for all Inertia page props and response payloads.
@@ -47,18 +55,11 @@ A record of a user's application to a specific job opening.
   - `ai_salary_notes` (string/text market context, nullable)
   - `ai_evaluated_at` (timestamp, nullable)
 
-### Ephemeral Resume Processing
-Resume files (PDF/TXT) or pasted text are uploaded directly within the AI Match Analysis dialog. The text is parsed in-memory, evaluated by Google Gemini API, and immediately discarded without saving any resume files or text to disk, database, or cloud storage. This ensures zero storage cost and privacy security.
-
-### AI Evaluation / Match Analysis
-An independent AI-generated analysis comparing a Job Application's description with the user-provided ephemeral Resume text.
-
-### Salary Reality Check
-An independent AI-estimated salary range in Philippine Peso (₱) contextualized for Philippine market tiers (e.g., Local PH Company, BPO/Shared Services, Foreign Remote).
-
 ---
 
 ## Decisions Log
+- **2026-07-26 - Dual Layout Strategy**: Authenticated views use a left collapsible Sidebar navigation (`app-layout.tsx`); Guest views use a Top Navigation header (`guest-layout.tsx`) and a landing page (`welcome.tsx`).
+- **2026-07-26 - "Philippine Professional" Visual Design**: Standardized modern glassmorphism aesthetic with curated HSL status tokens, smooth hover micro-animations, and clean typography.
 - **2026-07-26 - Full User Authentication Suite**: Standard email/password registration with email verification, forgot password reset, and Google OAuth social login via Laravel Socialite.
 - **2026-07-26 - Eloquent API Resources**: All Inertia page props and response payloads are transformed using `JobApplicationResource` (`app/Http/Resources/JobApplicationResource.php`) to decouple DB schema from frontend props.
 - **2026-07-26 - Git Commit Convention**: Standardized Conventional Commits with ticket scope (e.g. `feat(00): add google socialite`, `feat(01): create migration`).

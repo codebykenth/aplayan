@@ -1,4 +1,6 @@
 import { Head, usePage } from '@inertiajs/react';
+import type { ReactNode } from 'react';
+import AppLayout from '@/layouts/app-layout';
 
 export default function VerifyEmail() {
     const { status } = usePage<{ status?: string }>().props;
@@ -47,3 +49,5 @@ export default function VerifyEmail() {
         </>
     );
 }
+
+VerifyEmail.layout = (page: ReactNode) => <AppLayout>{page}</AppLayout>;

@@ -1,6 +1,6 @@
 import { createInertiaApp } from '@inertiajs/react';
 import { type ReactNode } from 'react';
-import AppLayout from './layouts/app-layout';
+import GuestLayout from './layouts/guest-layout';
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 
@@ -14,7 +14,7 @@ createInertiaApp({
         const page = pages[`./pages/${name}.tsx`] as {
             default: React.ComponentType<Record<string, unknown>> & { layout?: (page: ReactNode) => ReactNode };
         };
-        page.default.layout ??= (page: ReactNode) => <AppLayout>{page}</AppLayout>;
+        page.default.layout ??= (page: ReactNode) => <GuestLayout>{page}</GuestLayout>;
         return page;
     },
 });
