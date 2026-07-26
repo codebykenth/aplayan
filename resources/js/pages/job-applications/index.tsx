@@ -3,8 +3,8 @@ import { useState, useMemo, type ReactNode } from 'react';
 import { SearchIcon, PlusIcon } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import JobApplicationCard from '@/components/job-applications/job-application-card';
 import JobApplicationForm from '@/components/job-applications/job-application-form';
+import KanbanBoard from '@/components/job-applications/kanban-board';
 import { STATUS_COLORS, JOB_APPLICATION_STATUSES } from '@/types/job-application';
 import type { JobApplication, JobApplicationStatus } from '@/types/job-application';
 import { destroy as jobAppDestroy } from '@/routes/job-applications';
@@ -136,16 +136,11 @@ export default function JobApplicationsIndex({
                         )}
                     </div>
                 ) : (
-                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                        {filtered.map((app) => (
-                            <JobApplicationCard
-                                key={app.id}
-                                application={app}
-                                onEdit={() => openEdit(app)}
-                                onDelete={() => handleDelete(app)}
-                            />
-                        ))}
-                    </div>
+                    <KanbanBoard
+                        applications={filtered}
+                        onEdit={(app) => openEdit(app)}
+                        onDelete={(app) => handleDelete(app)}
+                    />
                 )}
             </div>
 

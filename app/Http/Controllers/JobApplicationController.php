@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\JobApplicationStatus;
 use App\Http\Requests\StoreJobApplicationRequest;
 use App\Http\Requests\UpdateJobApplicationRequest;
+use App\Http\Requests\UpdateJobApplicationStatusRequest;
 use App\Http\Resources\JobApplicationResource;
 use App\Models\JobApplication;
 use App\Services\JobApplicationService;
@@ -56,6 +58,15 @@ class JobApplicationController extends Controller
         $this->authorize('delete', $jobApplication);
 
         $this->service->deleteForUser($jobApplication);
+
+        return to_route('job-applications.index');
+    }
+
+    public function updateStatus(UpdateJobApplicationStatusRequest $request, JobApplication $jobApplication): RedirectResponse
+    {
+        $this->authorize('update', $jobApplication);
+
+        $this->service->updateStatusForUser($jobApplication, JobApplicationStatus::from($request->validated('status')));
 
         return to_route('job-applications.index');
     }

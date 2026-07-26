@@ -118,6 +118,59 @@ it('validates required fields on update', function () {
     $response->assertJsonValidationErrors(['company_name', 'job_title', 'location', 'status']);
 });
 
+it('updates status of an application owned by the user', function () {
+    $application = JobApplication::factory()->create([
+        'user_id' => $this->user->id,
+        'status' => 'wishlist',
+    ]);
+
+    $response = $this->actingAs($this->user)->patchJson(
+        route('job-applications.status', $application),
+        ['status' => 'applied'],
+    );
+
+    $response->assertRedirect(route('job-applications.index'));
+    $this->assertDatabaseHas('job_applications', [
+        'id' => $application->id,
+        'status' => 'applied',
+    ]);
+});
+
+it('validates status is a valid enum value on status update', function () {
+    $application = JobApplication::factory()->create([
+        'user_id' => $this->user->id,
+    ]);
+
+    $response = $this->actingAs($this->user)->patchJson(
+        route('job-applications.status', $application),
+        ['status' => 'invalid-status'],
+    );
+
+    $response->assertJsonValidationErrors(['status']);
+});
+
+it('returns 403 when updating status of another users application', function () {
+    $application = JobApplication::factory()->create([
+        'user_id' => $this->otherUser->id,
+    ]);
+
+    $response = $this->actingAs($this->user)->patchJson(
+        route('job-applications.status', $application),
+        ['status' => 'interviewing'],
+    );
+
+    $response->assertForbidden();
+});
+
+it('redirects unauthenticated users when updating status', function () {
+    $application = JobApplication::factory()->create();
+
+    $this->patch(
+        route('job-applications.status', $application),
+        ['status' => 'offer'],
+    )->assertRedirect();
+});
+
 it('shows a single job application owned by the user', function () {
     $application = JobApplication::factory()->create(['user_id' => $this->user->id]);
 
