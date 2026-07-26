@@ -84,8 +84,8 @@ export default function JobApplicationsIndex({
         <>
             <Head title="Job Applications" />
 
-            <div className="flex flex-col gap-6">
-                <div className="flex items-center justify-between">
+            <div className="flex flex-1 min-h-0 flex-col gap-4 sm:gap-6">
+                <div className="flex shrink-0 items-center justify-between">
                     <h1 className="text-2xl font-semibold text-foreground">
                         Job Applications
                     </h1>
@@ -95,7 +95,7 @@ export default function JobApplicationsIndex({
                     </Button>
                 </div>
 
-                <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                <div className="flex shrink-0 flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                     <div className="relative w-full max-w-xs">
                         <SearchIcon className="pointer-events-none absolute left-2.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
                         <Input
@@ -129,7 +129,7 @@ export default function JobApplicationsIndex({
                 </div>
 
                 {filtered.length === 0 ? (
-                    <div className="flex flex-col items-center gap-2 py-16 text-center">
+                    <div className="flex flex-1 min-h-0 flex-col items-center justify-center gap-2 py-16 text-center">
                         <p className="text-sm text-muted-foreground">
                             {applicationList.length === 0
                                 ? 'No job applications yet.'

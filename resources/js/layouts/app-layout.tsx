@@ -40,7 +40,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     }, []);
 
     return (
-        <div className="flex min-h-screen bg-[#FDFDFC] dark:bg-[#0a0a0a]">
+        <div className="flex h-screen w-full min-w-0 overflow-hidden bg-[#FDFDFC] dark:bg-[#0a0a0a]">
             <Head />
 
             {/* Mobile sidebar overlay */}
@@ -53,10 +53,12 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
             {/* Sidebar */}
             <aside
-                className={`fixed inset-y-0 left-0 z-50 flex flex-col border-r border-[#e3e3e0] bg-white transition-all duration-300 dark:border-[#3E3E3A] dark:bg-[#161615] ${
-                    sidebarOpen
-                        ? 'w-64'
-                        : 'w-0 -translate-x-full md:w-16 md:translate-x-0'
+                className={`fixed inset-y-0 left-0 z-50 flex flex-col border-r border-[#e3e3e0] bg-white transition-transform duration-300 dark:border-[#3E3E3A] dark:bg-[#161615] ${
+                    mobileSidebarOpen
+                        ? 'w-64 translate-x-0'
+                        : sidebarOpen
+                          ? 'w-64 max-md:-translate-x-full'
+                          : 'w-0 -translate-x-full md:w-16 md:translate-x-0'
                 }`}
             >
                 {/* Sidebar header */}
@@ -154,7 +156,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
             {/* Main content area */}
             <div
-                className={`flex min-h-screen flex-1 flex-col transition-all duration-300 ${
+                className={`flex h-full min-w-0 flex-1 flex-col transition-all duration-300 ${
                     sidebarOpen ? 'md:ml-64' : 'md:ml-16'
                 }`}
             >
@@ -171,7 +173,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                     </Link>
                 </header>
 
-                <main className="flex-1 p-4 sm:p-6 lg:p-8">{children}</main>
+                <main className="flex flex-1 min-h-0 flex-col overflow-hidden p-4 sm:p-6 lg:p-8">{children}</main>
             </div>
         </div>
     );

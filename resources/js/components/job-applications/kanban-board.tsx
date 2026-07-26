@@ -38,13 +38,13 @@ function Column({
     return (
         <div
             ref={setNodeRef}
-            className={`flex w-72 shrink-0 flex-col gap-3 rounded-xl border bg-card/70 p-3 backdrop-blur-md transition-shadow max-sm:w-full max-sm:shrink ${
+            className={`flex h-full max-h-full w-72 shrink-0 flex-col gap-3 rounded-xl border bg-card/70 p-3 backdrop-blur-md transition-shadow max-md:w-full max-md:h-full ${
                 isOver
                     ? 'border-primary shadow-lg shadow-primary/10'
                     : 'border-border'
             }`}
         >
-            <div className="flex items-center justify-between px-1">
+            <div className="flex shrink-0 items-center justify-between px-1">
                 <h3 className="text-sm font-semibold text-card-foreground">
                     {label}
                 </h3>
@@ -55,7 +55,7 @@ function Column({
                 </span>
             </div>
 
-            <div className="flex flex-col gap-2">
+            <div className="flex flex-1 min-h-0 flex-col gap-2 overflow-y-auto pr-1">
                 {applications.map((app) => (
                     <DraggableCard
                         key={app.id}
@@ -141,6 +141,9 @@ export default function KanbanBoard({
     const [activeApplication, setActiveApplication] =
         useState<JobApplication | null>(null);
     const [localApplications, setLocalApplications] = useState(applications);
+    const [activeTab, setActiveTab] = useState<JobApplicationStatus>(
+        JOB_APPLICATION_STATUSES[0].value
+    );
 
     useEffect(() => {
         setLocalApplications(applications);
@@ -210,17 +213,52 @@ export default function KanbanBoard({
             onDragStart={handleDragStart}
             onDragEnd={handleDragEnd}
         >
-            <div className="flex gap-4 overflow-x-auto pb-4 max-sm:flex-col max-sm:overflow-x-visible">
+            {/* Mobile Tab Navigation */}
+            <div className="mb-4 flex shrink-0 gap-2 overflow-x-auto pb-2 md:hidden [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
                 {JOB_APPLICATION_STATUSES.map(({ value, label }) => (
-                    <Column
+                    <button
                         key={value}
-                        status={value}
-                        label={label}
-                        applications={grouped[value]}
-                        onView={onView}
-                        onEdit={onEdit}
-                        onDelete={onDelete}
-                    />
+                        type="button"
+                        onClick={() => setActiveTab(value)}
+                        className={`flex items-center gap-2 whitespace-nowrap rounded-full px-4 py-2 text-sm font-medium transition-colors ${
+                            activeTab === value
+                                ? 'bg-primary text-primary-foreground'
+                                : 'bg-muted text-muted-foreground hover:bg-muted/80'
+                        }`}
+                    >
+                        {label}
+                        <span
+                            className={`rounded-full px-2 py-0.5 text-xs font-medium ${
+                                activeTab === value
+                                    ? 'bg-primary-foreground/20 text-primary-foreground'
+                                    : STATUS_COLORS[value]
+                            }`}
+                        >
+                            {grouped[value].length}
+                        </span>
+                    </button>
+                ))}
+            </div>
+
+            <div className="flex flex-1 min-h-0 gap-4 overflow-x-auto pb-2 max-md:flex-col max-md:overflow-x-hidden">
+                {JOB_APPLICATION_STATUSES.map(({ value, label }) => (
+                    <div
+                        key={value}
+                        className={`h-full max-md:w-full ${
+                            activeTab === value
+                                ? 'flex flex-1 min-h-0 flex-col max-md:h-full'
+                                : 'hidden max-md:hidden'
+                        } md:flex md:flex-col`}
+                    >
+                        <Column
+                            status={value}
+                            label={label}
+                            applications={grouped[value]}
+                            onView={onView}
+                            onEdit={onEdit}
+                            onDelete={onDelete}
+                        />
+                    </div>
                 ))}
             </div>
 
