@@ -22,12 +22,14 @@ function Column({
     status,
     label,
     applications,
+    onView,
     onEdit,
     onDelete,
 }: {
     status: JobApplicationStatus;
     label: string;
     applications: JobApplication[];
+    onView: (app: JobApplication) => void;
     onEdit: (app: JobApplication) => void;
     onDelete: (app: JobApplication) => void;
 }) {
@@ -58,6 +60,7 @@ function Column({
                     <DraggableCard
                         key={app.id}
                         application={app}
+                        onView={() => onView(app)}
                         onEdit={() => onEdit(app)}
                         onDelete={() => onDelete(app)}
                     />
@@ -74,10 +77,12 @@ function Column({
 
 function DraggableCard({
     application,
+    onView,
     onEdit,
     onDelete,
 }: {
     application: JobApplication;
+    onView: () => void;
     onEdit: () => void;
     onDelete: () => void;
 }) {
@@ -100,6 +105,7 @@ function DraggableCard({
         >
             <JobApplicationCard
                 application={application}
+                onView={onView}
                 onEdit={onEdit}
                 onDelete={onDelete}
             />
@@ -126,10 +132,12 @@ function KanbanCardOverlay({ application }: { application: JobApplication }) {
 
 export default function KanbanBoard({
     applications,
+    onView,
     onEdit,
     onDelete,
 }: {
     applications: JobApplication[];
+    onView: (app: JobApplication) => void;
     onEdit: (app: JobApplication) => void;
     onDelete: (app: JobApplication) => void;
 }) {
@@ -212,6 +220,7 @@ export default function KanbanBoard({
                         status={value}
                         label={label}
                         applications={grouped[value]}
+                        onView={onView}
                         onEdit={onEdit}
                         onDelete={onDelete}
                     />

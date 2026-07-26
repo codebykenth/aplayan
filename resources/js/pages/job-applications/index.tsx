@@ -4,6 +4,7 @@ import { SearchIcon, PlusIcon } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import JobApplicationForm from '@/components/job-applications/job-application-form';
+import ApplicationDetailModal from '@/components/job-applications/application-detail-modal';
 import KanbanBoard from '@/components/job-applications/kanban-board';
 import { STATUS_COLORS, JOB_APPLICATION_STATUSES } from '@/types/job-application';
 import type { JobApplication, JobApplicationStatus } from '@/types/job-application';
@@ -33,6 +34,8 @@ export default function JobApplicationsIndex({
     const [formOpen, setFormOpen] = useState(false);
     const [editingApplication, setEditingApplication] =
         useState<JobApplication | null>(null);
+    const [viewingApplication, setViewingApplication] =
+        useState<JobApplication | null>(null);
 
     const filtered = useMemo(() => {
         return applicationList.filter((app) => {
@@ -54,6 +57,10 @@ export default function JobApplicationsIndex({
     function openCreate() {
         setEditingApplication(null);
         setFormOpen(true);
+    }
+
+    function openView(app: JobApplication) {
+        setViewingApplication(app);
     }
 
     function openEdit(app: JobApplication) {
@@ -138,11 +145,18 @@ export default function JobApplicationsIndex({
                 ) : (
                     <KanbanBoard
                         applications={filtered}
+                        onView={(app) => openView(app)}
                         onEdit={(app) => openEdit(app)}
                         onDelete={(app) => handleDelete(app)}
                     />
                 )}
             </div>
+
+            <ApplicationDetailModal
+                open={viewingApplication !== null}
+                onClose={() => setViewingApplication(null)}
+                application={viewingApplication}
+            />
 
             <JobApplicationForm
                 open={formOpen}

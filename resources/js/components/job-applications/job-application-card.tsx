@@ -25,15 +25,28 @@ function formatDate(date: string | null): string | null {
 
 export default function JobApplicationCard({
     application,
+    onView,
     onEdit,
     onDelete,
 }: {
     application: JobApplication;
+    onView: () => void;
     onEdit: () => void;
     onDelete: () => void;
 }) {
     return (
-        <div className="flex flex-col gap-3 rounded-xl border border-border bg-card p-4 shadow-xs">
+        <div
+            role="button"
+            tabIndex={0}
+            onClick={onView}
+            onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    onView();
+                }
+            }}
+            className="flex cursor-pointer flex-col gap-3 rounded-xl border border-border bg-card p-4 shadow-xs transition-colors hover:border-primary/30 hover:bg-accent/30"
+        >
             <div className="flex items-start justify-between gap-4">
                 <div className="flex min-w-0 flex-col gap-1">
                     <h3 className="truncate text-sm font-semibold text-card-foreground">
@@ -97,14 +110,20 @@ export default function JobApplicationCard({
             <div className="flex items-center justify-end gap-2 border-t border-border pt-3">
                 <button
                     type="button"
-                    onClick={onEdit}
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        onEdit();
+                    }}
                     className="rounded-md px-2.5 py-1 text-xs font-medium text-muted-foreground hover:bg-accent hover:text-accent-foreground"
                 >
                     Edit
                 </button>
                 <button
                     type="button"
-                    onClick={onDelete}
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        onDelete();
+                    }}
                     className="rounded-md px-2.5 py-1 text-xs font-medium text-destructive hover:bg-destructive/10"
                 >
                     Delete
