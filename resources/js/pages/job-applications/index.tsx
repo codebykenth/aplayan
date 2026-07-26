@@ -1,6 +1,6 @@
-import { Head, router } from '@inertiajs/react';
-import { useState, useMemo, type ReactNode } from 'react';
-import { SearchIcon, PlusIcon } from 'lucide-react';
+import { Head, router, useForm } from '@inertiajs/react';
+import { useState, useMemo, useRef, useEffect, type ReactNode } from 'react';
+import { SearchIcon, PlusIcon, DownloadIcon, UploadIcon } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import JobApplicationForm from '@/components/job-applications/job-application-form';
@@ -8,7 +8,7 @@ import ApplicationDetailModal from '@/components/job-applications/application-de
 import KanbanBoard from '@/components/job-applications/kanban-board';
 import { STATUS_COLORS, JOB_APPLICATION_STATUSES } from '@/types/job-application';
 import type { JobApplication, JobApplicationStatus } from '@/types/job-application';
-import { destroy as jobAppDestroy } from '@/routes/job-applications';
+import { destroy as jobAppDestroy, exportMethod, importMethod } from '@/routes/job-applications';
 import AppLayout from '@/layouts/app-layout';
 
 const ALL_STATUS = 'all' as const;
@@ -36,6 +36,36 @@ export default function JobApplicationsIndex({
         useState<JobApplication | null>(null);
     const [viewingApplication, setViewingApplication] =
         useState<JobApplication | null>(null);
+    const [exportOpen, setExportOpen] = useState(false);
+    const fileInputRef = useRef<HTMLInputElement>(null);
+    const importForm = useForm<{ file: File | null }>({ file: null });
+
+    function handleImportChange(e: React.ChangeEvent<HTMLInputElement>) {
+        const file = e.target.files?.[0];
+        if (file) {
+            importForm.setData('file', file);
+            importForm.post(importMethod.url(), {
+                onSuccess: () => {
+                    importForm.reset();
+                    if (fileInputRef.current) {
+                        fileInputRef.current.value = '';
+                    }
+                },
+                preserveScroll: true,
+            });
+        }
+    }
+
+    useEffect(() => {
+        if (!exportOpen) return;
+
+        function handleClickOutside() {
+            setExportOpen(false);
+        }
+
+        document.addEventListener('click', handleClickOutside);
+        return () => document.removeEventListener('click', handleClickOutside);
+    }, [exportOpen]);
 
     const filtered = useMemo(() => {
         return applicationList.filter((app) => {
@@ -89,10 +119,61 @@ export default function JobApplicationsIndex({
                     <h1 className="text-2xl font-semibold text-foreground">
                         Job Applications
                     </h1>
-                    <Button onClick={openCreate}>
-                        <PlusIcon data-icon="inline-start" />
-                        New Application
-                    </Button>
+                    <div className="flex items-center gap-2">
+                        <div className="relative">
+                            <Button
+                                variant="outline"
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    setExportOpen(!exportOpen);
+                                }}
+                            >
+                                <DownloadIcon data-icon="inline-start" />
+                                Export Data
+                            </Button>
+                            {exportOpen && (
+                                <div
+                                    className="absolute right-0 top-full z-50 mt-1 min-w-36 rounded-lg border bg-popover p-1 shadow-md"
+                                    onClick={(e) => e.stopPropagation()}
+                                >
+                                    <a
+                                        href={exportMethod.url({ query: { format: 'csv' } })}
+                                        download
+                                        className="block w-full rounded-md px-3 py-2 text-left text-sm hover:bg-accent hover:text-accent-foreground"
+                                        onClick={() => setExportOpen(false)}
+                                    >
+                                        Export as CSV
+                                    </a>
+                                    <a
+                                        href={exportMethod.url({ query: { format: 'json' } })}
+                                        download
+                                        className="block w-full rounded-md px-3 py-2 text-left text-sm hover:bg-accent hover:text-accent-foreground"
+                                        onClick={() => setExportOpen(false)}
+                                    >
+                                        Export as JSON
+                                    </a>
+                                </div>
+                            )}
+                        </div>
+                        <Button
+                            variant="outline"
+                            onClick={() => fileInputRef.current?.click()}
+                        >
+                            <UploadIcon data-icon="inline-start" />
+                            Import CSV
+                        </Button>
+                        <input
+                            ref={fileInputRef}
+                            type="file"
+                            accept=".csv,.txt"
+                            onChange={handleImportChange}
+                            className="hidden"
+                        />
+                        <Button onClick={openCreate}>
+                            <PlusIcon data-icon="inline-start" />
+                            New Application
+                        </Button>
+                    </div>
                 </div>
 
                 <div className="flex shrink-0 flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">

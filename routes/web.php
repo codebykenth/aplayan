@@ -8,6 +8,8 @@ use App\Http\Controllers\FollowUpEmailController;
 use App\Http\Controllers\InterviewPrepController;
 use App\Http\Controllers\JobApplicationAiController;
 use App\Http\Controllers\JobApplicationController;
+use App\Http\Controllers\JobApplicationExportController;
+use App\Http\Controllers\JobApplicationImportController;
 use App\Http\Controllers\JobApplicationSalaryController;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\Request;
@@ -57,8 +59,10 @@ Route::middleware('auth')->group(function () {
     })->middleware('throttle:6,1')->name('verification.send');
 
     Route::get('job-applications', [JobApplicationController::class, 'index'])->name('job-applications.index');
-    Route::get('job-applications/{jobApplication}', [JobApplicationController::class, 'show'])->name('job-applications.show');
+    Route::get('job-applications/export', JobApplicationExportController::class)->name('job-applications.export');
+    Route::post('job-applications/import', JobApplicationImportController::class)->name('job-applications.import');
     Route::post('job-applications', [JobApplicationController::class, 'store'])->name('job-applications.store');
+    Route::get('job-applications/{jobApplication}', [JobApplicationController::class, 'show'])->name('job-applications.show');
     Route::match(['put', 'patch'], 'job-applications/{jobApplication}', [JobApplicationController::class, 'update'])->name('job-applications.update');
     Route::patch('job-applications/{jobApplication}/status', [JobApplicationController::class, 'updateStatus'])->name('job-applications.status');
     Route::delete('job-applications/{jobApplication}', [JobApplicationController::class, 'destroy'])->name('job-applications.destroy');
