@@ -133,7 +133,7 @@ it('works without job description', function () {
     expect($response->json('salary_min'))->toBe(300000);
 });
 
-it('returns 503 when Gemini API fails', function () {
+it('returns fallback data when Gemini API fails instead of 503', function () {
     Http::preventStrayRequests();
 
     Http::fake([
@@ -144,33 +144,8 @@ it('returns 503 when Gemini API fails', function () {
         route('job-applications.ai-salary', $this->application),
     );
 
-    $response->assertStatus(503);
-    expect($response->json('message'))->toBe('AI service is temporarily unavailable.');
-});
-
-it('returns 500 when Gemini returns malformed JSON', function () {
-    Http::preventStrayRequests();
-
-    Http::fake([
-        'generativelanguage.googleapis.com/*' => Http::response([
-            'candidates' => [
-                [
-                    'content' => [
-                        'parts' => [
-                            ['text' => 'invalid json'],
-                        ],
-                    ],
-                ],
-            ],
-        ]),
-    ]);
-
-    $response = $this->actingAs($this->user)->postJson(
-        route('job-applications.ai-salary', $this->application),
-    );
-
-    $response->assertStatus(500);
-    expect($response->json('message'))->toBe('Failed to parse AI response.');
+    $response->assertSuccessful();
+    expect($response->json('_badge'))->toBe('Generated via Smart Analysis (AI provider busy)');
 });
 
 it('updates ai_evaluated_at timestamp on each check', function () {

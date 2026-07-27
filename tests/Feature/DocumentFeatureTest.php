@@ -268,7 +268,7 @@ it('returns 422 when profile is missing for cover letter', function () {
         ->assertJsonValidationErrors(['profile']);
 });
 
-it('returns 503 when Gemini API fails for cover letter', function () {
+it('returns fallback content when Gemini API fails for cover letter', function () {
     ResumeProfile::factory()->create([
         'user_id' => $this->user->id,
         'full_name' => 'Juan Dela Cruz',
@@ -284,8 +284,8 @@ it('returns 503 when Gemini API fails for cover letter', function () {
         'job_description' => 'Looking for a PHP developer.',
     ]);
 
-    $response->assertStatus(503);
-    expect($response->json('message'))->toBe('AI service is temporarily unavailable.');
+    $response->assertSuccessful();
+    expect($response->json('cover_letter'))->toContain('Smart Analysis');
 });
 
 it('returns empty arrays as defaults for JSON fields', function () {
@@ -376,7 +376,7 @@ it('returns 422 for invalid cover letter improvement preset', function () {
     $response->assertJsonValidationErrors(['preset']);
 });
 
-it('returns 503 when Gemini API fails for resume polish', function () {
+it('returns fallback polish when Gemini API fails for resume polish', function () {
     ResumeProfile::factory()->create(['user_id' => $this->user->id]);
 
     Http::preventStrayRequests();
@@ -390,8 +390,8 @@ it('returns 503 when Gemini API fails for resume polish', function () {
         'content' => 'test content',
     ]);
 
-    $response->assertStatus(503);
-    expect($response->json('message'))->toBe('AI service is temporarily unavailable.');
+    $response->assertSuccessful();
+    expect($response->json('polished'))->toContain('Smart Analysis');
 });
 
 it('saves a cover letter with target metadata', function () {

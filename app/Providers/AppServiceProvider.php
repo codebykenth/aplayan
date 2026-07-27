@@ -57,5 +57,13 @@ class AppServiceProvider extends ServiceProvider
 
             return Limit::perDay(20)->by($key);
         });
+
+        RateLimiter::for('ai-uncached', function (Request $request) {
+            $user = $request->user();
+
+            $key = 'ai-uncached:'.($user ? $user->id : $request->ip());
+
+            return Limit::perDay(10)->by($key);
+        });
     }
 }

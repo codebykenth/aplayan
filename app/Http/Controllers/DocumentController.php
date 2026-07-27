@@ -9,15 +9,12 @@ use App\Http\Requests\SaveCoverLetterRequest;
 use App\Http\Requests\UpdateResumeProfileRequest;
 use App\Models\SavedCoverLetter;
 use App\Models\SavedResume;
-use App\Models\User;
-use App\Services\GeminiService;
+use App\Services\AiCacheService;
 use App\Services\ResumeProfileService;
-use Illuminate\Http\Client\RequestException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
-use Illuminate\Support\Facades\RateLimiter;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -25,14 +22,14 @@ class DocumentController extends Controller
 {
     public function __construct(
         private ResumeProfileService $profileService,
-        private GeminiService $geminiService,
+        private AiCacheService $aiCache,
     ) {}
 
     public function index(Request $request): Response
     {
         $user = auth()->user();
         $profile = $this->profileService->getOrCreateProfile($user);
-        $aiLimit = $this->getAiRateLimitInfo($user);
+        $aiLimit = $this->aiCache->getRateLimitInfo($user->id);
 
         $loadedResume = null;
         if ($request->has('load_resume')) {
@@ -76,52 +73,37 @@ class DocumentController extends Controller
 
         Gate::authorize('view', $profile);
 
-        try {
-            $profileText = $this->profileService->buildProfileText($profile);
-            $coverLetter = $this->geminiService->generateCoverLetter(
-                $profileText,
-                $request->input('job_description'),
-            );
+        $profileText = $this->profileService->buildProfileText($profile);
+        $coverLetter = $this->aiCache->generateCoverLetter(
+            $profileText,
+            $request->input('job_description'),
+            $user->id,
+        );
 
-            return response()->json(['cover_letter' => $coverLetter]);
-        } catch (RequestException) {
-            return response()->json([
-                'message' => 'AI service is temporarily unavailable.',
-            ], 503);
-        }
+        return response()->json(['cover_letter' => $coverLetter]);
     }
 
     public function aiPolishResume(AiPolishResumeRequest $request): JsonResponse
     {
-        try {
-            $polished = $this->geminiService->polishResumeSection(
-                $request->input('section'),
-                $request->input('content'),
-                $request->input('context', ''),
-            );
+        $polished = $this->aiCache->polishResumeSection(
+            $request->input('section'),
+            $request->input('content'),
+            $request->input('context', ''),
+            $request->user()->id,
+        );
 
-            return response()->json(['polished' => $polished]);
-        } catch (RequestException) {
-            return response()->json([
-                'message' => 'AI service is temporarily unavailable.',
-            ], 503);
-        }
+        return response()->json(['polished' => $polished]);
     }
 
     public function aiImproveCoverLetter(AiImproveCoverLetterRequest $request): JsonResponse
     {
-        try {
-            $improved = $this->geminiService->improveCoverLetter(
-                $request->input('content'),
-                $request->input('preset'),
-            );
+        $improved = $this->aiCache->improveCoverLetter(
+            $request->input('content'),
+            $request->input('preset'),
+            $request->user()->id,
+        );
 
-            return response()->json(['improved' => $improved]);
-        } catch (RequestException) {
-            return response()->json([
-                'message' => 'AI service is temporarily unavailable.',
-            ], 503);
-        }
+        return response()->json(['improved' => $improved]);
     }
 
     public function saved(): Response
@@ -193,22 +175,5 @@ class DocumentController extends Controller
         $savedCoverLetter->delete();
 
         return to_route('documents.saved')->with('success', 'Cover letter deleted.');
-    }
-
-    private function getAiRateLimitInfo(?User $user): array
-    {
-        if (! $user) {
-            return ['remaining' => 0, 'total' => 20, 'exhausted' => true];
-        }
-
-        $key = 'ai:'.$user->id;
-
-        $remaining = RateLimiter::remaining($key, 20);
-
-        return [
-            'remaining' => $remaining,
-            'total' => 20,
-            'exhausted' => $remaining <= 0,
-        ];
     }
 }

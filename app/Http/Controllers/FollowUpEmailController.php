@@ -3,16 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Models\JobApplication;
-use App\Services\GeminiService;
+use App\Services\AiCacheService;
 use App\Services\JobApplicationService;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Response;
-use JsonException;
 
 class FollowUpEmailController extends Controller
 {
     public function __construct(
-        private GeminiService $gemini,
+        private AiCacheService $aiCache,
         private ?JobApplicationService $service = null,
     ) {}
 
@@ -20,24 +18,21 @@ class FollowUpEmailController extends Controller
     {
         $this->authorize('view', $jobApplication);
 
-        try {
-            $daysSinceContact = $jobApplication->last_contacted_at
-                ? $jobApplication->last_contacted_at->diffInDays(now())
-                : ($jobApplication->updated_at
-                    ? $jobApplication->updated_at->diffInDays(now())
-                    : ($jobApplication->created_at
-                        ? $jobApplication->created_at->diffInDays(now())
-                        : 0));
+        $daysSinceContact = $jobApplication->last_contacted_at
+            ? $jobApplication->last_contacted_at->diffInDays(now())
+            : ($jobApplication->updated_at
+                ? $jobApplication->updated_at->diffInDays(now())
+                : ($jobApplication->created_at
+                    ? $jobApplication->created_at->diffInDays(now())
+                    : 0));
 
-            $draft = $this->gemini->generateFollowUpEmail(
-                $jobApplication->company_name,
-                $jobApplication->job_title,
-                $daysSinceContact,
-                $jobApplication->status,
-            );
-        } catch (JsonException $e) {
-            return response()->json(['message' => 'Failed to generate follow-up draft.'], Response::HTTP_INTERNAL_SERVER_ERROR);
-        }
+        $draft = $this->aiCache->followUpEmail(
+            $jobApplication->company_name,
+            $jobApplication->job_title,
+            $daysSinceContact,
+            $jobApplication->status,
+            $jobApplication->user_id,
+        );
 
         return response()->json(['draft' => $draft]);
     }

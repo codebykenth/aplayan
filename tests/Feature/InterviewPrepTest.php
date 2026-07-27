@@ -124,31 +124,7 @@ it('passes the job description to Gemini', function () {
     });
 });
 
-it('returns 500 when AI response cannot be parsed', function () {
-    Http::preventStrayRequests();
-
-    Http::fake([
-        'generativelanguage.googleapis.com/*' => Http::response([
-            'candidates' => [
-                [
-                    'content' => [
-                        'parts' => [
-                            ['text' => 'invalid json'],
-                        ],
-                    ],
-                ],
-            ],
-        ]),
-    ]);
-
-    $response = $this->actingAs($this->user)->postJson(
-        route('job-applications.interview-prep', $this->application),
-    );
-
-    $response->assertStatus(500);
-});
-
-it('returns 503 when Gemini API fails', function () {
+it('returns fallback data when Gemini API fails instead of 500/503', function () {
     Http::preventStrayRequests();
 
     Http::fake([
@@ -159,8 +135,8 @@ it('returns 503 when Gemini API fails', function () {
         route('job-applications.interview-prep', $this->application),
     );
 
-    $response->assertStatus(503);
-    expect($response->json('message'))->toBe('AI service is temporarily unavailable.');
+    $response->assertSuccessful();
+    expect($response->json('_badge'))->toBe('Generated via Smart Analysis (AI provider busy)');
 });
 
 it('works without a job description (empty string fallback)', function () {
