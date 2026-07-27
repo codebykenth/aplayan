@@ -56,6 +56,16 @@ class JobApplicationResource extends JsonResource
                 'description' => $activity->description,
                 'created_at' => $activity->created_at?->toIso8601String(),
             ])->sortByDesc('created_at')->values(),
+            'contacts' => $this->relationLoaded('contacts')
+                ? $this->contacts->map(fn ($contact) => [
+                    'id' => $contact->id,
+                    'name' => $contact->name,
+                    'email' => $contact->email,
+                    'phone' => $contact->phone,
+                    'company_name' => $contact->company_name,
+                    'role' => $contact->role,
+                ])
+                : [],
         ];
     }
 }

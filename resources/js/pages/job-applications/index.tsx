@@ -10,6 +10,7 @@ import QuickApplyDialog from '@/components/application-templates/quick-apply-dia
 import { STATUS_COLORS, JOB_APPLICATION_STATUSES } from '@/types/job-application';
 import type { JobApplication, JobApplicationStatus } from '@/types/job-application';
 import type { ApplicationTemplate } from '@/types/application-template';
+import type { Contact } from '@/types/contact';
 import { destroy as jobAppDestroy, exportMethod, importMethod } from '@/routes/job-applications';
 import AppLayout from '@/layouts/app-layout';
 
@@ -25,9 +26,11 @@ const STATUS_FILTERS: { value: FilterStatus; label: string }[] = [
 export default function JobApplicationsIndex({
     applications,
     templates = [],
+    contacts = [],
 }: {
     applications: { data: JobApplication[] } | JobApplication[];
     templates?: ApplicationTemplate[];
+    contacts?: Contact[];
 }) {
     const applicationList = Array.isArray(applications)
         ? applications
@@ -261,6 +264,7 @@ export default function JobApplicationsIndex({
                 open={viewingApplication !== null}
                 onClose={() => setViewingApplication(null)}
                 application={viewingApplication}
+                availableContacts={contacts}
             />
 
             <JobApplicationForm

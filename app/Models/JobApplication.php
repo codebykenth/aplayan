@@ -7,6 +7,7 @@ use Database\Factories\JobApplicationFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
@@ -92,5 +93,10 @@ class JobApplication extends Model
     public function activities(): HasMany
     {
         return $this->hasMany(JobApplicationActivity::class);
+    }
+
+    public function contacts(): BelongsToMany
+    {
+        return $this->belongsToMany(Contact::class)->withTimestamps();
     }
 }

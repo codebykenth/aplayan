@@ -1,3 +1,5 @@
+import type { Contact } from '@/types/contact';
+
 export interface JobApplicationActivity {
     id: number;
     type: string;
@@ -52,6 +54,7 @@ export interface JobApplication {
     created_at: string;
     updated_at: string;
     activities: JobApplicationActivity[];
+    contacts?: Pick<Contact, 'id' | 'name' | 'email' | 'phone' | 'company_name' | 'role'>[];
 }
 
 export type JobApplicationStatus =

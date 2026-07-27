@@ -14,6 +14,9 @@ import {
     MailIcon,
     CopyIcon,
     BookmarkIcon,
+    UsersIcon,
+    LinkIcon,
+    UnlinkIcon,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -35,7 +38,9 @@ import TaxBreakdownCard from '@/components/job-applications/tax-breakdown-card';
 import SaveAsTemplateDialog from '@/components/application-templates/save-as-template-dialog';
 import { JOB_APPLICATION_STATUSES, STATUS_COLORS } from '@/types/job-application';
 import type { JobApplication } from '@/types/job-application';
+import type { Contact } from '@/types/contact';
 import { status as updateStatus, aiMatch, aiSalary } from '@/routes/job-applications';
+import { link as linkContactRoute, unlink as unlinkContactRoute } from '@/routes/contacts';
 
 function formatSalary(amount: number | null): string | null {
     if (amount === null) return null;
@@ -62,10 +67,12 @@ export default function ApplicationDetailModal({
     open,
     onClose,
     application,
+    availableContacts = [],
 }: {
     open: boolean;
     onClose: () => void;
     application: JobApplication | null;
+    availableContacts?: Contact[];
 }) {
     const [updating, setUpdating] = useState(false);
     const [resumeText, setResumeText] = useState('');
@@ -824,6 +831,73 @@ export default function ApplicationDetailModal({
                                          </ul>
                                      </div>
                                  )}
+                             </div>
+                         )}
+                     </div>
+
+                     <div className="flex flex-col gap-3 border-t border-border pt-4">
+                         <div className="flex items-center justify-between">
+                             <span className="text-xs text-muted-foreground">
+                                 Contacts
+                             </span>
+                         </div>
+                         {app.contacts && app.contacts.length > 0 ? (
+                             <div className="flex flex-wrap gap-1">
+                                 {app.contacts.map((contact: { id: number; name: string; email?: string | null; role?: string | null; company_name?: string | null }) => (
+                                     <Badge
+                                         key={contact.id}
+                                         variant="secondary"
+                                         className="gap-1 text-xs"
+                                     >
+                                         <UsersIcon className="size-2.5" />
+                                         {contact.name}
+                                         {contact.role && (
+                                             <span className="text-muted-foreground">
+                                                 ({contact.role})
+                                             </span>
+                                         )}
+                                     </Badge>
+                                 ))}
+                             </div>
+                         ) : (
+                             <p className="text-xs text-muted-foreground italic">
+                                 No contacts linked
+                             </p>
+                         )}
+                         {availableContacts.length > 0 && (
+                             <div className="flex flex-col gap-1">
+                                 <span className="text-[11px] text-muted-foreground">
+                                     Link a contact:
+                                 </span>
+                                 <div className="flex flex-wrap gap-1">
+                                     {availableContacts
+                                         .filter(
+                                             (c) =>
+                                                 !app.contacts?.some(
+                                                     (ec: { id: number }) => ec.id === c.id,
+                                                 ),
+                                         )
+                                         .map((contact) => (
+                                             <Button
+                                                 key={contact.id}
+                                                 variant="outline"
+                                                 size="sm"
+                                                 className="h-6 px-2 text-xs"
+                                                 onClick={() => {
+                                                     router.post(
+                                                         linkContactRoute.url(contact.id),
+                                                         {
+                                                             job_application_id: app.id,
+                                                         },
+                                                         { preserveState: true },
+                                                     );
+                                                 }}
+                                             >
+                                                 <LinkIcon className="size-2.5" />
+                                                 {contact.name}
+                                             </Button>
+                                         ))}
+                                 </div>
                              </div>
                          )}
                      </div>

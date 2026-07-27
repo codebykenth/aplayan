@@ -5,6 +5,7 @@ use App\Http\Controllers\ApplicationTemplateController;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\SocialiteController;
+use App\Http\Controllers\ContactController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DocumentController;
 use App\Http\Controllers\FollowUpEmailController;
@@ -92,6 +93,13 @@ Route::middleware('auth')->group(function () {
     Route::post('templates', [ApplicationTemplateController::class, 'store'])->name('templates.store');
     Route::match(['put', 'patch'], 'templates/{applicationTemplate}', [ApplicationTemplateController::class, 'update'])->name('templates.update');
     Route::delete('templates/{applicationTemplate}', [ApplicationTemplateController::class, 'destroy'])->name('templates.destroy');
+
+    Route::get('contacts', [ContactController::class, 'index'])->name('contacts.index');
+    Route::post('contacts', [ContactController::class, 'store'])->name('contacts.store');
+    Route::match(['put', 'patch'], 'contacts/{contact}', [ContactController::class, 'update'])->name('contacts.update');
+    Route::delete('contacts/{contact}', [ContactController::class, 'destroy'])->name('contacts.destroy');
+    Route::post('contacts/{contact}/link', [ContactController::class, 'link'])->name('contacts.link');
+    Route::post('contacts/{contact}/unlink', [ContactController::class, 'unlink'])->name('contacts.unlink');
 
     Route::get('documents', [DocumentController::class, 'index'])->name('documents.index');
     Route::put('documents/profile', [DocumentController::class, 'updateProfile'])->name('documents.profile.update');
