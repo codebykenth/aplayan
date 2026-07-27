@@ -24,33 +24,27 @@ import type { JobApplicationStatus } from '@/types/job-application';
 import AppLayout from '@/layouts/app-layout';
 
 const STATUS_CHART_COLORS: Record<JobApplicationStatus, string> = {
-    wishlist: 'hsl(var(--chart-5))',
-    applied: 'hsl(var(--chart-2))',
-    interviewing: 'hsl(var(--chart-3))',
-    offer: 'hsl(var(--chart-1))',
-    rejected: 'hsl(0 70% 50%)',
-};
-
-const STATUS_TICK_STYLES: Record<string, { fill: string }> = {
-    Wishlist: { fill: 'hsl(var(--chart-5))' },
-    Applied: { fill: 'hsl(var(--chart-2))' },
-    Interviewing: { fill: 'hsl(var(--chart-3))' },
-    Offer: { fill: 'hsl(var(--chart-1))' },
+    wishlist: '#94a3b8',
+    applied: '#3b82f6',
+    interviewing: '#f59e0b',
+    offer: '#10b981',
+    rejected: '#ef4444',
 };
 
 const FUNNEL_COLORS = [
-    'hsl(var(--chart-5))',
-    'hsl(var(--chart-2))',
-    'hsl(var(--chart-3))',
-    'hsl(var(--chart-1))',
+    '#94a3b8',
+    '#3b82f6',
+    '#f59e0b',
+    '#10b981',
+    '#ef4444',
 ];
 
 const RESPONSE_COLORS = [
-    'hsl(142 76% 36%)',
-    'hsl(142 71% 45%)',
-    'hsl(38 92% 50%)',
-    'hsl(25 95% 53%)',
-    'hsl(0 72% 51%)',
+    '#15803d',
+    '#22c55e',
+    '#eab308',
+    '#f97316',
+    '#ef4444',
 ];
 
 function statusLabel(value: string): string {
@@ -131,7 +125,7 @@ export default function Analytics({
     }
 
     const weeklyConfig: ChartConfig = {
-        count: { label: 'Applications', color: 'hsl(var(--chart-1))' },
+        count: { label: 'Applications', color: '#6366f1' }, // indigo-500
     };
 
     const statusOverTimeConfig: ChartConfig = {};
@@ -143,8 +137,8 @@ export default function Analytics({
     }
 
     const salaryBandsConfig: ChartConfig = {
-        expected: { label: 'Expected', color: 'hsl(var(--chart-3))' },
-        offered: { label: 'Offered', color: 'hsl(var(--chart-1))' },
+        expected: { label: 'Expected', color: '#f59e0b' }, // amber-500
+        offered: { label: 'Offered', color: '#10b981' }, // emerald-500
     };
 
     const responseConfig: ChartConfig = {};
@@ -174,7 +168,7 @@ export default function Analytics({
                 </div>
 
                 {/* Salary Insights Summary */}
-                <div className="grid gap-4 sm:grid-cols-2">
+                <div className="grid gap-4 sm:grid-cols-2 shrink-0">
                     <Card>
                         <CardHeader className="flex flex-row items-center justify-between pb-2">
                             <CardTitle className="text-sm font-medium text-muted-foreground">
@@ -182,7 +176,7 @@ export default function Analytics({
                             </CardTitle>
                         </CardHeader>
                         <CardContent>
-                            <p className="text-3xl font-bold text-[hsl(var(--chart-3))]">
+                            <p className="text-3xl font-bold text-foreground">
                                 {salary_insights.avg_expected !== null
                                     ? `₱${salary_insights.avg_expected.toLocaleString()}`
                                     : '—'}
@@ -196,7 +190,7 @@ export default function Analytics({
                             </CardTitle>
                         </CardHeader>
                         <CardContent>
-                            <p className="text-3xl font-bold text-[hsl(var(--chart-1))]">
+                            <p className="text-3xl font-bold text-foreground">
                                 {salary_insights.avg_offered !== null
                                     ? `₱${salary_insights.avg_offered.toLocaleString()}`
                                     : '—'}
@@ -206,7 +200,7 @@ export default function Analytics({
                 </div>
 
                 {/* Main Chart Grid */}
-                <div className="grid gap-6 md:grid-cols-2">
+                <div className="grid gap-6 md:grid-cols-2 shrink-0">
                     {/* 1. Application Funnel */}
                     <Card>
                         <CardHeader>
@@ -218,68 +212,90 @@ export default function Analytics({
                                     No applications yet
                                 </div>
                             ) : (
-                                <ChartContainer config={funnelConfig} className="h-[300px] w-full">
-                                    <BarChart
-                                        data={funnel}
-                                        layout="vertical"
-                                        margin={{ left: 90, right: 20 }}
-                                    >
-                                        <CartesianGrid
-                                            horizontal={false}
-                                            strokeDasharray="3 3"
-                                            stroke="hsl(var(--border))"
-                                        />
-                                        <XAxis
-                                            type="number"
-                                            tickLine={false}
-                                            axisLine={false}
-                                            allowDecimals={false}
-                                            fontSize={10}
-                                        />
-                                        <YAxis
-                                            type="category"
-                                            dataKey="name"
-                                            tickLine={false}
-                                            axisLine={false}
-                                            fontSize={11}
-                                            width={80}
-                                            tick={(props) => {
-                                                const { x, y, payload } = props;
-                                                const style = STATUS_TICK_STYLES[payload.value] ?? {
-                                                    fill: 'hsl(var(--foreground))',
-                                                };
-                                                return (
-                                                    <text
-                                                        x={x}
-                                                        y={y}
-                                                        dx={-4}
-                                                        dy={4}
-                                                        textAnchor="end"
-                                                        fontSize={11}
-                                                        fill={style.fill}
-                                                    >
-                                                        {payload.value}
-                                                    </text>
-                                                );
-                                            }}
-                                        />
-                                        <ChartTooltip
-                                            content={<ChartTooltipContent nameKey="name" />}
-                                        />
-                                        <Bar
-                                            dataKey="value"
-                                            radius={[0, 4, 4, 0]}
-                                            barSize={32}
+                                <>
+                                    <ChartContainer config={funnelConfig} className="h-[300px] w-full">
+                                        <BarChart
+                                            data={funnel.map((item, index) => ({
+                                                ...item,
+                                                fill: FUNNEL_COLORS[index],
+                                            }))}
+                                            layout="vertical"
+                                            margin={{ left: 0, right: 20 }}
                                         >
-                                            {funnel.map((_, index) => (
-                                                <Cell
-                                                    key={index}
-                                                    fill={FUNNEL_COLORS[index]}
-                                                />
-                                            ))}
-                                        </Bar>
-                                    </BarChart>
-                                </ChartContainer>
+                                            <CartesianGrid
+                                                horizontal={false}
+                                                strokeDasharray="3 3"
+                                                stroke="hsl(var(--border))"
+                                            />
+                                            <XAxis
+                                                type="number"
+                                                tickLine={false}
+                                                axisLine={false}
+                                                allowDecimals={false}
+                                                fontSize={10}
+                                            />
+                                            <YAxis
+                                                type="category"
+                                                dataKey="name"
+                                                tickLine={false}
+                                                axisLine={false}
+                                                fontSize={11}
+                                                width={80}
+                                            />
+                                            <ChartTooltip
+                                                cursor={{ fill: 'var(--muted)', opacity: 0.2 }}
+                                                content={
+                                                    <ChartTooltipContent
+                                                        hideLabel
+                                                        formatter={(value, name, item, index, payload) => {
+                                                            const p = payload as Record<string, any>;
+                                                            return (
+                                                                <>
+                                                                    <div
+                                                                        className="h-2.5 w-2.5 shrink-0 rounded-[2px]"
+                                                                        style={{ backgroundColor: p.fill }}
+                                                                    />
+                                                                    <div className="flex flex-1 justify-between leading-none items-center gap-4">
+                                                                        <span className="text-muted-foreground">
+                                                                            {p.name}
+                                                                        </span>
+                                                                        <span className="font-mono font-medium text-foreground tabular-nums">
+                                                                            {value as React.ReactNode}
+                                                                        </span>
+                                                                    </div>
+                                                                </>
+                                                            );
+                                                        }}
+                                                    />
+                                                }
+                                            />
+                                            <ChartLegend
+                                                content={() => (
+                                                    <ChartLegendContent
+                                                        payload={funnel.map((item, index) => ({
+                                                            dataKey: item.name,
+                                                            value: item.name,
+                                                            type: 'square',
+                                                            color: FUNNEL_COLORS[index],
+                                                        }) as any)}
+                                                    />
+                                                )}
+                                            />
+                                            <Bar
+                                                dataKey="value"
+                                                radius={[0, 4, 4, 0]}
+                                                barSize={32}
+                                            >
+                                                {funnel.map((_, index) => (
+                                                    <Cell
+                                                        key={index}
+                                                        fill={FUNNEL_COLORS[index]}
+                                                    />
+                                                ))}
+                                            </Bar>
+                                        </BarChart>
+                                    </ChartContainer>
+                                </>
                             )}
                         </CardContent>
                     </Card>
@@ -314,6 +330,7 @@ export default function Analytics({
                                             axisLine={false}
                                             allowDecimals={false}
                                             fontSize={10}
+                                            width={30}
                                         />
                                         <ChartTooltip
                                             content={
@@ -322,9 +339,10 @@ export default function Analytics({
                                                 />
                                             }
                                         />
+                                        <ChartLegend content={<ChartLegendContent />} />
                                         <Bar
                                             dataKey="count"
-                                            fill="hsl(var(--chart-1))"
+                                            fill="#6366f1"
                                             radius={[3, 3, 0, 0]}
                                         />
                                     </BarChart>
@@ -362,6 +380,7 @@ export default function Analytics({
                                             axisLine={false}
                                             allowDecimals={false}
                                             fontSize={10}
+                                            width={30}
                                         />
                                         <ChartTooltip
                                             content={
@@ -417,18 +436,19 @@ export default function Analytics({
                                             axisLine={false}
                                             allowDecimals={false}
                                             fontSize={10}
+                                            width={30}
                                         />
                                         <ChartTooltip content={<ChartTooltipContent />} />
                                         <ChartLegend content={<ChartLegendContent />} />
                                         <Bar
                                             dataKey="expected"
-                                            fill="hsl(var(--chart-3))"
+                                            fill="#f59e0b"
                                             radius={[3, 3, 0, 0]}
                                             barSize={16}
                                         />
                                         <Bar
                                             dataKey="offered"
-                                            fill="hsl(var(--chart-1))"
+                                            fill="#10b981"
                                             radius={[3, 3, 0, 0]}
                                             barSize={16}
                                         />
@@ -440,7 +460,7 @@ export default function Analytics({
                 </div>
 
                 {/* 5. Time-to-Response (full width) */}
-                <Card>
+                <Card className="shrink-0">
                     <CardHeader>
                         <CardTitle>Time to Response</CardTitle>
                     </CardHeader>
@@ -454,7 +474,7 @@ export default function Analytics({
                                 <BarChart
                                     data={time_to_response.slice(0, 15)}
                                     layout="vertical"
-                                    margin={{ left: 140, right: 40, bottom: 20 }}
+                                    margin={{ left: 0, right: 40, bottom: 20 }}
                                 >
                                     <CartesianGrid
                                         horizontal={false}
@@ -498,7 +518,7 @@ export default function Analytics({
                                             />
                                         }
                                     />
-                                    <Bar dataKey="days" radius={[0, 4, 4, 0]} barSize={22}>
+                                    <Bar dataKey="days" radius={[0, 4, 4, 0]} barSize={22} minPointSize={2}>
                                         {time_to_response.slice(0, 15).map((item, index) => (
                                             <Cell key={index} fill={responseColor(item.days)} />
                                         ))}

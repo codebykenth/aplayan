@@ -58,6 +58,9 @@ A record of a user's application to a specific job opening.
 ### Action Feed
 A priority-ranked, auto-clearing list of action items (stale follow-ups, upcoming interviews, high-match unactioned, missing AI analysis, salary negotiation opps, rejection momentum check) calculated on the server using pure DB queries (0 AI cost).
 
+### Recent Activity Feed
+A chronological stream of activity events across a user's job applications (status changes, newly created applications, note additions, contact updates, and AI evaluations) displayed on the Dashboard right sidebar for quick context and modal inspection.
+
 ### Weekly Application Goal
 A user-defined weekly target for applications submitted (e.g., 10/week) with a streak counter and a 4-week historical average benchmark computed via pure PHP math.
 
@@ -91,3 +94,4 @@ A structured Resume & Cover Letter generator storing user experience, education,
 - **2026-07-26 - Milestone 2 Roadmap**: Planned and initialized issues 10–14 covering Data Export & Import (`10-data-export-and-import.md`), Application Timeline & Activity Log (`11-application-timeline-log.md`), Philippine Statutory Tax & Net Take-Home Pay Calculator (`12-philippine-tax-calculator.md`), Offer Comparison Matrix Page (`13-offer-comparison-matrix.md`), and User Settings & Theme Management (`14-user-settings-and-theme.md`).
 - **2026-07-27 - Zero-AI-Cost Job Search Intelligence Architecture**: Replaced full-dashboard AI charts with a dedicated Analytics page (6 non-AI charts) and a server-side Smart Action Feed on the Dashboard. Goals feature uses manual user targets with pure PHP 4-week math benchmarks. Guarantees $0 recurring AI token costs for daily application tracking.
 - **2026-07-27 - Phase 2 Zero-Storage Documents, Contacts & Calendar**: Planned Phase 2 extensions including Dynamic ATS Resume/Cover Letter Builder (zero cloud file storage), standalone & linked Contacts management, and a read-only Calendar suite with automated follow-up overlays.
+- **2026-07-27 - Dashboard Recent Activity Sidebar Architecture**: Structured a responsive multi-column layout for the Dashboard featuring a right sidebar Recent Activity feed. Eager loads `jobApplication` relations to prevent N+1 queries and enables instant modal inspection upon clicking activity items.

@@ -31,6 +31,7 @@ Aplayan is a free-to-maintain, privacy-first, web-based Job Application Tracker 
 19. As a job seeker, I want a Zero-Storage Dynamic Resume & Cover Letter Builder (`/documents`), so that I can store structured experience data and export ATS-friendly PDFs in 3 visual templates without uploading files to cloud storage.
 20. As a job seeker, I want a Contacts Management module (`/contacts`), so that I can store recruiter and hiring manager records and link them many-to-many to specific job applications.
 21. As a job seeker, I want a read-only Calendar view (`/calendar`), so that I can inspect interview dates, application milestones, and follow-up deadlines on Month and Week schedules.
+22. As a job seeker, I want a Recent Activity Feed in a right sidebar card on my Dashboard, so that I can view my latest status changes, note updates, contact logs, and AI evaluations and click any item to open the application detail modal.
 
 ## Implementation Decisions
 
@@ -40,6 +41,7 @@ Aplayan is a free-to-maintain, privacy-first, web-based Job Application Tracker 
   - `JobApplicationService`: Application CRUD, user-scoped querying, and status updates.
   - `GeminiService`: Google Gemini API prompt formatting, HTTP communication, JSON parsing, and fallbacks.
   - `ActionFeedService`: Computes 6 priority-ranked action items for the Dashboard feed server-side with 0 AI cost.
+  - `ActivityService`: Fetches top 10 recent activity records across user applications with eager loading for the Dashboard sidebar.
   - `AnalyticsService`: Computes 6 deep-dive charts (Funnel, 12-Week Volume, Status Over Time, Salary Insights, Salary Bands, Time-to-Response) via SQL aggregations.
   - `GoalService`: Computes weekly application progress, streak counters, and 4-week moving average benchmarks.
   - `ApplicationTemplateService`: Manages preset templates and quick-apply pre-filling.
@@ -61,6 +63,7 @@ Aplayan is a free-to-maintain, privacy-first, web-based Job Application Tracker 
 
 ### API & Data Contracts
 - **Action Feed Contract**: `Array<{ id: string, title: string, priority: 'urgent'|'moderate'|'low', description: string, job_application_id: int, company_name: string, action_label: string, action_route: string }>`
+- **Recent Activity Props Contract**: `Array<{ id: int, type: string, description: string, created_at: string, job_application_id: int, company_name: string, job_title: string }>`
 - **Analytics Props Contract**: `{ funnel: Object, weekly_volume: Array, status_over_time: Array, salary_insights: Object, salary_bands: Array, time_to_response: Object }`
 - **Goals Props Contract**: `{ weekly_goal: int, current_week_count: int, streak_count: int, four_week_avg: int, weekly_history: Array }`
 

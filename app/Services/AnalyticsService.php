@@ -17,8 +17,7 @@ class AnalyticsService
             ->groupBy('status')
             ->pluck('count', 'status');
 
-        $order = collect(JobApplicationStatus::cases())
-            ->reject(fn (JobApplicationStatus $status) => $status === JobApplicationStatus::Rejected);
+        $order = collect(JobApplicationStatus::cases());
 
         return $order->map(fn (JobApplicationStatus $status) => [
             'name' => $status->label(),

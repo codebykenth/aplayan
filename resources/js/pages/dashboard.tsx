@@ -1,5 +1,5 @@
 import { Head } from '@inertiajs/react';
-import { BarChart, Bar, XAxis, YAxis, PieChart, Pie, Cell } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, PieChart, Pie, Cell, CartesianGrid } from 'recharts';
 import type { ReactNode } from 'react';
 import { Briefcase, TrendingUp, CalendarDays } from 'lucide-react';
 import {
@@ -18,11 +18,11 @@ import ActionFeed from '@/components/action-feed';
 import type { ActionItem } from '@/components/action-feed';
 
 const STATUS_CHART_COLORS: Record<JobApplicationStatus, string> = {
-    wishlist: 'var(--color-wishlist)',
-    applied: 'var(--color-applied)',
-    interviewing: 'var(--color-interviewing)',
-    offer: 'var(--color-offer)',
-    rejected: 'var(--color-rejected)',
+    wishlist: '#94a3b8',
+    applied: '#3b82f6',
+    interviewing: '#f59e0b',
+    offer: '#10b981',
+    rejected: '#ef4444',
 };
 
 function statusLabel(value: string): string {
@@ -63,7 +63,7 @@ export default function Dashboard({
     const barConfig: ChartConfig = {
         count: {
             label: 'Applications',
-            color: 'var(--color-count)',
+            color: '#6366f1',
         },
     };
 
@@ -147,7 +147,7 @@ export default function Dashboard({
                                     No applications yet
                                 </div>
                             ) : (
-                                <ChartContainer config={pieConfig} className="h-[350px] w-full">
+                                <ChartContainer config={pieConfig} className="h-[300px] w-full">
                                     <PieChart>
                                         <ChartTooltip
                                             content={
@@ -189,8 +189,9 @@ export default function Dashboard({
                                     No data yet
                                 </div>
                             ) : (
-                                <ChartContainer config={barConfig} className="h-[350px] w-full">
-                                    <BarChart data={trend}>
+                                <ChartContainer config={barConfig} className="h-[300px] w-full">
+                                    <BarChart data={trend} margin={{ left: 0, right: 0 }}>
+                                        <CartesianGrid vertical={false} strokeDasharray="3 3" stroke="hsl(var(--border))" />
                                         <XAxis
                                             dataKey="date"
                                             tickLine={false}
@@ -206,6 +207,7 @@ export default function Dashboard({
                                             axisLine={false}
                                             allowDecimals={false}
                                             fontSize={10}
+                                            width={30}
                                         />
                                         <ChartTooltip
                                             content={
@@ -227,7 +229,7 @@ export default function Dashboard({
                                         />
                                         <Bar
                                             dataKey="count"
-                                            fill="var(--color-count)"
+                                            fill="#6366f1"
                                             radius={[3, 3, 0, 0]}
                                         />
                                     </BarChart>
