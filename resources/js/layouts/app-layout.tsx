@@ -1,10 +1,11 @@
 import type { Auth } from '@/types/auth';
 import { Head, Link, usePage } from '@inertiajs/react';
 import { useState, useEffect } from 'react';
-import { Briefcase, ChevronLeft, ChevronRight, LayoutDashboard, LogOut, Menu, Settings, BookmarkIcon, GitCompareArrowsIcon } from 'lucide-react';
+import { BarChart3, Briefcase, ChevronLeft, ChevronRight, LayoutDashboard, LogOut, Menu, Settings, BookmarkIcon, GitCompareArrowsIcon } from 'lucide-react';
 
 const sidebarLinks = [
     { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
+    { href: '/analytics', label: 'Analytics', icon: BarChart3 },
     { href: '/job-applications', label: 'Applications', icon: Briefcase },
     { href: '/job-applications/offers', label: 'Offer Comparison', icon: GitCompareArrowsIcon },
     { href: '/templates', label: 'Templates', icon: BookmarkIcon },
