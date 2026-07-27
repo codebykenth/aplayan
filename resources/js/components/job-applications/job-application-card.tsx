@@ -229,23 +229,29 @@ export default function JobApplicationCard({
                     </p>
                 </div>
 
-                <Badge
-                    className={`shrink-0 border-0 px-2 py-0 text-[10px] font-medium leading-normal capitalize ${STATUS_COLORS[application.status]}`}
-                >
-                    {application.status}
-                </Badge>
+                <div className="flex shrink-0 items-center gap-1.5">
+                    <Badge
+                        className={`border-0 px-2 py-0 text-[10px] font-medium leading-normal capitalize ${STATUS_COLORS[application.status]}`}
+                    >
+                        {application.status}
+                    </Badge>
 
-                {application.status === 'interviewing' && application.interview_date && (
-                    <InterviewCountdownBadge interviewDate={application.interview_date} />
-                )}
-
-                <StalenessBadge
-                    level={application.staleness_level}
-                    daysSinceUpdate={application.days_since_update}
-                />
-
-                <ActionsDropdown onEdit={onEdit} onDelete={onDelete} />
+                    <ActionsDropdown onEdit={onEdit} onDelete={onDelete} />
+                </div>
             </div>
+
+            {(application.status === 'interviewing' && application.interview_date || application.staleness_level !== null) && (
+                <div className="flex flex-wrap items-center gap-1.5">
+                    {application.status === 'interviewing' && application.interview_date && (
+                        <InterviewCountdownBadge interviewDate={application.interview_date} />
+                    )}
+
+                    <StalenessBadge
+                        level={application.staleness_level}
+                        daysSinceUpdate={application.days_since_update}
+                    />
+                </div>
+            )}
 
             <div className="flex flex-wrap items-center gap-x-3 gap-y-0.5 text-[11px] text-muted-foreground">
                 {application.date_applied && (

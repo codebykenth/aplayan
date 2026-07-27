@@ -1,7 +1,8 @@
 import { createInertiaApp } from '@inertiajs/react';
-import { type ReactNode, useEffect } from 'react';
-import GuestLayout from './layouts/guest-layout';
+import {  useEffect } from 'react';
+import type {ReactNode} from 'react';
 import { initTheme, subscribeToThemeChanges } from '@/hooks/use-theme';
+import GuestLayout from './layouts/guest-layout';
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 
@@ -9,6 +10,7 @@ function ThemeProvider({ children }: { children: ReactNode }) {
     useEffect(() => {
         initTheme();
         const unsubscribe = subscribeToThemeChanges();
+
         return unsubscribe;
     }, []);
 
@@ -26,6 +28,7 @@ createInertiaApp({
             default: React.ComponentType<Record<string, unknown>> & { layout?: (page: ReactNode) => ReactNode };
         };
         page.default.layout ??= (page: ReactNode) => <GuestLayout>{page}</GuestLayout>;
+
         return page;
     },
     withApp(app) {

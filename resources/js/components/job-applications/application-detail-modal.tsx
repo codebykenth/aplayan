@@ -36,10 +36,11 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
+import { Input } from '@/components/ui/input';
 import { link as linkContactRoute, unlink as unlinkContactRoute } from '@/routes/contacts';
 import { status as updateStatus, aiMatch, aiSalary } from '@/routes/job-applications';
 import type { Contact } from '@/types/contact';
-import { JOB_APPLICATION_STATUSES, STATUS_COLORS } from '@/types/job-application';
+import { JOB_APPLICATION_STATUSES, JOB_APPLICATION_STATUS_ORDER, STATUS_COLORS } from '@/types/job-application';
 import type { JobApplication } from '@/types/job-application';
 
 function formatSalary(amount: number | null): string | null {
@@ -93,8 +94,18 @@ export default function ApplicationDetailModal({
     const [notesSaving, setNotesSaving] = useState(false);
     const [notesError, setNotesError] = useState<string | null>(null);
     const [interviewDate, setInterviewDate] = useState<string>('');
+    const [interviewDateSaving, setInterviewDateSaving] = useState(false);
+    const [interviewDateError, setInterviewDateError] = useState<string | null>(null);
+    const [interviewDateModalOpen, setInterviewDateModalOpen] = useState(false);
+    const [pendingStatusChange, setPendingStatusChange] = useState<string | null>(null);
+    const [statusUpdateKey, setStatusUpdateKey] = useState(0);
     const [localApplication, setLocalApplication] = useState<JobApplication | null>(null);
     const [templateDialogOpen, setTemplateDialogOpen] = useState(false);
+    const [createContactOpen, setCreateContactOpen] = useState(false);
+    const [newContactName, setNewContactName] = useState('');
+    const [newContactEmail, setNewContactEmail] = useState('');
+    const [newContactRole, setNewContactRole] = useState('');
+    const [creatingContact, setCreatingContact] = useState(false);
 
     useEffect(() => {
         if (application) {
@@ -146,12 +157,12 @@ return;
         }
     }, [localApplication, application]);
 
-    const handleMarkAsContacted = useCallback(async () => {
+    const handleMarkAsContacted = useCallback(async (dateVal: string | null = 'now') => {
         const app = localApplication ?? application;
 
         if (!app) {
-return;
-}
+            return;
+        }
 
         setContacting(true);
 
@@ -165,6 +176,7 @@ return;
                         'Accept': 'application/json',
                         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? '',
                     },
+                    body: JSON.stringify({ date: dateVal }),
                 },
             );
 
@@ -189,6 +201,22 @@ const handleStatusChange = useCallback(
                 return;
             }
 
+            if (newStatus === 'interviewing' && !interviewDate) {
+                setPendingStatusChange(newStatus);
+                setInterviewDateModalOpen(true);
+                return;
+            }
+
+            performStatusChange(newStatus);
+        },
+        [application, interviewDate],
+    );
+
+    const performStatusChange = useCallback(
+        (newStatus: string) => {
+            const app = localApplication ?? application;
+            if (!app) return;
+
             setUpdating(true);
 
             const data: { status: string; interview_date?: string } = { status: newStatus };
@@ -198,16 +226,25 @@ const handleStatusChange = useCallback(
             }
 
             router.patch(
-                updateStatus.url(application.id),
+                updateStatus.url(app.id),
                 data,
                 {
-                    preserveState: true,
+                    onError: () => setStatusUpdateKey((k) => k + 1),
                     onFinish: () => setUpdating(false),
                 },
             );
         },
-        [application, interviewDate],
+        [localApplication, application, interviewDate],
     );
+
+    const handleInterviewDateConfirm = useCallback(() => {
+        setInterviewDateModalOpen(false);
+
+        if (pendingStatusChange) {
+            performStatusChange(pendingStatusChange);
+            setPendingStatusChange(null);
+        }
+    }, [pendingStatusChange, performStatusChange]);
 
     const handleAnalyzeMatch = useCallback(async () => {
         const app = localApplication ?? application;
@@ -374,6 +411,7 @@ return;
                     headers: {
                         'Content-Type': 'application/json',
                         'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest',
                         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? '',
                     },
                     body: JSON.stringify({
@@ -385,12 +423,69 @@ return;
             if (!response.ok) {
                 throw new Error('Failed to save interview notes.');
             }
+
+            const result = await response.json();
+            setLocalApplication((prev) => {
+                if (!prev) return prev;
+                return {
+                    ...prev,
+                    interview_notes: result.data.interview_notes,
+                    last_contacted_at: result.data.last_contacted_at,
+                };
+            });
         } catch (error) {
             setNotesError(error instanceof Error ? error.message : 'An unexpected error occurred');
         } finally {
             setNotesSaving(false);
         }
     }, [localApplication, application]);
+
+    const handleInterviewDateChange = useCallback(
+        (newDate: string) => {
+            setInterviewDate(newDate);
+
+            const app = localApplication ?? application;
+
+            if (!app) {
+                return;
+            }
+
+            setInterviewDateSaving(true);
+            setInterviewDateError(null);
+
+            fetch(`/job-applications/${app.id}/interview-date`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? '',
+                },
+                body: JSON.stringify({
+                    interview_date: newDate || null,
+                }),
+            })
+                .then((response) => {
+                    if (!response.ok) {
+                        throw new Error('Failed to save interview date.');
+                    }
+
+                    return response.json();
+                })
+                .then((result) => {
+                    setLocalApplication((prev) => {
+                        if (!prev) return prev;
+                        return { ...prev, interview_date: result.data.interview_date };
+                    });
+                })
+                .catch((error) => {
+                    setInterviewDateError(error instanceof Error ? error.message : 'An unexpected error occurred');
+                })
+                .finally(() => {
+                    setInterviewDateSaving(false);
+                });
+        },
+        [localApplication, application],
+    );
 
     if (!application) {
 return null;
@@ -672,6 +767,7 @@ return;
                             Status
                         </span>
                         <Select
+                            key={`${app.status}-${statusUpdateKey}`}
                             value={app.status}
                             onValueChange={handleStatusChange}
                             disabled={updating}
@@ -692,57 +788,120 @@ return;
                         </Select>
                     </div>
 
-                    {app.status === 'interviewing' && (
-                        <div className="flex flex-col gap-3 border-t border-border pt-4">
-                            <span className="text-xs text-muted-foreground">
-                                Interview Date
-                            </span>
-                            <Input
-                                type="date"
-                                value={interviewDate || (app.interview_date ? app.interview_date.split('T')[0] : '')}
-                                onChange={(e) => setInterviewDate(e.target.value)}
-                                className="w-full"
-                            />
-                        </div>
-                    )}
+{app.status === 'interviewing' && (
+                         <div className="flex flex-col gap-3 border-t border-border pt-4">
+                             <span className="text-xs text-muted-foreground">
+                                 Interview Date
+                             </span>
+                             <Input
+                                 type="date"
+                                 value={interviewDate || (app.interview_date ? app.interview_date.split('T')[0] : '')}
+                                 onChange={(e) => handleInterviewDateChange(e.target.value)}
+                                 className="w-full"
+                             />
+                             {interviewDateSaving && (
+                                 <span className="text-xs text-muted-foreground flex items-center gap-1">
+                                     <LoaderIcon className="size-3 animate-spin" />
+                                     Saving...
+                                 </span>
+                             )}
+                             {interviewDateError && (
+                                 <p className="text-xs text-destructive">{interviewDateError}</p>
+                             )}
+                         </div>
+                     )}
+
+                     <Dialog open={interviewDateModalOpen} onOpenChange={(open) => {
+                         if (!open) {
+                             setInterviewDateModalOpen(false);
+                             setPendingStatusChange(null);
+                         }
+                     }}>
+                         <DialogContent className="sm:max-w-sm">
+                             <DialogHeader>
+                                 <DialogTitle className="text-base">
+                                     Set Interview Date
+                                 </DialogTitle>
+                             </DialogHeader>
+                             <div className="flex flex-col gap-4">
+                                 <p className="text-sm text-muted-foreground">
+                                     Please set the interview date before changing to Interviewing status.
+                                 </p>
+                                 <Input
+                                     type="date"
+                                     value={interviewDate}
+                                     onChange={(e) => setInterviewDate(e.target.value)}
+                                     className="w-full"
+                                 />
+                                 <div className="flex justify-end gap-2">
+                                     <Button
+                                         variant="outline"
+                                         onClick={() => {
+                                             setInterviewDateModalOpen(false);
+                                             setPendingStatusChange(null);
+                                         }}
+                                     >
+                                         Cancel
+                                     </Button>
+                                     <Button
+                                         onClick={handleInterviewDateConfirm}
+                                         disabled={!interviewDate}
+                                     >
+                                         Confirm
+                                     </Button>
+                                 </div>
+                             </div>
+                         </DialogContent>
+                     </Dialog>
 
                     <div className="flex flex-col gap-3 border-t border-border pt-4">
                         <div className="flex items-center justify-between">
                             <span className="text-xs text-muted-foreground">
                                 Last Contacted
                             </span>
-                            <Button
-                                onClick={handleMarkAsContacted}
-                                disabled={contacting}
-                                variant="outline"
-                                size="sm"
-                            >
-                                {contacting ? (
-                                    <>
+                            <div className="flex items-center gap-1.5">
+                                <Button
+                                    onClick={() => handleMarkAsContacted('now')}
+                                    disabled={contacting}
+                                    variant="outline"
+                                    size="sm"
+                                    className="h-7 text-xs"
+                                >
+                                    {contacting ? (
                                         <LoaderIcon className="size-3 animate-spin" />
-                                        Saving...
-                                    </>
-                                ) : (
-                                    <>
-                                        <ClockIcon className="size-3" />
-                                        Mark as Contacted
-                                    </>
+                                    ) : (
+                                        <>
+                                            <ClockIcon className="size-3" />
+                                            Today
+                                        </>
+                                    )}
+                                </Button>
+                                {app.last_contacted_at && (
+                                    <Button
+                                        onClick={() => handleMarkAsContacted(null)}
+                                        disabled={contacting}
+                                        variant="ghost"
+                                        size="sm"
+                                        className="h-7 text-xs text-destructive hover:bg-destructive/10"
+                                    >
+                                        Clear
+                                    </Button>
                                 )}
-                            </Button>
+                            </div>
                         </div>
-                        {app.last_contacted_at && (
-                            <span className="text-xs text-muted-foreground">
-                                Last contacted:{' '}
-                                {new Date(app.last_contacted_at).toLocaleDateString('en-PH', {
-                                    year: 'numeric',
-                                    month: 'short',
-                                    day: 'numeric',
-                                })}
-                            </span>
-                        )}
+
+                        <div className="flex items-center gap-2">
+                            <Input
+                                type="date"
+                                value={app.last_contacted_at ? app.last_contacted_at.split('T')[0] : ''}
+                                onChange={(e) => handleMarkAsContacted(e.target.value || null)}
+                                disabled={contacting}
+                                className="h-8 text-xs"
+                            />
+                        </div>
                     </div>
 
-{app.status === 'interviewing' && (
+{(app.status === 'applied' || app.status === 'interviewing') && app.staleness_level !== null && (
                      <div className="flex flex-col gap-3 border-t border-border pt-4">
                          <div className="flex items-center justify-between">
                              <span className="text-xs text-muted-foreground">
@@ -793,23 +952,22 @@ return;
                          )}
                      </div>
                  )}
-
-                      {app.status === 'interviewing' && (
+                 {(app.status === 'interviewing' || Boolean(app.interview_notes)) && (
                       <div className="flex flex-col gap-3 border-t border-border pt-4">
                           <span className="text-xs text-muted-foreground">
                               Interview Notes
                           </span>
                           <textarea
                               value={app.interview_notes ?? ''}
-                               onChange={(e) => {
-                                   setLocalApplication((prev) => {
-                                       if (!prev) {
-                                           return prev;
-                                       }
+                              onChange={(e) => {
+                                  setLocalApplication((prev) => {
+                                      if (!prev) {
+                                          return prev;
+                                      }
 
-                                       return { ...prev, interview_notes: e.target.value };
-                                   });
-                               }}
+                                      return { ...prev, interview_notes: e.target.value };
+                                  });
+                              }}
                               placeholder="Record interviewer names, questions asked, observations..."
                               rows={4}
                               className="w-full resize-none rounded-lg border border-input bg-transparent p-2 text-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
@@ -819,7 +977,11 @@ return;
                           )}
                           <Button
                               onClick={handleSaveInterviewNotes}
-                              disabled={notesSaving}
+                              disabled={
+                                  notesSaving ||
+                                  !app.interview_notes?.trim() ||
+                                  (app.interview_notes ?? '') === (application?.interview_notes ?? '')
+                              }
                               size="sm"
                           >
                               {notesSaving ? (
@@ -904,71 +1066,84 @@ return;
                   )}
 
                      <div className="flex flex-col gap-3 border-t border-border pt-4">
-                         <div className="flex items-center justify-between">
-                             <span className="text-xs text-muted-foreground">
-                                 Contacts
-                             </span>
-                         </div>
-                         {app.contacts && app.contacts.length > 0 ? (
-                             <div className="flex flex-wrap gap-1">
-                                 {app.contacts.map((contact: { id: number; name: string; email?: string | null; role?: string | null; company_name?: string | null }) => (
-                                     <Badge
-                                         key={contact.id}
-                                         variant="secondary"
-                                         className="gap-1 text-xs"
-                                     >
-                                         <UsersIcon className="size-2.5" />
-                                         {contact.name}
-                                         {contact.role && (
-                                             <span className="text-muted-foreground">
-                                                 ({contact.role})
-                                             </span>
-                                         )}
-                                     </Badge>
-                                 ))}
-                             </div>
-                         ) : (
-                             <p className="text-xs text-muted-foreground italic">
-                                 No contacts linked
-                             </p>
-                         )}
-                         {availableContacts.length > 0 && (
-                             <div className="flex flex-col gap-1">
-                                 <span className="text-[11px] text-muted-foreground">
-                                     Link a contact:
-                                 </span>
-                                 <div className="flex flex-wrap gap-1">
-                                     {availableContacts
-                                         .filter(
-                                             (c) =>
-                                                 !app.contacts?.some(
-                                                     (ec: { id: number }) => ec.id === c.id,
-                                                 ),
-                                         )
-                                         .map((contact) => (
-                                             <Button
-                                                 key={contact.id}
-                                                 variant="outline"
-                                                 size="sm"
-                                                 className="h-6 px-2 text-xs"
-                                                 onClick={() => {
-                                                     router.post(
-                                                         linkContactRoute.url(contact.id),
-                                                         {
-                                                             job_application_id: app.id,
-                                                         },
-                                                         { preserveState: true },
-                                                     );
-                                                 }}
-                                             >
-                                                 <LinkIcon className="size-2.5" />
-                                                 {contact.name}
-                                             </Button>
-                                         ))}
-                                 </div>
-                             </div>
-                         )}
-                     </div>
+                          <div className="flex items-center justify-between">
+                              <span className="text-xs text-muted-foreground">
+                                  Contacts
+                              </span>
+                              <Button
+                                  variant="outline"
+                                  size="sm"
+                                  className="h-6 px-2 text-xs"
+                                  onClick={() => setCreateContactOpen(true)}
+                              >
+                                  + Create Contact
+                              </Button>
+                          </div>
+                          {app.contacts && app.contacts.length > 0 ? (
+                              <div className="flex flex-wrap gap-1">
+                                  {app.contacts.map((contact: { id: number; name: string; email?: string | null; role?: string | null; company_name?: string | null }) => (
+                                      <Badge
+                                          key={contact.id}
+                                          variant="secondary"
+                                          className="gap-1 text-xs"
+                                      >
+                                          <UsersIcon className="size-2.5" />
+                                          {contact.name}
+                                          {contact.role && (
+                                              <span className="text-muted-foreground">
+                                                  ({contact.role})
+                                              </span>
+                                          )}
+                                      </Badge>
+                                  ))}
+                              </div>
+                          ) : (
+                              <p className="text-xs text-muted-foreground italic">
+                                  No contacts linked
+                              </p>
+                          )}
+                          {availableContacts.length > 0 && (
+                              <div className="flex flex-col gap-1">
+                                  <span className="text-[11px] text-muted-foreground">
+                                      Link a contact:
+                                  </span>
+                                  <div className="flex flex-wrap gap-1">
+                                      {availableContacts
+                                          .filter(
+                                              (c) =>
+                                                  !app.contacts?.some(
+                                                      (ec: { id: number }) => ec.id === c.id,
+                                                  ),
+                                          )
+                                          .map((contact) => (
+                                              <Button
+                                                  key={contact.id}
+                                                  variant="outline"
+                                                  size="sm"
+                                                  className="h-6 px-2 text-xs"
+                                                  onClick={() => {
+                                                      setLocalApplication((prev) => {
+                                                          if (!prev) return prev;
+                                                          const updatedContacts = [...(prev.contacts ?? []), contact];
+                                                          return { ...prev, contacts: updatedContacts };
+                                                      });
+                                                      router.post(
+                                                          linkContactRoute.url(contact.id),
+                                                          {
+                                                              job_application_id: app.id,
+                                                          },
+                                                          { preserveState: true },
+                                                      );
+                                                  }}
+                                              >
+                                                  <LinkIcon className="size-2.5" />
+                                                  {contact.name}
+                                              </Button>
+                                          ))}
+                                  </div>
+                              </div>
+                          )}
+                      </div>
                  {app.activities && app.activities.length > 0 && (
                         <ActivityTimeline activities={app.activities} />
                     )}
@@ -989,6 +1164,100 @@ return;
                     onClose={() => setTemplateDialogOpen(false)}
                     application={app}
                 />
+
+                <Dialog open={createContactOpen} onOpenChange={(open) => !open && setCreateContactOpen(false)}>
+                    <DialogContent className="sm:max-w-md">
+                        <DialogHeader>
+                            <DialogTitle className="text-base">
+                                Quick Create Contact
+                            </DialogTitle>
+                        </DialogHeader>
+                        <form
+                            onSubmit={(e) => {
+                                e.preventDefault();
+                                if (!newContactName.trim()) return;
+                                setCreatingContact(true);
+
+                                router.post(
+                                    '/contacts',
+                                    {
+                                        name: newContactName,
+                                        email: newContactEmail || null,
+                                        role: newContactRole || null,
+                                        company_name: app.company_name,
+                                        job_application_id: app.id,
+                                    },
+                                    {
+                                        preserveState: true,
+                                        onSuccess: () => {
+                                            setNewContactName('');
+                                            setNewContactEmail('');
+                                            setNewContactRole('');
+                                            setCreateContactOpen(false);
+                                        },
+                                        onFinish: () => setCreatingContact(false),
+                                    },
+                                );
+                            }}
+                            className="flex flex-col gap-3"
+                        >
+                            <div className="flex flex-col gap-1">
+                                <label className="text-xs text-muted-foreground font-medium">
+                                    Name *
+                                </label>
+                                <Input
+                                    value={newContactName}
+                                    onChange={(e) => setNewContactName(e.target.value)}
+                                    placeholder="e.g. Jane Doe"
+                                    required
+                                />
+                            </div>
+
+                            <div className="flex flex-col gap-1">
+                                <label className="text-xs text-muted-foreground font-medium">
+                                    Role / Title
+                                </label>
+                                <Input
+                                    value={newContactRole}
+                                    onChange={(e) => setNewContactRole(e.target.value)}
+                                    placeholder="e.g. Senior Recruiter"
+                                />
+                            </div>
+
+                            <div className="flex flex-col gap-1">
+                                <label className="text-xs text-muted-foreground font-medium">
+                                    Email
+                                </label>
+                                <Input
+                                    type="email"
+                                    value={newContactEmail}
+                                    onChange={(e) => setNewContactEmail(e.target.value)}
+                                    placeholder="jane@company.com"
+                                />
+                            </div>
+
+                            <div className="mt-2 flex justify-end gap-2">
+                                <Button
+                                    type="button"
+                                    variant="outline"
+                                    onClick={() => setCreateContactOpen(false)}
+                                >
+                                    Cancel
+                                </Button>
+                                <Button type="submit" disabled={creatingContact || !newContactName.trim()}>
+                                    {creatingContact ? (
+                                        <>
+                                            <LoaderIcon className="size-3 animate-spin" />
+                                            Creating...
+                                        </>
+                                    ) : (
+                                        'Create Contact'
+                                    )}
+                                </Button>
+                            </div>
+                        </form>
+                    </DialogContent>
+                </Dialog>
             </DialogContent>
         </Dialog>
     );

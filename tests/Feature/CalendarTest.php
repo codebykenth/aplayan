@@ -3,10 +3,10 @@
 use App\Models\JobApplication;
 use App\Models\User;
 
- beforeEach(function () {
-     $this->user = User::factory()->create();
-     $this->otherUser = User::factory()->create();
- });
+beforeEach(function () {
+    $this->user = User::factory()->create();
+    $this->otherUser = User::factory()->create();
+});
 
 it('redirects unauthenticated users to login', function () {
     $this->get('/calendar')->assertRedirect();

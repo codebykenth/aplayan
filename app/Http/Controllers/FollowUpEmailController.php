@@ -46,8 +46,14 @@ class FollowUpEmailController extends Controller
     {
         $this->authorize('update', $jobApplication);
 
+        $validated = request()->validate([
+            'date' => ['nullable', 'string'],
+        ]);
+
+        $dateParam = array_key_exists('date', $validated) ? $validated['date'] : 'now';
+
         $service = $this->service ?? app(JobApplicationService::class);
-        $updated = $service->markAsContacted($jobApplication);
+        $updated = $service->markAsContacted($jobApplication, $dateParam);
 
         return response()->json([
             'data' => [

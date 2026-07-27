@@ -1,10 +1,10 @@
 import { Head, useForm } from '@inertiajs/react';
-import type { ReactNode } from 'react';
 import { Flame, Target, TrendingUp, Save } from 'lucide-react';
+import type { ReactNode } from 'react';
 import { Button } from '@/components/ui/button';
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import AppLayout from '@/layouts/app-layout';
 import goals from '@/routes/goals';
 

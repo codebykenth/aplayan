@@ -1,15 +1,17 @@
 import { Head, Link } from '@inertiajs/react';
-import { type ReactNode } from 'react';
 import { MapPinIcon, ExternalLinkIcon, TrendingUp, CalendarDays, Briefcase, PhilippinePesoIcon } from 'lucide-react';
+import type {ReactNode} from 'react';
+import TaxBreakdownCard from '@/components/job-applications/tax-breakdown-card';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import TaxBreakdownCard from '@/components/job-applications/tax-breakdown-card';
+import AppLayout from '@/layouts/app-layout';
 import { JOB_APPLICATION_STATUSES, STATUS_COLORS } from '@/types/job-application';
 import type { JobApplication } from '@/types/job-application';
-import AppLayout from '@/layouts/app-layout';
 
 function formatSalary(amount: number | null): string | null {
-    if (amount === null) return null;
+    if (amount === null) {
+return null;
+}
 
     return `₱${amount.toLocaleString('en-PH', {
         minimumFractionDigits: 0,
@@ -18,7 +20,9 @@ function formatSalary(amount: number | null): string | null {
 }
 
 function formatDate(date: string | null): string | null {
-    if (!date) return null;
+    if (!date) {
+return null;
+}
 
     const d = new Date(date);
 

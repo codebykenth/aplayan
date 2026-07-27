@@ -22,7 +22,7 @@ class JobApplicationFactory extends Factory
             'job_url' => fake()->url(),
             'job_description' => fake()->paragraph(),
             'location' => fake()->randomElement(['Metro Manila', 'Cebu', 'Davao', 'Remote PH', 'Foreign Remote']),
-            'status' => fake()->randomElement(['wishlist', 'applied', 'interviewing', 'offer', 'rejected']),
+            'status' => 'wishlist',
             'date_applied' => fake()->optional()->date(),
             'expected_salary' => fake()->optional()->numberBetween(20000, 200000),
             'offered_salary' => fake()->optional()->numberBetween(20000, 200000),

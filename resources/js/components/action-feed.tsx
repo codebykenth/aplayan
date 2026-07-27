@@ -1,7 +1,4 @@
 import { Link } from '@inertiajs/react';
-import { show as showRoute } from '@/routes/job-applications';
-import { Badge } from '@/components/ui/badge';
-import { cn } from '@/lib/utils';
 import {
     Bell,
     Clock,
@@ -12,6 +9,9 @@ import {
     TrendingDown,
     ArrowRight,
 } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { cn } from '@/lib/utils';
+import { show as showRoute } from '@/routes/job-applications';
 
 export interface ActionItem {
     type: string;

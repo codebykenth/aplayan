@@ -11,6 +11,8 @@ use App\Models\JobApplication;
 use App\Services\ApplicationTemplateService;
 use App\Services\ContactService;
 use App\Services\JobApplicationService;
+use Carbon\Carbon;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -56,11 +58,15 @@ class JobApplicationController extends Controller
         return new JobApplicationResource($jobApplication);
     }
 
-    public function update(UpdateJobApplicationRequest $request, JobApplication $jobApplication): RedirectResponse
+    public function update(UpdateJobApplicationRequest $request, JobApplication $jobApplication): JobApplicationResource|RedirectResponse|JsonResponse
     {
         $this->authorize('update', $jobApplication);
 
-        $this->service->updateForUser($jobApplication, $request->validated());
+        $updated = $this->service->updateForUser($jobApplication, $request->validated());
+
+        if ($request->wantsJson()) {
+            return new JobApplicationResource($updated);
+        }
 
         return to_route('job-applications.index');
     }
@@ -78,12 +84,36 @@ class JobApplicationController extends Controller
     {
         $this->authorize('update', $jobApplication);
 
-        $this->service->updateStatusForUser(
-            $jobApplication,
-            JobApplicationStatus::from($request->validated('status')),
-            $request->validated('interview_date'),
-        );
+        try {
+            $this->service->updateStatusForUser(
+                $jobApplication,
+                JobApplicationStatus::from($request->validated('status')),
+                $request->validated('interview_date'),
+            );
+        } catch (\InvalidArgumentException $e) {
+            return back()->withErrors(['status' => $e->getMessage()]);
+        }
 
         return to_route('job-applications.index');
+    }
+
+    public function updateInterviewDate(JobApplication $jobApplication): JsonResponse
+    {
+        $this->authorize('update', $jobApplication);
+
+        $validated = request()->validate([
+            'interview_date' => ['nullable', 'date'],
+        ]);
+
+        $interviewDate = $validated['interview_date'] ?? null;
+
+        $jobApplication->update(['interview_date' => $interviewDate ? Carbon::parse($interviewDate)->toDateTimeString() : null]);
+
+        return response()->json([
+            'data' => [
+                'id' => $jobApplication->id,
+                'interview_date' => $jobApplication->interview_date?->toIso8601String(),
+            ],
+        ]);
     }
 }

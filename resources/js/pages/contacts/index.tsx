@@ -1,5 +1,4 @@
 import { Head, router, useForm } from '@inertiajs/react';
-import { useState, useMemo, type ReactNode } from 'react';
 import {
     SearchIcon,
     PlusIcon,
@@ -14,10 +13,10 @@ import {
     LinkIcon,
     UnlinkIcon,
 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import { useState, useMemo  } from 'react';
+import type {ReactNode} from 'react';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import {
     Dialog,
     DialogContent,
@@ -26,9 +25,9 @@ import {
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import AppLayout from '@/layouts/app-layout';
-import type { Contact } from '@/types/contact';
-import type { JobApplication } from '@/types/job-application';
 import {
     store as storeContact,
     update as updateContact,
@@ -36,6 +35,8 @@ import {
     link as linkContact,
     unlink as unlinkContact,
 } from '@/routes/contacts';
+import type { Contact } from '@/types/contact';
+import type { JobApplication } from '@/types/job-application';
 
 interface ContactFormData {
     name: string;
@@ -48,8 +49,12 @@ interface ContactFormData {
 }
 
 function formatLastContacted(date: string | null): string | null {
-    if (!date) return null;
+    if (!date) {
+return null;
+}
+
     const d = new Date(date);
+
     return d.toLocaleDateString('en-PH', {
         year: 'numeric',
         month: 'short',
@@ -274,8 +279,12 @@ export default function ContactsIndex({
         });
 
     const filtered = useMemo(() => {
-        if (!search) return contacts;
+        if (!search) {
+return contacts;
+}
+
         const q = search.toLowerCase();
+
         return contacts.filter(
             (c) =>
                 c.name.toLowerCase().includes(q) ||
@@ -341,7 +350,10 @@ export default function ContactsIndex({
     }
 
     function handleDelete(contact: Contact) {
-        if (!window.confirm(`Delete contact "${contact.name}"?`)) return;
+        if (!window.confirm(`Delete contact "${contact.name}"?`)) {
+return;
+}
+
         router.delete(deleteContact.url(contact.id));
     }
 

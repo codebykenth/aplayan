@@ -1,6 +1,6 @@
 import { useForm, router } from '@inertiajs/react';
-import { useState, useCallback } from 'react';
 import { ZapIcon, LoaderIcon } from 'lucide-react';
+import { useState, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import {
     Dialog,
@@ -52,6 +52,7 @@ export default function QuickApplyDialog({
     function handleTemplateChange(templateId: string | null) {
         if (!templateId) {
             setSelectedTemplate(null);
+
             return;
         }
 
@@ -61,7 +62,10 @@ export default function QuickApplyDialog({
 
     async function submit(e: React.FormEvent) {
         e.preventDefault();
-        if (!selectedTemplate) return;
+
+        if (!selectedTemplate) {
+return;
+}
 
         setSubmitting(true);
 

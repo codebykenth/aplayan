@@ -1,21 +1,22 @@
 import { Head } from '@inertiajs/react';
-import { BarChart, Bar, XAxis, YAxis, PieChart, Pie, Cell, CartesianGrid } from 'recharts';
-import type { ReactNode } from 'react';
 import { Briefcase, TrendingUp, CalendarDays } from 'lucide-react';
+import type { ReactNode } from 'react';
+import { BarChart, Bar, XAxis, YAxis, PieChart, Pie, Cell, CartesianGrid } from 'recharts';
+import ActionFeed from '@/components/action-feed';
+import type { ActionItem } from '@/components/action-feed';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
     ChartContainer,
     ChartTooltip,
     ChartTooltipContent,
     ChartLegend,
-    ChartLegendContent,
-    type ChartConfig,
+    ChartLegendContent
+    
 } from '@/components/ui/chart';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import type {ChartConfig} from '@/components/ui/chart';
+import AppLayout from '@/layouts/app-layout';
 import { JOB_APPLICATION_STATUSES } from '@/types/job-application';
 import type { JobApplicationStatus } from '@/types/job-application';
-import AppLayout from '@/layouts/app-layout';
-import ActionFeed from '@/components/action-feed';
-import type { ActionItem } from '@/components/action-feed';
 
 const STATUS_CHART_COLORS: Record<JobApplicationStatus, string> = {
     wishlist: '#94a3b8',
@@ -23,6 +24,7 @@ const STATUS_CHART_COLORS: Record<JobApplicationStatus, string> = {
     interviewing: '#f59e0b',
     offer: '#10b981',
     rejected: '#ef4444',
+    withdrawn: '#64748b',
 };
 
 function statusLabel(value: string): string {
@@ -53,6 +55,7 @@ export default function Dashboard({
     }));
 
     const pieConfig: ChartConfig = {};
+
     for (const { value } of JOB_APPLICATION_STATUSES) {
         pieConfig[value] = {
             label: statusLabel(value),
@@ -198,6 +201,7 @@ export default function Dashboard({
                                             axisLine={false}
                                             tickFormatter={(val: string) => {
                                                 const d = new Date(val + 'T00:00:00');
+
                                                 return `${d.getMonth() + 1}/${d.getDate()}`;
                                             }}
                                             fontSize={10}
@@ -216,6 +220,7 @@ export default function Dashboard({
                                                         const d = new Date(
                                                             String(label) + 'T00:00:00'
                                                         );
+
                                                         return d.toLocaleDateString('en-US', {
                                                             month: 'short',
                                                             day: 'numeric',

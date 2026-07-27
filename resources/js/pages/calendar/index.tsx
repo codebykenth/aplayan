@@ -134,14 +134,28 @@ export default function Calendar({
         }
     };
 
-    const navigateToApplication = (applicationId: number) => {
-        router.visit(`/job-applications/${applicationId}`, {
-            preserveState: true,
-        });
-    };
+    const [loadingAppId, setLoadingAppId] = useState<number | null>(null);
 
-    const openApplicationDetail = (app: JobApplication) => {
-        setViewingApplication(app);
+    const openApplicationDetailById = async (applicationId: number) => {
+        setLoadingAppId(applicationId);
+
+        try {
+            const response = await fetch(`/job-applications/${applicationId}`, {
+                headers: {
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest',
+                },
+            });
+
+            if (response.ok) {
+                const json = await response.json();
+                setViewingApplication(json.data);
+            }
+        } catch {
+            // handle error silently
+        } finally {
+            setLoadingAppId(null);
+        }
     };
 
     const weekDays = view === 'week' && events.length > 0
@@ -150,18 +164,25 @@ export default function Calendar({
 
     const weeks = view === 'month' ? getWeeksInMonth(currentYear, currentMonth) : [];
 
+    const [selectedDate, setSelectedDate] = useState<string | null>(null);
+
+    const selectedDayEvents = useMemo(() => {
+        if (!selectedDate) return [];
+        return eventsByDate.get(selectedDate) ?? [];
+    }, [selectedDate, eventsByDate]);
+
     return (
         <>
             <Head title="Calendar" />
 
             <div className="flex flex-1 min-h-0 flex-col gap-6 overflow-y-auto">
-                <div className="flex items-center justify-between">
+                <div className="flex flex-wrap items-center justify-between gap-3">
                     <h1 className="text-2xl font-semibold text-foreground">Calendar</h1>
                     <div className="flex items-center gap-2">
                         <Button variant="outline" size="sm" onClick={prevMonth}>
                             <ChevronLeftIcon className="size-4" />
                         </Button>
-                        <span className="min-w-[160px] text-center text-lg font-medium text-foreground">
+                        <span className="min-w-[140px] text-center text-sm sm:text-base font-semibold text-foreground">
                             {formatMonthYear(currentYear, currentMonth)}
                         </span>
                         <Button variant="outline" size="sm" onClick={nextMonth}>
@@ -189,16 +210,17 @@ export default function Calendar({
                     </Button>
                 </div>
 
-                <Card className="glass-card">
-                    <CardContent className="p-4">
+                <Card className="glass-card overflow-hidden">
+                    <CardContent className="p-2 sm:p-4">
                         {view === 'month' ? (
                             <div className="grid grid-cols-7 gap-1">
                                 {DAY_NAMES.map((day) => (
                                     <div
                                         key={day}
-                                        className="text-center text-xs font-medium text-muted-foreground py-2"
+                                        className="text-center text-[11px] sm:text-xs font-semibold text-muted-foreground py-1"
                                     >
-                                        {day}
+                                        <span className="sm:hidden">{day[0]}</span>
+                                        <span className="hidden sm:inline">{day}</span>
                                     </div>
                                 ))}
                                 {weeks.map((week, weekIndex) => (
@@ -207,38 +229,72 @@ export default function Calendar({
                                             ? `${currentYear}-${String(currentMonth).padStart(2, '0')}-${String(day).padStart(2, '0')}`
                                             : '';
                                         const dayEvents = day ? eventsByDate.get(dateStr) : [];
+                                        const isSelected = selectedDate === dateStr;
+                                        const hasEvents = dayEvents && dayEvents.length > 0;
 
                                         return (
                                             <div
                                                 key={`${weekIndex}-${dayIndex}`}
-                                                className={`min-h-[80px] rounded-lg border p-2 transition-colors ${
+                                                className={`min-h-[50px] sm:min-h-[85px] rounded-lg border p-1 sm:p-2 transition-all flex flex-col justify-between ${
                                                     day
-                                                        ? 'bg-card hover:bg-muted/50 cursor-pointer'
-                                                        : 'bg-transparent border-transparent'
+                                                        ? isSelected
+                                                            ? 'border-primary bg-primary/10 ring-1 ring-primary'
+                                                            : 'bg-card hover:bg-muted/50 cursor-pointer'
+                                                        : 'bg-transparent border-transparent opacity-0 pointer-events-none'
                                                 }`}
                                                 onClick={() => {
-                                                    if (day && dayEvents && dayEvents.length > 0) {
-                                                        openApplicationDetail(dayEvents[0] as unknown as JobApplication);
+                                                    if (day) {
+                                                        setSelectedDate(dateStr);
+                                                        if (dayEvents && dayEvents.length > 0 && window.innerWidth >= 640) {
+                                                            openApplicationDetailById(dayEvents[0].id);
+                                                        }
                                                     }
                                                 }}
                                             >
                                                 {day ? (
                                                     <>
-                                                        <span className="text-sm font-medium text-foreground">
-                                                            {day}
-                                                        </span>
-                                                        <div className="mt-1 flex flex-col gap-1">
+                                                        <div className="flex items-center justify-between">
+                                                            <span className={`text-xs sm:text-sm font-medium ${isSelected ? 'text-primary font-bold' : 'text-foreground'}`}>
+                                                                {day}
+                                                            </span>
+                                                            {hasEvents && (
+                                                                <span className="sm:hidden flex size-2 rounded-full bg-primary" />
+                                                            )}
+                                                        </div>
+
+                                                        {/* Mobile Dots */}
+                                                        {hasEvents && (
+                                                            <div className="mt-1 flex flex-wrap gap-0.5 sm:hidden justify-center">
+                                                                {dayEvents.map((event, idx) => (
+                                                                    <span
+                                                                        key={idx}
+                                                                        className={`size-1.5 rounded-full ${
+                                                                            event.status === 'interviewing'
+                                                                                ? 'bg-amber-500'
+                                                                                : event.status === 'offer'
+                                                                                  ? 'bg-green-500'
+                                                                                  : event.status === 'applied'
+                                                                                    ? 'bg-blue-500'
+                                                                                    : 'bg-slate-400'
+                                                                        }`}
+                                                                    />
+                                                                ))}
+                                                            </div>
+                                                        )}
+
+                                                        {/* Desktop Badges */}
+                                                        <div className="mt-1 hidden sm:flex flex-col gap-1">
                                                             {dayEvents?.map((event) => (
                                                                 <div
                                                                     key={`${event.id}-${event.type}`}
                                                                     className="cursor-pointer"
                                                                     onClick={(e) => {
                                                                         e.stopPropagation();
-                                                                        navigateToApplication(event.id);
+                                                                        openApplicationDetailById(event.id);
                                                                     }}
                                                                 >
                                                                     <Badge
-                                                                        className={`${STATUS_COLORS[event.status as keyof typeof STATUS_COLORS] ?? 'bg-gray-100 text-gray-700'} cursor-pointer text-[10px] capitalize`}
+                                                                        className={`${STATUS_COLORS[event.status as keyof typeof STATUS_COLORS] ?? 'bg-gray-100 text-gray-700'} cursor-pointer text-[10px] capitalize truncate max-w-full`}
                                                                     >
                                                                         {event.label}
                                                                     </Badge>
@@ -260,24 +316,24 @@ export default function Calendar({
                                     return (
                                         <div
                                             key={date}
-                                            className="flex items-center gap-4 rounded-lg border bg-card p-3 hover:bg-muted/50 transition-colors"
+                                            className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 rounded-lg border bg-card p-3 hover:bg-muted/50 transition-colors"
                                         >
-                                            <span className="w-24 text-sm font-medium text-foreground shrink-0">
+                                            <span className="w-full sm:w-24 text-xs sm:text-sm font-semibold text-foreground shrink-0">
                                                 {label}
                                             </span>
-                                            <div className="flex flex-wrap gap-1">
+                                            <div className="flex flex-wrap gap-1.5">
                                                 {dayEvents && dayEvents.length > 0 ? (
                                                     dayEvents.map((event) => (
                                                         <Badge
                                                             key={`${event.id}-${event.type}`}
-                                                            className={`${STATUS_COLORS[event.status as keyof typeof STATUS_COLORS] ?? 'bg-gray-100 text-gray-700'} cursor-pointer capitalize`}
-                                                            onClick={() => navigateToApplication(event.id)}
+                                                            className={`${STATUS_COLORS[event.status as keyof typeof STATUS_COLORS] ?? 'bg-gray-100 text-gray-700'} cursor-pointer capitalize text-xs`}
+                                                            onClick={() => openApplicationDetailById(event.id)}
                                                         >
                                                             {event.label}
                                                         </Badge>
                                                     ))
                                                 ) : (
-                                                    <span className="text-sm text-muted-foreground">No events</span>
+                                                    <span className="text-xs text-muted-foreground">No events</span>
                                                 )}
                                             </div>
                                         </div>
@@ -288,6 +344,49 @@ export default function Calendar({
                     </CardContent>
                 </Card>
 
+                {/* Selected Date Agenda (Mobile & Quick Detail) */}
+                {selectedDate && (
+                    <Card className="glass-card">
+                        <CardContent className="p-4 flex flex-col gap-3">
+                            <div className="flex items-center justify-between">
+                                <h3 className="text-sm font-semibold text-foreground">
+                                    Events for {new Date(selectedDate).toLocaleDateString('en-PH', { month: 'short', day: 'numeric', year: 'numeric' })}
+                                </h3>
+                                <Button variant="ghost" size="sm" className="h-6 px-2 text-xs" onClick={() => setSelectedDate(null)}>
+                                    Clear
+                                </Button>
+                            </div>
+
+                            {selectedDayEvents.length > 0 ? (
+                                <div className="flex flex-col gap-2">
+                                    {selectedDayEvents.map((event) => (
+                                        <div
+                                            key={`${event.id}-${event.type}`}
+                                            onClick={() => openApplicationDetailById(event.id)}
+                                            className="flex cursor-pointer items-center justify-between rounded-lg border border-border bg-card p-3 transition-colors hover:bg-accent"
+                                        >
+                                            <div className="flex flex-col gap-0.5">
+                                                <span className="text-sm font-semibold text-foreground">
+                                                    {event.job_title}
+                                                </span>
+                                                <span className="text-xs text-muted-foreground">
+                                                    {event.company_name}
+                                                </span>
+                                            </div>
+                                            <Badge className={`${STATUS_COLORS[event.status as keyof typeof STATUS_COLORS]} capitalize text-xs`}>
+                                                {event.label}
+                                            </Badge>
+                                        </div>
+                                    ))}
+                                </div>
+                            ) : (
+                                <p className="text-xs text-muted-foreground italic">
+                                    No events scheduled for this day.
+                                </p>
+                            )}
+                        </CardContent>
+                    </Card>
+                )}
                 {events.length === 0 && (
                     <div className="flex items-center justify-center py-12 text-sm text-muted-foreground">
                         No calendar events for this period

@@ -1,9 +1,8 @@
 import { Head, router, useForm } from '@inertiajs/react';
-import { useState, type ReactNode } from 'react';
 import { FileText, PlusIcon, Trash2Icon, PencilIcon, SaveIcon, XIcon, BookmarkIcon } from 'lucide-react';
+import { useState  } from 'react';
+import type {ReactNode} from 'react';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import {
     Dialog,
     DialogContent,
@@ -12,9 +11,11 @@ import {
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import AppLayout from '@/layouts/app-layout';
-import type { ApplicationTemplate } from '@/types/application-template';
 import { store as saveTemplate, update as updateTemplate, destroy as deleteTemplate } from '@/routes/templates';
+import type { ApplicationTemplate } from '@/types/application-template';
 
 interface FormData {
     name: string;
@@ -92,20 +93,34 @@ export default function TemplatesIndex({ templates }: { templates: ApplicationTe
     }
 
     function handleDelete(template: ApplicationTemplate) {
-        if (!window.confirm(`Delete template "${template.name}"?`)) return;
+        if (!window.confirm(`Delete template "${template.name}"?`)) {
+return;
+}
+
         router.delete(deleteTemplate.url(template.id));
     }
 
     const grouped = templates.reduce<Record<string, ApplicationTemplate[]>>((acc, t) => {
         const key = t.category || 'Uncategorized';
-        if (!acc[key]) acc[key] = [];
+
+        if (!acc[key]) {
+acc[key] = [];
+}
+
         acc[key].push(t);
+
         return acc;
     }, {});
 
     const sortedCategories = Object.keys(grouped).sort((a, b) => {
-        if (a === 'Uncategorized') return 1;
-        if (b === 'Uncategorized') return -1;
+        if (a === 'Uncategorized') {
+return 1;
+}
+
+        if (b === 'Uncategorized') {
+return -1;
+}
+
         return a.localeCompare(b);
     });
 

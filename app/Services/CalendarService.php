@@ -32,6 +32,11 @@ class CalendarService
             if ($app->interview_date) {
                 $interviewDate = Carbon::parse($app->interview_date);
                 if ($interviewDate->between($startDate, $endDate)) {
+                    $prefix = match ($app->status) {
+                        'withdrawn' => 'Withdrawn Interview',
+                        'rejected' => 'Past Interview',
+                        default => 'Interview',
+                    };
                     $events->push([
                         'id' => $app->id,
                         'type' => 'interview',
@@ -41,7 +46,7 @@ class CalendarService
                         'status' => $app->status,
                         'company_name' => $app->company_name,
                         'job_title' => $app->job_title,
-                        'label' => "Interview: {$app->company_name}",
+                        'label' => "{$prefix}: {$app->company_name}",
                     ]);
                 }
             }

@@ -1,6 +1,7 @@
 import { Head, Link, usePage } from '@inertiajs/react';
+import {  useState } from 'react';
+import type {FormEvent} from 'react';
 import type { Auth } from '@/types/auth';
-import { type FormEvent, useState } from 'react';
 
 export default function Register() {
     const { errors: pageErrors } = usePage<{ errors: Record<string, string> }>().props;

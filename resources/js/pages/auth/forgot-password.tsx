@@ -1,5 +1,6 @@
 import { Head, Link, usePage } from '@inertiajs/react';
-import { type FormEvent, useState } from 'react';
+import {  useState } from 'react';
+import type {FormEvent} from 'react';
 
 export default function ForgotPassword() {
     const { status, errors: pageErrors } = usePage<{ status?: string; errors: Record<string, string> }>().props;

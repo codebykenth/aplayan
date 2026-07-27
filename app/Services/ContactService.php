@@ -16,7 +16,19 @@ class ContactService
 
     public function createForUser(User $user, array $data): Contact
     {
-        return $user->contacts()->create($data);
+        $applicationId = $data['job_application_id'] ?? null;
+        unset($data['job_application_id']);
+
+        $contact = $user->contacts()->create($data);
+
+        if ($applicationId) {
+            $application = $user->jobApplications()->find($applicationId);
+            if ($application) {
+                $this->linkToApplication($contact, $application);
+            }
+        }
+
+        return $contact;
     }
 
     public function updateForUser(Contact $contact, array $data): Contact
@@ -34,6 +46,7 @@ class ContactService
     public function linkToApplication(Contact $contact, JobApplication $jobApplication): void
     {
         $contact->jobApplications()->syncWithoutDetaching($jobApplication->id);
+        $jobApplication->update(['last_contacted_at' => now()]);
     }
 
     public function unlinkFromApplication(Contact $contact, JobApplication $jobApplication): void

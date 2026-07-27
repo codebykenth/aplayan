@@ -1,11 +1,11 @@
 import { Head, Link, router } from '@inertiajs/react';
+import { FileText, Mail, Trash2, Eye, Download, ArrowLeft } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogClose } from '@/components/ui/dialog';
 import AppLayout from '@/layouts/app-layout';
-import { FileText, Mail, Trash2, Eye, Download, ArrowLeft } from 'lucide-react';
 
 type SavedResume = {
     id: number;
@@ -46,14 +46,24 @@ interface SavedDocumentsProps {
 function getTemplateLabel(template: string): string {
     const labels: Record<string, string> = {
         clean: 'Clean Minimal',
+        ats_classic: 'ATS Classic (One-Line Contact)',
+        ats_executive: 'ATS Executive (High Density)',
+        ats_bullet: 'ATS Bulleted (High Scannability)',
         modern: 'Modern Professional',
-        philippine: 'Philippine Standard',
+        philippine: 'Philippine Standard (CV)',
+        cl_modern: 'Modern & Engaging',
+        cl_formal: 'Classic & Formal',
+        cl_executive: 'Executive & Strategic',
+        cl_creative: 'Creative & Narrative',
+        cl_minimal: 'Clean & Direct',
     };
+
     return labels[template] || template;
 }
 
 function formatDate(dateString: string): string {
     const date = new Date(dateString);
+
     return date.toLocaleDateString('en-US', {
         year: 'numeric',
         month: 'short',
@@ -103,12 +113,14 @@ function ResumeCard({ resume, onDelete }: { resume: SavedResume; onDelete: (id: 
                     )}
                 </CardContent>
                 <CardFooter className="flex justify-end gap-2">
-                    <Button variant="ghost" size="sm" onClick={handlePreview}>
-                        <Eye className="mr-1 h-3 w-3" />
-                        Preview
-                    </Button>
-                    <Button variant="ghost" size="sm" onClick={() => setDeleteOpen(true)}>
-                        <Trash2 className="mr-1 h-3 w-3" />
+                    <Link href={`/documents?load_resume=${resume.id}`}>
+                        <Button variant="default" size="sm">
+                            <Eye className="mr-1 h-3.5 w-3.5" />
+                            Load & Preview
+                        </Button>
+                    </Link>
+                    <Button variant="outline" size="sm" onClick={() => setDeleteOpen(true)}>
+                        <Trash2 className="mr-1 h-3.5 w-3.5" />
                         Delete
                     </Button>
                 </CardFooter>
@@ -244,16 +256,14 @@ function CoverLetterCard({ letter, onDelete }: { letter: SavedCoverLetter; onDel
                     </p>
                 </CardContent>
                 <CardFooter className="flex justify-end gap-2">
-                    <Button variant="ghost" size="sm" onClick={() => setPreviewOpen(true)}>
-                        <Eye className="mr-1 h-3 w-3" />
-                        View
-                    </Button>
-                    <Button variant="ghost" size="sm" onClick={handleCopy}>
-                        <Download className="mr-1 h-3 w-3" />
-                        Copy
-                    </Button>
-                    <Button variant="ghost" size="sm" onClick={() => setDeleteOpen(true)}>
-                        <Trash2 className="mr-1 h-3 w-3" />
+                    <Link href={`/documents?load_cover_letter=${letter.id}`}>
+                        <Button variant="default" size="sm">
+                            <Eye className="mr-1 h-3.5 w-3.5" />
+                            Load & Preview
+                        </Button>
+                    </Link>
+                    <Button variant="outline" size="sm" onClick={() => setDeleteOpen(true)}>
+                        <Trash2 className="mr-1 h-3.5 w-3.5" />
                         Delete
                     </Button>
                 </CardFooter>

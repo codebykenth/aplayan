@@ -19,7 +19,10 @@ function setStoredTheme(theme: string): void {
 }
 
 function getSystemPrefersDark(): boolean {
-    if (typeof window === 'undefined') return false;
+    if (typeof window === 'undefined') {
+return false;
+}
+
     return window.matchMedia('(prefers-color-scheme: dark)').matches;
 }
 
@@ -30,12 +33,14 @@ function applyTheme(theme: string): void {
 
 function subscribeToStorage(callback: () => void): () => void {
     window.addEventListener('storage', callback);
+
     return () => window.removeEventListener('storage', callback);
 }
 
 function subscribeToSystemTheme(callback: () => void): () => void {
     const mq = window.matchMedia('(prefers-color-scheme: dark)');
     mq.addEventListener('change', callback);
+
     return () => mq.removeEventListener('change', callback);
 }
 

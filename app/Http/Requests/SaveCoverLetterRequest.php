@@ -18,7 +18,7 @@ class SaveCoverLetterRequest extends FormRequest
             'job_description' => ['nullable', 'string', 'max:10000'],
             'target_company' => ['nullable', 'string', 'max:255'],
             'target_job_title' => ['nullable', 'string', 'max:255'],
-            'template' => ['nullable', 'string', 'in:clean,modern,philippine'],
+            'template' => ['nullable', 'string', 'in:clean,modern,philippine,ats_classic,ats_executive,ats_bullet,cl_modern,cl_formal,cl_executive,cl_creative,cl_minimal'],
         ];
     }
 }

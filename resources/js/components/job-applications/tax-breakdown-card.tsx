@@ -1,5 +1,5 @@
-import { useState } from 'react';
 import { PhilippinePesoIcon } from 'lucide-react';
+import { useState } from 'react';
 import type { TaxBreakdown } from '@/types/job-application';
 
 function formatSalary(amount: number): string {

@@ -62,7 +62,8 @@ export type JobApplicationStatus =
     | 'applied'
     | 'interviewing'
     | 'offer'
-    | 'rejected';
+    | 'rejected'
+    | 'withdrawn';
 
 export const JOB_APPLICATION_STATUSES: {
     value: JobApplicationStatus;
@@ -73,6 +74,7 @@ export const JOB_APPLICATION_STATUSES: {
     { value: 'interviewing', label: 'Interviewing' },
     { value: 'offer', label: 'Offer' },
     { value: 'rejected', label: 'Rejected' },
+    { value: 'withdrawn', label: 'Withdrawn' },
 ];
 
 export const STATUS_COLORS: Record<JobApplicationStatus, string> = {
@@ -83,7 +85,16 @@ export const STATUS_COLORS: Record<JobApplicationStatus, string> = {
     offer: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300',
     rejected:
         'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300',
+    withdrawn:
+        'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300',
 };
+
+export const JOB_APPLICATION_STATUS_ORDER: JobApplicationStatus[] = [
+    'wishlist',
+    'applied',
+    'interviewing',
+    'offer',
+];
 
 export interface ParsedJobUrl {
     company_name: string | null;

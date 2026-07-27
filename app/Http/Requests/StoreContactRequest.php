@@ -21,6 +21,7 @@ class StoreContactRequest extends FormRequest
             'role' => ['nullable', 'string', 'max:255'],
             'notes' => ['nullable', 'string'],
             'last_contacted_at' => ['nullable', 'date'],
+            'job_application_id' => ['nullable', 'integer', 'exists:job_applications,id'],
         ];
     }
 }

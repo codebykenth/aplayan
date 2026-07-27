@@ -86,7 +86,7 @@ class JobApplicationImportService
         $validator = Validator::make($data, [
             'company_name' => ['required', 'string', 'max:255'],
             'job_title' => ['required', 'string', 'max:255'],
-            'status' => ['required', 'in:wishlist,applied,interviewing,offer,rejected'],
+            'status' => ['required', 'in:wishlist,applied,interviewing,offer,rejected,withdrawn'],
             'location' => ['required', 'string', 'max:255'],
             'expected_salary' => ['nullable', 'integer', 'min:0'],
             'date_applied' => ['nullable', 'date'],

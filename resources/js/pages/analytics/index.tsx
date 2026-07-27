@@ -1,4 +1,5 @@
 import { Head } from '@inertiajs/react';
+import type { ReactNode } from 'react';
 import {
     BarChart,
     Bar,
@@ -9,19 +10,19 @@ import {
     CartesianGrid,
     Cell,
 } from 'recharts';
-import type { ReactNode } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
     ChartContainer,
     ChartTooltip,
     ChartTooltipContent,
     ChartLegend,
-    ChartLegendContent,
-    type ChartConfig,
+    ChartLegendContent
+    
 } from '@/components/ui/chart';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import type {ChartConfig} from '@/components/ui/chart';
+import AppLayout from '@/layouts/app-layout';
 import { JOB_APPLICATION_STATUSES } from '@/types/job-application';
 import type { JobApplicationStatus } from '@/types/job-application';
-import AppLayout from '@/layouts/app-layout';
 
 const STATUS_CHART_COLORS: Record<JobApplicationStatus, string> = {
     wishlist: '#94a3b8',
@@ -29,6 +30,7 @@ const STATUS_CHART_COLORS: Record<JobApplicationStatus, string> = {
     interviewing: '#f59e0b',
     offer: '#10b981',
     rejected: '#ef4444',
+    withdrawn: '#64748b',
 };
 
 const FUNNEL_COLORS = [
@@ -52,20 +54,34 @@ function statusLabel(value: string): string {
 }
 
 function responseColor(days: number): string {
-    if (days <= 7) return RESPONSE_COLORS[0];
-    if (days <= 14) return RESPONSE_COLORS[1];
-    if (days <= 30) return RESPONSE_COLORS[2];
-    if (days <= 60) return RESPONSE_COLORS[3];
+    if (days <= 7) {
+return RESPONSE_COLORS[0];
+}
+
+    if (days <= 14) {
+return RESPONSE_COLORS[1];
+}
+
+    if (days <= 30) {
+return RESPONSE_COLORS[2];
+}
+
+    if (days <= 60) {
+return RESPONSE_COLORS[3];
+}
+
     return RESPONSE_COLORS[4];
 }
 
 function weekLabel(dateStr: string): string {
     const d = new Date(dateStr + 'T00:00:00');
+
     return `${d.getMonth() + 1}/${d.getDate()}`;
 }
 
 function weekTooltipLabel(dateStr: string): string {
     const d = new Date(dateStr + 'T00:00:00');
+
     return `Week of ${d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`;
 }
 
@@ -117,6 +133,7 @@ export default function Analytics({
     time_to_response: TimeToResponseItem[];
 }) {
     const funnelConfig: ChartConfig = {};
+
     for (const item of funnel) {
         funnelConfig[item.name] = {
             label: item.name,
@@ -129,6 +146,7 @@ export default function Analytics({
     };
 
     const statusOverTimeConfig: ChartConfig = {};
+
     for (const { value } of JOB_APPLICATION_STATUSES) {
         statusOverTimeConfig[value] = {
             label: statusLabel(value),
@@ -142,6 +160,7 @@ export default function Analytics({
     };
 
     const responseConfig: ChartConfig = {};
+
     for (const item of time_to_response) {
         const color = responseColor(item.days);
         responseConfig[item.company] = { label: item.company, color };
@@ -249,6 +268,7 @@ export default function Analytics({
                                                         hideLabel
                                                         formatter={(value, name, item, index, payload) => {
                                                             const p = payload as Record<string, any>;
+
                                                             return (
                                                                 <>
                                                                     <div
@@ -511,6 +531,7 @@ export default function Analytics({
                                                     const item = payload?.[0]?.payload as
                                                         | TimeToResponseItem
                                                         | undefined;
+
                                                     return item
                                                         ? `${item.company} — ${item.job_title}`
                                                         : '';

@@ -1,20 +1,21 @@
-import { useMemo, useState, useCallback, useEffect } from 'react';
 import {
     DndContext,
     DragOverlay,
     useDroppable,
-    useDraggable,
-    type DragEndEvent,
-    type DragStartEvent,
+    useDraggable
+    
+    
 } from '@dnd-kit/core';
+import type {DragEndEvent, DragStartEvent} from '@dnd-kit/core';
 import { router } from '@inertiajs/react';
+import { useMemo, useState, useCallback, useEffect } from 'react';
 import JobApplicationCard from '@/components/job-applications/job-application-card';
+import { status as updateStatus } from '@/routes/job-applications';
 import {
     JOB_APPLICATION_STATUSES,
     STATUS_COLORS,
 } from '@/types/job-application';
 import type { JobApplication, JobApplicationStatus } from '@/types/job-application';
-import { status as updateStatus } from '@/routes/job-applications';
 
 type FilterOption = 'all' | 'needs-attention';
 
@@ -163,6 +164,7 @@ export default function KanbanBoard({
         if (activeFilter === 'needs-attention') {
             return localApplications.filter(needsAttention);
         }
+
         return localApplications;
     }, [localApplications, activeFilter]);
 
@@ -190,14 +192,20 @@ export default function KanbanBoard({
 
             const { active, over } = event;
 
-            if (!over) return;
+            if (!over) {
+return;
+}
 
             const app = active.data.current as JobApplication;
             const newStatus = over.id as JobApplicationStatus;
 
-            if (app.status === newStatus) return;
+            if (app.status === newStatus) {
+return;
+}
 
-            if (!COLUMN_IDS.includes(newStatus)) return;
+            if (!COLUMN_IDS.includes(newStatus)) {
+                return;
+            }
 
             setLocalApplications((prev) =>
                 prev.map((a) =>

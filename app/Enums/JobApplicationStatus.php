@@ -9,6 +9,7 @@ enum JobApplicationStatus: string
     case Interviewing = 'interviewing';
     case Offer = 'offer';
     case Rejected = 'rejected';
+    case Withdrawn = 'withdrawn';
 
     public function label(): string
     {
@@ -18,6 +19,7 @@ enum JobApplicationStatus: string
             self::Interviewing => 'Interviewing',
             self::Offer => 'Offer',
             self::Rejected => 'Rejected',
+            self::Withdrawn => 'Withdrawn',
         };
     }
 }

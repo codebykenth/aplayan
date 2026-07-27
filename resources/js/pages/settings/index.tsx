@@ -1,12 +1,12 @@
 import { Head, router, useForm } from '@inertiajs/react';
-import type { ReactNode } from 'react';
 import { Sun, Moon, Monitor, User, KeyRound, Palette } from 'lucide-react';
+import type { ReactNode } from 'react';
 import { Button } from '@/components/ui/button';
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
-import AppLayout from '@/layouts/app-layout';
 import { useTheme } from '@/hooks/use-theme';
+import AppLayout from '@/layouts/app-layout';
 import settings from '@/routes/settings';
 
 const THEME_OPTIONS = [

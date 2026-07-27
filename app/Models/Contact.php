@@ -45,6 +45,10 @@ class Contact extends Model
         ];
     }
 
+    protected $appends = [
+        'job_application_ids',
+    ];
+
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);

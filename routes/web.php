@@ -78,6 +78,7 @@ Route::middleware('auth')->group(function () {
     Route::post('job-applications', [JobApplicationController::class, 'store'])->name('job-applications.store');
     Route::get('job-applications/{jobApplication}', [JobApplicationController::class, 'show'])->name('job-applications.show');
     Route::match(['put', 'patch'], 'job-applications/{jobApplication}', [JobApplicationController::class, 'update'])->name('job-applications.update');
+    Route::post('job-applications/{jobApplication}/interview-date', [JobApplicationController::class, 'updateInterviewDate'])->name('job-applications.interview-date');
     Route::patch('job-applications/{jobApplication}/status', [JobApplicationController::class, 'updateStatus'])->name('job-applications.status');
     Route::delete('job-applications/{jobApplication}', [JobApplicationController::class, 'destroy'])->name('job-applications.destroy');
     Route::post('job-applications/{jobApplication}/ai-match', [JobApplicationAiController::class, 'analyzeMatch'])->name('job-applications.ai-match');

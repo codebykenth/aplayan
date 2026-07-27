@@ -203,7 +203,9 @@ export default function JobApplicationForm({
                                 <Select
                                     value={data.status}
                                     onValueChange={(value: string | null) => {
-                                        if (value) setData('status', value);
+                                        if (value) {
+setData('status', value);
+}
                                     }}
                                 >
                                     <SelectTrigger aria-invalid={!!errors.status}>

@@ -27,6 +27,10 @@ class JobApplicationService
     public function updateForUser(JobApplication $jobApplication, array $data): JobApplication
     {
         $originalNotes = $jobApplication->notes;
+        if (array_key_exists('interview_notes', $data) && $data['interview_notes'] !== $jobApplication->interview_notes) {
+            $data['last_contacted_at'] = now();
+        }
+
         $jobApplication->update($data);
 
         if (array_key_exists('notes', $data) && $data['notes'] !== $originalNotes) {
@@ -44,8 +48,17 @@ class JobApplicationService
         $jobApplication->delete();
     }
 
+    private const array STATUS_ORDER = [
+        'wishlist',
+        'applied',
+        'interviewing',
+        'offer',
+    ];
+
     public function updateStatusForUser(JobApplication $jobApplication, JobApplicationStatus $status, ?string $interviewDate = null): JobApplication
     {
+        $this->validateStatusTransition($jobApplication->status, $status->value);
+
         $data = ['status' => $status->value];
 
         if ($status === JobApplicationStatus::Interviewing && $interviewDate !== null) {
@@ -62,13 +75,28 @@ class JobApplicationService
         return $jobApplication;
     }
 
-    public function markAsContacted(JobApplication $jobApplication): JobApplication
+    public function validateStatusTransition(string $currentStatus, string $newStatus): void
     {
-        $jobApplication->update(['last_contacted_at' => now()]);
+        // Flexible status transitions allowed across all stages.
+    }
+
+    public function markAsContacted(JobApplication $jobApplication, ?string $date = 'now'): JobApplication
+    {
+        $newDate = match ($date) {
+            'now' => now(),
+            null => null,
+            default => Carbon::parse($date),
+        };
+
+        $jobApplication->update(['last_contacted_at' => $newDate]);
+
+        $description = $newDate === null
+            ? 'Contact date cleared'
+            : "Marked as contacted ({$newDate->format('M j, Y')})";
 
         $jobApplication->activities()->create([
             'type' => 'contacted',
-            'description' => 'Marked as contacted',
+            'description' => $description,
         ]);
 
         return $jobApplication;

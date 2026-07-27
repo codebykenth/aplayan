@@ -28,15 +28,27 @@ class DocumentController extends Controller
         private GeminiService $geminiService,
     ) {}
 
-    public function index(): Response
+    public function index(Request $request): Response
     {
-        $profile = $this->profileService->getOrCreateProfile(auth()->user());
+        $user = auth()->user();
+        $profile = $this->profileService->getOrCreateProfile($user);
+        $aiLimit = $this->getAiRateLimitInfo($user);
 
-        $aiLimit = $this->getAiRateLimitInfo(auth()->user());
+        $loadedResume = null;
+        if ($request->has('load_resume')) {
+            $loadedResume = $user->savedResumes()->find($request->input('load_resume'));
+        }
+
+        $loadedCoverLetter = null;
+        if ($request->has('load_cover_letter')) {
+            $loadedCoverLetter = $user->savedCoverLetters()->find($request->input('load_cover_letter'));
+        }
 
         return Inertia::render('documents/index', [
             'profile' => $profile,
             'aiLimit' => $aiLimit,
+            'loadedResume' => $loadedResume,
+            'loadedCoverLetter' => $loadedCoverLetter,
         ]);
     }
 
@@ -128,7 +140,7 @@ class DocumentController extends Controller
     {
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
-            'template' => ['required', 'string', 'in:clean,modern,philippine'],
+            'template' => ['required', 'string', 'in:clean,modern,philippine,ats_classic,ats_executive,ats_bullet'],
             'profile_data' => ['required', 'array'],
             'photo_url' => ['nullable', 'string', 'max:500'],
         ]);

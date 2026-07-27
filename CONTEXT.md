@@ -45,7 +45,7 @@ The authenticated account owner tracking their job hunt.
 ### Job Application
 A record of a user's application to a specific job opening.
 - **Core Fields**: `company_name`, `job_title`, `job_url` (optional), `job_description` (optional text for AI analysis), `location` (Metro Manila, Cebu, Davao, Remote, etc.), `status`, `date_applied`, `expected_salary` (in ₱), `offered_salary` (in ₱), `notes`.
-- **Statuses**: `wishlist`, `applied`, `interviewing`, `offer`, `rejected`.
+- **Statuses**: `wishlist`, `applied`, `interviewing`, `offer`, `rejected`, `withdrawn`.
 - **AI Evaluation Fields**:
   - `ai_match_percentage` (0–100, nullable)
   - `ai_strengths` (JSON array of strings, nullable)
@@ -76,6 +76,9 @@ A read-only calendar view displaying interview dates, follow-up deadlines, and a
 ### Dynamic Document Builder
 A structured Resume & Cover Letter generator storing user experience, education, skills, and personal data as structured JSON/DB records. Renders ATS-friendly React templates with instant PDF generation without storing static PDF/Word files in cloud storage.
 
+### Target Role
+An optional headline displayed prominently in the resume header indicating the specific position the resume is tailored for (e.g. "Senior Software Developer"). Allows a single resume profile to be customized per job application without duplicating data.
+
 ---
 
 ## Decisions Log
@@ -96,3 +99,4 @@ A structured Resume & Cover Letter generator storing user experience, education,
 - **2026-07-27 - Phase 2 Zero-Storage Documents, Contacts & Calendar**: Planned Phase 2 extensions including Dynamic ATS Resume/Cover Letter Builder (zero cloud file storage), standalone & linked Contacts management, and a read-only Calendar suite with automated follow-up overlays.
 - **2026-07-27 - Dashboard Recent Activity Sidebar Architecture**: Structured a responsive multi-column layout for the Dashboard featuring a right sidebar Recent Activity feed. Eager loads `jobApplication` relations to prevent N+1 queries and enables instant modal inspection upon clicking activity items.
 - **2026-07-27 - Zero-Cost Serverless AI Caching and Entity Normalization Architecture**: Established a global entity-normalized cache system (`ai_responses_cache`) with SHA-256 canonical keys, daily user rate-limiting allowance, 100% serverless synchronous execution, and fallback to local PHP `AiFallbackService` rules during Gemini outages. (See `docs/adr/0006-zero-cost-serverless-ai-caching-architecture.md`).
+- **2026-07-27 - Target Role Resume Header**: Added optional `target_role` field to Resume Profile, displayed as a headline under the name in all 6 resume templates. Enables per-application tailoring of a single resume profile without data duplication. Field is nullable — when empty, templates render normally without the role line.

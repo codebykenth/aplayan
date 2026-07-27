@@ -1,18 +1,19 @@
 import { Head, router, useForm } from '@inertiajs/react';
-import { useState, useMemo, useRef, useEffect, type ReactNode } from 'react';
 import { SearchIcon, PlusIcon, DownloadIcon, UploadIcon, ZapIcon } from 'lucide-react';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import JobApplicationForm from '@/components/job-applications/job-application-form';
-import ApplicationDetailModal from '@/components/job-applications/application-detail-modal';
-import KanbanBoard from '@/components/job-applications/kanban-board';
+import { useState, useMemo, useRef, useEffect  } from 'react';
+import type {ReactNode} from 'react';
 import QuickApplyDialog from '@/components/application-templates/quick-apply-dialog';
-import { STATUS_COLORS, JOB_APPLICATION_STATUSES } from '@/types/job-application';
-import type { JobApplication, JobApplicationStatus } from '@/types/job-application';
+import ApplicationDetailModal from '@/components/job-applications/application-detail-modal';
+import JobApplicationForm from '@/components/job-applications/job-application-form';
+import KanbanBoard from '@/components/job-applications/kanban-board';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import AppLayout from '@/layouts/app-layout';
+import { destroy as jobAppDestroy, exportMethod, importMethod } from '@/routes/job-applications';
 import type { ApplicationTemplate } from '@/types/application-template';
 import type { Contact } from '@/types/contact';
-import { destroy as jobAppDestroy, exportMethod, importMethod } from '@/routes/job-applications';
-import AppLayout from '@/layouts/app-layout';
+import { STATUS_COLORS, JOB_APPLICATION_STATUSES } from '@/types/job-application';
+import type { JobApplication, JobApplicationStatus } from '@/types/job-application';
 
 const ALL_STATUS = 'all' as const;
 
@@ -50,11 +51,13 @@ export default function JobApplicationsIndex({
 
     function handleImportChange(e: React.ChangeEvent<HTMLInputElement>) {
         const file = e.target.files?.[0];
+
         if (file) {
             importForm.setData('file', file);
             importForm.post(importMethod.url(), {
                 onSuccess: () => {
                     importForm.reset();
+
                     if (fileInputRef.current) {
                         fileInputRef.current.value = '';
                     }
@@ -65,13 +68,16 @@ export default function JobApplicationsIndex({
     }
 
     useEffect(() => {
-        if (!exportOpen) return;
+        if (!exportOpen) {
+return;
+}
 
         function handleClickOutside() {
             setExportOpen(false);
         }
 
         document.addEventListener('click', handleClickOutside);
+
         return () => document.removeEventListener('click', handleClickOutside);
     }, [exportOpen]);
 
@@ -263,7 +269,11 @@ export default function JobApplicationsIndex({
             <ApplicationDetailModal
                 open={viewingApplication !== null}
                 onClose={() => setViewingApplication(null)}
-                application={viewingApplication}
+                application={
+                    viewingApplication
+                        ? (applicationList.find((a) => a.id === viewingApplication.id) ?? viewingApplication)
+                        : null
+                }
                 availableContacts={contacts}
             />
 

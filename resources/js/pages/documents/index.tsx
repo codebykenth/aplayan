@@ -1,14 +1,14 @@
 import { Head, Link, useForm, router } from '@inertiajs/react';
+import { User, Briefcase, GraduationCap, Wrench, Award, FolderGit2, FileText, Download, Mail, Camera, Save, Sparkles, Eye, Edit3, FilePenLine, Wand2, Loader2, AlertCircle, BookText, ArrowUp, ArrowDown } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogClose } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from '@/components/ui/select';
 import AppLayout from '@/layouts/app-layout';
-import { User, Briefcase, GraduationCap, Wrench, Award, FolderGit2, FileText, Download, Mail, Camera, Save, Sparkles, Eye, Edit3, FilePenLine, Wand2, Loader2, AlertCircle, BookText, ArrowUp, ArrowDown } from 'lucide-react';
 
 type WorkExperience = {
     company: string;
@@ -173,6 +173,7 @@ Best regards,
 
 function getPredefinedCoverLetter(templateId: string, jobTitle: string, companyName: string, fullName: string): string {
     const raw = COVER_LETTER_PREDEFINED_TEXTS[templateId] || COVER_LETTER_PREDEFINED_TEXTS.cl_modern;
+
     return raw
         .replaceAll('[Target Job Title]', jobTitle || 'Software Developer')
         .replaceAll('[Target Company]', companyName || 'Target Company')
@@ -216,6 +217,7 @@ function getPrintStyles(template: string): string {
             .photo { width: 96px; height: 96px; border-radius: 8px; object-fit: cover; float: right; margin-left: 16px; }
         `;
     }
+
     if (template === 'ats_executive') {
         return base + `
             .exec-header { margin-bottom: 16px; border-bottom: 1px solid #dcdcd8; padding-bottom: 12px; }
@@ -236,6 +238,7 @@ function getPrintStyles(template: string): string {
             .project-desc { font-size: 13px; margin-top: 4px; line-height: 1.4; }
         `;
     }
+
     if (template === 'ats_bullet') {
         return base + `
             .bullet-header { text-align: center; margin-bottom: 16px; border-bottom: 2px solid #1b1b18; padding-bottom: 12px; }
@@ -252,6 +255,7 @@ function getPrintStyles(template: string): string {
             .photo { width: 96px; height: 96px; border-radius: 8px; object-fit: cover; float: right; margin-left: 16px; }
         `;
     }
+
     if (template === 'clean') {
         return base + `
             .header { margin-bottom: 16px; }
@@ -273,6 +277,7 @@ function getPrintStyles(template: string): string {
             .project-desc { font-size: 13px; margin-top: 4px; line-height: 1.4; }
         `;
     }
+
     if (template === 'modern') {
         return base + `
             .header { background: #1b1b18; color: white; padding: 24px; }
@@ -295,6 +300,7 @@ function getPrintStyles(template: string): string {
             .project-desc { font-size: 13px; margin-top: 4px; line-height: 1.4; }
         `;
     }
+
     return base + `
         .header { text-align: center; border-bottom: 2px solid #1b1b18; padding-bottom: 16px; margin-bottom: 16px; }
         .cv-title { font-size: 11px; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; color: #706f6c; margin-bottom: 4px; }
@@ -341,6 +347,7 @@ function getScopedResumeStyles(template: string): string {
             .resume-paper-preview .photo { width: 96px; height: 96px; border-radius: 8px; object-fit: cover; float: right; margin-left: 16px; }
         `;
     }
+
     if (template === 'ats_executive') {
         return base + `
             .resume-paper-preview .exec-header { margin-bottom: 16px; border-bottom: 1px solid #dcdcd8; padding-bottom: 12px; }
@@ -361,6 +368,7 @@ function getScopedResumeStyles(template: string): string {
             .resume-paper-preview .project-desc { font-size: 13px; margin-top: 4px; line-height: 1.4; color: #1b1b18; }
         `;
     }
+
     if (template === 'ats_bullet') {
         return base + `
             .resume-paper-preview .bullet-header { text-align: center; margin-bottom: 16px; border-bottom: 2px solid #1b1b18; padding-bottom: 12px; }
@@ -399,6 +407,7 @@ function getScopedResumeStyles(template: string): string {
             .resume-paper-preview .project-desc { font-size: 13px; margin-top: 4px; line-height: 1.4; color: #1b1b18; }
         `;
     }
+
     if (template === 'modern') {
         return base + `
             .resume-paper-preview .header { background: #1b1b18; color: white; padding: 24px; border-radius: 6px 6px 0 0; margin: -32px -32px 24px -32px; }
@@ -421,6 +430,7 @@ function getScopedResumeStyles(template: string): string {
             .resume-paper-preview .project-desc { font-size: 13px; margin-top: 4px; line-height: 1.4; color: #1b1b18; }
         `;
     }
+
     return base + `
         .resume-paper-preview .header { text-align: center; border-bottom: 2px solid #1b1b18; padding-bottom: 16px; margin-bottom: 16px; }
         .resume-paper-preview .name { font-size: 24px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #1b1b18; }
@@ -466,6 +476,7 @@ function getCoverLetterPrintStyles(template: string): string {
             .letter-signature { margin-top: 6px; font-weight: 700; font-size: 14px; }
         `;
     }
+
     if (template === 'cl_executive' || template === 'ats_executive') {
         return base + `
             .letter-header { border-left: 4px solid #1b1b18; padding-left: 12px; margin-bottom: 20px; }
@@ -480,6 +491,7 @@ function getCoverLetterPrintStyles(template: string): string {
             .letter-signature { margin-top: 6px; font-weight: 700; }
         `;
     }
+
     if (template === 'cl_modern' || template === 'modern') {
         return base + `
             .letter-header { background: #1b1b18; color: white; padding: 24px; margin-bottom: 24px; border-radius: 6px; }
@@ -493,6 +505,7 @@ function getCoverLetterPrintStyles(template: string): string {
             .letter-signature { margin-top: 6px; font-weight: 700; }
         `;
     }
+
     if (template === 'cl_creative' || template === 'philippine') {
         return base + `
             .letter-header { text-align: left; border-bottom: 2px solid #6366f1; padding-bottom: 12px; margin-bottom: 20px; }
@@ -506,6 +519,7 @@ function getCoverLetterPrintStyles(template: string): string {
             .letter-signature { margin-top: 8px; font-weight: 800; font-size: 15px; }
         `;
     }
+
     return base + `
         .letter-header { margin-bottom: 24px; border-bottom: 1px solid #e5e7eb; padding-bottom: 12px; }
         .letter-name { font-size: 22px; font-weight: 600; letter-spacing: -0.01em; }
@@ -538,6 +552,7 @@ function getScopedCoverLetterStyles(template: string): string {
             .cover-letter-paper-preview .letter-signature { margin-top: 6px; font-weight: 700; font-size: 14px; color: #1b1b18; }
         `;
     }
+
     if (template === 'cl_executive' || template === 'ats_executive') {
         return base + `
             .cover-letter-paper-preview .letter-header { border-left: 4px solid #1b1b18; padding-left: 12px; margin-bottom: 20px; }
@@ -552,6 +567,7 @@ function getScopedCoverLetterStyles(template: string): string {
             .cover-letter-paper-preview .letter-signature { margin-top: 6px; font-weight: 700; color: #1b1b18; }
         `;
     }
+
     if (template === 'cl_modern' || template === 'modern') {
         return base + `
             .cover-letter-paper-preview .letter-header { background: #1b1b18; color: white; padding: 24px; margin-bottom: 24px; border-radius: 6px; }
@@ -566,6 +582,7 @@ function getScopedCoverLetterStyles(template: string): string {
             .cover-letter-paper-preview .letter-signature { margin-top: 6px; font-weight: 700; color: #1b1b18; }
         `;
     }
+
     if (template === 'cl_creative' || template === 'philippine') {
         return base + `
             .cover-letter-paper-preview .letter-header { text-align: left; border-bottom: 2px solid #6366f1; padding-bottom: 12px; margin-bottom: 20px; }
@@ -579,6 +596,7 @@ function getScopedCoverLetterStyles(template: string): string {
             .cover-letter-paper-preview .letter-signature { margin-top: 8px; font-weight: 800; font-size: 15px; color: #3730a3; }
         `;
     }
+
     return base + `
         .cover-letter-paper-preview .letter-header { margin-bottom: 24px; border-bottom: 1px solid #e5e7eb; padding-bottom: 12px; }
         .cover-letter-paper-preview .letter-name { font-size: 22px; font-weight: 600; letter-spacing: -0.01em; color: #111827; }
@@ -654,7 +672,11 @@ function PersonalInfoTab({ data, setData, errors, photoDataUrl, onPhotoDataUrlCh
                     id="full_name"
                     value={data.full_name}
                     onChange={(e) => setData('full_name', e.target.value)}
-                    onFocus={() => { if (data.full_name === 'Juan Dela Cruz') setData('full_name', ''); }}
+                    onFocus={() => {
+ if (data.full_name === 'Juan Dela Cruz') {
+setData('full_name', '');
+} 
+}}
                     placeholder="Juan Dela Cruz"
                     aria-invalid={!!errors.full_name}
                 />
@@ -669,7 +691,11 @@ function PersonalInfoTab({ data, setData, errors, photoDataUrl, onPhotoDataUrlCh
                         type="email"
                         value={data.email}
                         onChange={(e) => setData('email', e.target.value)}
-                        onFocus={() => { if (data.email === 'juan@example.com') setData('email', ''); }}
+                        onFocus={() => {
+ if (data.email === 'juan@example.com') {
+setData('email', '');
+} 
+}}
                         placeholder="juan@example.com"
                         aria-invalid={!!errors.email}
                     />
@@ -682,7 +708,11 @@ function PersonalInfoTab({ data, setData, errors, photoDataUrl, onPhotoDataUrlCh
                         id="phone"
                         value={data.phone}
                         onChange={(e) => setData('phone', e.target.value)}
-                        onFocus={() => { if (data.phone === '+63 917 123 4567') setData('phone', ''); }}
+                        onFocus={() => {
+ if (data.phone === '+63 917 123 4567') {
+setData('phone', '');
+} 
+}}
                         placeholder="+63 917 123 4567"
                         aria-invalid={!!errors.phone}
                     />
@@ -696,7 +726,11 @@ function PersonalInfoTab({ data, setData, errors, photoDataUrl, onPhotoDataUrlCh
                     id="location"
                     value={data.location}
                     onChange={(e) => setData('location', e.target.value)}
-                    onFocus={() => { if (data.location === 'Metro Manila') setData('location', ''); }}
+                    onFocus={() => {
+ if (data.location === 'Metro Manila') {
+setData('location', '');
+} 
+}}
                     placeholder="Metro Manila"
                     aria-invalid={!!errors.location}
                 />
@@ -709,7 +743,11 @@ function PersonalInfoTab({ data, setData, errors, photoDataUrl, onPhotoDataUrlCh
                     id="linkedin_url"
                     value={data.linkedin_url ?? ''}
                     onChange={(e) => setData('linkedin_url', e.target.value)}
-                    onFocus={() => { if (data.linkedin_url === 'https://linkedin.com/in/juandelacruz') setData('linkedin_url', ''); }}
+                    onFocus={() => {
+ if (data.linkedin_url === 'https://linkedin.com/in/juandelacruz') {
+setData('linkedin_url', '');
+} 
+}}
                     placeholder="https://linkedin.com/in/juandelacruz"
                 />
             </div>
@@ -720,7 +758,11 @@ function PersonalInfoTab({ data, setData, errors, photoDataUrl, onPhotoDataUrlCh
                     id="github_url"
                     value={data.github_url ?? ''}
                     onChange={(e) => setData('github_url', e.target.value)}
-                    onFocus={() => { if (data.github_url === 'https://github.com/juandelacruz') setData('github_url', ''); }}
+                    onFocus={() => {
+ if (data.github_url === 'https://github.com/juandelacruz') {
+setData('github_url', '');
+} 
+}}
                     placeholder="https://github.com/juandelacruz"
                 />
             </div>
@@ -731,7 +773,11 @@ function PersonalInfoTab({ data, setData, errors, photoDataUrl, onPhotoDataUrlCh
                     id="website_url"
                     value={data.website_url ?? ''}
                     onChange={(e) => setData('website_url', e.target.value)}
-                    onFocus={() => { if (data.website_url === 'https://juanportfolio.com') setData('website_url', ''); }}
+                    onFocus={() => {
+ if (data.website_url === 'https://juanportfolio.com') {
+setData('website_url', '');
+} 
+}}
                     placeholder="https://juanportfolio.com"
                 />
             </div>
@@ -753,7 +799,11 @@ function PersonalInfoTab({ data, setData, errors, photoDataUrl, onPhotoDataUrlCh
                     id="summary"
                     value={data.summary ?? ''}
                     onChange={(e) => setData('summary', e.target.value)}
-                    onFocus={() => { if (data.summary === 'Experienced software developer with expertise in building scalable web applications...') setData('summary', ''); }}
+                    onFocus={() => {
+ if (data.summary === 'Experienced software developer with expertise in building scalable web applications...') {
+setData('summary', '');
+} 
+}}
                     rows={4}
                     className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring"
                     placeholder="Experienced software developer with expertise in building scalable web applications..."
@@ -785,7 +835,11 @@ function WorkExperienceTab({ data, setData, onAiPolish }: { data: ResumeProfile;
 
     function moveExperience(index: number, direction: 'up' | 'down') {
         const target = direction === 'up' ? index - 1 : index + 1;
-        if (target < 0 || target >= experiences.length) return;
+
+        if (target < 0 || target >= experiences.length) {
+return;
+}
+
         const updated = [...experiences];
         [updated[index], updated[target]] = [updated[target], updated[index]];
         setData('work_experience', updated);
@@ -802,7 +856,11 @@ function WorkExperienceTab({ data, setData, onAiPolish }: { data: ResumeProfile;
                                 <Input
                                     value={exp.company}
                                     onChange={(e) => updateExperience(index, 'company', e.target.value)}
-                                    onFocus={() => { if (exp.company === 'Acme Corp') updateExperience(index, 'company', ''); }}
+                                    onFocus={() => {
+ if (exp.company === 'Acme Corp') {
+updateExperience(index, 'company', '');
+} 
+}}
                                     placeholder="Acme Corp"
                                 />
                             </div>
@@ -811,7 +869,11 @@ function WorkExperienceTab({ data, setData, onAiPolish }: { data: ResumeProfile;
                                 <Input
                                     value={exp.position}
                                     onChange={(e) => updateExperience(index, 'position', e.target.value)}
-                                    onFocus={() => { if (exp.position === 'Software Developer') updateExperience(index, 'position', ''); }}
+                                    onFocus={() => {
+ if (exp.position === 'Software Developer') {
+updateExperience(index, 'position', '');
+} 
+}}
                                     placeholder="Software Developer"
                                 />
                             </div>
@@ -821,7 +883,11 @@ function WorkExperienceTab({ data, setData, onAiPolish }: { data: ResumeProfile;
                             <Input
                                 value={exp.duration}
                                 onChange={(e) => updateExperience(index, 'duration', e.target.value)}
-                                onFocus={() => { if (exp.duration === '2020 - 2023') updateExperience(index, 'duration', ''); }}
+                                onFocus={() => {
+ if (exp.duration === '2020 - 2023') {
+updateExperience(index, 'duration', '');
+} 
+}}
                                 placeholder="2020 - 2023"
                             />
                         </div>
@@ -841,7 +907,11 @@ function WorkExperienceTab({ data, setData, onAiPolish }: { data: ResumeProfile;
                             <textarea
                                 value={exp.description}
                                 onChange={(e) => updateExperience(index, 'description', e.target.value)}
-                                onFocus={() => { if (exp.description === 'Developed and maintained various web applications using Laravel and React.') updateExperience(index, 'description', ''); }}
+                                onFocus={() => {
+ if (exp.description === 'Developed and maintained various web applications using Laravel and React.') {
+updateExperience(index, 'description', '');
+} 
+}}
                                 rows={3}
                                 className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring"
                                 placeholder="Key responsibilities and achievements..."
@@ -902,7 +972,11 @@ function EducationTab({ data, setData }: { data: ResumeProfile; setData: (key: s
 
     function moveEducation(index: number, direction: 'up' | 'down') {
         const target = direction === 'up' ? index - 1 : index + 1;
-        if (target < 0 || target >= education.length) return;
+
+        if (target < 0 || target >= education.length) {
+return;
+}
+
         const updated = [...education];
         [updated[index], updated[target]] = [updated[target], updated[index]];
         setData('education', updated);
@@ -919,7 +993,11 @@ function EducationTab({ data, setData }: { data: ResumeProfile; setData: (key: s
                                 <Input
                                     value={edu.institution}
                                     onChange={(e) => updateEducation(index, 'institution', e.target.value)}
-                                    onFocus={() => { if (edu.institution === 'UP Diliman') updateEducation(index, 'institution', ''); }}
+                                    onFocus={() => {
+ if (edu.institution === 'UP Diliman') {
+updateEducation(index, 'institution', '');
+} 
+}}
                                     placeholder="UP Diliman"
                                 />
                             </div>
@@ -928,7 +1006,11 @@ function EducationTab({ data, setData }: { data: ResumeProfile; setData: (key: s
                                 <Input
                                     value={edu.degree}
                                     onChange={(e) => updateEducation(index, 'degree', e.target.value)}
-                                    onFocus={() => { if (edu.degree === 'BS Computer Science') updateEducation(index, 'degree', ''); }}
+                                    onFocus={() => {
+ if (edu.degree === 'BS Computer Science') {
+updateEducation(index, 'degree', '');
+} 
+}}
                                     placeholder="BS Computer Science"
                                 />
                             </div>
@@ -938,7 +1020,11 @@ function EducationTab({ data, setData }: { data: ResumeProfile; setData: (key: s
                             <Input
                                 value={edu.year}
                                 onChange={(e) => updateEducation(index, 'year', e.target.value)}
-                                onFocus={() => { if (edu.year === '2020') updateEducation(index, 'year', ''); }}
+                                onFocus={() => {
+ if (edu.year === '2020') {
+updateEducation(index, 'year', '');
+} 
+}}
                                 placeholder="2020"
                             />
                         </div>
@@ -981,6 +1067,7 @@ function SkillsTab({ data, setData }: { data: ResumeProfile; setData: (key: stri
 
     function addSkill() {
         const trimmed = skillInput.trim();
+
         if (trimmed && !skills.includes(trimmed)) {
             setData('skills', [...skills, trimmed]);
             setSkillInput('');
@@ -1039,6 +1126,7 @@ function CertificationsTab({ data, setData }: { data: ResumeProfile; setData: (k
 
     function addCertification() {
         const trimmed = certInput.trim();
+
         if (trimmed && !certifications.includes(trimmed)) {
             setData('certifications', [...certifications, trimmed]);
             setCertInput('');
@@ -1113,7 +1201,11 @@ function ProjectsTab({ data, setData, onAiPolish }: { data: ResumeProfile; setDa
 
     function moveProject(index: number, direction: 'up' | 'down') {
         const target = direction === 'up' ? index - 1 : index + 1;
-        if (target < 0 || target >= projects.length) return;
+
+        if (target < 0 || target >= projects.length) {
+return;
+}
+
         const updated = [...projects];
         [updated[index], updated[target]] = [updated[target], updated[index]];
         setData('projects', updated);
@@ -1129,7 +1221,11 @@ function ProjectsTab({ data, setData, onAiPolish }: { data: ResumeProfile; setDa
                             <Input
                                 value={project.title}
                                 onChange={(e) => updateProject(index, 'title', e.target.value)}
-                                onFocus={() => { if (project.title === 'E-commerce Platform') updateProject(index, 'title', ''); }}
+                                onFocus={() => {
+ if (project.title === 'E-commerce Platform') {
+updateProject(index, 'title', '');
+} 
+}}
                                 placeholder="E-commerce Platform"
                             />
                         </div>
@@ -1149,7 +1245,11 @@ function ProjectsTab({ data, setData, onAiPolish }: { data: ResumeProfile; setDa
                             <textarea
                                 value={project.description}
                                 onChange={(e) => updateProject(index, 'description', e.target.value)}
-                                onFocus={() => { if (project.description === 'Built a full-stack e-commerce platform with Next.js and Stripe.') updateProject(index, 'description', ''); }}
+                                onFocus={() => {
+ if (project.description === 'Built a full-stack e-commerce platform with Next.js and Stripe.') {
+updateProject(index, 'description', '');
+} 
+}}
                                 rows={3}
                                 className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring"
                                 placeholder="Key features and your role in the project..."
@@ -1160,7 +1260,11 @@ function ProjectsTab({ data, setData, onAiPolish }: { data: ResumeProfile; setDa
                             <Input
                                 value={project.technologies}
                                 onChange={(e) => updateProject(index, 'technologies', e.target.value)}
-                                onFocus={() => { if (project.technologies === 'Laravel, React, PostgreSQL') updateProject(index, 'technologies', ''); }}
+                                onFocus={() => {
+ if (project.technologies === 'Laravel, React, PostgreSQL') {
+updateProject(index, 'technologies', '');
+} 
+}}
                                 placeholder="Laravel, React, PostgreSQL"
                             />
                         </div>
@@ -1216,13 +1320,16 @@ function ProjectsTab({ data, setData, onAiPolish }: { data: ResumeProfile; setDa
 }
 
 function getDirectImageUrl(url: string | null): string | null {
-    if (!url || !url.trim()) return null;
+    if (!url || !url.trim()) {
+return null;
+}
 
     const trimmed = url.trim();
 
     // Check Google Drive file viewer URLs:
     // e.g. https://drive.google.com/file/d/1dsfk6o2fdsfdsdfsi1lAUiIDvH/view?usp=sharing
     const driveFileMatch = trimmed.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
+
     if (driveFileMatch && driveFileMatch[1]) {
         return `https://lh3.googleusercontent.com/d/${driveFileMatch[1]}`;
     }
@@ -1230,6 +1337,7 @@ function getDirectImageUrl(url: string | null): string | null {
     // Check Google Drive parameter URLs:
     // e.g. https://drive.google.com/open?id=1dsfk6o2fdsfdsdfsi1lAUiIDvH or https://drive.google.com/uc?id=...
     const driveParamMatch = trimmed.match(/drive\.google\.com\/.*[?&]id=([a-zA-Z0-9_-]+)/);
+
     if (driveParamMatch && driveParamMatch[1]) {
         return `https://lh3.googleusercontent.com/d/${driveParamMatch[1]}`;
     }
@@ -1251,7 +1359,10 @@ function PhotoUploader({ currentDataUrl, onDataUrlChange, hidePreview = false }:
 
     function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
         const file = e.target.files?.[0];
-        if (!file) return;
+
+        if (!file) {
+return;
+}
 
         const reader = new FileReader();
         reader.onloadend = () => {
@@ -1265,6 +1376,7 @@ function PhotoUploader({ currentDataUrl, onDataUrlChange, hidePreview = false }:
     function handleClear() {
         setPreviewUrl(null);
         onDataUrlChange(null);
+
         if (fileInputRef.current) {
             fileInputRef.current.value = '';
         }
@@ -1341,10 +1453,16 @@ function ResumePreview({ data, template, photoDataUrl }: { data: ResumeProfile; 
 
     function handleDownload() {
         const printWindow = window.open('', '_blank');
-        if (!printWindow) return;
+
+        if (!printWindow) {
+return;
+}
 
         const content = previewRef.current?.innerHTML;
-        if (!content) return;
+
+        if (!content) {
+return;
+}
 
         printWindow.document.write(`
             <!DOCTYPE html>
@@ -1380,21 +1498,35 @@ function ResumePreview({ data, template, photoDataUrl }: { data: ResumeProfile; 
     }
 
     function formatDisplayUrl(url?: string | null): string {
-        if (!url || !url.trim()) return '';
+        if (!url || !url.trim()) {
+return '';
+}
+
         return url.trim().replace(/^https?:\/\/(www\.)?/, '');
     }
 
     function ensureHttpUrl(url?: string | null): string {
-        if (!url || !url.trim()) return '#';
+        if (!url || !url.trim()) {
+return '#';
+}
+
         const trimmed = url.trim();
-        if (/^https?:\/\//i.test(trimmed)) return trimmed;
+
+        if (/^https?:\/\//i.test(trimmed)) {
+return trimmed;
+}
+
         return `https://${trimmed}`;
     }
 
     function renderLink(url?: string | null) {
-        if (!url || !url.trim()) return null;
+        if (!url || !url.trim()) {
+return null;
+}
+
         const href = ensureHttpUrl(url);
         const text = formatDisplayUrl(url);
+
         return (
             <a
                 href={href}
@@ -1408,13 +1540,18 @@ function ResumePreview({ data, template, photoDataUrl }: { data: ResumeProfile; 
     }
 
     function renderAsBullets(text?: string | null) {
-        if (!text || !text.trim()) return null;
+        if (!text || !text.trim()) {
+return null;
+}
+
         const lines = text
             .split(/\n|(?<=[\.\?!])\s+(?=[A-Z0-9])|•|▪|\*/)
             .map(l => l.trim().replace(/^[-•*▪]\s*/, ''))
             .filter(l => l.length > 0);
 
-        if (lines.length === 0) return null;
+        if (lines.length === 0) {
+return null;
+}
 
         return (
             <ul className="bullet-list">
@@ -1451,7 +1588,11 @@ function ResumePreview({ data, template, photoDataUrl }: { data: ResumeProfile; 
                                     data.website_url ? <span key="web">{renderLink(data.website_url)}</span> : null,
                                 ].filter(Boolean).reduce((acc: React.ReactNode[], curr, i, arr) => {
                                     acc.push(curr);
-                                    if (i < arr.length - 1) acc.push(<span key={`sep-${i}`}>  •  </span>);
+
+                                    if (i < arr.length - 1) {
+acc.push(<span key={`sep-${i}`}>  •  </span>);
+}
+
                                     return acc;
                                 }, [])}
                             </div>
@@ -1543,7 +1684,11 @@ function ResumePreview({ data, template, photoDataUrl }: { data: ResumeProfile; 
                                     data.website_url ? <span key="web">{renderLink(data.website_url)}</span> : null,
                                 ].filter(Boolean).reduce((acc: React.ReactNode[], curr, i, arr) => {
                                     acc.push(curr);
-                                    if (i < arr.length - 1) acc.push(<span key={`sep-${i}`}>  |  </span>);
+
+                                    if (i < arr.length - 1) {
+acc.push(<span key={`sep-${i}`}>  |  </span>);
+}
+
                                     return acc;
                                 }, [])}
                             </div>
@@ -1633,7 +1778,11 @@ function ResumePreview({ data, template, photoDataUrl }: { data: ResumeProfile; 
                                     data.website_url ? <span key="web">{renderLink(data.website_url)}</span> : null,
                                 ].filter(Boolean).reduce((acc: React.ReactNode[], curr, i, arr) => {
                                     acc.push(curr);
-                                    if (i < arr.length - 1) acc.push(<span key={`sep-${i}`}>  •  </span>);
+
+                                    if (i < arr.length - 1) {
+acc.push(<span key={`sep-${i}`}>  •  </span>);
+}
+
                                     return acc;
                                 }, [])}
                             </div>
@@ -1813,7 +1962,11 @@ function ResumePreview({ data, template, photoDataUrl }: { data: ResumeProfile; 
                                                     project.github_url ? <span key="gh">{renderLink(project.github_url)}</span> : null,
                                                 ].filter(Boolean).reduce((acc: React.ReactNode[], curr, i, arr) => {
                                                     acc.push(curr);
-                                                    if (i < arr.length - 1) acc.push(<span key={`psep-${i}`}>  •  </span>);
+
+                                                    if (i < arr.length - 1) {
+acc.push(<span key={`psep-${i}`}>  •  </span>);
+}
+
                                                     return acc;
                                                 }, [])}
                                             </div>
@@ -1916,7 +2069,11 @@ function ResumePreview({ data, template, photoDataUrl }: { data: ResumeProfile; 
                                                         project.github_url ? <span key="gh">{renderLink(project.github_url)}</span> : null,
                                                     ].filter(Boolean).reduce((acc: React.ReactNode[], curr, i, arr) => {
                                                         acc.push(curr);
-                                                        if (i < arr.length - 1) acc.push(<span key={`psep-${i}`}>  •  </span>);
+
+                                                        if (i < arr.length - 1) {
+acc.push(<span key={`psep-${i}`}>  •  </span>);
+}
+
                                                         return acc;
                                                     }, [])}
                                                 </div>
@@ -2110,10 +2267,16 @@ function CoverLetterPreview({ content, template, fullName, targetCompany, target
 
     function handleDownload() {
         const printWindow = window.open('', '_blank');
-        if (!printWindow) return;
+
+        if (!printWindow) {
+return;
+}
 
         const contentHtml = previewRef.current?.innerHTML;
-        if (!contentHtml) return;
+
+        if (!contentHtml) {
+return;
+}
 
         printWindow.document.write(`
             <!DOCTYPE html>
@@ -2209,7 +2372,9 @@ function CoverLetterBuilder({ profile, template, onTemplateChange, aiLimit, cove
     }, [companyName, jobTitle, onCoverLetterMetaChange]);
 
     async function handleGenerate() {
-        if (!jobDescription.trim()) return;
+        if (!jobDescription.trim()) {
+return;
+}
 
         setGenerating(true);
         setError(null);
@@ -2243,7 +2408,9 @@ function CoverLetterBuilder({ profile, template, onTemplateChange, aiLimit, cove
     }
 
     async function handlePolish(preset: string) {
-        if (!coverLetterContent.trim()) return;
+        if (!coverLetterContent.trim()) {
+return;
+}
 
         setPolishingPreset(preset);
         setPolishing(true);
@@ -2279,7 +2446,9 @@ function CoverLetterBuilder({ profile, template, onTemplateChange, aiLimit, cove
     }
 
     async function handleSave() {
-        if (!coverLetterContent.trim()) return;
+        if (!coverLetterContent.trim()) {
+return;
+}
 
         setSaving(true);
         setError(null);
@@ -2349,8 +2518,15 @@ function CoverLetterBuilder({ profile, template, onTemplateChange, aiLimit, cove
 
     function handleLoadLetter(letter: { id: number; content: string; target_company: string | null; target_job_title: string | null }) {
         onCoverLetterContentChange(letter.content);
-        if (letter.target_company) setCompanyName(letter.target_company);
-        if (letter.target_job_title) setJobTitle(letter.target_job_title);
+
+        if (letter.target_company) {
+setCompanyName(letter.target_company);
+}
+
+        if (letter.target_job_title) {
+setJobTitle(letter.target_job_title);
+}
+
         setLoadDialogOpen(false);
     }
 
@@ -2639,7 +2815,9 @@ export default function DocumentsIndex({ profile, aiLimit, loadedResume, loadedC
     }
 
     async function handleAiPolish(section: string, content: string) {
-        if (!content.trim() || aiLimit.exhausted) return;
+        if (!content.trim() || aiLimit.exhausted) {
+return;
+}
 
         setAiPolishing(true);
         setAiError(null);
@@ -2671,6 +2849,7 @@ export default function DocumentsIndex({ profile, aiLimit, loadedResume, loadedC
                     if (exp.description === content) {
                         return { ...exp, description: data.polished };
                     }
+
                     return exp;
                 });
                 setData('work_experience', updated);
@@ -2680,6 +2859,7 @@ export default function DocumentsIndex({ profile, aiLimit, loadedResume, loadedC
                     if (proj.description === content) {
                         return { ...proj, description: data.polished };
                     }
+
                     return proj;
                 });
                 setData('projects', updated);
