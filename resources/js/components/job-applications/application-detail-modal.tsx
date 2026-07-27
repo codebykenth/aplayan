@@ -22,6 +22,7 @@ import SaveAsTemplateDialog from '@/components/application-templates/save-as-tem
 import { ActivityTimeline } from '@/components/job-applications/activity-timeline';
 import TaxBreakdownCard from '@/components/job-applications/tax-breakdown-card';
 import { Badge } from '@/components/ui/badge';
+import { StatusBadge } from '@/components/ui/status-badge';
 import { Button } from '@/components/ui/button';
 import {
     Dialog,
@@ -40,7 +41,7 @@ import { Input } from '@/components/ui/input';
 import { link as linkContactRoute, unlink as unlinkContactRoute } from '@/routes/contacts';
 import { status as updateStatus, aiMatch, aiSalary } from '@/routes/job-applications';
 import type { Contact } from '@/types/contact';
-import { JOB_APPLICATION_STATUSES, JOB_APPLICATION_STATUS_ORDER, STATUS_COLORS } from '@/types/job-application';
+import { JOB_APPLICATION_STATUSES, JOB_APPLICATION_STATUS_ORDER } from '@/types/job-application';
 import type { JobApplication } from '@/types/job-application';
 
 function formatSalary(amount: number | null): string | null {
@@ -515,13 +516,7 @@ return null;
                                 </p>
                             )}
                         </div>
-                        <Badge
-                            className={`shrink-0 border-0 capitalize ${STATUS_COLORS[app.status]}`}
-                        >
-                            {JOB_APPLICATION_STATUSES.find(
-                                (s) => s.value === app.status,
-                            )?.label ?? app.status}
-                        </Badge>
+                        <StatusBadge status={app.status} />
                     </div>
 
                     <div className="grid grid-cols-2 gap-4">

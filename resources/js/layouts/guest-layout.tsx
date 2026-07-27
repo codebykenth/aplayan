@@ -8,29 +8,29 @@ export default function GuestLayout({ children }: { children: React.ReactNode })
     return (
         <>
             <Head />
-            <div className="flex min-h-screen flex-col bg-[#FDFDFC] dark:bg-[#0a0a0a]">
-                <header className="border-b border-[#e3e3e0] bg-white dark:border-[#3E3E3A] dark:bg-[#161615]">
+            <div className="flex min-h-screen flex-col bg-background">
+                <header className="border-b border-border bg-background">
                     <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-                        <Link href="/" className="text-lg font-semibold text-[#1b1b18] dark:text-[#EDEDEC]">
+                        <Link href="/" className="text-lg font-semibold text-foreground">
                             Aplayan
                         </Link>
 
                         <nav className="hidden items-center gap-6 sm:flex">
                             <Link
                                 href="/#features"
-                                className="text-sm text-[#706f6c] hover:text-[#1b1b18] dark:text-[#A1A09A] dark:hover:text-[#EDEDEC]"
+                                className="text-sm text-muted-foreground hover:text-foreground"
                             >
                                 Features
                             </Link>
                             <Link
                                 href="/login"
-                                className="text-sm text-[#706f6c] hover:text-[#1b1b18] dark:text-[#A1A09A] dark:hover:text-[#EDEDEC]"
+                                className="text-sm text-muted-foreground hover:text-foreground"
                             >
                                 Sign in
                             </Link>
                             <Link
                                 href="/register"
-                                className="rounded-sm border border-[#1b1b18] bg-[#1b1b18] px-4 py-1.5 text-sm text-white hover:bg-black dark:border-[#eeeeec] dark:bg-[#eeeeec] dark:text-[#1C1C1A] dark:hover:bg-white"
+                                className="rounded-sm border border-foreground bg-foreground px-4 py-1.5 text-sm text-background hover:bg-foreground/90 dark:border-foreground dark:bg-foreground dark:text-background dark:hover:bg-foreground/90"
                             >
                                 Get Started
                             </Link>
@@ -42,33 +42,33 @@ export default function GuestLayout({ children }: { children: React.ReactNode })
                             aria-label="Toggle navigation menu"
                         >
                             {mobileMenuOpen ? (
-                                <X className="h-6 w-6 text-[#1b1b18] dark:text-[#EDEDEC]" />
+                                <X className="h-6 w-6 text-foreground" />
                             ) : (
-                                <Menu className="h-6 w-6 text-[#1b1b18] dark:text-[#EDEDEC]" />
+                                <Menu className="h-6 w-6 text-foreground" />
                             )}
                         </button>
                     </div>
 
                     {mobileMenuOpen && (
-                        <div className="border-t border-[#e3e3e0] px-4 py-4 sm:hidden dark:border-[#3E3E3A]">
+                        <div className="border-t border-border px-4 py-4 sm:hidden">
                             <nav className="flex flex-col gap-4">
                                 <Link
                                     href="/#features"
-                                    className="text-sm text-[#706f6c] dark:text-[#A1A09A]"
+                                    className="text-sm text-muted-foreground"
                                     onClick={() => setMobileMenuOpen(false)}
                                 >
                                     Features
                                 </Link>
                                 <Link
                                     href="/login"
-                                    className="text-sm text-[#706f6c] dark:text-[#A1A09A]"
+                                    className="text-sm text-muted-foreground"
                                     onClick={() => setMobileMenuOpen(false)}
                                 >
                                     Sign in
                                 </Link>
                                 <Link
                                     href="/register"
-                                    className="inline-block rounded-sm border border-[#1b1b18] bg-[#1b1b18] px-4 py-1.5 text-center text-sm text-white dark:border-[#eeeeec] dark:bg-[#eeeeec] dark:text-[#1C1C1A]"
+                                    className="inline-block rounded-sm border border-foreground bg-foreground px-4 py-1.5 text-center text-sm text-background"
                                     onClick={() => setMobileMenuOpen(false)}
                                 >
                                     Get Started

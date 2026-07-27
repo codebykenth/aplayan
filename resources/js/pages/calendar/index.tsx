@@ -6,9 +6,11 @@ import ApplicationDetailModal from '@/components/job-applications/application-de
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import { StatusBadge } from '@/components/ui/status-badge';
+import { PageHeader } from '@/components/ui/page-header';
 import AppLayout from '@/layouts/app-layout';
-import { STATUS_COLORS } from '@/types/job-application';
 import type { JobApplication } from '@/types/job-application';
+import type { JobApplicationStatus } from '@/types/job-application';
 
 interface CalendarEvent {
     id: number;
@@ -176,8 +178,7 @@ export default function Calendar({
             <Head title="Calendar" />
 
             <div className="flex flex-1 min-h-0 flex-col gap-6 overflow-y-auto">
-                <div className="flex flex-wrap items-center justify-between gap-3">
-                    <h1 className="text-2xl font-semibold text-foreground">Calendar</h1>
+                <PageHeader title="Calendar">
                     <div className="flex items-center gap-2">
                         <Button variant="outline" size="sm" onClick={prevMonth}>
                             <ChevronLeftIcon className="size-4" />
@@ -189,7 +190,7 @@ export default function Calendar({
                             <ChevronRightIcon className="size-4" />
                         </Button>
                     </div>
-                </div>
+                </PageHeader>
 
                 <div className="flex items-center gap-2">
                     <Button
@@ -210,7 +211,7 @@ export default function Calendar({
                     </Button>
                 </div>
 
-                <Card className="glass-card overflow-hidden">
+                <Card className="overflow-hidden">
                     <CardContent className="p-2 sm:p-4">
                         {view === 'month' ? (
                             <div className="grid grid-cols-7 gap-1">
@@ -293,11 +294,10 @@ export default function Calendar({
                                                                         openApplicationDetailById(event.id);
                                                                     }}
                                                                 >
-                                                                    <Badge
-                                                                        className={`${STATUS_COLORS[event.status as keyof typeof STATUS_COLORS] ?? 'bg-gray-100 text-gray-700'} cursor-pointer text-[10px] capitalize truncate max-w-full`}
-                                                                    >
-                                                                        {event.label}
-                                                                    </Badge>
+                                                                    <StatusBadge
+                                                                        status={event.status as JobApplicationStatus}
+                                                                        className="cursor-pointer text-[10px] truncate max-w-full"
+                                                                    />
                                                                 </div>
                                                             ))}
                                                         </div>
@@ -324,13 +324,12 @@ export default function Calendar({
                                             <div className="flex flex-wrap gap-1.5">
                                                 {dayEvents && dayEvents.length > 0 ? (
                                                     dayEvents.map((event) => (
-                                                        <Badge
+                                                        <StatusBadge
                                                             key={`${event.id}-${event.type}`}
-                                                            className={`${STATUS_COLORS[event.status as keyof typeof STATUS_COLORS] ?? 'bg-gray-100 text-gray-700'} cursor-pointer capitalize text-xs`}
+                                                            status={event.status as JobApplicationStatus}
+                                                            className="cursor-pointer text-xs"
                                                             onClick={() => openApplicationDetailById(event.id)}
-                                                        >
-                                                            {event.label}
-                                                        </Badge>
+                                                        />
                                                     ))
                                                 ) : (
                                                     <span className="text-xs text-muted-foreground">No events</span>
@@ -346,7 +345,7 @@ export default function Calendar({
 
                 {/* Selected Date Agenda (Mobile & Quick Detail) */}
                 {selectedDate && (
-                    <Card className="glass-card">
+                    <Card>
                         <CardContent className="p-4 flex flex-col gap-3">
                             <div className="flex items-center justify-between">
                                 <h3 className="text-sm font-semibold text-foreground">
@@ -373,9 +372,7 @@ export default function Calendar({
                                                     {event.company_name}
                                                 </span>
                                             </div>
-                                            <Badge className={`${STATUS_COLORS[event.status as keyof typeof STATUS_COLORS]} capitalize text-xs`}>
-                                                {event.label}
-                                            </Badge>
+                                            <StatusBadge status={event.status as JobApplicationStatus} className="text-xs" />
                                         </div>
                                     ))}
                                 </div>

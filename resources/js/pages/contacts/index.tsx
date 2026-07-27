@@ -27,6 +27,8 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { PageHeader } from '@/components/ui/page-header';
 import AppLayout from '@/layouts/app-layout';
 import {
     store as storeContact,
@@ -362,15 +364,12 @@ return;
             <Head title="Contacts" />
 
             <div className="flex flex-1 min-h-0 flex-col gap-6">
-                <div className="flex shrink-0 items-center justify-between">
-                    <h1 className="text-2xl font-semibold text-foreground">
-                        Contacts
-                    </h1>
+                <PageHeader title="Contacts">
                     <Button onClick={openCreate}>
                         <PlusIcon data-icon="inline-start" />
                         New Contact
                     </Button>
-                </div>
+                </PageHeader>
 
                 <div className="relative w-full max-w-xs shrink-0">
                     <SearchIcon className="pointer-events-none absolute left-2.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
@@ -509,12 +508,11 @@ return;
 
                             <div className="flex flex-col gap-2">
                                 <Label htmlFor="contact-notes">Notes</Label>
-                                <textarea
+                                <Textarea
                                     id="contact-notes"
                                     rows={3}
                                     value={data.notes}
                                     onChange={(e) => setData('notes', e.target.value)}
-                                    className="w-full min-h-[60px] rounded-lg border border-input bg-transparent px-2.5 py-1.5 text-sm transition-colors outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 dark:bg-input/30"
                                     placeholder="Met at job fair, referred by..."
                                 />
                             </div>

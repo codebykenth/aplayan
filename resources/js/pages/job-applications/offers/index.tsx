@@ -2,10 +2,10 @@ import { Head, Link } from '@inertiajs/react';
 import { MapPinIcon, ExternalLinkIcon, TrendingUp, CalendarDays, Briefcase, PhilippinePesoIcon } from 'lucide-react';
 import type {ReactNode} from 'react';
 import TaxBreakdownCard from '@/components/job-applications/tax-breakdown-card';
-import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { StatusBadge } from '@/components/ui/status-badge';
+import { PageHeader } from '@/components/ui/page-header';
 import AppLayout from '@/layouts/app-layout';
-import { JOB_APPLICATION_STATUSES, STATUS_COLORS } from '@/types/job-application';
 import type { JobApplication } from '@/types/job-application';
 
 function formatSalary(amount: number | null): string | null {
@@ -54,9 +54,7 @@ function OfferCard({ offer }: { offer: JobApplication }) {
                             </p>
                         )}
                     </div>
-                    <Badge className={`shrink-0 border-0 ${STATUS_COLORS.offer}`}>
-                        Offer
-                    </Badge>
+                    <StatusBadge status="offer" />
                 </div>
             </CardHeader>
             <CardContent className="flex flex-1 flex-col gap-3">
@@ -129,14 +127,7 @@ export default function OfferComparisonIndex({ offers }: { offers: { data: JobAp
             <Head title="Offer Comparison" />
 
             <div className="flex flex-col gap-6">
-                <div>
-                    <h1 className="text-2xl font-semibold text-foreground">
-                        Offer Comparison
-                    </h1>
-                    <p className="text-sm text-muted-foreground">
-                        Compare your job offers side by side
-                    </p>
-                </div>
+                <PageHeader title="Offer Comparison" description="Compare your job offers side by side" />
 
                 {offerList.length === 0 ? (
                     <div className="flex flex-col items-center justify-center gap-2 py-16 text-center">

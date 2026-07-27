@@ -20,12 +20,12 @@ export default function Login() {
             <Head title="Login" />
 
             <div className="mx-auto mt-16 w-full max-w-sm">
-                <h1 className="mb-6 text-2xl font-semibold text-[#1b1b18] dark:text-[#EDEDEC]">
+                <h1 className="mb-6 text-2xl font-semibold text-foreground">
                     Sign in to your account
                 </h1>
 
                 {auth.user && (
-                    <p className="mb-4 text-sm text-[#706f6c] dark:text-[#A1A09A]">
+                    <p className="mb-4 text-sm text-muted-foreground">
                         You are already signed in as <strong>{auth.user.email}</strong>.
                     </p>
                 )}
@@ -34,7 +34,7 @@ export default function Login() {
                     <input type="hidden" name="_token" value={usePage().props.csrf_token as string} />
 
                     <div>
-                        <label htmlFor="email" className="block text-sm font-medium text-[#1b1b18] dark:text-[#EDEDEC]">
+                        <label htmlFor="email" className="block text-sm font-medium text-foreground">
                             Email
                         </label>
                         <input
@@ -45,7 +45,7 @@ export default function Login() {
                             autoFocus
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
-                            className="mt-1 block w-full rounded-sm border border-[#e3e3e0] px-3 py-2 text-sm text-[#1b1b18] placeholder-[#706f6c] dark:border-[#3E3E3A] dark:bg-[#161615] dark:text-[#EDEDEC] dark:placeholder-[#A1A09A]"
+                            className="mt-1 block w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground placeholder-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
                             placeholder="you@example.com"
                         />
                         {pageErrors?.email && (
@@ -54,7 +54,7 @@ export default function Login() {
                     </div>
 
                     <div>
-                        <label htmlFor="password" className="block text-sm font-medium text-[#1b1b18] dark:text-[#EDEDEC]">
+                        <label htmlFor="password" className="block text-sm font-medium text-foreground">
                             Password
                         </label>
                         <input
@@ -64,26 +64,26 @@ export default function Login() {
                             required
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
-                            className="mt-1 block w-full rounded-sm border border-[#e3e3e0] px-3 py-2 text-sm text-[#1b1b18] placeholder-[#706f6c] dark:border-[#3E3E3A] dark:bg-[#161615] dark:text-[#EDEDEC] dark:placeholder-[#A1A09A]"
+                            className="mt-1 block w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground placeholder-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
                             placeholder="Password"
                         />
                     </div>
 
                     <div className="flex items-center justify-between">
-                        <label className="flex items-center gap-2 text-sm text-[#706f6c] dark:text-[#A1A09A]">
+                        <label className="flex items-center gap-2 text-sm text-muted-foreground">
                             <input
                                 type="checkbox"
                                 name="remember"
                                 checked={remember}
                                 onChange={(e) => setRemember(e.target.checked)}
-                                className="rounded border-[#e3e3e0] dark:border-[#3E3E3A]"
+                                className="rounded border-border"
                             />
                             Remember me
                         </label>
 
                         <Link
                             href="/forgot-password"
-                            className="text-sm text-[#f53003] underline underline-offset-4 hover:text-[#d42d00] dark:text-[#FF4433]"
+                            className="text-sm text-primary underline underline-offset-4 hover:text-primary/80"
                         >
                             Forgot password?
                         </Link>
@@ -91,7 +91,7 @@ export default function Login() {
 
                     <button
                         type="submit"
-                        className="w-full rounded-sm border border-black bg-[#1b1b18] px-5 py-2 text-sm text-white hover:bg-black dark:border-[#eeeeec] dark:bg-[#eeeeec] dark:text-[#1C1C1A] dark:hover:bg-white"
+                        className="w-full rounded-lg border border-foreground bg-foreground px-5 py-2 text-sm text-background hover:bg-foreground/90"
                     >
                         Sign in
                     </button>
@@ -99,10 +99,10 @@ export default function Login() {
 
                 <div className="relative my-6">
                     <div className="absolute inset-0 flex items-center">
-                        <div className="w-full border-t border-[#e3e3e0] dark:border-[#3E3E3A]" />
+                        <div className="w-full border-t border-border" />
                     </div>
                     <div className="relative flex justify-center text-xs uppercase">
-                        <span className="bg-[#FDFDFC] px-2 text-[#706f6c] dark:bg-[#0a0a0a] dark:text-[#A1A09A]">
+                        <span className="bg-background px-2 text-muted-foreground">
                             Or continue with
                         </span>
                     </div>
@@ -110,7 +110,7 @@ export default function Login() {
 
                 <a
                     href="/auth/google/redirect"
-                    className="flex w-full items-center justify-center gap-3 rounded-sm border border-[#e3e3e0] px-5 py-2 text-sm text-[#1b1b18] hover:bg-[#f5f5f4] dark:border-[#3E3E3A] dark:text-[#EDEDEC] dark:hover:bg-[#1C1C1A]"
+                    className="flex w-full items-center justify-center gap-3 rounded-lg border border-border bg-background px-5 py-2 text-sm text-foreground hover:bg-muted"
                 >
                     <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none">
                         <path
@@ -133,11 +133,11 @@ export default function Login() {
                     Google
                 </a>
 
-                <p className="mt-6 text-center text-sm text-[#706f6c] dark:text-[#A1A09A]">
+                <p className="mt-6 text-center text-sm text-muted-foreground">
                     Don't have an account?{' '}
                     <Link
                         href="/register"
-                        className="font-medium text-[#f53003] underline underline-offset-4 hover:text-[#d42d00] dark:text-[#FF4433]"
+                        className="font-medium text-primary underline underline-offset-4 hover:text-primary/80"
                     >
                         Register
                     </Link>

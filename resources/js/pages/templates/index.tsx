@@ -13,6 +13,8 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { PageHeader } from '@/components/ui/page-header';
 import AppLayout from '@/layouts/app-layout';
 import { store as saveTemplate, update as updateTemplate, destroy as deleteTemplate } from '@/routes/templates';
 import type { ApplicationTemplate } from '@/types/application-template';
@@ -129,15 +131,12 @@ return -1;
             <Head title="Application Templates" />
 
             <div className="flex flex-1 min-h-0 flex-col gap-6">
-                <div className="flex shrink-0 items-center justify-between">
-                    <h1 className="text-2xl font-semibold text-foreground">
-                        Application Templates
-                    </h1>
+                <PageHeader title="Application Templates">
                     <Button onClick={openCreate}>
                         <PlusIcon data-icon="inline-start" />
                         New Template
                     </Button>
-                </div>
+                </PageHeader>
 
                 {templates.length === 0 ? (
                     <div className="flex flex-1 min-h-0 flex-col items-center justify-center gap-2 py-16 text-center">
@@ -297,24 +296,22 @@ return -1;
                                 <Label htmlFor="default_job_description_keywords">
                                     Job Description Keywords
                                 </Label>
-                                <textarea
+                                <Textarea
                                     id="default_job_description_keywords"
                                     rows={2}
                                     value={data.default_job_description_keywords}
                                     onChange={(e) => setData('default_job_description_keywords', e.target.value)}
-                                    className="h-16 w-full min-w-0 rounded-lg border border-input bg-transparent px-2.5 py-1.5 text-sm transition-colors outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 dark:bg-input/30"
                                     placeholder="React, TypeScript, Laravel, Remote"
                                 />
                             </div>
 
                             <div className="flex flex-col gap-2">
                                 <Label htmlFor="default_notes">Default Notes</Label>
-                                <textarea
+                                <Textarea
                                     id="default_notes"
                                     rows={2}
                                     value={data.default_notes}
                                     onChange={(e) => setData('default_notes', e.target.value)}
-                                    className="h-16 w-full min-w-0 rounded-lg border border-input bg-transparent px-2.5 py-1.5 text-sm transition-colors outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 dark:bg-input/30"
                                     placeholder="Any default notes for this type of application"
                                 />
                             </div>

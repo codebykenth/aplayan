@@ -7,8 +7,8 @@ import {
 } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
 import { Badge } from '@/components/ui/badge';
+import { StatusBadge } from '@/components/ui/status-badge';
 import type { JobApplication } from '@/types/job-application';
-import { STATUS_COLORS } from '@/types/job-application';
 
 function formatSalary(amount: number | null): string | null {
     if (amount === null) {
@@ -230,11 +230,7 @@ export default function JobApplicationCard({
                 </div>
 
                 <div className="flex shrink-0 items-center gap-1.5">
-                    <Badge
-                        className={`border-0 px-2 py-0 text-[10px] font-medium leading-normal capitalize ${STATUS_COLORS[application.status]}`}
-                    >
-                        {application.status}
-                    </Badge>
+                    <StatusBadge status={application.status} className="text-[10px] px-2 py-0 leading-normal" />
 
                     <ActionsDropdown onEdit={onEdit} onDelete={onDelete} />
                 </div>

@@ -22,8 +22,8 @@ function UserAvatar({ user, compact }: { user: Auth['user']; compact?: boolean }
         ? 'mx-auto h-8 w-8 rounded-full'
         : 'h-8 w-8 shrink-0 rounded-full';
     const fallbackClass = compact
-        ? 'mx-auto flex h-8 w-8 items-center justify-center rounded-full bg-[#e3e3e0] text-xs font-medium text-[#706f6c] dark:bg-[#3E3E3A] dark:text-[#A1A09A]'
-        : 'flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#e3e3e0] text-xs font-medium text-[#706f6c] dark:bg-[#3E3E3A] dark:text-[#A1A09A]';
+        ? 'mx-auto flex h-8 w-8 items-center justify-center rounded-full bg-muted text-xs font-medium text-muted-foreground'
+        : 'flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-muted text-xs font-medium text-muted-foreground';
 
     if (user?.avatar) {
         return <img src={user.avatar} alt="" className={avatarClass} />;
@@ -48,7 +48,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     }, []);
 
     return (
-        <div className="flex h-screen w-full min-w-0 overflow-hidden bg-[#FDFDFC] dark:bg-[#0a0a0a]">
+        <div className="flex h-screen w-full min-w-0 overflow-hidden bg-background">
             <Head />
 
             {/* Mobile sidebar overlay */}
@@ -61,7 +61,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
             {/* Sidebar */}
             <aside
-                className={`fixed inset-y-0 left-0 z-50 flex flex-col border-r border-[#e3e3e0] bg-white transition-transform duration-300 dark:border-[#3E3E3A] dark:bg-[#161615] ${
+                className={`fixed inset-y-0 left-0 z-50 flex flex-col border-r border-border bg-card transition-transform duration-300 ${
                     mobileSidebarOpen
                         ? 'w-64 translate-x-0'
                         : sidebarOpen
@@ -70,16 +70,16 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                 }`}
             >
                 {/* Sidebar header */}
-                <div className="flex h-16 shrink-0 items-center border-b border-[#e3e3e0] px-4 dark:border-[#3E3E3A]">
+                <div className="flex h-16 shrink-0 items-center border-b border-border px-4">
                     {sidebarOpen && (
                         <>
-<Link href="/dashboard" className="text-lg font-semibold text-[#1b1b18] dark:text-[#EDEDEC]">
+<Link href="/dashboard" className="text-lg font-semibold text-foreground">
                                 Aplayan
                             </Link>
                             <div className="flex-1" />
                             <button
                                 onClick={() => setSidebarOpen(false)}
-                                className="hidden rounded-sm p-1 text-[#706f6c] hover:bg-[#f5f5f4] dark:text-[#A1A09A] dark:hover:bg-[#1C1C1A] md:block"
+                                className="hidden rounded-sm p-1 text-muted-foreground hover:bg-muted md:block"
                                 aria-label="Collapse sidebar"
                             >
                                 <ChevronLeft className="h-4 w-4" />
@@ -89,7 +89,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                     {!sidebarOpen && (
                         <button
                             onClick={() => setSidebarOpen(true)}
-                            className="mx-auto rounded-sm p-1 text-[#706f6c] hover:bg-[#f5f5f4] dark:text-[#A1A09A] dark:hover:bg-[#1C1C1A]"
+                            className="mx-auto rounded-sm p-1 text-muted-foreground hover:bg-muted"
                             aria-label="Expand sidebar"
                         >
                             <ChevronRight className="h-4 w-4" />
@@ -105,7 +105,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                                 <Link
                                     key={href}
                                     href={href}
-                                    className="flex items-center gap-3 rounded-sm px-3 py-2 text-sm text-[#706f6c] hover:bg-[#f5f5f4] hover:text-[#1b1b18] dark:text-[#A1A09A] dark:hover:bg-[#1C1C1A] dark:hover:text-[#EDEDEC]"
+                                    className="flex items-center gap-3 rounded-sm px-3 py-2 text-sm text-muted-foreground hover:bg-muted hover:text-foreground"
                                 >
                                     <Icon className="h-4 w-4 shrink-0" />
                                     {label}
@@ -118,7 +118,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                                 <Link
                                     key={href}
                                     href={href}
-                                    className="flex items-center justify-center rounded-sm px-2 py-2 text-[#706f6c] hover:bg-[#f5f5f4] hover:text-[#1b1b18] dark:text-[#A1A09A] dark:hover:bg-[#1C1C1A] dark:hover:text-[#EDEDEC]"
+                                    className="flex items-center justify-center rounded-sm px-2 py-2 text-muted-foreground hover:bg-muted hover:text-foreground"
                                     title={label}
                                 >
                                     <Icon className="h-5 w-5 shrink-0" />
@@ -130,14 +130,14 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
                 {/* User profile footer */}
                 {sidebarOpen && (
-                    <div className="shrink-0 border-t border-[#e3e3e0] p-3 dark:border-[#3E3E3A]">
+                    <div className="shrink-0 border-t border-border p-3">
                         <div className="flex items-center gap-3">
                             <UserAvatar user={auth.user} />
                             <div className="min-w-0 flex-1">
-                                <p className="truncate text-sm font-medium text-[#1b1b18] dark:text-[#EDEDEC]">
+                                <p className="truncate text-sm font-medium text-foreground">
                                     {auth.user?.name}
                                 </p>
-                                <p className="truncate text-xs text-[#706f6c] dark:text-[#A1A09A]">
+                                <p className="truncate text-xs text-muted-foreground">
                                     {auth.user?.email}
                                 </p>
                             </div>
@@ -146,7 +146,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                             href="/logout"
                             method="post"
                             as="button"
-                            className="mt-2 flex w-full items-center gap-2 rounded-sm px-3 py-2 text-sm text-[#706f6c] hover:bg-[#f5f5f4] hover:text-[#1b1b18] dark:text-[#A1A09A] dark:hover:bg-[#1C1C1A] dark:hover:text-[#EDEDEC]"
+                            className="mt-2 flex w-full items-center gap-2 rounded-sm px-3 py-2 text-sm text-muted-foreground hover:bg-muted hover:text-foreground"
                         >
                             <LogOut className="h-4 w-4" />
                             Logout
@@ -156,7 +156,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
                 {/* User avatar only when collapsed */}
                 {!sidebarOpen && (
-                    <div className="shrink-0 border-t border-[#e3e3e0] p-2 dark:border-[#3E3E3A]">
+                    <div className="shrink-0 border-t border-border p-2">
                         <UserAvatar user={auth.user} compact />
                     </div>
                 )}
@@ -169,14 +169,14 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                 }`}
             >
                 {/* Top bar (mobile only) */}
-                <header className="flex h-16 shrink-0 items-center gap-3 border-b border-[#e3e3e0] bg-white px-4 dark:border-[#3E3E3A] dark:bg-[#161615] md:hidden">
+                <header className="flex h-16 shrink-0 items-center gap-3 border-b border-border bg-background px-4 md:hidden">
                     <button
                         onClick={() => setMobileSidebarOpen(true)}
                         aria-label="Open navigation menu"
                     >
-                        <Menu className="h-5 w-5 text-[#1b1b18] dark:text-[#EDEDEC]" />
+                        <Menu className="h-5 w-5 text-foreground" />
                     </button>
-                    <Link href="/" className="text-lg font-semibold text-[#1b1b18] dark:text-[#EDEDEC]">
+                    <Link href="/" className="text-lg font-semibold text-foreground">
                         Aplayan
                     </Link>
                 </header>

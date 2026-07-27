@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { PageHeader } from '@/components/ui/page-header';
 import { useTheme } from '@/hooks/use-theme';
 import AppLayout from '@/layouts/app-layout';
 import settings from '@/routes/settings';
@@ -285,14 +286,7 @@ export default function SettingsIndex({ user }: SettingsPageProps) {
             <Head title="Settings" />
 
             <div className="flex flex-col gap-6">
-                <div>
-                    <h1 className="text-2xl font-semibold text-foreground">
-                        Settings
-                    </h1>
-                    <p className="text-sm text-muted-foreground">
-                        Manage your account settings and preferences.
-                    </p>
-                </div>
+                <PageHeader title="Settings" description="Manage your account settings and preferences." />
 
                 <div className="flex flex-col gap-6 max-w-2xl">
                     <ProfileSection user={user} />

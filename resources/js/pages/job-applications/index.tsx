@@ -8,6 +8,7 @@ import JobApplicationForm from '@/components/job-applications/job-application-fo
 import KanbanBoard from '@/components/job-applications/kanban-board';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { PageHeader } from '@/components/ui/page-header';
 import AppLayout from '@/layouts/app-layout';
 import { destroy as jobAppDestroy, exportMethod, importMethod } from '@/routes/job-applications';
 import type { ApplicationTemplate } from '@/types/application-template';
@@ -129,22 +130,19 @@ return;
             <Head title="Job Applications" />
 
             <div className="flex flex-1 min-h-0 flex-col gap-4 sm:gap-6">
-                <div className="flex shrink-0 items-center justify-between">
-                    <h1 className="text-2xl font-semibold text-foreground">
-                        Job Applications
-                    </h1>
-                    <div className="flex items-center gap-2">
-                        <div className="relative">
-                            <Button
-                                variant="outline"
-                                onClick={(e) => {
-                                    e.stopPropagation();
-                                    setExportOpen(!exportOpen);
-                                }}
-                            >
-                                <DownloadIcon data-icon="inline-start" />
-                                Export Data
-                            </Button>
+                <PageHeader title="Job Applications">
+                        <div className="flex items-center gap-2">
+                            <div className="relative">
+                                <Button
+                                    variant="outline"
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        setExportOpen(!exportOpen);
+                                    }}
+                                >
+                                    <DownloadIcon data-icon="inline-start" />
+                                    Export Data
+                                </Button>
                             {exportOpen && (
                                 <div
                                     className="absolute right-0 top-full z-50 mt-1 min-w-36 rounded-lg border bg-popover p-1 shadow-md"
@@ -194,7 +192,7 @@ return;
                             New Application
                         </Button>
                     </div>
-                </div>
+                </PageHeader>
 
                 <div className="flex shrink-0 flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                     <div className="relative w-full max-w-xs">

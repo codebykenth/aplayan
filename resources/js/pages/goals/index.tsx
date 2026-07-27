@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { PageHeader } from '@/components/ui/page-header';
 import AppLayout from '@/layouts/app-layout';
 import goals from '@/routes/goals';
 
@@ -198,12 +199,7 @@ export default function GoalsIndex({
             <Head title="Goals" />
 
             <div className="flex flex-1 min-h-0 flex-col gap-6 overflow-y-auto pr-2 pb-4">
-                <div>
-                    <h1 className="text-2xl font-semibold text-foreground">Weekly Goals</h1>
-                    <p className="text-sm text-muted-foreground">
-                        Track your application consistency and keep your momentum going.
-                    </p>
-                </div>
+                <PageHeader title="Weekly Goals" description="Track your application consistency and keep your momentum going." />
 
                 <div className="grid gap-6 lg:grid-cols-3">
                     <Card className="lg:col-span-2">

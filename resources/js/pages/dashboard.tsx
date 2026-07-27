@@ -27,6 +27,7 @@ import {
     ChartLegendContent,
 } from '@/components/ui/chart';
 import type { ChartConfig } from '@/components/ui/chart';
+import { PageHeader } from '@/components/ui/page-header';
 import AppLayout from '@/layouts/app-layout';
 import { JOB_APPLICATION_STATUSES } from '@/types/job-application';
 import type { JobApplicationStatus } from '@/types/job-application';
@@ -115,14 +116,7 @@ export default function Dashboard({
             <Head title="Dashboard" />
 
             <div className="flex min-h-0 flex-1 flex-col gap-6 overflow-y-auto pr-2 pb-4">
-                <div>
-                    <h1 className="text-2xl font-semibold text-foreground">
-                        Dashboard
-                    </h1>
-                    <p className="text-sm text-muted-foreground">
-                        Overview of your job search activity
-                    </p>
-                </div>
+                <PageHeader title="Dashboard" description="Overview of your job search activity" />
 
                 {/* Action Feed */}
                 <ActionFeed items={action_items} />

@@ -20,6 +20,7 @@ import {
     
 } from '@/components/ui/chart';
 import type {ChartConfig} from '@/components/ui/chart';
+import { PageHeader } from '@/components/ui/page-header';
 import AppLayout from '@/layouts/app-layout';
 import { JOB_APPLICATION_STATUSES } from '@/types/job-application';
 import type { JobApplicationStatus } from '@/types/job-application';
@@ -177,14 +178,7 @@ export default function Analytics({
             <Head title="Analytics" />
 
             <div className="flex flex-1 min-h-0 flex-col gap-6 overflow-y-auto pr-2 pb-4">
-                <div>
-                    <h1 className="text-2xl font-semibold text-foreground">
-                        Analytics
-                    </h1>
-                    <p className="text-sm text-muted-foreground">
-                        Deep-dive metrics on your job search pipeline
-                    </p>
-                </div>
+                <PageHeader title="Analytics" description="Deep-dive metrics on your job search pipeline" />
 
                 {/* Salary Insights Summary */}
                 <div className="grid gap-4 sm:grid-cols-2 shrink-0">

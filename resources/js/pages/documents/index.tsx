@@ -7,6 +7,7 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/com
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogClose } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from '@/components/ui/select';
 import AppLayout from '@/layouts/app-layout';
 
@@ -795,7 +796,7 @@ setData('website_url', '');
                         AI Polish
                     </button>
                 </div>
-                <textarea
+                <Textarea
                     id="summary"
                     value={data.summary ?? ''}
                     onChange={(e) => setData('summary', e.target.value)}
@@ -904,7 +905,7 @@ updateExperience(index, 'duration', '');
                                     AI Polish
                                 </button>
                             </div>
-                            <textarea
+                            <Textarea
                                 value={exp.description}
                                 onChange={(e) => updateExperience(index, 'description', e.target.value)}
                                 onFocus={() => {
@@ -913,8 +914,6 @@ updateExperience(index, 'description', '');
 } 
 }}
                                 rows={3}
-                                className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring"
-                                placeholder="Key responsibilities and achievements..."
                             />
                         </div>
                     </div>
@@ -1242,7 +1241,7 @@ updateProject(index, 'title', '');
                                     AI Polish
                                 </button>
                             </div>
-                            <textarea
+                            <Textarea
                                 value={project.description}
                                 onChange={(e) => updateProject(index, 'description', e.target.value)}
                                 onFocus={() => {
@@ -1251,8 +1250,6 @@ updateProject(index, 'description', '');
 } 
 }}
                                 rows={3}
-                                className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring"
-                                placeholder="Key features and your role in the project..."
                             />
                         </div>
                         <div className="flex flex-col gap-2">
@@ -2582,12 +2579,11 @@ setJobTitle(letter.target_job_title);
 
             <div className="flex flex-col gap-2">
                 <Label htmlFor="job_description">Job Description</Label>
-                <textarea
+                <Textarea
                     id="job_description"
                     value={jobDescription}
                     onChange={(e) => setJobDescription(e.target.value)}
                     rows={3}
-                    className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring"
                     placeholder="Paste the job description here to generate a tailored cover letter..."
                 />
             </div>
@@ -2685,12 +2681,12 @@ setJobTitle(letter.target_job_title);
 
             <div className="flex flex-col gap-2 flex-1 min-h-0">
                 <Label htmlFor="cover_letter_content">Cover Letter</Label>
-                <textarea
+                <Textarea
                     id="cover_letter_content"
                     value={coverLetterContent}
                     onChange={(e) => onCoverLetterContentChange(e.target.value)}
                     rows={18}
-                    className="w-full flex-1 rounded-md border border-input bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring font-mono leading-relaxed resize-none"
+                    className="flex-1 font-mono leading-relaxed resize-none"
                     placeholder="Write your cover letter here, or select a template to load predefined text..."
                 />
             </div>

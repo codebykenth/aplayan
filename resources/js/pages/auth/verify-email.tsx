@@ -10,10 +10,10 @@ export default function VerifyEmail() {
             <Head title="Verify Email" />
 
             <div className="mx-auto mt-16 w-full max-w-sm text-center">
-                <h1 className="mb-2 text-2xl font-semibold text-[#1b1b18] dark:text-[#EDEDEC]">
+                <h1 className="mb-2 text-2xl font-semibold text-foreground">
                     Verify your email address
                 </h1>
-                <p className="mb-6 text-sm text-[#706f6c] dark:text-[#A1A09A]">
+                <p className="mb-6 text-sm text-muted-foreground">
                     Thanks for signing up! Before getting started, could you verify your email address by clicking the
                     link we just emailed to you? If you didn't receive the email, we will gladly send you another.
                 </p>
@@ -29,7 +29,7 @@ export default function VerifyEmail() {
 
                     <button
                         type="submit"
-                        className="w-full rounded-sm border border-black bg-[#1b1b18] px-5 py-2 text-sm text-white hover:bg-black dark:border-[#eeeeec] dark:bg-[#eeeeec] dark:text-[#1C1C1A] dark:hover:bg-white"
+                        className="w-full rounded-lg border border-foreground bg-foreground px-5 py-2 text-sm text-background hover:bg-foreground/90"
                     >
                         Resend Verification Email
                     </button>
@@ -40,7 +40,7 @@ export default function VerifyEmail() {
 
                     <button
                         type="submit"
-                        className="text-sm text-[#706f6c] underline underline-offset-4 hover:text-[#1b1b18] dark:text-[#A1A09A] dark:hover:text-[#EDEDEC]"
+                        className="text-sm text-muted-foreground underline underline-offset-4 hover:text-foreground"
                     >
                         Logout
                     </button>
