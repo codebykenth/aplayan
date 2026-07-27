@@ -33,6 +33,14 @@ class ResumeProfileService
             $parts[] = "LinkedIn: {$profile->linkedin_url}";
         }
 
+        if ($profile->github_url) {
+            $parts[] = "GitHub: {$profile->github_url}";
+        }
+
+        if ($profile->website_url) {
+            $parts[] = "Website: {$profile->website_url}";
+        }
+
         if ($profile->summary) {
             $parts[] = "\nSummary:\n{$profile->summary}";
         }
@@ -60,6 +68,20 @@ class ResumeProfileService
 
         if ($profile->certifications !== []) {
             $parts[] = "\nCertifications: ".implode(', ', $profile->certifications);
+        }
+
+        if ($profile->projects !== []) {
+            $parts[] = "\nProjects:";
+            foreach ($profile->projects as $project) {
+                $line = "- {$project['title']}";
+                if (isset($project['technologies'])) {
+                    $line .= " ({$project['technologies']})";
+                }
+                $parts[] = $line;
+                if (isset($project['description'])) {
+                    $parts[] = "  {$project['description']}";
+                }
+            }
         }
 
         return implode("\n", $parts);

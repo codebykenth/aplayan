@@ -17,12 +17,13 @@ class AnalyticsService
             ->groupBy('status')
             ->pluck('count', 'status');
 
-        $order = collect(JobApplicationStatus::cases());
+        $order = collect(JobApplicationStatus::cases())
+            ->reject(fn (JobApplicationStatus $status) => $status === JobApplicationStatus::Rejected);
 
         return $order->map(fn (JobApplicationStatus $status) => [
             'name' => $status->label(),
             'value' => (int) ($counts[$status->value] ?? 0),
-        ]);
+        ])->values();
     }
 
     public function weeklyVolume(User $user): Collection

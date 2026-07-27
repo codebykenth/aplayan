@@ -20,6 +20,8 @@ class UpdateResumeProfileRequest extends FormRequest
             'location' => ['required', 'string', 'max:255'],
             'photo_url' => ['nullable', 'url', 'max:500'],
             'linkedin_url' => ['nullable', 'url', 'max:500'],
+            'github_url' => ['nullable', 'url', 'max:500'],
+            'website_url' => ['nullable', 'url', 'max:500'],
             'summary' => ['nullable', 'string', 'max:5000'],
             'work_experience' => ['sometimes', 'array'],
             'work_experience.*.company' => ['required_with:work_experience', 'string', 'max:255'],
@@ -34,6 +36,11 @@ class UpdateResumeProfileRequest extends FormRequest
             'skills.*' => ['string', 'max:100'],
             'certifications' => ['sometimes', 'array'],
             'certifications.*' => ['string', 'max:255'],
+            'projects' => ['sometimes', 'array'],
+            'projects.*.title' => ['required_with:projects', 'string', 'max:255'],
+            'projects.*.description' => ['nullable', 'string', 'max:2000'],
+            'projects.*.url' => ['nullable', 'url', 'max:500'],
+            'projects.*.technologies' => ['nullable', 'string', 'max:500'],
         ];
     }
 }

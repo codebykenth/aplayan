@@ -315,6 +315,7 @@ it('clears salary negotiation item when offer is rejected', function () {
 it('clears upcoming interview when interview passes', function () {
     $application = JobApplication::factory()->create([
         'user_id' => $this->user->id,
+        'status' => 'applied',
         'interview_date' => now()->addDays(1),
         'ai_evaluated_at' => now(),
         'last_contacted_at' => now(),
@@ -331,4 +332,6 @@ it('clears upcoming interview when interview passes', function () {
         ->assertInertia(fn ($page) => $page
             ->where('action_items', [])
         );
+
+    $this->travelBack();
 });

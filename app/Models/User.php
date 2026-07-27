@@ -52,6 +52,16 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->hasOne(ResumeProfile::class);
     }
 
+    public function savedResumes(): HasMany
+    {
+        return $this->hasMany(SavedResume::class);
+    }
+
+    public function savedCoverLetters(): HasMany
+    {
+        return $this->hasMany(SavedCoverLetter::class);
+    }
+
     /**
      * Get the attributes that should be cast.
      *

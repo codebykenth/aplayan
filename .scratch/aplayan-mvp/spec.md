@@ -29,9 +29,11 @@ Aplayan is a free-to-maintain, privacy-first, web-based Job Application Tracker 
 17. As a job seeker, I want an Offer Comparison Matrix (`/job-applications/offers`), so that I can evaluate multiple job offers side-by-side.
 18. As a job seeker in the Philippines, I want a Philippine Statutory Tax & Take-Home Pay Calculator (`PhilippineTaxCalculatorService`), so that I can estimate net monthly pay under TRAIN Law tax brackets, SSS, PhilHealth, and Pag-IBIG.
 19. As a job seeker, I want a Zero-Storage Dynamic Resume & Cover Letter Builder (`/documents`), so that I can store structured experience data and export ATS-friendly PDFs in 3 visual templates without uploading files to cloud storage.
+23. As a job seeker, I want full-page views for Resume Builder, Cover Letter Builder, Resume Preview, and Cover Letter Preview with manual cover letter creation, targeted AI polish, and daily AI rate limiting, so that I have a full-width workspace and scalable AI assistance.
 20. As a job seeker, I want a Contacts Management module (`/contacts`), so that I can store recruiter and hiring manager records and link them many-to-many to specific job applications.
 21. As a job seeker, I want a read-only Calendar view (`/calendar`), so that I can inspect interview dates, application milestones, and follow-up deadlines on Month and Week schedules.
 22. As a job seeker, I want a Recent Activity Feed in a right sidebar card on my Dashboard, so that I can view my latest status changes, note updates, contact logs, and AI evaluations and click any item to open the application detail modal.
+24. As a user, I want consistent UI design across all pages (layout structure, typography scale, card styles, button sizes, status badges, and dark mode contrast), so that the application feels cohesive and state-of-the-art.
 
 ## Implementation Decisions
 
@@ -70,6 +72,7 @@ Aplayan is a free-to-maintain, privacy-first, web-based Job Application Tracker 
 ### Zero-Cost & Serverless Hosting Decision
 - Project is deployed on Vercel serverless PHP architecture.
 - Daily action feed, deep-dive analytics, goals, contacts, and calendar run strictly server-side on database queries with **$0 recurring AI API costs**.
+- AI features use a global entity-normalized SHA-256 caching architecture (`ai_responses_cache`) with canonical company/job title normalization (`Canva Inc.` -> `canva`) and daily user rate limits to guarantee $0 AI operational costs at scale.
 - Ephemeral in-memory resume processing and dynamic client-side ATS PDF generation guarantee **$0 cloud file storage fees**.
 
 ## Testing Decisions

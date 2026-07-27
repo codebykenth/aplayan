@@ -17,11 +17,14 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property string $location
  * @property string|null $photo_url
  * @property string|null $linkedin_url
+ * @property string|null $github_url
+ * @property string|null $website_url
  * @property string|null $summary
  * @property array $work_experience
  * @property array $education
  * @property array $skills
  * @property array $certifications
+ * @property array $projects
  * @property Carbon $created_at
  * @property Carbon $updated_at
  */
@@ -38,11 +41,14 @@ class ResumeProfile extends Model
         'location',
         'photo_url',
         'linkedin_url',
+        'github_url',
+        'website_url',
         'summary',
         'work_experience',
         'education',
         'skills',
         'certifications',
+        'projects',
     ];
 
     protected function casts(): array
@@ -52,6 +58,7 @@ class ResumeProfile extends Model
             'education' => 'array',
             'skills' => 'array',
             'certifications' => 'array',
+            'projects' => 'array',
         ];
     }
 
