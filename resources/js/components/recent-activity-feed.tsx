@@ -7,11 +7,15 @@ import {
     Sparkles,
     History,
     ExternalLink,
+    ArrowRight,
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Link } from '@inertiajs/react';
 import { cn } from '@/lib/utils';
 import type { JobApplicationActivity } from '@/types/job-application';
+import { index as jobAppsIndex } from '@/routes/job-applications';
 
 export interface RecentActivityItem extends Omit<
     JobApplicationActivity,
@@ -71,9 +75,11 @@ function formatRelativeTime(date: string): string {
     const diffDays = Math.floor(diffMs / 86400000);
 
     if (diffMins < 1) return 'Just now';
-    if (diffMins < 60) return `${diffMins}m ago`;
-    if (diffHours < 24) return `${diffHours}h ago`;
-    if (diffDays < 7) return `${diffDays}d ago`;
+    if (diffMins < 60)
+        return `${diffMins} minute${diffMins === 1 ? '' : 's'} ago`;
+    if (diffHours < 24)
+        return `${diffHours} hour${diffHours === 1 ? '' : 's'} ago`;
+    if (diffDays < 7) return `${diffDays} day${diffDays === 1 ? '' : 's'} ago`;
 
     return d.toLocaleDateString('en-PH', {
         month: 'short',
@@ -153,17 +159,25 @@ export default function RecentActivityFeed({
             </CardHeader>
             <CardContent className="px-0">
                 {items.length === 0 ? (
-                    <div className="flex flex-col items-center gap-2 px-(--card-spacing) py-8 text-center">
+                    <div className="flex flex-col items-center gap-3 px-(--card-spacing) py-8 text-center">
                         <div className="flex size-10 items-center justify-center rounded-full bg-muted">
                             <History className="size-5 text-muted-foreground/50" />
                         </div>
-                        <p className="text-sm font-medium text-foreground">
-                            No activity yet
-                        </p>
-                        <p className="max-w-44 text-xs text-muted-foreground">
-                            Activities from your job applications will appear
-                            here as you make progress.
-                        </p>
+                        <div>
+                            <p className="text-sm font-medium text-foreground">
+                                No activity yet
+                            </p>
+                            <p className="mt-1 max-w-44 text-xs text-muted-foreground">
+                                Activities from your job applications will
+                                appear here as you make progress.
+                            </p>
+                        </div>
+                        <Link href={jobAppsIndex.url()}>
+                            <Button variant="outline" size="sm">
+                                Add your first application
+                                <ArrowRight className="size-3" />
+                            </Button>
+                        </Link>
                     </div>
                 ) : (
                     <div className="flex flex-col gap-0">

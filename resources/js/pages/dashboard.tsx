@@ -1,6 +1,7 @@
-import { Head, router } from '@inertiajs/react';
+import { Head } from '@inertiajs/react';
 import { Briefcase, TrendingUp, CalendarDays } from 'lucide-react';
 import { useState, useCallback, type ReactNode } from 'react';
+import { show as showRoute } from '@/routes/job-applications';
 import {
     BarChart,
     Bar,
@@ -72,18 +73,15 @@ export default function Dashboard({
         async (applicationId: number) => {
             setIsLoadingApplication(true);
             try {
-                const response = await fetch(
-                    `/job-applications/${applicationId}`,
-                    {
-                        headers: { Accept: 'application/json' },
-                    },
-                );
+                const response = await fetch(showRoute.url(applicationId), {
+                    headers: { Accept: 'application/json' },
+                });
                 if (!response.ok)
                     throw new Error('Failed to fetch application');
                 const json = await response.json();
                 setSelectedApplication(json.data as JobApplication);
             } catch {
-                router.visit(`/job-applications/${applicationId}`);
+                window.location.href = showRoute.url(applicationId);
             } finally {
                 setIsLoadingApplication(false);
             }
