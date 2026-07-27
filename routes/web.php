@@ -6,6 +6,7 @@ use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\SocialiteController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\DocumentController;
 use App\Http\Controllers\FollowUpEmailController;
 use App\Http\Controllers\GoalController;
 use App\Http\Controllers\InterviewPrepController;
@@ -91,4 +92,8 @@ Route::middleware('auth')->group(function () {
     Route::post('templates', [ApplicationTemplateController::class, 'store'])->name('templates.store');
     Route::match(['put', 'patch'], 'templates/{applicationTemplate}', [ApplicationTemplateController::class, 'update'])->name('templates.update');
     Route::delete('templates/{applicationTemplate}', [ApplicationTemplateController::class, 'destroy'])->name('templates.destroy');
+
+    Route::get('documents', [DocumentController::class, 'index'])->name('documents.index');
+    Route::put('documents/profile', [DocumentController::class, 'updateProfile'])->name('documents.profile.update');
+    Route::post('documents/cover-letter', [DocumentController::class, 'coverLetter'])->name('documents.cover-letter');
 });

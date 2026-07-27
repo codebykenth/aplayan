@@ -101,6 +101,34 @@ PROMPT;
         return $this->extractJson($response, ['questions', 'talking_points', 'tips']);
     }
 
+    public function generateCoverLetter(string $profileText, string $jobDescription): string
+    {
+        $prompt = <<<PROMPT
+You are a professional career coach helping a job seeker in the Philippines write a tailored cover letter.
+
+Use the following resume profile to personalize the letter:
+
+{$profileText}
+
+Job Description:
+{$jobDescription}
+
+Write a professional, compelling cover letter that:
+- Is tailored to the specific job and company
+- Highlights relevant experience and skills from the profile
+- Shows enthusiasm for the role
+- Is appropriate for the Philippine professional context
+- Is concise (under 300 words)
+- Uses a formal but personable tone
+
+Return ONLY the cover letter text, no subject line or additional commentary.
+PROMPT;
+
+        $response = $this->sendRequest($prompt);
+
+        return $response['candidates'][0]['content']['parts'][0]['text'] ?? 'Unable to generate cover letter.';
+    }
+
     private function client(): PendingRequest
     {
         return Http::timeout(self::TIMEOUT)
