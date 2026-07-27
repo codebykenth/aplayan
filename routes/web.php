@@ -5,6 +5,7 @@ use App\Http\Controllers\ApplicationTemplateController;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\SocialiteController;
+use App\Http\Controllers\CalendarController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DocumentController;
@@ -42,6 +43,7 @@ Route::middleware('guest')->group(function () {
 
 Route::middleware('auth')->group(function () {
     Route::get('dashboard', DashboardController::class)->name('dashboard');
+    Route::get('calendar', CalendarController::class)->name('calendar');
     Route::get('analytics', AnalyticsController::class)->name('analytics');
 
     Route::post('logout', [AuthController::class, 'destroy'])->name('logout');
