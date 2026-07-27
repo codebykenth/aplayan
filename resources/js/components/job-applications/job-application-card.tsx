@@ -1,4 +1,3 @@
-import { useState, useRef, useEffect } from 'react';
 import {
     GripVerticalIcon,
     MoreVerticalIcon,
@@ -6,12 +5,15 @@ import {
     TrashIcon,
     CalendarClockIcon,
 } from 'lucide-react';
+import { useState, useRef, useEffect } from 'react';
 import { Badge } from '@/components/ui/badge';
 import type { JobApplication } from '@/types/job-application';
 import { STATUS_COLORS } from '@/types/job-application';
 
 function formatSalary(amount: number | null): string | null {
-    if (amount === null) return null;
+    if (amount === null) {
+return null;
+}
 
     return `₱${amount.toLocaleString('en-PH', {
         minimumFractionDigits: 0,
@@ -20,7 +22,9 @@ function formatSalary(amount: number | null): string | null {
 }
 
 function formatDate(date: string | null): string | null {
-    if (!date) return null;
+    if (!date) {
+return null;
+}
 
     const d = new Date(date);
 
@@ -46,7 +50,9 @@ function InterviewCountdownBadge({
         setDaysRemaining(diffDays);
     }, [interviewDate]);
 
-    if (daysRemaining === null || daysRemaining < 0) return null;
+    if (daysRemaining === null || daysRemaining < 0) {
+return null;
+}
 
     const label = daysRemaining === 0
         ? 'Interview today'
@@ -69,7 +75,9 @@ function StalenessBadge({
     level: 'warning' | 'alert' | null;
     daysSinceUpdate: number;
 }) {
-    if (level === null) return null;
+    if (level === null) {
+return null;
+}
 
     return (
         <span
@@ -79,7 +87,7 @@ function StalenessBadge({
                     : 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300'
             }`}
         >
-            {level === 'alert' ? '🔴' : '⚠️'} {daysSinceUpdate}d
+            {level === 'alert' ? 'Needs attention' : 'Follow up'} {daysSinceUpdate}d
         </span>
     );
 }
@@ -95,7 +103,9 @@ function ActionsDropdown({
     const ref = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
-        if (!open) return;
+        if (!open) {
+return;
+}
 
         function handleKeyDown(event: KeyboardEvent) {
             if (event.key === 'Escape') {
@@ -111,6 +121,7 @@ function ActionsDropdown({
 
         document.addEventListener('keydown', handleKeyDown);
         document.addEventListener('mousedown', handleClickOutside);
+
         return () => {
             document.removeEventListener('keydown', handleKeyDown);
             document.removeEventListener('mousedown', handleClickOutside);
