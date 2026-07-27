@@ -1,4 +1,4 @@
-import { Head, useForm, router } from '@inertiajs/react';
+import { Head, Link, useForm, router } from '@inertiajs/react';
 import type { ReactNode } from 'react';
 import { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
@@ -55,18 +55,129 @@ type AiLimit = {
     exhausted: boolean;
 };
 
+interface SavedResumeProp {
+    id: number;
+    name: string;
+    template: string;
+    profile_data: ResumeProfile;
+    photo_url: string | null;
+}
+
+interface SavedCoverLetterProp {
+    id: number;
+    content: string;
+    target_company: string | null;
+    target_job_title: string | null;
+    template: string | null;
+}
+
 interface DocumentsPageProps {
     profile: ResumeProfile | null;
     aiLimit: AiLimit;
+    loadedResume?: SavedResumeProp | null;
+    loadedCoverLetter?: SavedCoverLetterProp | null;
+    flash?: {
+        success?: string;
+        error?: string;
+    };
 }
 
 const TEMPLATES = [
     { id: 'clean', name: 'Clean Minimal' },
     { id: 'ats_classic', name: 'ATS Classic (One-Line Contact)' },
     { id: 'ats_executive', name: 'ATS Executive (High Density)' },
+    { id: 'ats_bullet', name: 'ATS Bulleted (High Scannability)' },
     { id: 'modern', name: 'Modern Professional' },
     { id: 'philippine', name: 'Philippine Standard (CV)' },
 ] as const;
+
+const COVER_LETTER_TEMPLATES = [
+    { id: 'cl_modern', name: 'Modern & Engaging' },
+    { id: 'cl_formal', name: 'Classic & Formal' },
+    { id: 'cl_executive', name: 'Executive & Strategic' },
+    { id: 'cl_creative', name: 'Creative & Narrative' },
+    { id: 'cl_minimal', name: 'Clean & Direct' },
+] as const;
+
+const COVER_LETTER_PREDEFINED_TEXTS: Record<string, string> = {
+    cl_modern: `Dear Hiring Team,
+
+I am writing to express my strong interest in the [Target Job Title] position at [Target Company]. Having closely followed your recent achievements and industry leadership, I am eager to bring my hands-on expertise, technical drive, and problem-solving mindset to your dynamic team.
+
+Throughout my career, I have consistently focused on building scalable, reliable, and user-centric solutions. At my previous roles, I led initiatives that streamlined operational workflows and improved product performance. I thrive in collaborative, fast-paced environments where innovation and continuous improvement are prioritized.
+
+What excites me most about [Target Company] is your commitment to pushing technological boundaries and delivering meaningful impact. I am confident that my background in full-stack development, system architecture, and cross-functional team collaboration aligns exceptionally well with your goals.
+
+Thank you for your time and consideration. I would welcome the opportunity to discuss how my experience and passion can contribute to the ongoing success of [Target Company].
+
+Sincerely,
+[Your Name]`,
+
+    cl_formal: `Dear Hiring Manager,
+
+Please accept this letter as my formal application for the [Target Job Title] vacancy currently available at [Target Company]. With a proven track record of professional excellence and a disciplined approach to execution, I am eager to contribute to your organization's continued success.
+
+In my previous positions, I have successfully executed complex technical projects, ensured strict adherence to industry standards, and consistently delivered high-quality results within demanding timelines. My core competencies include technical architecture, system optimization, and strategic project delivery.
+
+I am particularly drawn to [Target Company] because of your established reputation for excellence, integrity, and market leadership. I am eager to apply my skills and rigorous work ethic toward achieving your strategic objectives.
+
+Enclosed is my resume for your review. I look forward to the opportunity to participate in an interview to discuss how my qualifications meet your requirements.
+
+Sincerely,
+[Your Name]`,
+
+    cl_executive: `Dear Members of the Executive Search Committee,
+
+I am writing to submit my candidacy for the [Target Job Title] position at [Target Company]. As an experienced leader with a deep commitment to driving technical innovation, operational excellence, and organizational growth, I am inspired by [Target Company]'s vision and market positioning.
+
+Over the course of my leadership career, I have successfully guided cross-functional teams through complex technological transformations, scaled engineering infrastructure, and aligned technology initiatives with core business growth metrics. Key highlights of my trajectory include:
+
+• Architecting resilient enterprise systems that reduced operational overhead and improved system reliability.
+• Championing high-performing engineering cultures centered on accountability, mentorship, and continuous delivery.
+• Collaborating directly with executive stakeholders to translate high-level business vision into actionable technical roadmaps.
+
+I welcome the opportunity to bring strategic vision, technical leadership, and execution excellence to [Target Company]. Thank you for your time and consideration.
+
+Sincerely,
+[Your Name]`,
+
+    cl_creative: `Dear [Target Company] Team,
+
+Great products are built at the intersection of curiosity, craft, and relentless execution—values that clearly define [Target Company]. When I saw the opening for [Target Job Title], I immediately recognized an alignment of vision and passion.
+
+My journey in software engineering has been fueled by a desire to solve non-trivial problems and build intuitive, human-centered experiences. Whether optimizing complex database queries or refining user-facing interfaces, I approach every challenge with strategic intent and a high standard of quality.
+
+At [Target Company], your commitment to engineering quality and product innovation stands out. I am excited about the prospect of contributing my creative problem-solving capabilities, technical foundation, and collaborative energy to your upcoming milestones.
+
+I would love the opportunity to connect and share more about how my background and enthusiasm can elevate your team. Thank you for considering my application!
+
+Warm regards,
+[Your Name]`,
+
+    cl_minimal: `Dear Hiring Team,
+
+I am applying for the [Target Job Title] role at [Target Company]. My background spans full-stack software development, cloud infrastructure, and technical leadership with a focused commitment to delivering measurable business value.
+
+Key achievements from my background include:
+• Delivering high-availability web applications supporting thousands of active users.
+• Optimizing backend data pipelines to reduce latency and enhance overall throughput.
+• Partnering closely with product managers and designers to launch key platform features on schedule.
+
+I am impressed by [Target Company]'s product trajectory and would appreciate the opportunity to contribute directly to your team's engineering goals.
+
+Thank you for your time. I look forward to connecting.
+
+Best regards,
+[Your Name]`,
+};
+
+function getPredefinedCoverLetter(templateId: string, jobTitle: string, companyName: string, fullName: string): string {
+    const raw = COVER_LETTER_PREDEFINED_TEXTS[templateId] || COVER_LETTER_PREDEFINED_TEXTS.cl_modern;
+    return raw
+        .replaceAll('[Target Job Title]', jobTitle || 'Software Developer')
+        .replaceAll('[Target Company]', companyName || 'Target Company')
+        .replaceAll('[Your Name]', fullName || 'Applicant');
+}
 
 const TABS = [
     { id: 'personal', label: 'Personal Info', icon: User },
@@ -123,6 +234,22 @@ function getPrintStyles(template: string): string {
             .project-title { font-size: 14px; font-weight: 600; }
             .project-tech { font-size: 12px; color: #706f6c; }
             .project-desc { font-size: 13px; margin-top: 4px; line-height: 1.4; }
+        `;
+    }
+    if (template === 'ats_bullet') {
+        return base + `
+            .bullet-header { text-align: center; margin-bottom: 16px; border-bottom: 2px solid #1b1b18; padding-bottom: 12px; }
+            .bullet-name { font-size: 24px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px; }
+            .bullet-contact { font-size: 12px; color: #4a4a46; font-weight: 500; }
+            .bullet-section-title { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; border-bottom: 1.5px solid #1b1b18; padding-bottom: 3px; margin-top: 14px; margin-bottom: 8px; }
+            .bullet-item { margin-bottom: 10px; }
+            .bullet-item-header { display: flex; justify-content: space-between; align-items: baseline; }
+            .bullet-title { font-size: 14px; font-weight: 700; }
+            .bullet-date { font-size: 12px; color: #4a4a46; font-weight: 500; }
+            .bullet-company { font-size: 13px; font-weight: 600; color: #4a4a46; font-style: italic; }
+            .bullet-list { margin-top: 4px; padding-left: 20px; list-style-type: disc; }
+            .bullet-list li { font-size: 13px; margin-bottom: 3px; line-height: 1.45; }
+            .photo { width: 96px; height: 96px; border-radius: 8px; object-fit: cover; float: right; margin-left: 16px; }
         `;
     }
     if (template === 'clean') {
@@ -234,6 +361,22 @@ function getScopedResumeStyles(template: string): string {
             .resume-paper-preview .project-desc { font-size: 13px; margin-top: 4px; line-height: 1.4; color: #1b1b18; }
         `;
     }
+    if (template === 'ats_bullet') {
+        return base + `
+            .resume-paper-preview .bullet-header { text-align: center; margin-bottom: 16px; border-bottom: 2px solid #1b1b18; padding-bottom: 12px; }
+            .resume-paper-preview .bullet-name { font-size: 24px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #1b1b18; margin-bottom: 6px; }
+            .resume-paper-preview .bullet-contact { font-size: 12px; color: #4a4a46; font-weight: 500; }
+            .resume-paper-preview .bullet-section-title { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; border-bottom: 1.5px solid #1b1b18; padding-bottom: 3px; margin-top: 14px; margin-bottom: 8px; color: #1b1b18; }
+            .resume-paper-preview .bullet-item { margin-bottom: 10px; }
+            .resume-paper-preview .bullet-item-header { display: flex; justify-content: space-between; align-items: baseline; }
+            .resume-paper-preview .bullet-title { font-size: 14px; font-weight: 700; color: #1b1b18; }
+            .resume-paper-preview .bullet-date { font-size: 12px; color: #4a4a46; font-weight: 500; }
+            .resume-paper-preview .bullet-company { font-size: 13px; font-weight: 600; color: #4a4a46; font-style: italic; }
+            .resume-paper-preview .bullet-list { margin-top: 4px; padding-left: 20px; list-style-type: disc; }
+            .resume-paper-preview .bullet-list li { font-size: 13px; margin-bottom: 3px; line-height: 1.45; color: #1b1b18; }
+            .resume-paper-preview .photo { width: 96px; height: 96px; border-radius: 8px; object-fit: cover; float: right; margin-left: 16px; }
+        `;
+    }
 
     if (template === 'clean') {
         return base + `
@@ -294,7 +437,7 @@ function getScopedResumeStyles(template: string): string {
         .resume-paper-preview .edu-institution { font-size: 12px; color: #706f6c; }
         .resume-paper-preview .job-desc { font-size: 13px; margin-top: 4px; line-height: 1.4; color: #1b1b18; }
         .resume-paper-preview .skills-text { font-size: 13px; line-height: 1.5; color: #1b1b18; }
-        .resume-paper-preview .certs { font-size: 13px; line-height: 1.5; color: #1b1b18; }
+.resume-paper-preview .certs { font-size: 13px; line-height: 1.5; color: #1b1b18; }
         .resume-paper-preview .photo { width: 96px; height: 96px; border-radius: 8px; object-fit: cover; margin: 0 auto 12px; display: block; }
         .resume-paper-preview .project { margin-bottom: 10px; }
         .resume-paper-preview .project-title { font-size: 14px; font-weight: 600; color: #1b1b18; }
@@ -309,7 +452,7 @@ function getCoverLetterPrintStyles(template: string): string {
         body { font-family: 'Instrument Sans', Arial, sans-serif; color: #1b1b18; font-size: 13px; line-height: 1.6; padding: 40px; }
     `;
 
-    if (template === 'ats_classic') {
+    if (template === 'cl_formal' || template === 'ats_classic') {
         return base + `
             .letter-header { text-align: center; border-bottom: 2px solid #1b1b18; padding-bottom: 12px; margin-bottom: 20px; }
             .letter-name { font-size: 24px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px; }
@@ -323,7 +466,7 @@ function getCoverLetterPrintStyles(template: string): string {
             .letter-signature { margin-top: 6px; font-weight: 700; font-size: 14px; }
         `;
     }
-    if (template === 'ats_executive') {
+    if (template === 'cl_executive' || template === 'ats_executive') {
         return base + `
             .letter-header { border-left: 4px solid #1b1b18; padding-left: 12px; margin-bottom: 20px; }
             .letter-name { font-size: 24px; font-weight: 700; margin-bottom: 4px; }
@@ -337,44 +480,42 @@ function getCoverLetterPrintStyles(template: string): string {
             .letter-signature { margin-top: 6px; font-weight: 700; }
         `;
     }
-    if (template === 'modern') {
+    if (template === 'cl_modern' || template === 'modern') {
         return base + `
-            .letter-header { background: #1b1b18; color: white; padding: 24px; margin-bottom: 24px; }
+            .letter-header { background: #1b1b18; color: white; padding: 24px; margin-bottom: 24px; border-radius: 6px; }
             .letter-header .letter-name { font-size: 24px; font-weight: 700; color: white; margin-bottom: 4px; }
             .letter-header .letter-contact-line { font-size: 12px; color: rgba(255,255,255,0.85); }
             .letter-header .letter-date { color: rgba(255,255,255,0.75); font-size: 12px; margin-top: 8px; }
-            .letter-body-wrapper { padding: 0 24px; }
             .letter-salutation { font-size: 14px; font-weight: 600; margin-bottom: 16px; }
             .letter-body { font-size: 13px; line-height: 1.7; }
             .letter-body p { margin-bottom: 14px; }
-            .letter-closing { margin-top: 28px; padding: 0 24px; }
+            .letter-closing { margin-top: 28px; }
             .letter-signature { margin-top: 6px; font-weight: 700; }
         `;
     }
-    if (template === 'philippine') {
+    if (template === 'cl_creative' || template === 'philippine') {
         return base + `
-            .letter-header { text-align: center; border-bottom: 2px solid #1b1b18; padding-bottom: 12px; margin-bottom: 20px; }
-            .letter-doc-title { font-size: 11px; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; color: #706f6c; margin-bottom: 4px; }
-            .letter-name { font-size: 22px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; }
-            .letter-contact-line { font-size: 12px; color: #706f6c; margin-top: 4px; }
-            .letter-date { color: #1b1b18; font-size: 12px; margin-bottom: 16px; }
-            .letter-recipient { font-size: 13px; line-height: 1.5; margin-bottom: 16px; }
-            .letter-subject { font-weight: 700; font-size: 13px; text-transform: uppercase; margin-bottom: 16px; text-decoration: underline; }
-            .letter-salutation { font-size: 14px; font-weight: 600; margin-bottom: 16px; }
-            .letter-body { font-size: 13px; line-height: 1.7; }
-            .letter-body p { margin-bottom: 14px; text-indent: 32px; text-align: justify; }
-            .letter-closing { margin-top: 32px; float: right; min-width: 200px; text-align: center; }
-            .letter-signature { border-top: 1px solid #1b1b18; margin-top: 40px; padding-top: 4px; font-weight: 700; font-size: 13px; }
+            .letter-header { text-align: left; border-bottom: 2px solid #6366f1; padding-bottom: 12px; margin-bottom: 20px; }
+            .letter-name { font-size: 26px; font-weight: 800; color: #4338ca; letter-spacing: -0.02em; }
+            .letter-contact-line { font-size: 12px; color: #6366f1; margin-top: 4px; font-weight: 500; }
+            .letter-date { color: #6b7280; font-size: 12px; margin-bottom: 16px; }
+            .letter-salutation { font-size: 15px; font-weight: 700; color: #3730a3; margin-bottom: 16px; }
+            .letter-body { font-size: 13.5px; line-height: 1.75; }
+            .letter-body p { margin-bottom: 16px; }
+            .letter-closing { margin-top: 32px; font-weight: 600; color: #3730a3; }
+            .letter-signature { margin-top: 8px; font-weight: 800; font-size: 15px; }
         `;
     }
     return base + `
-        .letter-header { margin-bottom: 24px; }
-        .letter-date { color: #706f6c; font-size: 12px; margin-bottom: 16px; }
-        .letter-salutation { font-size: 14px; margin-bottom: 16px; }
+        .letter-header { margin-bottom: 24px; border-bottom: 1px solid #e5e7eb; padding-bottom: 12px; }
+        .letter-name { font-size: 22px; font-weight: 600; letter-spacing: -0.01em; }
+        .letter-contact-line { font-size: 12px; color: #6b7280; margin-top: 2px; }
+        .letter-date { color: #6b7280; font-size: 12px; margin-bottom: 16px; }
+        .letter-salutation { font-size: 14px; font-weight: 600; margin-bottom: 16px; }
         .letter-body { font-size: 13px; line-height: 1.7; }
         .letter-body p { margin-bottom: 14px; }
         .letter-closing { margin-top: 24px; }
-        .letter-signature { margin-top: 4px; font-weight: 500; }
+        .letter-signature { margin-top: 4px; font-weight: 600; }
     `;
 }
 
@@ -383,7 +524,7 @@ function getScopedCoverLetterStyles(template: string): string {
         .cover-letter-paper-preview { font-family: 'Instrument Sans', Arial, sans-serif; color: #1b1b18; font-size: 13px; line-height: 1.6; }
     `;
 
-    if (template === 'ats_classic') {
+    if (template === 'cl_formal' || template === 'ats_classic') {
         return base + `
             .cover-letter-paper-preview .letter-header { text-align: center; border-bottom: 2px solid #1b1b18; padding-bottom: 12px; margin-bottom: 20px; }
             .cover-letter-paper-preview .letter-name { font-size: 24px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #1b1b18; margin-bottom: 6px; }
@@ -397,7 +538,7 @@ function getScopedCoverLetterStyles(template: string): string {
             .cover-letter-paper-preview .letter-signature { margin-top: 6px; font-weight: 700; font-size: 14px; color: #1b1b18; }
         `;
     }
-    if (template === 'ats_executive') {
+    if (template === 'cl_executive' || template === 'ats_executive') {
         return base + `
             .cover-letter-paper-preview .letter-header { border-left: 4px solid #1b1b18; padding-left: 12px; margin-bottom: 20px; }
             .cover-letter-paper-preview .letter-name { font-size: 24px; font-weight: 700; color: #1b1b18; margin-bottom: 4px; }
@@ -407,13 +548,13 @@ function getScopedCoverLetterStyles(template: string): string {
             .cover-letter-paper-preview .letter-salutation { font-size: 14px; font-weight: 600; margin-bottom: 16px; color: #1b1b18; }
             .cover-letter-paper-preview .letter-body { font-size: 13px; line-height: 1.7; color: #1b1b18; }
             .cover-letter-paper-preview .letter-body p { margin-bottom: 14px; }
-            .cover-letter-paper-preview .letter-closing { margin-top: 28px; color: #1b1b18; }
+            .cover-letter-paper-preview .letter-closing { margin-top: 28px; }
             .cover-letter-paper-preview .letter-signature { margin-top: 6px; font-weight: 700; color: #1b1b18; }
         `;
     }
-    if (template === 'modern') {
+    if (template === 'cl_modern' || template === 'modern') {
         return base + `
-            .cover-letter-paper-preview .letter-header { background: #1b1b18; color: white; padding: 24px; margin: -32px -32px 24px -32px; border-radius: 6px 6px 0 0; }
+            .cover-letter-paper-preview .letter-header { background: #1b1b18; color: white; padding: 24px; margin-bottom: 24px; border-radius: 6px; }
             .cover-letter-paper-preview .letter-header .letter-name { font-size: 24px; font-weight: 700; color: white; margin-bottom: 4px; }
             .cover-letter-paper-preview .letter-header .letter-contact-line { font-size: 12px; color: rgba(255,255,255,0.85); }
             .cover-letter-paper-preview .letter-header .letter-date { color: rgba(255,255,255,0.75); font-size: 12px; margin-top: 8px; }
@@ -425,30 +566,29 @@ function getScopedCoverLetterStyles(template: string): string {
             .cover-letter-paper-preview .letter-signature { margin-top: 6px; font-weight: 700; color: #1b1b18; }
         `;
     }
-    if (template === 'philippine') {
+    if (template === 'cl_creative' || template === 'philippine') {
         return base + `
-            .cover-letter-paper-preview .letter-header { text-align: center; border-bottom: 2px solid #1b1b18; padding-bottom: 12px; margin-bottom: 20px; }
-            .cover-letter-paper-preview .letter-doc-title { font-size: 11px; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; color: #706f6c; margin-bottom: 4px; }
-            .cover-letter-paper-preview .letter-name { font-size: 22px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #1b1b18; }
-            .cover-letter-paper-preview .letter-contact-line { font-size: 12px; color: #706f6c; margin-top: 4px; }
-            .cover-letter-paper-preview .letter-date { color: #1b1b18; font-size: 12px; margin-bottom: 16px; }
-            .cover-letter-paper-preview .letter-recipient { font-size: 13px; line-height: 1.5; margin-bottom: 16px; color: #1b1b18; }
-            .cover-letter-paper-preview .letter-subject { font-weight: 700; font-size: 13px; text-transform: uppercase; margin-bottom: 16px; text-decoration: underline; color: #1b1b18; }
-            .cover-letter-paper-preview .letter-salutation { font-size: 14px; font-weight: 600; margin-bottom: 16px; color: #1b1b18; }
-            .cover-letter-paper-preview .letter-body { font-size: 13px; line-height: 1.7; color: #1b1b18; }
-            .cover-letter-paper-preview .letter-body p { margin-bottom: 14px; text-indent: 32px; text-align: justify; }
-            .cover-letter-paper-preview .letter-closing { margin-top: 32px; float: right; min-width: 200px; text-align: center; color: #1b1b18; }
-            .cover-letter-paper-preview .letter-signature { border-top: 1px solid #1b1b18; margin-top: 40px; padding-top: 4px; font-weight: 700; font-size: 13px; color: #1b1b18; }
+            .cover-letter-paper-preview .letter-header { text-align: left; border-bottom: 2px solid #6366f1; padding-bottom: 12px; margin-bottom: 20px; }
+            .cover-letter-paper-preview .letter-name { font-size: 26px; font-weight: 800; color: #4338ca; letter-spacing: -0.02em; }
+            .cover-letter-paper-preview .letter-contact-line { font-size: 12px; color: #6366f1; margin-top: 4px; font-weight: 500; }
+            .cover-letter-paper-preview .letter-date { color: #6b7280; font-size: 12px; margin-bottom: 16px; }
+            .cover-letter-paper-preview .letter-salutation { font-size: 15px; font-weight: 700; color: #3730a3; margin-bottom: 16px; }
+            .cover-letter-paper-preview .letter-body { font-size: 13.5px; line-height: 1.75; color: #1f2937; }
+            .cover-letter-paper-preview .letter-body p { margin-bottom: 16px; }
+            .cover-letter-paper-preview .letter-closing { margin-top: 32px; font-weight: 600; color: #3730a3; }
+            .cover-letter-paper-preview .letter-signature { margin-top: 8px; font-weight: 800; font-size: 15px; color: #3730a3; }
         `;
     }
     return base + `
-        .cover-letter-paper-preview .letter-header { margin-bottom: 24px; }
-        .cover-letter-paper-preview .letter-date { color: #706f6c; font-size: 12px; margin-bottom: 16px; }
-        .cover-letter-paper-preview .letter-salutation { font-size: 14px; margin-bottom: 16px; color: #1b1b18; }
-        .cover-letter-paper-preview .letter-body { font-size: 13px; line-height: 1.7; color: #1b1b18; }
+        .cover-letter-paper-preview .letter-header { margin-bottom: 24px; border-bottom: 1px solid #e5e7eb; padding-bottom: 12px; }
+        .cover-letter-paper-preview .letter-name { font-size: 22px; font-weight: 600; letter-spacing: -0.01em; color: #111827; }
+        .cover-letter-paper-preview .letter-contact-line { font-size: 12px; color: #6b7280; margin-top: 2px; }
+        .cover-letter-paper-preview .letter-date { color: #6b7280; font-size: 12px; margin-bottom: 16px; }
+        .cover-letter-paper-preview .letter-salutation { font-size: 14px; font-weight: 600; margin-bottom: 16px; color: #111827; }
+        .cover-letter-paper-preview .letter-body { font-size: 13px; line-height: 1.7; color: #1f2937; }
         .cover-letter-paper-preview .letter-body p { margin-bottom: 14px; }
         .cover-letter-paper-preview .letter-closing { margin-top: 24px; }
-        .cover-letter-paper-preview .letter-signature { margin-top: 4px; font-weight: 500; color: #1b1b18; }
+        .cover-letter-paper-preview .letter-signature { margin-top: 4px; font-weight: 600; color: #111827; }
     `;
 }
 
@@ -461,26 +601,52 @@ function PersonalInfoTab({ data, setData, errors, photoDataUrl, onPhotoDataUrlCh
     onPhotoDataUrlChange: (url: string | null) => void;
     onAiPolish: (section: string, content: string) => void;
 }) {
+    const hasPhotoUrl = !!(data.photo_url && data.photo_url.trim());
+    const hasUploadedPhoto = !!photoDataUrl;
+    const previewSrc = photoDataUrl || (hasPhotoUrl ? getDirectImageUrl(data.photo_url) : null) || null;
+
     return (
         <div className="flex flex-col gap-6 rounded-xl border border-border bg-card p-4">
-            <PhotoUploader
-                currentDataUrl={photoDataUrl || getDirectImageUrl(data.photo_url) || null}
-                onDataUrlChange={onPhotoDataUrlChange}
-            />
-
-            <div className="flex flex-col gap-2">
-                <Label htmlFor="photo_url">Photo URL (optional)</Label>
-                <Input
-                    id="photo_url"
-                    type="url"
-                    value={data.photo_url ?? ''}
-                    onChange={(e) => setData('photo_url', e.target.value)}
-                    placeholder="https://example.com/my-photo.jpg"
-                />
-                <p className="text-xs text-muted-foreground">
-                    Paste an online image URL or upload a local file above.
-                </p>
+            <div className="flex flex-col gap-3">
+                <Label>Profile Photo</Label>
+                <div className="flex items-center gap-4">
+                    {previewSrc ? (
+                        <img
+                            src={previewSrc}
+                            alt="Profile preview"
+                            referrerPolicy="no-referrer"
+                            className="h-16 w-16 rounded-full object-cover border border-[#e3e3e0] dark:border-[#3E3E3A]"
+                        />
+                    ) : (
+                        <div className="flex h-16 w-16 items-center justify-center rounded-full bg-muted">
+                            <Camera className="h-6 w-6 text-muted-foreground" />
+                        </div>
+                    )}
+                    {!hasPhotoUrl && (
+                        <PhotoUploader
+                            currentDataUrl={photoDataUrl}
+                            onDataUrlChange={onPhotoDataUrlChange}
+                            hidePreview
+                        />
+                    )}
+                </div>
             </div>
+
+            {!hasUploadedPhoto && (
+                <div className="flex flex-col gap-2">
+                    <Label htmlFor="photo_url">Photo URL (optional)</Label>
+                    <Input
+                        id="photo_url"
+                        type="url"
+                        value={data.photo_url ?? ''}
+                        onChange={(e) => setData('photo_url', e.target.value)}
+                        placeholder="https://example.com/my-photo.jpg"
+                    />
+                    <p className="text-xs text-muted-foreground">
+                        Paste an online image URL for your profile photo.
+                    </p>
+                </div>
+            )}
 
             <div className="flex flex-col gap-2">
                 <Label htmlFor="full_name">Full Name</Label>
@@ -1071,9 +1237,10 @@ function getDirectImageUrl(url: string | null): string | null {
     return trimmed;
 }
 
-function PhotoUploader({ currentDataUrl, onDataUrlChange }: {
+function PhotoUploader({ currentDataUrl, onDataUrlChange, hidePreview = false }: {
     currentDataUrl: string | null;
     onDataUrlChange: (url: string | null) => void;
+    hidePreview?: boolean;
 }) {
     const [previewUrl, setPreviewUrl] = useState<string | null>(getDirectImageUrl(currentDataUrl));
     const fileInputRef = useRef<HTMLInputElement>(null);
@@ -1101,6 +1268,23 @@ function PhotoUploader({ currentDataUrl, onDataUrlChange }: {
         if (fileInputRef.current) {
             fileInputRef.current.value = '';
         }
+    }
+
+    if (hidePreview) {
+        return (
+            <div className="flex-1 flex items-center gap-2">
+                <Input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/*"
+                    onChange={handleFileChange}
+                    className="cursor-pointer"
+                />
+                <p className="text-xs text-muted-foreground whitespace-nowrap">
+                    Upload a local file
+                </p>
+            </div>
+        );
     }
 
     return (
@@ -1195,6 +1379,52 @@ function ResumePreview({ data, template, photoDataUrl }: { data: ResumeProfile; 
         setSaveDialogOpen(false);
     }
 
+    function formatDisplayUrl(url?: string | null): string {
+        if (!url || !url.trim()) return '';
+        return url.trim().replace(/^https?:\/\/(www\.)?/, '');
+    }
+
+    function ensureHttpUrl(url?: string | null): string {
+        if (!url || !url.trim()) return '#';
+        const trimmed = url.trim();
+        if (/^https?:\/\//i.test(trimmed)) return trimmed;
+        return `https://${trimmed}`;
+    }
+
+    function renderLink(url?: string | null) {
+        if (!url || !url.trim()) return null;
+        const href = ensureHttpUrl(url);
+        const text = formatDisplayUrl(url);
+        return (
+            <a
+                href={href}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{ color: 'inherit', textDecoration: 'underline' }}
+            >
+                {text}
+            </a>
+        );
+    }
+
+    function renderAsBullets(text?: string | null) {
+        if (!text || !text.trim()) return null;
+        const lines = text
+            .split(/\n|(?<=[\.\?!])\s+(?=[A-Z0-9])|•|▪|\*/)
+            .map(l => l.trim().replace(/^[-•*▪]\s*/, ''))
+            .filter(l => l.length > 0);
+
+        if (lines.length === 0) return null;
+
+        return (
+            <ul className="bullet-list">
+                {lines.map((line, idx) => (
+                    <li key={idx}>{line}</li>
+                ))}
+            </ul>
+        );
+    }
+
     const photoSrc = getDirectImageUrl(photoDataUrl || data.photo_url) || '';
     const hasPhoto = !!photoSrc;
 
@@ -1213,13 +1443,17 @@ function ResumePreview({ data, template, photoDataUrl }: { data: ResumeProfile; 
                             <div className="ats-name">{data.full_name || 'Your Name'}</div>
                             <div className="ats-contact-line">
                                 {[
-                                    data.location,
-                                    data.phone,
-                                    data.email,
-                                    data.linkedin_url ? `LinkedIn: ${data.linkedin_url}` : null,
-                                    data.github_url ? `GitHub: ${data.github_url}` : null,
-                                    data.website_url ? `Web: ${data.website_url}` : null,
-                                ].filter(Boolean).join('  •  ')}
+                                    data.location ? <span key="loc">{data.location}</span> : null,
+                                    data.phone ? <span key="phone">{data.phone}</span> : null,
+                                    data.email ? <a key="email" href={`mailto:${data.email}`} style={{ color: 'inherit', textDecoration: 'underline' }}>{data.email}</a> : null,
+                                    data.linkedin_url ? <span key="li">{renderLink(data.linkedin_url)}</span> : null,
+                                    data.github_url ? <span key="gh">{renderLink(data.github_url)}</span> : null,
+                                    data.website_url ? <span key="web">{renderLink(data.website_url)}</span> : null,
+                                ].filter(Boolean).reduce((acc: React.ReactNode[], curr, i, arr) => {
+                                    acc.push(curr);
+                                    if (i < arr.length - 1) acc.push(<span key={`sep-${i}`}>  •  </span>);
+                                    return acc;
+                                }, [])}
                             </div>
                         </div>
 
@@ -1301,13 +1535,17 @@ function ResumePreview({ data, template, photoDataUrl }: { data: ResumeProfile; 
                             <div className="exec-name">{data.full_name || 'Your Name'}</div>
                             <div className="exec-contact-line">
                                 {[
-                                    data.location,
-                                    data.phone,
-                                    data.email,
-                                    data.linkedin_url,
-                                    data.github_url,
-                                    data.website_url,
-                                ].filter(Boolean).join('  |  ')}
+                                    data.location ? <span key="loc">{data.location}</span> : null,
+                                    data.phone ? <span key="phone">{data.phone}</span> : null,
+                                    data.email ? <a key="email" href={`mailto:${data.email}`} style={{ color: 'inherit', textDecoration: 'underline' }}>{data.email}</a> : null,
+                                    data.linkedin_url ? <span key="li">{renderLink(data.linkedin_url)}</span> : null,
+                                    data.github_url ? <span key="gh">{renderLink(data.github_url)}</span> : null,
+                                    data.website_url ? <span key="web">{renderLink(data.website_url)}</span> : null,
+                                ].filter(Boolean).reduce((acc: React.ReactNode[], curr, i, arr) => {
+                                    acc.push(curr);
+                                    if (i < arr.length - 1) acc.push(<span key={`sep-${i}`}>  |  </span>);
+                                    return acc;
+                                }, [])}
                             </div>
                         </div>
 
@@ -1380,6 +1618,112 @@ function ResumePreview({ data, template, photoDataUrl }: { data: ResumeProfile; 
                     </>
                 )}
 
+                {template === 'ats_bullet' && (
+                    <>
+                        <div className="bullet-header">
+                            {hasPhoto && <img src={photoSrc} alt="" className="photo" referrerPolicy="no-referrer" />}
+                            <div className="bullet-name">{data.full_name || 'Your Name'}</div>
+                            <div className="bullet-contact">
+                                {[
+                                    data.location ? <span key="loc">{data.location}</span> : null,
+                                    data.phone ? <span key="phone">{data.phone}</span> : null,
+                                    data.email ? <a key="email" href={`mailto:${data.email}`} style={{ color: 'inherit', textDecoration: 'underline' }}>{data.email}</a> : null,
+                                    data.linkedin_url ? <span key="li">{renderLink(data.linkedin_url)}</span> : null,
+                                    data.github_url ? <span key="gh">{renderLink(data.github_url)}</span> : null,
+                                    data.website_url ? <span key="web">{renderLink(data.website_url)}</span> : null,
+                                ].filter(Boolean).reduce((acc: React.ReactNode[], curr, i, arr) => {
+                                    acc.push(curr);
+                                    if (i < arr.length - 1) acc.push(<span key={`sep-${i}`}>  •  </span>);
+                                    return acc;
+                                }, [])}
+                            </div>
+                        </div>
+
+                        {data.summary && (
+                            <>
+                                <div className="bullet-section-title">Professional Summary</div>
+                                {renderAsBullets(data.summary)}
+                            </>
+                        )}
+
+                        {(data.work_experience?.length ?? 0) > 0 && (
+                            <>
+                                <div className="bullet-section-title">Work Experience</div>
+                                {data.work_experience?.map((job, i) => (
+                                    <div key={i} className="bullet-item">
+                                        <div className="bullet-item-header">
+                                            <span className="bullet-title">{job.position || 'Position'}</span>
+                                            <span className="bullet-date">{job.duration}</span>
+                                        </div>
+                                        <div className="bullet-company">{job.company}</div>
+                                        {job.description && renderAsBullets(job.description)}
+                                    </div>
+                                ))}
+                            </>
+                        )}
+
+                        {(data.education?.length ?? 0) > 0 && (
+                            <>
+                                <div className="bullet-section-title">Education</div>
+                                {data.education?.map((edu, i) => (
+                                    <div key={i} className="bullet-item">
+                                        <div className="bullet-item-header">
+                                            <span className="bullet-title">{edu.degree || 'Degree'}</span>
+                                            <span className="bullet-date">{edu.year}</span>
+                                        </div>
+                                        <div className="bullet-company">{edu.institution}</div>
+                                    </div>
+                                ))}
+                            </>
+                        )}
+
+                        {(data.skills?.length ?? 0) > 0 && (
+                            <>
+                                <div className="bullet-section-title">Skills & Core Competencies</div>
+                                <ul className="bullet-list">
+                                    {data.skills?.map((skill, i) => (
+                                        <li key={i}>{skill}</li>
+                                    ))}
+                                </ul>
+                            </>
+                        )}
+
+                        {(data.certifications?.length ?? 0) > 0 && (
+                            <>
+                                <div className="bullet-section-title">Certifications</div>
+                                <ul className="bullet-list">
+                                    {data.certifications?.map((cert, i) => (
+                                        <li key={i}>{cert}</li>
+                                    ))}
+                                </ul>
+                            </>
+                        )}
+
+                        {(data.projects?.length ?? 0) > 0 && (
+                            <>
+                                <div className="bullet-section-title">Projects</div>
+                                {data.projects?.map((project, i) => (
+                                    <div key={i} className="bullet-item">
+                                        <div className="bullet-item-header">
+                                            <span className="bullet-title">{project.title}</span>
+                                            {project.technologies && <span className="bullet-date">{project.technologies}</span>}
+                                        </div>
+                                        {(project.url || project.github_url) && (
+                                            <div className="bullet-company" style={{ fontSize: '11px' }}>
+                                                {[
+                                                    project.url ? `Demo: ${project.url}` : null,
+                                                    project.github_url ? `GitHub: ${project.github_url}` : null,
+                                                ].filter(Boolean).join('  •  ')}
+                                            </div>
+                                        )}
+                                        {project.description && renderAsBullets(project.description)}
+                                    </div>
+                                ))}
+                            </>
+                        )}
+                    </>
+                )}
+
                 {template === 'clean' && (
                     <>
                         <div className="header">
@@ -1387,18 +1731,18 @@ function ResumePreview({ data, template, photoDataUrl }: { data: ResumeProfile; 
                             <div className="name">{data.full_name || 'Your Name'}</div>
                         </div>
                         <div className="contact">
-                            {data.email && <span>{data.email}</span>}
+                            {data.email && <a href={`mailto:${data.email}`} style={{ color: 'inherit', textDecoration: 'underline' }}>{data.email}</a>}
                             {data.phone && <span>{data.phone}</span>}
                             {data.location && <span>{data.location}</span>}
                         </div>
                         {data.linkedin_url && (
-                            <div className="linkedin">{data.linkedin_url}</div>
+                            <div className="linkedin">{renderLink(data.linkedin_url)}</div>
                         )}
                         {data.github_url && (
-                            <div className="linkedin">GitHub: {data.github_url}</div>
+                            <div className="linkedin">{renderLink(data.github_url)}</div>
                         )}
                         {data.website_url && (
-                            <div className="linkedin">Web: {data.website_url}</div>
+                            <div className="linkedin">{renderLink(data.website_url)}</div>
                         )}
 
                         {data.summary && (
@@ -1465,9 +1809,13 @@ function ResumePreview({ data, template, photoDataUrl }: { data: ResumeProfile; 
                                         {(project.url || project.github_url) && (
                                             <div className="project-tech" style={{ fontSize: '11px', opacity: 0.85 }}>
                                                 {[
-                                                    project.url ? `Demo: ${project.url}` : null,
-                                                    project.github_url ? `GitHub: ${project.github_url}` : null,
-                                                ].filter(Boolean).join('  •  ')}
+                                                    project.url ? <span key="demo">{renderLink(project.url)}</span> : null,
+                                                    project.github_url ? <span key="gh">{renderLink(project.github_url)}</span> : null,
+                                                ].filter(Boolean).reduce((acc: React.ReactNode[], curr, i, arr) => {
+                                                    acc.push(curr);
+                                                    if (i < arr.length - 1) acc.push(<span key={`psep-${i}`}>  •  </span>);
+                                                    return acc;
+                                                }, [])}
                                             </div>
                                         )}
                                         {project.description && <p className="project-desc">{project.description}</p>}
@@ -1484,18 +1832,18 @@ function ResumePreview({ data, template, photoDataUrl }: { data: ResumeProfile; 
                             {hasPhoto && <img src={photoSrc} alt="" className="photo" referrerPolicy="no-referrer" />}
                             <div className="name">{data.full_name || 'Your Name'}</div>
                             <div className="contact">
-                                {data.email && <span>{data.email}</span>}
+                                {data.email && <a href={`mailto:${data.email}`} style={{ color: 'inherit', textDecoration: 'underline' }}>{data.email}</a>}
                                 {data.phone && <span>{data.phone}</span>}
                                 {data.location && <span>{data.location}</span>}
                             </div>
                             {data.linkedin_url && (
-                                <div className="linkedin">{data.linkedin_url}</div>
+                                <div className="linkedin">{renderLink(data.linkedin_url)}</div>
                             )}
                             {data.github_url && (
-                                <div className="linkedin">GitHub: {data.github_url}</div>
+                                <div className="linkedin">{renderLink(data.github_url)}</div>
                             )}
                             {data.website_url && (
-                                <div className="linkedin">Web: {data.website_url}</div>
+                                <div className="linkedin">{renderLink(data.website_url)}</div>
                             )}
                         </div>
 
@@ -1564,9 +1912,13 @@ function ResumePreview({ data, template, photoDataUrl }: { data: ResumeProfile; 
                                             {(project.url || project.github_url) && (
                                                 <div className="project-tech" style={{ fontSize: '11px', opacity: 0.85 }}>
                                                     {[
-                                                        project.url ? `Demo: ${project.url}` : null,
-                                                        project.github_url ? `GitHub: ${project.github_url}` : null,
-                                                    ].filter(Boolean).join('  •  ')}
+                                                        project.url ? <span key="demo">{renderLink(project.url)}</span> : null,
+                                                        project.github_url ? <span key="gh">{renderLink(project.github_url)}</span> : null,
+                                                    ].filter(Boolean).reduce((acc: React.ReactNode[], curr, i, arr) => {
+                                                        acc.push(curr);
+                                                        if (i < arr.length - 1) acc.push(<span key={`psep-${i}`}>  •  </span>);
+                                                        return acc;
+                                                    }, [])}
                                                 </div>
                                             )}
                                             {project.description && <p className="project-desc">{project.description}</p>}
@@ -1584,18 +1936,18 @@ function ResumePreview({ data, template, photoDataUrl }: { data: ResumeProfile; 
                             {hasPhoto && <img src={photoSrc} alt="" className="photo" referrerPolicy="no-referrer" />}
                             <div className="name">{data.full_name || 'Your Name'}</div>
                             <div className="contact">
-                                {data.location && <span>Address: {data.location}</span>}
-                                {data.phone && <span>Contact No: {data.phone}</span>}
-                                {data.email && <span>Email: {data.email}</span>}
+                                {data.location && <span>{data.location}</span>}
+                                {data.phone && <span>{data.phone}</span>}
+                                {data.email && <a href={`mailto:${data.email}`} style={{ color: 'inherit', textDecoration: 'underline' }}>{data.email}</a>}
                             </div>
                             {data.linkedin_url && (
-                                <div className="linkedin">LinkedIn: {data.linkedin_url}</div>
+                                <div className="linkedin">{renderLink(data.linkedin_url)}</div>
                             )}
                             {data.github_url && (
-                                <div className="linkedin">GitHub: {data.github_url}</div>
+                                <div className="linkedin">{renderLink(data.github_url)}</div>
                             )}
                             {data.website_url && (
-                                <div className="linkedin">Portfolio: {data.website_url}</div>
+                                <div className="linkedin">{renderLink(data.website_url)}</div>
                             )}
                         </div>
 
@@ -1846,6 +2198,7 @@ function CoverLetterBuilder({ profile, template, onTemplateChange, aiLimit, cove
     const [polishingPreset, setPolishingPreset] = useState<string | null>(null);
     const [polishing, setPolishing] = useState(false);
     const [saving, setSaving] = useState(false);
+    const [saveSuccess, setSaveSuccess] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [loadDialogOpen, setLoadDialogOpen] = useState(false);
     const [savedLetters, setSavedLetters] = useState<Array<{ id: number; content: string; target_company: string | null; target_job_title: string | null; created_at: string }>>([]);
@@ -1860,6 +2213,7 @@ function CoverLetterBuilder({ profile, template, onTemplateChange, aiLimit, cove
 
         setGenerating(true);
         setError(null);
+        setSaveSuccess(false);
 
         try {
             const token = (document.querySelector('meta[name="csrf-token"]') as HTMLMetaElement)?.content ?? '';
@@ -1867,17 +2221,19 @@ function CoverLetterBuilder({ profile, template, onTemplateChange, aiLimit, cove
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
+                    'Accept': 'application/json',
                     'X-CSRF-TOKEN': token,
                 },
                 body: JSON.stringify({ job_description: jobDescription }),
             });
 
+            const isJson = response.headers.get('content-type')?.includes('application/json');
+            const data = isJson ? await response.json() : null;
+
             if (!response.ok) {
-                const data = await response.json();
-                throw new Error(data.message || 'Generation failed');
+                throw new Error(data?.message || `Generation failed (HTTP ${response.status})`);
             }
 
-            const data = await response.json();
             onCoverLetterContentChange(data.cover_letter);
         } catch (err) {
             setError(err instanceof Error ? err.message : 'Failed to generate cover letter');
@@ -1892,6 +2248,7 @@ function CoverLetterBuilder({ profile, template, onTemplateChange, aiLimit, cove
         setPolishingPreset(preset);
         setPolishing(true);
         setError(null);
+        setSaveSuccess(false);
 
         try {
             const token = (document.querySelector('meta[name="csrf-token"]') as HTMLMetaElement)?.content ?? '';
@@ -1899,17 +2256,19 @@ function CoverLetterBuilder({ profile, template, onTemplateChange, aiLimit, cove
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
+                    'Accept': 'application/json',
                     'X-CSRF-TOKEN': token,
                 },
                 body: JSON.stringify({ content: coverLetterContent, preset }),
             });
 
+            const isJson = response.headers.get('content-type')?.includes('application/json');
+            const data = isJson ? await response.json() : null;
+
             if (!response.ok) {
-                const data = await response.json();
-                throw new Error(data.message || 'Improvement failed');
+                throw new Error(data?.message || `Improvement failed (HTTP ${response.status})`);
             }
 
-            const data = await response.json();
             onCoverLetterContentChange(data.improved);
         } catch (err) {
             setError(err instanceof Error ? err.message : 'Failed to improve cover letter');
@@ -1924,6 +2283,7 @@ function CoverLetterBuilder({ profile, template, onTemplateChange, aiLimit, cove
 
         setSaving(true);
         setError(null);
+        setSaveSuccess(false);
 
         try {
             const token = (document.querySelector('meta[name="csrf-token"]') as HTMLMetaElement)?.content ?? '';
@@ -1931,6 +2291,7 @@ function CoverLetterBuilder({ profile, template, onTemplateChange, aiLimit, cove
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
+                    'Accept': 'application/json',
                     'X-CSRF-TOKEN': token,
                 },
                 body: JSON.stringify({
@@ -1942,7 +2303,15 @@ function CoverLetterBuilder({ profile, template, onTemplateChange, aiLimit, cove
                 }),
             });
 
-            if (!response.ok) throw new Error('Save failed');
+            const isJson = response.headers.get('content-type')?.includes('application/json');
+            const data = isJson ? await response.json() : null;
+
+            if (!response.ok) {
+                throw new Error(data?.message || `Save failed (HTTP ${response.status})`);
+            }
+
+            setSaveSuccess(true);
+            setTimeout(() => setSaveSuccess(false), 5000);
         } catch (err) {
             setError(err instanceof Error ? err.message : 'Failed to save cover letter');
         } finally {
@@ -1963,10 +2332,14 @@ function CoverLetterBuilder({ profile, template, onTemplateChange, aiLimit, cove
         try {
             const token = (document.querySelector('meta[name="csrf-token"]') as HTMLMetaElement)?.content ?? '';
             const response = await fetch('/documents/saved-cover-letters', {
-                headers: { 'X-CSRF-TOKEN': token },
+                headers: {
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': token,
+                },
             });
-            const data = await response.json();
-            setSavedLetters(data.coverLetters ?? []);
+            const isJson = response.headers.get('content-type')?.includes('application/json');
+            const data = isJson ? await response.json() : null;
+            setSavedLetters(data?.coverLetters ?? []);
         } catch {
             setError('Failed to load saved cover letters.');
         } finally {
@@ -1987,6 +2360,12 @@ function CoverLetterBuilder({ profile, template, onTemplateChange, aiLimit, cove
         { id: 'formal', label: 'Make Formal', icon: Briefcase },
     ] as const;
 
+    function handleTemplateSelect(value: string) {
+        onTemplateChange(value);
+        const predefinedText = getPredefinedCoverLetter(value, jobTitle, companyName, profile?.full_name || 'Applicant');
+        onCoverLetterContentChange(predefinedText);
+    }
+
     return (
         <div className="flex flex-col gap-4 h-full">
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
@@ -1996,7 +2375,6 @@ function CoverLetterBuilder({ profile, template, onTemplateChange, aiLimit, cove
                         id="target_job_title"
                         value={jobTitle}
                         onChange={(e) => setJobTitle(e.target.value)}
-                        onFocus={() => { if (jobTitle === 'Software Developer') setJobTitle(''); }}
                         placeholder="e.g. Senior Software Engineer"
                     />
                 </div>
@@ -2006,18 +2384,17 @@ function CoverLetterBuilder({ profile, template, onTemplateChange, aiLimit, cove
                         id="target_company"
                         value={companyName}
                         onChange={(e) => setCompanyName(e.target.value)}
-                        onFocus={() => { if (companyName === 'Acme Corp') setCompanyName(''); }}
                         placeholder="e.g. TechCorp"
                     />
                 </div>
                 <div className="flex flex-col gap-2">
-                    <Label>Template</Label>
-                    <Select value={template} onValueChange={(value: string | null) => value && onTemplateChange(value)}>
+                    <Label>Cover Letter Style</Label>
+                    <Select value={template} onValueChange={(value: string | null) => value && handleTemplateSelect(value)}>
                         <SelectTrigger>
-                            <SelectValue placeholder="Select template" />
+                            <SelectValue placeholder="Select style" />
                         </SelectTrigger>
                         <SelectContent>
-                            {TEMPLATES.map((t) => (
+                            {COVER_LETTER_TEMPLATES.map((t) => (
                                 <SelectItem key={t.id} value={t.id}>
                                     {t.name}
                                 </SelectItem>
@@ -2103,6 +2480,13 @@ function CoverLetterBuilder({ profile, template, onTemplateChange, aiLimit, cove
                 </div>
             )}
 
+            {saveSuccess && (
+                <div className="flex items-center gap-2 rounded-lg border border-emerald-500/20 bg-emerald-500/10 p-3 text-sm text-emerald-600 dark:text-emerald-400">
+                    <Sparkles className="size-4 shrink-0 text-emerald-500" />
+                    Cover letter saved successfully! You can load it anytime via "Load Saved".
+                </div>
+            )}
+
             <div className="flex flex-wrap items-center gap-2">
                 <span className="text-xs font-medium text-muted-foreground">AI Polish:</span>
                 {polishPresets.map((preset) => (
@@ -2129,10 +2513,9 @@ function CoverLetterBuilder({ profile, template, onTemplateChange, aiLimit, cove
                     id="cover_letter_content"
                     value={coverLetterContent}
                     onChange={(e) => onCoverLetterContentChange(e.target.value)}
-                    onFocus={() => { if (coverLetterContent === DEFAULT_COVER_LETTER) onCoverLetterContentChange(''); }}
                     rows={18}
                     className="w-full flex-1 rounded-md border border-input bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring font-mono leading-relaxed resize-none"
-                    placeholder="Write your cover letter here, or use AI Generate to create one from your resume profile and job description..."
+                    placeholder="Write your cover letter here, or select a template to load predefined text..."
                 />
             </div>
 
@@ -2191,30 +2574,36 @@ function CoverLetterBuilder({ profile, template, onTemplateChange, aiLimit, cove
     );
 }
 
-export default function DocumentsIndex({ profile, aiLimit }: DocumentsPageProps) {
+export default function DocumentsIndex({ profile, aiLimit, loadedResume, loadedCoverLetter, flash }: DocumentsPageProps) {
+    const initialView = loadedResume ? 'resume-preview' : (loadedCoverLetter ? 'cover-letter-preview' : 'resume-edit');
+    const initialTemplate = loadedResume?.template || 'clean';
+    const initialCLTemplate = loadedCoverLetter?.template || 'cl_modern';
+
     const [activeEditorTab, setActiveEditorTab] = useState('personal');
-    const [activeView, setActiveView] = useState<string>('resume-edit');
-    const [template, setTemplate] = useState<string>('clean');
+    const [activeView, setActiveView] = useState<string>(initialView);
+    const [template, setTemplate] = useState<string>(initialTemplate);
+    const [clTemplate, setCLTemplate] = useState<string>(initialCLTemplate);
     const [photoDataUrl, setPhotoDataUrl] = useState<string | null>(null);
     const [aiPolishing, setAiPolishing] = useState(false);
     const [aiError, setAiError] = useState<string | null>(null);
-    const [coverLetterContent, setCoverLetterContent] = useState(DEFAULT_COVER_LETTER);
-    const [coverLetterCompany, setCoverLetterCompany] = useState('Acme Corp');
-    const [coverLetterJobTitle, setCoverLetterJobTitle] = useState('Software Developer');
+    const [coverLetterContent, setCoverLetterContent] = useState(loadedCoverLetter?.content || DEFAULT_COVER_LETTER);
+    const [coverLetterCompany, setCoverLetterCompany] = useState(loadedCoverLetter?.target_company || 'Acme Corp');
+    const [coverLetterJobTitle, setCoverLetterJobTitle] = useState(loadedCoverLetter?.target_job_title || 'Software Developer');
 
     const isNew = !profile || !profile.id;
+    const activeProfileData = loadedResume?.profile_data || profile;
 
-    const { data, setData, put, processing, errors } = useForm<ResumeProfile>({
-        full_name: profile?.full_name ?? (isNew ? 'Juan Dela Cruz' : ''),
-        email: profile?.email ?? (isNew ? 'juan@example.com' : ''),
-        phone: profile?.phone ?? (isNew ? '+63 917 123 4567' : ''),
-        location: profile?.location ?? (isNew ? 'Metro Manila' : ''),
-        photo_url: profile?.photo_url ?? '',
-        linkedin_url: profile?.linkedin_url ?? (isNew ? 'https://linkedin.com/in/juandelacruz' : ''),
-        github_url: profile?.github_url ?? (isNew ? 'https://github.com/juandelacruz' : ''),
-        website_url: profile?.website_url ?? (isNew ? 'https://juanportfolio.com' : ''),
-        summary: profile?.summary ?? (isNew ? 'Experienced software developer with expertise in building scalable web applications...' : ''),
-        work_experience: profile?.work_experience ?? (isNew ? [
+    const { data, setData, put, processing, errors, recentlySuccessful } = useForm<ResumeProfile>({
+        full_name: activeProfileData?.full_name ?? (isNew ? 'Juan Dela Cruz' : ''),
+        email: activeProfileData?.email ?? (isNew ? 'juan@example.com' : ''),
+        phone: activeProfileData?.phone ?? (isNew ? '+63 917 123 4567' : ''),
+        location: activeProfileData?.location ?? (isNew ? 'Metro Manila' : ''),
+        photo_url: activeProfileData?.photo_url ?? '',
+        linkedin_url: activeProfileData?.linkedin_url ?? (isNew ? 'https://linkedin.com/in/juandelacruz' : ''),
+        github_url: activeProfileData?.github_url ?? (isNew ? 'https://github.com/juandelacruz' : ''),
+        website_url: activeProfileData?.website_url ?? (isNew ? 'https://juanportfolio.com' : ''),
+        summary: activeProfileData?.summary ?? (isNew ? 'Experienced software developer with expertise in building scalable web applications...' : ''),
+        work_experience: activeProfileData?.work_experience ?? (isNew ? [
             {
                 company: 'Acme Corp',
                 position: 'Software Developer',
@@ -2222,16 +2611,16 @@ export default function DocumentsIndex({ profile, aiLimit }: DocumentsPageProps)
                 description: 'Developed and maintained various web applications using Laravel and React.'
             }
         ] : []),
-        education: profile?.education ?? (isNew ? [
+        education: activeProfileData?.education ?? (isNew ? [
             {
                 institution: 'UP Diliman',
                 degree: 'BS Computer Science',
                 year: '2020'
             }
         ] : []),
-        skills: profile?.skills ?? (isNew ? ['PHP', 'Laravel', 'React', 'TypeScript'] : []),
-        certifications: profile?.certifications ?? (isNew ? ['AWS Certified Solutions Architect'] : []),
-        projects: profile?.projects ?? (isNew ? [
+        skills: activeProfileData?.skills ?? (isNew ? ['PHP', 'Laravel', 'React', 'TypeScript'] : []),
+        certifications: activeProfileData?.certifications ?? (isNew ? ['AWS Certified Solutions Architect'] : []),
+        projects: activeProfileData?.projects ?? (isNew ? [
             {
                 title: 'E-commerce Platform',
                 description: 'Built a full-stack e-commerce platform with Next.js and Stripe.',
@@ -2243,7 +2632,10 @@ export default function DocumentsIndex({ profile, aiLimit }: DocumentsPageProps)
 
     function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
-        put('/documents/profile');
+        put('/documents/profile', {
+            preserveScroll: true,
+            preserveState: true,
+        });
     }
 
     async function handleAiPolish(section: string, content: string) {
@@ -2258,17 +2650,18 @@ export default function DocumentsIndex({ profile, aiLimit }: DocumentsPageProps)
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
+                    'Accept': 'application/json',
                     'X-CSRF-TOKEN': token,
                 },
                 body: JSON.stringify({ section, content }),
             });
 
-            if (!response.ok) {
-                const data = await response.json();
-                throw new Error(data.message || 'Polish failed');
-            }
+            const isJson = response.headers.get('content-type')?.includes('application/json');
+            const data = isJson ? await response.json() : null;
 
-            const data = await response.json();
+            if (!response.ok) {
+                throw new Error(data?.message || `Polish failed (HTTP ${response.status})`);
+            }
 
             if (section === 'summary') {
                 setData('summary', data.polished);
@@ -2318,8 +2711,35 @@ export default function DocumentsIndex({ profile, aiLimit }: DocumentsPageProps)
                             <Sparkles className="size-3" />
                             {aiLimit.remaining}/{aiLimit.total} AI uses today
                         </span>
+                        <Link href="/documents/saved">
+                            <Button variant="outline" size="sm">
+                                <FolderGit2 className="mr-2 size-4" />
+                                Saved Documents
+                            </Button>
+                        </Link>
                     </div>
                 </div>
+
+                {(flash?.success || recentlySuccessful) && (
+                    <div className="flex items-center gap-2 rounded-lg border border-emerald-500/20 bg-emerald-500/10 p-3 text-sm font-medium text-emerald-600 dark:text-emerald-400">
+                        <Sparkles className="size-4 shrink-0 text-emerald-500" />
+                        {flash?.success || 'Resume profile saved successfully!'}
+                    </div>
+                )}
+
+                {loadedResume && (
+                    <div className="flex items-center gap-2 rounded-lg border border-emerald-500/20 bg-emerald-500/10 p-3 text-sm font-medium text-emerald-600 dark:text-emerald-400">
+                        <Sparkles className="size-4 shrink-0 text-emerald-500" />
+                        Loaded saved resume version: "{loadedResume.name}". You can customize details in Resume Builder or switch templates above.
+                    </div>
+                )}
+
+                {loadedCoverLetter && (
+                    <div className="flex items-center gap-2 rounded-lg border border-emerald-500/20 bg-emerald-500/10 p-3 text-sm font-medium text-emerald-600 dark:text-emerald-400">
+                        <Sparkles className="size-4 shrink-0 text-emerald-500" />
+                        Loaded saved cover letter for "{loadedCoverLetter.target_company || 'Target Company'}". You can customize text in Cover Letter Builder.
+                    </div>
+                )}
 
                 {aiError && (
                     <div className="flex items-center gap-2 rounded-lg border border-destructive/20 bg-destructive/5 p-3 text-sm text-destructive">
@@ -2434,8 +2854,8 @@ export default function DocumentsIndex({ profile, aiLimit }: DocumentsPageProps)
                     {activeView === 'cover-letter-edit' && (
                         <CoverLetterBuilder
                             profile={data}
-                            template={template}
-                            onTemplateChange={setTemplate}
+                            template={clTemplate}
+                            onTemplateChange={setCLTemplate}
                             aiLimit={aiLimit}
                             coverLetterContent={coverLetterContent}
                             onCoverLetterContentChange={setCoverLetterContent}
@@ -2470,13 +2890,13 @@ export default function DocumentsIndex({ profile, aiLimit }: DocumentsPageProps)
                     {activeView === 'cover-letter-preview' && (
                         <div className="flex flex-col gap-4">
                             <div className="flex shrink-0 items-center justify-between">
-                                <Label>Template</Label>
-                                <Select value={template} onValueChange={(value: string | null) => value && setTemplate(value)}>
-                                    <SelectTrigger className="w-[180px]">
-                                        <SelectValue placeholder="Select template" />
+                                <Label>Cover Letter Style</Label>
+                                <Select value={clTemplate} onValueChange={(value: string | null) => value && setCLTemplate(value)}>
+                                    <SelectTrigger className="w-[200px]">
+                                        <SelectValue placeholder="Select style" />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        {TEMPLATES.map((t) => (
+                                        {COVER_LETTER_TEMPLATES.map((t) => (
                                             <SelectItem key={t.id} value={t.id}>
                                                 {t.name}
                                             </SelectItem>
@@ -2486,7 +2906,7 @@ export default function DocumentsIndex({ profile, aiLimit }: DocumentsPageProps)
                             </div>
                             <CoverLetterPreview
                                 content={coverLetterContent}
-                                template={template}
+                                template={clTemplate}
                                 fullName={data.full_name}
                                 targetCompany={coverLetterCompany}
                                 targetJobTitle={coverLetterJobTitle}
