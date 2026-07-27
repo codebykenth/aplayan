@@ -44,6 +44,12 @@
     --radius-2xl: calc(var(--radius) * 1.8);
     --radius-3xl: calc(var(--radius) * 2.2);
     --radius-4xl: calc(var(--radius) * 2.6);
+    --animate-pulse-border: pulse-border 3s ease-in-out infinite;
+}
+
+@keyframes pulse-border {
+    0%, 100% { border-left-color: oklch(0.637 0.237 25.331); }
+    50% { border-left-color: oklch(0.577 0.245 27.325); }
 }
 
 :root {

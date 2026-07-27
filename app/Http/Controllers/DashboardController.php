@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\ActionFeedService;
 use App\Services\DashboardMetricsService;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -9,7 +10,10 @@ use Inertia\Response;
 
 class DashboardController extends Controller
 {
-    public function __construct(private DashboardMetricsService $metrics) {}
+    public function __construct(
+        private DashboardMetricsService $metrics,
+        private ActionFeedService $actionFeed,
+    ) {}
 
     public function __invoke(Request $request): Response
     {
@@ -22,6 +26,7 @@ class DashboardController extends Controller
             'added_this_week' => $this->metrics->addedThisWeekForUser($user),
             'added_this_month' => $this->metrics->addedThisMonthForUser($user),
             'trend' => $this->metrics->trendForUser($user),
+            'action_items' => $this->actionFeed->forUser($user),
         ]);
     }
 }

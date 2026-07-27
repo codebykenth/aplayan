@@ -14,6 +14,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { JOB_APPLICATION_STATUSES } from '@/types/job-application';
 import type { JobApplicationStatus } from '@/types/job-application';
 import AppLayout from '@/layouts/app-layout';
+import ActionFeed from '@/components/action-feed';
+import type { ActionItem } from '@/components/action-feed';
 
 const STATUS_CHART_COLORS: Record<JobApplicationStatus, string> = {
     wishlist: 'var(--color-wishlist)',
@@ -34,6 +36,7 @@ export default function Dashboard({
     added_this_week,
     added_this_month,
     trend,
+    action_items,
 }: {
     total: number;
     status_counts: Record<string, number>;
@@ -41,6 +44,7 @@ export default function Dashboard({
     added_this_week: number;
     added_this_month: number;
     trend: { date: string; count: number }[];
+    action_items: ActionItem[];
 }) {
     const statusData = Object.entries(status_counts).map(([key, value]) => ({
         status: key,
@@ -76,6 +80,9 @@ export default function Dashboard({
                         Overview of your job search activity
                     </p>
                 </div>
+
+                {/* Action Feed */}
+                <ActionFeed items={action_items} />
 
                 {/* Metric Cards */}
                 <div className="grid gap-4 sm:grid-cols-3">
