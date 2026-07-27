@@ -2,14 +2,22 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\AiImproveCoverLetterRequest;
+use App\Http\Requests\AiPolishResumeRequest;
 use App\Http\Requests\GenerateCoverLetterRequest;
+use App\Http\Requests\SaveCoverLetterRequest;
 use App\Http\Requests\UpdateResumeProfileRequest;
+use App\Models\SavedCoverLetter;
+use App\Models\SavedResume;
+use App\Models\User;
 use App\Services\GeminiService;
 use App\Services\ResumeProfileService;
 use Illuminate\Http\Client\RequestException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\RateLimiter;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -24,8 +32,11 @@ class DocumentController extends Controller
     {
         $profile = $this->profileService->getOrCreateProfile(auth()->user());
 
+        $aiLimit = $this->getAiRateLimitInfo(auth()->user());
+
         return Inertia::render('documents/index', [
             'profile' => $profile,
+            'aiLimit' => $aiLimit,
         ]);
     }
 
@@ -41,7 +52,8 @@ class DocumentController extends Controller
 
     public function coverLetter(GenerateCoverLetterRequest $request): JsonResponse
     {
-        $profile = $request->user()->resumeProfile;
+        $user = $request->user();
+        $profile = $user->resumeProfile;
 
         if (! $profile) {
             return response()->json([
@@ -65,5 +77,126 @@ class DocumentController extends Controller
                 'message' => 'AI service is temporarily unavailable.',
             ], 503);
         }
+    }
+
+    public function aiPolishResume(AiPolishResumeRequest $request): JsonResponse
+    {
+        try {
+            $polished = $this->geminiService->polishResumeSection(
+                $request->input('section'),
+                $request->input('content'),
+                $request->input('context', ''),
+            );
+
+            return response()->json(['polished' => $polished]);
+        } catch (RequestException) {
+            return response()->json([
+                'message' => 'AI service is temporarily unavailable.',
+            ], 503);
+        }
+    }
+
+    public function aiImproveCoverLetter(AiImproveCoverLetterRequest $request): JsonResponse
+    {
+        try {
+            $improved = $this->geminiService->improveCoverLetter(
+                $request->input('content'),
+                $request->input('preset'),
+            );
+
+            return response()->json(['improved' => $improved]);
+        } catch (RequestException) {
+            return response()->json([
+                'message' => 'AI service is temporarily unavailable.',
+            ], 503);
+        }
+    }
+
+    public function saved(): Response
+    {
+        $user = auth()->user();
+        $resumes = $user->savedResumes()->latest()->get();
+        $coverLetters = $user->savedCoverLetters()->latest()->get();
+
+        return Inertia::render('documents/saved', [
+            'resumes' => $resumes,
+            'coverLetters' => $coverLetters,
+        ]);
+    }
+
+    public function saveResume(Request $request): RedirectResponse
+    {
+        $validated = $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'template' => ['required', 'string', 'in:clean,modern,philippine'],
+            'profile_data' => ['required', 'array'],
+            'photo_url' => ['nullable', 'string', 'max:500'],
+        ]);
+
+        $request->user()->savedResumes()->create($validated);
+
+        return to_route('documents.saved')->with('success', 'Resume version saved.');
+    }
+
+    public function saveCoverLetter(SaveCoverLetterRequest $request): JsonResponse
+    {
+        $coverLetter = $request->user()->savedCoverLetters()->create(
+            $request->validated(),
+        );
+
+        return response()->json([
+            'message' => 'Cover letter saved.',
+            'cover_letter' => $coverLetter,
+        ]);
+    }
+
+    public function savedCoverLettersJson(): JsonResponse
+    {
+        $coverLetters = auth()->user()->savedCoverLetters()
+            ->latest()
+            ->take(20)
+            ->get()
+            ->map(fn ($letter) => [
+                'id' => $letter->id,
+                'content' => $letter->content,
+                'target_company' => $letter->target_company,
+                'target_job_title' => $letter->target_job_title,
+                'created_at' => $letter->created_at->diffForHumans(),
+            ]);
+
+        return response()->json(['coverLetters' => $coverLetters]);
+    }
+
+    public function destroyResumeVersion(SavedResume $savedResume): RedirectResponse
+    {
+        Gate::authorize('delete', $savedResume);
+        $savedResume->delete();
+
+        return to_route('documents.saved')->with('success', 'Resume version deleted.');
+    }
+
+    public function destroyCoverLetter(SavedCoverLetter $savedCoverLetter): RedirectResponse
+    {
+        Gate::authorize('delete', $savedCoverLetter);
+        $savedCoverLetter->delete();
+
+        return to_route('documents.saved')->with('success', 'Cover letter deleted.');
+    }
+
+    private function getAiRateLimitInfo(?User $user): array
+    {
+        if (! $user) {
+            return ['remaining' => 0, 'total' => 20, 'exhausted' => true];
+        }
+
+        $key = 'ai:'.$user->id;
+
+        $remaining = RateLimiter::remaining($key, 20);
+
+        return [
+            'remaining' => $remaining,
+            'total' => 20,
+            'exhausted' => $remaining <= 0,
+        ];
     }
 }

@@ -161,3 +161,142 @@ it('throws exception on invalid JSON response', function () {
 
     $service->analyzeResumeMatch('Job', 'Resume');
 })->throws(JsonException::class);
+
+it('polishes a resume summary section', function () {
+    Http::preventStrayRequests();
+
+    Http::fake([
+        'generativelanguage.googleapis.com/*' => Http::response([
+            'candidates' => [
+                [
+                    'content' => [
+                        'parts' => [
+                            ['text' => 'Senior software engineer with 8+ years of experience delivering scalable solutions.'],
+                        ],
+                    ],
+                ],
+            ],
+        ]),
+    ]);
+
+    $service = app(GeminiService::class);
+    $result = $service->polishResumeSection('summary', 'Senior software engineer with 8+ years experience.');
+
+    expect($result)->toBeString();
+    expect($result)->toContain('Senior');
+});
+
+it('polishes a work experience description', function () {
+    Http::preventStrayRequests();
+
+    Http::fake([
+        'generativelanguage.googleapis.com/*' => Http::response([
+            'candidates' => [
+                [
+                    'content' => [
+                        'parts' => [
+                            ['text' => 'Led development of microservices architecture improving deployment frequency by 40%.'],
+                        ],
+                    ],
+                ],
+            ],
+        ]),
+    ]);
+
+    $service = app(GeminiService::class);
+    $result = $service->polishResumeSection('work_experience', 'Led development of microservices.');
+
+    expect($result)->toBeString();
+});
+
+it('polishes a project description', function () {
+    Http::preventStrayRequests();
+
+    Http::fake([
+        'generativelanguage.googleapis.com/*' => Http::response([
+            'candidates' => [
+                [
+                    'content' => [
+                        'parts' => [
+                            ['text' => 'Built a full-stack e-commerce platform serving 10k+ monthly users.'],
+                        ],
+                    ],
+                ],
+            ],
+        ]),
+    ]);
+
+    $service = app(GeminiService::class);
+    $result = $service->polishResumeSection('projects', 'Built an e-commerce platform.');
+
+    expect($result)->toBeString();
+});
+
+it('improves a cover letter with polish preset', function () {
+    Http::preventStrayRequests();
+
+    Http::fake([
+        'generativelanguage.googleapis.com/*' => Http::response([
+            'candidates' => [
+                [
+                    'content' => [
+                        'parts' => [
+                            ['text' => 'I am writing to express my interest in the position at your company.'],
+                        ],
+                    ],
+                ],
+            ],
+        ]),
+    ]);
+
+    $service = app(GeminiService::class);
+    $result = $service->improveCoverLetter('I am writing to express my interest.', 'polish');
+
+    expect($result)->toBeString();
+});
+
+it('makes a cover letter more concise', function () {
+    Http::preventStrayRequests();
+
+    Http::fake([
+        'generativelanguage.googleapis.com/*' => Http::response([
+            'candidates' => [
+                [
+                    'content' => [
+                        'parts' => [
+                            ['text' => 'Interested in the position. Strong background in PHP and React.'],
+                        ],
+                    ],
+                ],
+            ],
+        ]),
+    ]);
+
+    $service = app(GeminiService::class);
+    $result = $service->improveCoverLetter('I am very interested in the position at your company.', 'concise');
+
+    expect($result)->toBeString();
+});
+
+it('makes a cover letter more formal', function () {
+    Http::preventStrayRequests();
+
+    Http::fake([
+        'generativelanguage.googleapis.com/*' => Http::response([
+            'candidates' => [
+                [
+                    'content' => [
+                        'parts' => [
+                            ['text' => 'I hereby submit my application for the position of Software Engineer.'],
+                        ],
+                    ],
+                ],
+            ],
+        ]),
+    ]);
+
+    $service = app(GeminiService::class);
+    $result = $service->improveCoverLetter('I want to apply for the software engineer job.', 'formal');
+
+    expect($result)->toBeString();
+});

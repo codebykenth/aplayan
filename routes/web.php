@@ -95,5 +95,13 @@ Route::middleware('auth')->group(function () {
 
     Route::get('documents', [DocumentController::class, 'index'])->name('documents.index');
     Route::put('documents/profile', [DocumentController::class, 'updateProfile'])->name('documents.profile.update');
-    Route::post('documents/cover-letter', [DocumentController::class, 'coverLetter'])->name('documents.cover-letter');
+    Route::post('documents/cover-letter', [DocumentController::class, 'coverLetter'])->middleware('throttle:ai')->name('documents.cover-letter');
+    Route::post('documents/ai-polish-resume', [DocumentController::class, 'aiPolishResume'])->middleware('throttle:ai')->name('documents.ai-polish-resume');
+    Route::post('documents/ai-improve-cover-letter', [DocumentController::class, 'aiImproveCoverLetter'])->middleware('throttle:ai')->name('documents.ai-improve-cover-letter');
+    Route::get('documents/saved', [DocumentController::class, 'saved'])->name('documents.saved');
+    Route::get('documents/saved-cover-letters', [DocumentController::class, 'savedCoverLettersJson'])->name('documents.saved-cover-letters');
+    Route::post('documents/save-resume', [DocumentController::class, 'saveResume'])->name('documents.save-resume');
+    Route::post('documents/save-cover-letter', [DocumentController::class, 'saveCoverLetter'])->name('documents.save-cover-letter');
+    Route::delete('documents/resume-versions/{savedResume}', [DocumentController::class, 'destroyResumeVersion'])->name('documents.resume-versions.destroy');
+    Route::delete('documents/cover-letters/{savedCoverLetter}', [DocumentController::class, 'destroyCoverLetter'])->name('documents.cover-letters.destroy');
 });

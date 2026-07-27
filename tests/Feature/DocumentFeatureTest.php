@@ -303,3 +303,115 @@ it('returns empty arrays as defaults for JSON fields', function () {
     expect($profile->skills)->toBe([]);
     expect($profile->certifications)->toBe([]);
 });
+
+it('polishes a resume section via AI', function () {
+    ResumeProfile::factory()->create(['user_id' => $this->user->id]);
+
+    Http::preventStrayRequests();
+
+    Http::fake([
+        'generativelanguage.googleapis.com/*' => Http::response([
+            'candidates' => [
+                [
+                    'content' => [
+                        'parts' => [
+                            ['text' => 'Experienced software developer with 5+ years building scalable web applications.'],
+                        ],
+                    ],
+                ],
+            ],
+        ]),
+    ]);
+
+    $response = $this->actingAs($this->user)->postJson(route('documents.ai-polish-resume'), [
+        'section' => 'summary',
+        'content' => 'Experienced software developer building web apps.',
+    ]);
+
+    $response->assertSuccessful()
+        ->assertJsonStructure(['polished']);
+});
+
+it('returns 422 for invalid resume polish section', function () {
+    $response = $this->actingAs($this->user)->postJson(route('documents.ai-polish-resume'), [
+        'section' => 'invalid_section',
+        'content' => 'test',
+    ]);
+
+    $response->assertJsonValidationErrors(['section']);
+});
+
+it('improves a cover letter via AI with polish preset', function () {
+    Http::preventStrayRequests();
+
+    Http::fake([
+        'generativelanguage.googleapis.com/*' => Http::response([
+            'candidates' => [
+                [
+                    'content' => [
+                        'parts' => [
+                            ['text' => 'I am writing to express my interest in the position.'],
+                        ],
+                    ],
+                ],
+            ],
+        ]),
+    ]);
+
+    $response = $this->actingAs($this->user)->postJson(route('documents.ai-improve-cover-letter'), [
+        'content' => 'I am writing to express my interest in the position.',
+        'preset' => 'polish',
+    ]);
+
+    $response->assertSuccessful()
+        ->assertJsonStructure(['improved']);
+});
+
+it('returns 422 for invalid cover letter improvement preset', function () {
+    $response = $this->actingAs($this->user)->postJson(route('documents.ai-improve-cover-letter'), [
+        'content' => 'test content',
+        'preset' => 'invalid_preset',
+    ]);
+
+    $response->assertJsonValidationErrors(['preset']);
+});
+
+it('returns 503 when Gemini API fails for resume polish', function () {
+    ResumeProfile::factory()->create(['user_id' => $this->user->id]);
+
+    Http::preventStrayRequests();
+
+    Http::fake([
+        'generativelanguage.googleapis.com/*' => Http::response([], 500),
+    ]);
+
+    $response = $this->actingAs($this->user)->postJson(route('documents.ai-polish-resume'), [
+        'section' => 'summary',
+        'content' => 'test content',
+    ]);
+
+    $response->assertStatus(503);
+    expect($response->json('message'))->toBe('AI service is temporarily unavailable.');
+});
+
+it('saves a cover letter with target metadata', function () {
+    $response = $this->actingAs($this->user)->postJson(route('documents.save-cover-letter'), [
+        'content' => 'Dear Hiring Manager, I am writing to apply...',
+        'job_description' => 'Looking for a PHP developer.',
+        'target_company' => 'TechCorp',
+        'target_job_title' => 'Senior Developer',
+        'template' => 'modern',
+    ]);
+
+    $response->assertSuccessful();
+    expect($response->json('cover_letter.target_company'))->toBe('TechCorp');
+    expect($response->json('cover_letter.target_job_title'))->toBe('Senior Developer');
+});
+
+it('includes ai_limit in documents page props', function () {
+    $this->actingAs($this->user)
+        ->get(route('documents.index'))
+        ->assertInertia(fn ($page) => $page
+            ->has('aiLimit')
+        );
+});

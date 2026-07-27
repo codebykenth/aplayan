@@ -129,6 +129,61 @@ PROMPT;
         return $response['candidates'][0]['content']['parts'][0]['text'] ?? 'Unable to generate cover letter.';
     }
 
+    public function polishResumeSection(string $sectionType, string $content, string $context = ''): string
+    {
+        $sectionLabels = [
+            'summary' => 'professional summary',
+            'work_experience' => 'work experience description',
+            'projects' => 'project description',
+        ];
+
+        $label = $sectionLabels[$sectionType] ?? $sectionType;
+
+        $prompt = <<<PROMPT
+You are a professional resume writer helping a job seeker in the Philippines polish their resume.
+
+Polish the following {$label} to make it more impactful, professional, and ATS-friendly.
+- Use strong action verbs and quantifiable achievements
+- Keep the same factual content and key details
+- Return ONLY the polished text, no commentary or labels
+
+{$context}
+
+Content to polish:
+{$content}
+PROMPT;
+
+        $response = $this->sendRequest($prompt);
+
+        return $response['candidates'][0]['content']['parts'][0]['text'] ?? 'Unable to polish section.';
+    }
+
+    public function improveCoverLetter(string $content, string $preset): string
+    {
+        $presetInstructions = [
+            'polish' => 'Polish the grammar, spelling, and flow while preserving the original meaning and structure.',
+            'concise' => 'Make the cover letter more concise and to-the-point. Reduce wordiness while keeping all key information.',
+            'formal' => 'Make the cover letter more formal and professional in tone. Use formal business language.',
+        ];
+
+        $instruction = $presetInstructions[$preset] ?? 'Polish the grammar and flow of this cover letter.';
+
+        $prompt = <<<PROMPT
+You are a professional career coach helping a job seeker in the Philippines improve their cover letter.
+
+{$instruction}
+
+Return ONLY the improved cover letter text, no commentary or labels.
+
+Cover Letter:
+{$content}
+PROMPT;
+
+        $response = $this->sendRequest($prompt);
+
+        return $response['candidates'][0]['content']['parts'][0]['text'] ?? 'Unable to improve cover letter.';
+    }
+
     private function client(): PendingRequest
     {
         return Http::timeout(self::TIMEOUT)
