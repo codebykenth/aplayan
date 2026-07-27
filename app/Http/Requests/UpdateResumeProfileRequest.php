@@ -14,6 +14,7 @@ class UpdateResumeProfileRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'target_role' => ['nullable', 'string', 'max:255'],
             'full_name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'email', 'max:255'],
             'phone' => ['required', 'string', 'max:50'],

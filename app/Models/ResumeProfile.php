@@ -35,6 +35,7 @@ class ResumeProfile extends Model
 
     protected $fillable = [
         'user_id',
+        'target_role',
         'full_name',
         'email',
         'phone',

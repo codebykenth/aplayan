@@ -20,6 +20,7 @@ type SavedResume = {
         linkedin_url: string | null;
         github_url: string | null;
         website_url: string | null;
+        target_role: string | null;
         summary: string | null;
         work_experience: Array<{ company: string; position: string; duration: string; description: string }>;
         education: Array<{ institution: string; degree: string; year: string }>;
@@ -154,6 +155,7 @@ function ResumeCard({ resume, onDelete }: { resume: SavedResume; onDelete: (id: 
                     <div className="text-sm leading-relaxed space-y-3">
                         <div>
                             <strong>{data.full_name}</strong>
+                            {data.target_role && <div className="text-sm font-medium mt-0.5 text-[#1b1b18]">{data.target_role}</div>}
                             <div className="text-[#706f6c]">
                                 {data.email} | {data.phone} | {data.location}
                             </div>

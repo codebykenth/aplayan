@@ -42,6 +42,7 @@ type ResumeProfile = {
     linkedin_url: string | null;
     github_url: string | null;
     website_url: string | null;
+    target_role: string | null;
     summary: string | null;
     work_experience: WorkExperience[];
     education: Education[];
@@ -207,6 +208,7 @@ function getPrintStyles(template: string): string {
         return base + `
             .ats-header { text-align: center; margin-bottom: 16px; border-bottom: 2px solid #1b1b18; padding-bottom: 12px; }
             .ats-name { font-size: 24px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px; }
+            .target-role { font-size: 13px; font-weight: 500; margin-bottom: 6px; }
             .ats-contact-line { font-size: 12px; color: #4a4a46; font-weight: 500; }
             .ats-section-title { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; border-bottom: 1.5px solid #1b1b18; padding-bottom: 3px; margin-top: 14px; margin-bottom: 8px; }
             .ats-item { margin-bottom: 10px; }
@@ -223,6 +225,7 @@ function getPrintStyles(template: string): string {
         return base + `
             .exec-header { margin-bottom: 16px; border-bottom: 1px solid #dcdcd8; padding-bottom: 12px; }
             .exec-name { font-size: 24px; font-weight: 700; margin-bottom: 4px; }
+            .target-role { font-size: 13px; font-weight: 500; margin-bottom: 4px; }
             .exec-contact-line { font-size: 12px; color: #555450; font-weight: 500; }
             .exec-section-title { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; border-left: 4px solid #1b1b18; padding-left: 8px; margin-top: 14px; margin-bottom: 8px; }
             .job, .edu { margin-bottom: 10px; }
@@ -244,6 +247,7 @@ function getPrintStyles(template: string): string {
         return base + `
             .bullet-header { text-align: center; margin-bottom: 16px; border-bottom: 2px solid #1b1b18; padding-bottom: 12px; }
             .bullet-name { font-size: 24px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px; }
+            .target-role { font-size: 13px; font-weight: 500; margin-bottom: 6px; }
             .bullet-contact { font-size: 12px; color: #4a4a46; font-weight: 500; }
             .bullet-section-title { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; border-bottom: 1.5px solid #1b1b18; padding-bottom: 3px; margin-top: 14px; margin-bottom: 8px; }
             .bullet-item { margin-bottom: 10px; }
@@ -261,6 +265,7 @@ function getPrintStyles(template: string): string {
         return base + `
             .header { margin-bottom: 16px; }
             .name { font-size: 24px; font-weight: 600; margin-bottom: 4px; }
+            .target-role { font-size: 14px; font-style: italic; color: #706f6c; margin-bottom: 6px; }
             .contact { font-size: 13px; color: #706f6c; display: flex; gap: 8px; flex-wrap: wrap; }
             .linkedin { font-size: 12px; color: #706f6c; margin-top: 4px; }
             h2 { font-size: 14px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 2px solid #1b1b18; padding-bottom: 4px; margin-top: 20px; margin-bottom: 12px; }
@@ -283,6 +288,7 @@ function getPrintStyles(template: string): string {
         return base + `
             .header { background: #1b1b18; color: white; padding: 24px; }
             .name { font-size: 24px; font-weight: 700; color: white; }
+            .target-role { font-size: 14px; color: white; opacity: 0.9; margin-top: 2px; }
             .contact { display: flex; gap: 12px; flex-wrap: wrap; font-size: 13px; margin-top: 8px; opacity: 0.9; color: white; }
             .linkedin { font-size: 12px; margin-top: 4px; opacity: 0.75; color: white; }
             .body { padding: 24px; }
@@ -306,6 +312,7 @@ function getPrintStyles(template: string): string {
         .header { text-align: center; border-bottom: 2px solid #1b1b18; padding-bottom: 16px; margin-bottom: 16px; }
         .cv-title { font-size: 11px; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; color: #706f6c; margin-bottom: 4px; }
         .name { font-size: 24px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; }
+        .target-role { font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: #706f6c; margin-top: 4px; }
         .contact { font-size: 12px; color: #706f6c; margin-top: 8px; display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; }
         .linkedin { font-size: 12px; color: #706f6c; margin-top: 4px; }
         h2 { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-top: 16px; margin-bottom: 4px; }
@@ -337,6 +344,7 @@ function getScopedResumeStyles(template: string): string {
         return base + `
             .resume-paper-preview .ats-header { text-align: center; margin-bottom: 16px; border-bottom: 2px solid #1b1b18; padding-bottom: 12px; }
             .resume-paper-preview .ats-name { font-size: 24px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #1b1b18; margin-bottom: 6px; }
+            .resume-paper-preview .target-role { font-size: 13px; font-weight: 500; margin-bottom: 6px; color: #1b1b18; }
             .resume-paper-preview .ats-contact-line { font-size: 12px; color: #4a4a46; font-weight: 500; }
             .resume-paper-preview .ats-section-title { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; border-bottom: 1.5px solid #1b1b18; padding-bottom: 3px; margin-top: 14px; margin-bottom: 8px; color: #1b1b18; }
             .resume-paper-preview .ats-item { margin-bottom: 10px; }
@@ -353,6 +361,7 @@ function getScopedResumeStyles(template: string): string {
         return base + `
             .resume-paper-preview .exec-header { margin-bottom: 16px; border-bottom: 1px solid #dcdcd8; padding-bottom: 12px; }
             .resume-paper-preview .exec-name { font-size: 24px; font-weight: 700; color: #1b1b18; margin-bottom: 4px; }
+            .resume-paper-preview .target-role { font-size: 13px; font-weight: 500; margin-bottom: 4px; color: #1b1b18; }
             .resume-paper-preview .exec-contact-line { font-size: 12px; color: #555450; font-weight: 500; }
             .resume-paper-preview .exec-section-title { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; border-left: 4px solid #1b1b18; padding-left: 8px; margin-top: 14px; margin-bottom: 8px; color: #1b1b18; }
             .resume-paper-preview .job, .resume-paper-preview .edu { margin-bottom: 10px; }
@@ -374,6 +383,7 @@ function getScopedResumeStyles(template: string): string {
         return base + `
             .resume-paper-preview .bullet-header { text-align: center; margin-bottom: 16px; border-bottom: 2px solid #1b1b18; padding-bottom: 12px; }
             .resume-paper-preview .bullet-name { font-size: 24px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #1b1b18; margin-bottom: 6px; }
+            .resume-paper-preview .target-role { font-size: 13px; font-weight: 500; margin-bottom: 6px; color: #1b1b18; }
             .resume-paper-preview .bullet-contact { font-size: 12px; color: #4a4a46; font-weight: 500; }
             .resume-paper-preview .bullet-section-title { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; border-bottom: 1.5px solid #1b1b18; padding-bottom: 3px; margin-top: 14px; margin-bottom: 8px; color: #1b1b18; }
             .resume-paper-preview .bullet-item { margin-bottom: 10px; }
@@ -391,6 +401,7 @@ function getScopedResumeStyles(template: string): string {
         return base + `
             .resume-paper-preview .header { margin-bottom: 16px; }
             .resume-paper-preview .name { font-size: 24px; font-weight: 600; margin-bottom: 4px; color: #1b1b18; }
+            .resume-paper-preview .target-role { font-size: 14px; font-style: italic; color: #706f6c; margin-bottom: 6px; }
             .resume-paper-preview .contact { font-size: 13px; color: #706f6c; display: flex; gap: 8px; flex-wrap: wrap; }
             .resume-paper-preview .linkedin { font-size: 12px; color: #706f6c; margin-top: 4px; }
             .resume-paper-preview h2 { font-size: 14px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 2px solid #1b1b18; padding-bottom: 4px; margin-top: 20px; margin-bottom: 12px; color: #1b1b18; }
@@ -413,6 +424,7 @@ function getScopedResumeStyles(template: string): string {
         return base + `
             .resume-paper-preview .header { background: #1b1b18; color: white; padding: 24px; border-radius: 6px 6px 0 0; margin: -32px -32px 24px -32px; }
             .resume-paper-preview .name { font-size: 24px; font-weight: 700; color: white; }
+            .resume-paper-preview .target-role { font-size: 14px; color: white; opacity: 0.9; margin-top: 2px; }
             .resume-paper-preview .contact { display: flex; gap: 12px; flex-wrap: wrap; font-size: 13px; margin-top: 8px; opacity: 0.9; color: white; }
             .resume-paper-preview .linkedin { font-size: 12px; margin-top: 4px; opacity: 0.75; color: white; }
             .resume-paper-preview .body { padding: 0; }
@@ -435,6 +447,7 @@ function getScopedResumeStyles(template: string): string {
     return base + `
         .resume-paper-preview .header { text-align: center; border-bottom: 2px solid #1b1b18; padding-bottom: 16px; margin-bottom: 16px; }
         .resume-paper-preview .name { font-size: 24px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #1b1b18; }
+        .resume-paper-preview .target-role { font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: #706f6c; margin-top: 4px; }
         .resume-paper-preview .contact { font-size: 12px; color: #706f6c; margin-top: 8px; display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; }
         .resume-paper-preview .linkedin { font-size: 12px; color: #706f6c; margin-top: 4px; }
         .resume-paper-preview h2 { font-size: 14px; font-weight: 700; text-transform: uppercase; margin-top: 16px; margin-bottom: 8px; color: #1b1b18; }
@@ -682,6 +695,18 @@ setData('full_name', '');
                     aria-invalid={!!errors.full_name}
                 />
                 {errors.full_name && <p className="text-xs text-destructive">{errors.full_name}</p>}
+            </div>
+
+            <div className="flex flex-col gap-2">
+                <Label htmlFor="target_role">Target Role (optional)</Label>
+                <Input
+                    id="target_role"
+                    value={data.target_role ?? ''}
+                    onChange={(e) => setData('target_role', e.target.value)}
+                    placeholder="e.g. Senior Software Developer"
+                    aria-invalid={!!errors.target_role}
+                />
+                {errors.target_role && <p className="text-xs text-destructive">{errors.target_role}</p>}
             </div>
 
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -1575,6 +1600,7 @@ return null;
                         <div className="ats-header">
                             {hasPhoto && <img src={photoSrc} alt="" className="photo" referrerPolicy="no-referrer" />}
                             <div className="ats-name">{data.full_name || 'Your Name'}</div>
+                            {data.target_role && <div className="target-role">{data.target_role}</div>}
                             <div className="ats-contact-line">
                                 {[
                                     data.location ? <span key="loc">{data.location}</span> : null,
@@ -1671,6 +1697,7 @@ acc.push(<span key={`sep-${i}`}>  •  </span>);
                         <div className="exec-header">
                             {hasPhoto && <img src={photoSrc} alt="" className="photo" referrerPolicy="no-referrer" />}
                             <div className="exec-name">{data.full_name || 'Your Name'}</div>
+                            {data.target_role && <div className="target-role">{data.target_role}</div>}
                             <div className="exec-contact-line">
                                 {[
                                     data.location ? <span key="loc">{data.location}</span> : null,
@@ -1765,6 +1792,7 @@ acc.push(<span key={`sep-${i}`}>  |  </span>);
                         <div className="bullet-header">
                             {hasPhoto && <img src={photoSrc} alt="" className="photo" referrerPolicy="no-referrer" />}
                             <div className="bullet-name">{data.full_name || 'Your Name'}</div>
+                            {data.target_role && <div className="target-role">{data.target_role}</div>}
                             <div className="bullet-contact">
                                 {[
                                     data.location ? <span key="loc">{data.location}</span> : null,
@@ -1875,6 +1903,7 @@ acc.push(<span key={`sep-${i}`}>  •  </span>);
                         <div className="header">
                             {hasPhoto && <img src={photoSrc} alt="" className="photo" referrerPolicy="no-referrer" />}
                             <div className="name">{data.full_name || 'Your Name'}</div>
+                            {data.target_role && <div className="target-role">{data.target_role}</div>}
                         </div>
                         <div className="contact">
                             {data.email && <a href={`mailto:${data.email}`} style={{ color: 'inherit', textDecoration: 'underline' }}>{data.email}</a>}
@@ -1981,6 +2010,7 @@ acc.push(<span key={`psep-${i}`}>  •  </span>);
                         <div className="header">
                             {hasPhoto && <img src={photoSrc} alt="" className="photo" referrerPolicy="no-referrer" />}
                             <div className="name">{data.full_name || 'Your Name'}</div>
+                            {data.target_role && <div className="target-role">{data.target_role}</div>}
                             <div className="contact">
                                 {data.email && <a href={`mailto:${data.email}`} style={{ color: 'inherit', textDecoration: 'underline' }}>{data.email}</a>}
                                 {data.phone && <span>{data.phone}</span>}
@@ -2089,6 +2119,7 @@ acc.push(<span key={`psep-${i}`}>  •  </span>);
                         <div className="header">
                             {hasPhoto && <img src={photoSrc} alt="" className="photo" referrerPolicy="no-referrer" />}
                             <div className="name">{data.full_name || 'Your Name'}</div>
+                            {data.target_role && <div className="target-role">{data.target_role}</div>}
                             <div className="contact">
                                 {data.location && <span>{data.location}</span>}
                                 {data.phone && <span>{data.phone}</span>}

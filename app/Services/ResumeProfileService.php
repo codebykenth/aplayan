@@ -24,10 +24,17 @@ class ResumeProfileService
     {
         $parts = [
             "Name: {$profile->full_name}",
+        ];
+
+        if ($profile->target_role) {
+            $parts[] = "Target Role: {$profile->target_role}";
+        }
+
+        $parts = array_merge($parts, [
             "Email: {$profile->email}",
             "Phone: {$profile->phone}",
             "Location: {$profile->location}",
-        ];
+        ]);
 
         if ($profile->linkedin_url) {
             $parts[] = "LinkedIn: {$profile->linkedin_url}";

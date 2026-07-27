@@ -17,6 +17,7 @@ class ResumeProfileFactory extends Factory
     {
         return [
             'user_id' => User::factory(),
+            'target_role' => fake()->optional(0.6)->jobTitle(),
             'full_name' => fake()->name(),
             'email' => fake()->safeEmail(),
             'phone' => '+63 9'.fake()->numerify('## #####'),

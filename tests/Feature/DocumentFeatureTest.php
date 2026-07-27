@@ -62,6 +62,7 @@ it('stores a new profile for the authenticated user', function () {
         'education' => [
             ['institution' => 'UP Diliman', 'degree' => 'BS Computer Science', 'year' => '2020'],
         ],
+        'target_role' => 'Senior Developer',
         'skills' => ['PHP', 'Laravel', 'React'],
         'certifications' => ['AWS Solutions Architect'],
     ];
@@ -72,6 +73,7 @@ it('stores a new profile for the authenticated user', function () {
     $this->assertDatabaseHas('resume_profiles', [
         'user_id' => $this->user->id,
         'full_name' => 'Juan Dela Cruz',
+        'target_role' => 'Senior Developer',
     ]);
 });
 
@@ -84,6 +86,7 @@ it('updates an existing profile for the authenticated user', function () {
         'phone' => '+63 917 999 9999',
         'location' => 'Cebu',
         'summary' => 'Updated summary.',
+        'target_role' => 'Lead Developer',
         'work_experience' => [],
         'education' => [],
         'skills' => [],
@@ -96,6 +99,7 @@ it('updates an existing profile for the authenticated user', function () {
     $this->assertDatabaseHas('resume_profiles', [
         'user_id' => $this->user->id,
         'full_name' => 'Updated Name',
+        'target_role' => 'Lead Developer',
     ]);
 });
 
@@ -114,6 +118,18 @@ it('validates email format on profile update', function () {
     ]);
 
     $response->assertJsonValidationErrors(['email']);
+});
+
+it('validates target_role max length on profile update', function () {
+    $response = $this->actingAs($this->user)->putJson(route('documents.profile.update'), [
+        'full_name' => 'Juan',
+        'email' => 'juan@example.com',
+        'phone' => '+63 917 123 4567',
+        'location' => 'Metro Manila',
+        'target_role' => str_repeat('a', 256),
+    ]);
+
+    $response->assertJsonValidationErrors(['target_role']);
 });
 
 it('validates work_experience is an array', function () {
