@@ -8,7 +8,7 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/com
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogClose } from '@/components/ui/dialog';
 import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from '@/components/ui/select';
 import AppLayout from '@/layouts/app-layout';
-import { User, Briefcase, GraduationCap, Wrench, Award, FolderGit2, FileText, Download, Mail, Camera, Save, Sparkles, Eye, Edit3, FilePenLine, Wand2, Loader2, AlertCircle, BookText } from 'lucide-react';
+import { User, Briefcase, GraduationCap, Wrench, Award, FolderGit2, FileText, Download, Mail, Camera, Save, Sparkles, Eye, Edit3, FilePenLine, Wand2, Loader2, AlertCircle, BookText, ArrowUp, ArrowDown } from 'lucide-react';
 
 type WorkExperience = {
     company: string;
@@ -27,6 +27,7 @@ type Project = {
     title: string;
     description: string;
     url: string;
+    github_url?: string;
     technologies: string;
 };
 
@@ -61,8 +62,10 @@ interface DocumentsPageProps {
 
 const TEMPLATES = [
     { id: 'clean', name: 'Clean Minimal' },
+    { id: 'ats_classic', name: 'ATS Classic (One-Line Contact)' },
+    { id: 'ats_executive', name: 'ATS Executive (High Density)' },
     { id: 'modern', name: 'Modern Professional' },
-    { id: 'philippine', name: 'Philippine Standard' },
+    { id: 'philippine', name: 'Philippine Standard (CV)' },
 ] as const;
 
 const TABS = [
@@ -87,6 +90,41 @@ function getPrintStyles(template: string): string {
         body { font-family: 'Instrument Sans', Arial, sans-serif; color: #1b1b18; font-size: 13px; line-height: 1.5; padding: 40px; }
     `;
 
+    if (template === 'ats_classic') {
+        return base + `
+            .ats-header { text-align: center; margin-bottom: 16px; border-bottom: 2px solid #1b1b18; padding-bottom: 12px; }
+            .ats-name { font-size: 24px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px; }
+            .ats-contact-line { font-size: 12px; color: #4a4a46; font-weight: 500; }
+            .ats-section-title { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; border-bottom: 1.5px solid #1b1b18; padding-bottom: 3px; margin-top: 14px; margin-bottom: 8px; }
+            .ats-item { margin-bottom: 10px; }
+            .ats-item-header { display: flex; justify-content: space-between; align-items: baseline; }
+            .ats-title { font-size: 14px; font-weight: 700; }
+            .ats-date { font-size: 12px; color: #4a4a46; font-weight: 500; }
+            .ats-company { font-size: 13px; font-weight: 600; color: #4a4a46; font-style: italic; }
+            .ats-desc { font-size: 13px; margin-top: 4px; line-height: 1.45; }
+            .photo { width: 96px; height: 96px; border-radius: 8px; object-fit: cover; float: right; margin-left: 16px; }
+        `;
+    }
+    if (template === 'ats_executive') {
+        return base + `
+            .exec-header { margin-bottom: 16px; border-bottom: 1px solid #dcdcd8; padding-bottom: 12px; }
+            .exec-name { font-size: 24px; font-weight: 700; margin-bottom: 4px; }
+            .exec-contact-line { font-size: 12px; color: #555450; font-weight: 500; }
+            .exec-section-title { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; border-left: 4px solid #1b1b18; padding-left: 8px; margin-top: 14px; margin-bottom: 8px; }
+            .job, .edu { margin-bottom: 10px; }
+            .job-row, .edu-row { display: flex; justify-content: space-between; align-items: baseline; }
+            .job-title, .edu-degree { font-size: 14px; font-weight: 600; }
+            .job-duration, .edu-year { font-size: 12px; color: #706f6c; white-space: nowrap; margin-left: 12px; }
+            .job-company, .edu-institution { font-size: 13px; color: #706f6c; }
+            .job-desc { font-size: 13px; margin-top: 4px; line-height: 1.4; }
+            .skills, .certs { font-size: 13px; line-height: 1.5; }
+            .photo { width: 96px; height: 96px; border-radius: 8px; object-fit: cover; float: right; margin-left: 16px; }
+            .project { margin-bottom: 10px; }
+            .project-title { font-size: 14px; font-weight: 600; }
+            .project-tech { font-size: 12px; color: #706f6c; }
+            .project-desc { font-size: 13px; margin-top: 4px; line-height: 1.4; }
+        `;
+    }
     if (template === 'clean') {
         return base + `
             .header { margin-bottom: 16px; }
@@ -101,7 +139,7 @@ function getPrintStyles(template: string): string {
             .job-company, .edu-institution { font-size: 13px; color: #706f6c; }
             .job-desc { font-size: 13px; margin-top: 4px; line-height: 1.4; }
             .skills, .certs { font-size: 13px; line-height: 1.5; }
-            .photo { width: 64px; height: 64px; border-radius: 6px; object-fit: cover; float: right; margin-left: 12px; }
+            .photo { width: 96px; height: 96px; border-radius: 8px; object-fit: cover; float: right; margin-left: 16px; }
             .project { margin-bottom: 12px; }
             .project-title { font-size: 14px; font-weight: 500; }
             .project-tech { font-size: 12px; color: #706f6c; }
@@ -123,7 +161,7 @@ function getPrintStyles(template: string): string {
             .job-company, .edu-institution { font-size: 13px; color: #706f6c; }
             .job-desc { font-size: 13px; margin-top: 4px; line-height: 1.4; }
             .skills, .certs { font-size: 13px; line-height: 1.5; }
-            .photo { width: 64px; height: 64px; border-radius: 6px; object-fit: cover; float: right; margin-left: 12px; }
+            .photo { width: 96px; height: 96px; border-radius: 8px; object-fit: cover; float: right; margin-left: 16px; }
             .project { margin-bottom: 12px; padding-left: 12px; border-left: 2px solid #1b1b18; }
             .project-title { font-size: 14px; font-weight: 500; }
             .project-tech { font-size: 12px; color: #706f6c; }
@@ -132,10 +170,11 @@ function getPrintStyles(template: string): string {
     }
     return base + `
         .header { text-align: center; border-bottom: 2px solid #1b1b18; padding-bottom: 16px; margin-bottom: 16px; }
+        .cv-title { font-size: 11px; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; color: #706f6c; margin-bottom: 4px; }
         .name { font-size: 24px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; }
         .contact { font-size: 12px; color: #706f6c; margin-top: 8px; display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; }
         .linkedin { font-size: 12px; color: #706f6c; margin-top: 4px; }
-        h2 { font-size: 14px; font-weight: 700; text-transform: uppercase; margin-top: 16px; margin-bottom: 8px; }
+        h2 { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-top: 16px; margin-bottom: 4px; }
         .section-line { border-top: 1px solid #e3e3e0; margin-bottom: 8px; }
         .job, .edu { margin-bottom: 10px; }
         .job-company { font-size: 14px; font-weight: 600; }
@@ -147,7 +186,7 @@ function getPrintStyles(template: string): string {
         .job-desc { font-size: 13px; margin-top: 4px; line-height: 1.4; }
         .skills-text { font-size: 13px; line-height: 1.5; }
         .certs { font-size: 13px; line-height: 1.5; }
-        .photo { width: 64px; height: 64px; border-radius: 6px; object-fit: cover; margin: 0 auto 12px; display: block; }
+        .photo { width: 96px; height: 96px; border-radius: 8px; object-fit: cover; margin: 0 auto 12px; display: block; }
         .project { margin-bottom: 10px; }
         .project-title { font-size: 14px; font-weight: 600; }
         .project-tech { font-size: 12px; color: #706f6c; }
@@ -159,6 +198,42 @@ function getScopedResumeStyles(template: string): string {
     const base = `
         .resume-paper-preview { font-family: 'Instrument Sans', Arial, sans-serif; color: #1b1b18; font-size: 13px; line-height: 1.5; }
     `;
+
+    if (template === 'ats_classic') {
+        return base + `
+            .resume-paper-preview .ats-header { text-align: center; margin-bottom: 16px; border-bottom: 2px solid #1b1b18; padding-bottom: 12px; }
+            .resume-paper-preview .ats-name { font-size: 24px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #1b1b18; margin-bottom: 6px; }
+            .resume-paper-preview .ats-contact-line { font-size: 12px; color: #4a4a46; font-weight: 500; }
+            .resume-paper-preview .ats-section-title { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; border-bottom: 1.5px solid #1b1b18; padding-bottom: 3px; margin-top: 14px; margin-bottom: 8px; color: #1b1b18; }
+            .resume-paper-preview .ats-item { margin-bottom: 10px; }
+            .resume-paper-preview .ats-item-header { display: flex; justify-content: space-between; align-items: baseline; }
+            .resume-paper-preview .ats-title { font-size: 14px; font-weight: 700; color: #1b1b18; }
+            .resume-paper-preview .ats-date { font-size: 12px; color: #4a4a46; font-weight: 500; }
+            .resume-paper-preview .ats-company { font-size: 13px; font-weight: 600; color: #4a4a46; font-style: italic; }
+            .resume-paper-preview .ats-desc { font-size: 13px; margin-top: 4px; line-height: 1.45; color: #1b1b18; }
+            .resume-paper-preview .photo { width: 96px; height: 96px; border-radius: 8px; object-fit: cover; float: right; margin-left: 16px; }
+        `;
+    }
+    if (template === 'ats_executive') {
+        return base + `
+            .resume-paper-preview .exec-header { margin-bottom: 16px; border-bottom: 1px solid #dcdcd8; padding-bottom: 12px; }
+            .resume-paper-preview .exec-name { font-size: 24px; font-weight: 700; color: #1b1b18; margin-bottom: 4px; }
+            .resume-paper-preview .exec-contact-line { font-size: 12px; color: #555450; font-weight: 500; }
+            .resume-paper-preview .exec-section-title { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; border-left: 4px solid #1b1b18; padding-left: 8px; margin-top: 14px; margin-bottom: 8px; color: #1b1b18; }
+            .resume-paper-preview .job, .resume-paper-preview .edu { margin-bottom: 10px; }
+            .resume-paper-preview .job-row, .resume-paper-preview .edu-row { display: flex; justify-content: space-between; align-items: baseline; }
+            .resume-paper-preview .job-title, .resume-paper-preview .edu-degree { font-size: 14px; font-weight: 600; color: #1b1b18; }
+            .resume-paper-preview .job-duration, .resume-paper-preview .edu-year { font-size: 12px; color: #706f6c; white-space: nowrap; margin-left: 12px; }
+            .resume-paper-preview .job-company, .resume-paper-preview .edu-institution { font-size: 13px; color: #706f6c; }
+            .resume-paper-preview .job-desc { font-size: 13px; margin-top: 4px; line-height: 1.4; color: #1b1b18; }
+            .resume-paper-preview .skills, .resume-paper-preview .certs { font-size: 13px; line-height: 1.5; color: #1b1b18; }
+            .resume-paper-preview .photo { width: 96px; height: 96px; border-radius: 8px; object-fit: cover; float: right; margin-left: 16px; }
+            .resume-paper-preview .project { margin-bottom: 10px; }
+            .resume-paper-preview .project-title { font-size: 14px; font-weight: 600; color: #1b1b18; }
+            .resume-paper-preview .project-tech { font-size: 12px; color: #706f6c; }
+            .resume-paper-preview .project-desc { font-size: 13px; margin-top: 4px; line-height: 1.4; color: #1b1b18; }
+        `;
+    }
 
     if (template === 'clean') {
         return base + `
@@ -174,7 +249,7 @@ function getScopedResumeStyles(template: string): string {
             .resume-paper-preview .job-company, .resume-paper-preview .edu-institution { font-size: 13px; color: #706f6c; }
             .resume-paper-preview .job-desc { font-size: 13px; margin-top: 4px; line-height: 1.4; color: #1b1b18; }
             .resume-paper-preview .skills, .resume-paper-preview .certs { font-size: 13px; line-height: 1.5; color: #1b1b18; }
-            .resume-paper-preview .photo { width: 64px; height: 64px; border-radius: 6px; object-fit: cover; float: right; margin-left: 12px; }
+            .resume-paper-preview .photo { width: 96px; height: 96px; border-radius: 8px; object-fit: cover; float: right; margin-left: 16px; }
             .resume-paper-preview .project { margin-bottom: 12px; }
             .resume-paper-preview .project-title { font-size: 14px; font-weight: 500; color: #1b1b18; }
             .resume-paper-preview .project-tech { font-size: 12px; color: #706f6c; }
@@ -196,7 +271,7 @@ function getScopedResumeStyles(template: string): string {
             .resume-paper-preview .job-company, .resume-paper-preview .edu-institution { font-size: 13px; color: #706f6c; }
             .resume-paper-preview .job-desc { font-size: 13px; margin-top: 4px; line-height: 1.4; color: #1b1b18; }
             .resume-paper-preview .skills, .resume-paper-preview .certs { font-size: 13px; line-height: 1.5; color: #1b1b18; }
-            .resume-paper-preview .photo { width: 64px; height: 64px; border-radius: 6px; object-fit: cover; float: right; margin-left: 12px; }
+            .resume-paper-preview .photo { width: 96px; height: 96px; border-radius: 8px; object-fit: cover; float: right; margin-left: 16px; }
             .resume-paper-preview .project { margin-bottom: 12px; padding-left: 12px; border-left: 2px solid #1b1b18; }
             .resume-paper-preview .project-title { font-size: 14px; font-weight: 500; color: #1b1b18; }
             .resume-paper-preview .project-tech { font-size: 12px; color: #706f6c; }
@@ -220,7 +295,7 @@ function getScopedResumeStyles(template: string): string {
         .resume-paper-preview .job-desc { font-size: 13px; margin-top: 4px; line-height: 1.4; color: #1b1b18; }
         .resume-paper-preview .skills-text { font-size: 13px; line-height: 1.5; color: #1b1b18; }
         .resume-paper-preview .certs { font-size: 13px; line-height: 1.5; color: #1b1b18; }
-        .resume-paper-preview .photo { width: 64px; height: 64px; border-radius: 6px; object-fit: cover; margin: 0 auto 12px; display: block; }
+        .resume-paper-preview .photo { width: 96px; height: 96px; border-radius: 8px; object-fit: cover; margin: 0 auto 12px; display: block; }
         .resume-paper-preview .project { margin-bottom: 10px; }
         .resume-paper-preview .project-title { font-size: 14px; font-weight: 600; color: #1b1b18; }
         .resume-paper-preview .project-tech { font-size: 12px; color: #706f6c; }
@@ -234,35 +309,70 @@ function getCoverLetterPrintStyles(template: string): string {
         body { font-family: 'Instrument Sans', Arial, sans-serif; color: #1b1b18; font-size: 13px; line-height: 1.6; padding: 40px; }
     `;
 
-    if (template === 'clean') {
+    if (template === 'ats_classic') {
         return base + `
-            .letter-header { margin-bottom: 24px; }
-            .letter-date { color: #706f6c; font-size: 12px; margin-bottom: 16px; }
-            .letter-salutation { font-size: 14px; margin-bottom: 16px; }
+            .letter-header { text-align: center; border-bottom: 2px solid #1b1b18; padding-bottom: 12px; margin-bottom: 20px; }
+            .letter-name { font-size: 24px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px; }
+            .letter-contact-line { font-size: 12px; color: #4a4a46; font-weight: 500; }
+            .letter-date { color: #4a4a46; font-size: 12px; margin-bottom: 16px; text-align: right; font-weight: 500; }
+            .letter-recipient { font-size: 13px; line-height: 1.5; margin-bottom: 20px; }
+            .letter-salutation { font-size: 14px; font-weight: 600; margin-bottom: 16px; }
             .letter-body { font-size: 13px; line-height: 1.7; }
-            .letter-body p { margin-bottom: 12px; }
-            .letter-closing { margin-top: 24px; }
-            .letter-signature { margin-top: 4px; font-weight: 500; }
+            .letter-body p { margin-bottom: 14px; text-align: justify; }
+            .letter-closing { margin-top: 28px; }
+            .letter-signature { margin-top: 6px; font-weight: 700; font-size: 14px; }
+        `;
+    }
+    if (template === 'ats_executive') {
+        return base + `
+            .letter-header { border-left: 4px solid #1b1b18; padding-left: 12px; margin-bottom: 20px; }
+            .letter-name { font-size: 24px; font-weight: 700; margin-bottom: 4px; }
+            .letter-contact-line { font-size: 12px; color: #555450; font-weight: 500; }
+            .letter-date { color: #706f6c; font-size: 12px; margin-bottom: 16px; }
+            .letter-recipient { font-size: 13px; line-height: 1.5; margin-bottom: 20px; }
+            .letter-salutation { font-size: 14px; font-weight: 600; margin-bottom: 16px; }
+            .letter-body { font-size: 13px; line-height: 1.7; }
+            .letter-body p { margin-bottom: 14px; }
+            .letter-closing { margin-top: 28px; }
+            .letter-signature { margin-top: 6px; font-weight: 700; }
         `;
     }
     if (template === 'modern') {
         return base + `
             .letter-header { background: #1b1b18; color: white; padding: 24px; margin-bottom: 24px; }
-            .letter-header .letter-date { color: rgba(255,255,255,0.7); font-size: 12px; margin-bottom: 8px; }
-            .letter-body { padding: 0 24px; }
-            .letter-salutation { font-size: 14px; margin-bottom: 16px; }
+            .letter-header .letter-name { font-size: 24px; font-weight: 700; color: white; margin-bottom: 4px; }
+            .letter-header .letter-contact-line { font-size: 12px; color: rgba(255,255,255,0.85); }
+            .letter-header .letter-date { color: rgba(255,255,255,0.75); font-size: 12px; margin-top: 8px; }
+            .letter-body-wrapper { padding: 0 24px; }
+            .letter-salutation { font-size: 14px; font-weight: 600; margin-bottom: 16px; }
             .letter-body { font-size: 13px; line-height: 1.7; }
-            .letter-body p { margin-bottom: 12px; }
-            .letter-closing { margin-top: 24px; padding: 0 24px; }
-            .letter-signature { margin-top: 4px; font-weight: 500; }
+            .letter-body p { margin-bottom: 14px; }
+            .letter-closing { margin-top: 28px; padding: 0 24px; }
+            .letter-signature { margin-top: 6px; font-weight: 700; }
+        `;
+    }
+    if (template === 'philippine') {
+        return base + `
+            .letter-header { text-align: center; border-bottom: 2px solid #1b1b18; padding-bottom: 12px; margin-bottom: 20px; }
+            .letter-doc-title { font-size: 11px; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; color: #706f6c; margin-bottom: 4px; }
+            .letter-name { font-size: 22px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; }
+            .letter-contact-line { font-size: 12px; color: #706f6c; margin-top: 4px; }
+            .letter-date { color: #1b1b18; font-size: 12px; margin-bottom: 16px; }
+            .letter-recipient { font-size: 13px; line-height: 1.5; margin-bottom: 16px; }
+            .letter-subject { font-weight: 700; font-size: 13px; text-transform: uppercase; margin-bottom: 16px; text-decoration: underline; }
+            .letter-salutation { font-size: 14px; font-weight: 600; margin-bottom: 16px; }
+            .letter-body { font-size: 13px; line-height: 1.7; }
+            .letter-body p { margin-bottom: 14px; text-indent: 32px; text-align: justify; }
+            .letter-closing { margin-top: 32px; float: right; min-width: 200px; text-align: center; }
+            .letter-signature { border-top: 1px solid #1b1b18; margin-top: 40px; padding-top: 4px; font-weight: 700; font-size: 13px; }
         `;
     }
     return base + `
-        .letter-header { text-align: center; border-bottom: 2px solid #1b1b18; padding-bottom: 16px; margin-bottom: 24px; }
-        .letter-date { color: #706f6c; font-size: 12px; margin-bottom: 16px; text-align: right; }
+        .letter-header { margin-bottom: 24px; }
+        .letter-date { color: #706f6c; font-size: 12px; margin-bottom: 16px; }
         .letter-salutation { font-size: 14px; margin-bottom: 16px; }
         .letter-body { font-size: 13px; line-height: 1.7; }
-        .letter-body p { margin-bottom: 12px; }
+        .letter-body p { margin-bottom: 14px; }
         .letter-closing { margin-top: 24px; }
         .letter-signature { margin-top: 4px; font-weight: 500; }
     `;
@@ -273,34 +383,70 @@ function getScopedCoverLetterStyles(template: string): string {
         .cover-letter-paper-preview { font-family: 'Instrument Sans', Arial, sans-serif; color: #1b1b18; font-size: 13px; line-height: 1.6; }
     `;
 
-    if (template === 'clean') {
+    if (template === 'ats_classic') {
         return base + `
-            .cover-letter-paper-preview .letter-header { margin-bottom: 24px; }
-            .cover-letter-paper-preview .letter-date { color: #706f6c; font-size: 12px; margin-bottom: 16px; }
-            .cover-letter-paper-preview .letter-salutation { font-size: 14px; margin-bottom: 16px; color: #1b1b18; }
+            .cover-letter-paper-preview .letter-header { text-align: center; border-bottom: 2px solid #1b1b18; padding-bottom: 12px; margin-bottom: 20px; }
+            .cover-letter-paper-preview .letter-name { font-size: 24px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #1b1b18; margin-bottom: 6px; }
+            .cover-letter-paper-preview .letter-contact-line { font-size: 12px; color: #4a4a46; font-weight: 500; }
+            .cover-letter-paper-preview .letter-date { color: #4a4a46; font-size: 12px; margin-bottom: 16px; text-align: right; font-weight: 500; }
+            .cover-letter-paper-preview .letter-recipient { font-size: 13px; line-height: 1.5; margin-bottom: 20px; color: #1b1b18; }
+            .cover-letter-paper-preview .letter-salutation { font-size: 14px; font-weight: 600; margin-bottom: 16px; color: #1b1b18; }
             .cover-letter-paper-preview .letter-body { font-size: 13px; line-height: 1.7; color: #1b1b18; }
-            .cover-letter-paper-preview .letter-body p { margin-bottom: 12px; }
-            .cover-letter-paper-preview .letter-closing { margin-top: 24px; }
-            .cover-letter-paper-preview .letter-signature { margin-top: 4px; font-weight: 500; color: #1b1b18; }
+            .cover-letter-paper-preview .letter-body p { margin-bottom: 14px; text-align: justify; }
+            .cover-letter-paper-preview .letter-closing { margin-top: 28px; color: #1b1b18; }
+            .cover-letter-paper-preview .letter-signature { margin-top: 6px; font-weight: 700; font-size: 14px; color: #1b1b18; }
+        `;
+    }
+    if (template === 'ats_executive') {
+        return base + `
+            .cover-letter-paper-preview .letter-header { border-left: 4px solid #1b1b18; padding-left: 12px; margin-bottom: 20px; }
+            .cover-letter-paper-preview .letter-name { font-size: 24px; font-weight: 700; color: #1b1b18; margin-bottom: 4px; }
+            .cover-letter-paper-preview .letter-contact-line { font-size: 12px; color: #555450; font-weight: 500; }
+            .cover-letter-paper-preview .letter-date { color: #706f6c; font-size: 12px; margin-bottom: 16px; }
+            .cover-letter-paper-preview .letter-recipient { font-size: 13px; line-height: 1.5; margin-bottom: 20px; color: #1b1b18; }
+            .cover-letter-paper-preview .letter-salutation { font-size: 14px; font-weight: 600; margin-bottom: 16px; color: #1b1b18; }
+            .cover-letter-paper-preview .letter-body { font-size: 13px; line-height: 1.7; color: #1b1b18; }
+            .cover-letter-paper-preview .letter-body p { margin-bottom: 14px; }
+            .cover-letter-paper-preview .letter-closing { margin-top: 28px; color: #1b1b18; }
+            .cover-letter-paper-preview .letter-signature { margin-top: 6px; font-weight: 700; color: #1b1b18; }
         `;
     }
     if (template === 'modern') {
         return base + `
             .cover-letter-paper-preview .letter-header { background: #1b1b18; color: white; padding: 24px; margin: -32px -32px 24px -32px; border-radius: 6px 6px 0 0; }
-            .cover-letter-paper-preview .letter-header .letter-date { color: rgba(255,255,255,0.75); font-size: 12px; margin-bottom: 8px; }
-            .cover-letter-paper-preview .letter-salutation { font-size: 14px; margin-bottom: 16px; color: #1b1b18; }
+            .cover-letter-paper-preview .letter-header .letter-name { font-size: 24px; font-weight: 700; color: white; margin-bottom: 4px; }
+            .cover-letter-paper-preview .letter-header .letter-contact-line { font-size: 12px; color: rgba(255,255,255,0.85); }
+            .cover-letter-paper-preview .letter-header .letter-date { color: rgba(255,255,255,0.75); font-size: 12px; margin-top: 8px; }
+            .cover-letter-paper-preview .letter-body-wrapper { padding: 0; }
+            .cover-letter-paper-preview .letter-salutation { font-size: 14px; font-weight: 600; margin-bottom: 16px; color: #1b1b18; }
             .cover-letter-paper-preview .letter-body { font-size: 13px; line-height: 1.7; color: #1b1b18; }
-            .cover-letter-paper-preview .letter-body p { margin-bottom: 12px; }
-            .cover-letter-paper-preview .letter-closing { margin-top: 24px; }
-            .cover-letter-paper-preview .letter-signature { margin-top: 4px; font-weight: 500; color: #1b1b18; }
+            .cover-letter-paper-preview .letter-body p { margin-bottom: 14px; }
+            .cover-letter-paper-preview .letter-closing { margin-top: 28px; color: #1b1b18; }
+            .cover-letter-paper-preview .letter-signature { margin-top: 6px; font-weight: 700; color: #1b1b18; }
+        `;
+    }
+    if (template === 'philippine') {
+        return base + `
+            .cover-letter-paper-preview .letter-header { text-align: center; border-bottom: 2px solid #1b1b18; padding-bottom: 12px; margin-bottom: 20px; }
+            .cover-letter-paper-preview .letter-doc-title { font-size: 11px; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; color: #706f6c; margin-bottom: 4px; }
+            .cover-letter-paper-preview .letter-name { font-size: 22px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #1b1b18; }
+            .cover-letter-paper-preview .letter-contact-line { font-size: 12px; color: #706f6c; margin-top: 4px; }
+            .cover-letter-paper-preview .letter-date { color: #1b1b18; font-size: 12px; margin-bottom: 16px; }
+            .cover-letter-paper-preview .letter-recipient { font-size: 13px; line-height: 1.5; margin-bottom: 16px; color: #1b1b18; }
+            .cover-letter-paper-preview .letter-subject { font-weight: 700; font-size: 13px; text-transform: uppercase; margin-bottom: 16px; text-decoration: underline; color: #1b1b18; }
+            .cover-letter-paper-preview .letter-salutation { font-size: 14px; font-weight: 600; margin-bottom: 16px; color: #1b1b18; }
+            .cover-letter-paper-preview .letter-body { font-size: 13px; line-height: 1.7; color: #1b1b18; }
+            .cover-letter-paper-preview .letter-body p { margin-bottom: 14px; text-indent: 32px; text-align: justify; }
+            .cover-letter-paper-preview .letter-closing { margin-top: 32px; float: right; min-width: 200px; text-align: center; color: #1b1b18; }
+            .cover-letter-paper-preview .letter-signature { border-top: 1px solid #1b1b18; margin-top: 40px; padding-top: 4px; font-weight: 700; font-size: 13px; color: #1b1b18; }
         `;
     }
     return base + `
-        .cover-letter-paper-preview .letter-header { text-align: center; border-bottom: 2px solid #1b1b18; padding-bottom: 16px; margin-bottom: 24px; }
-        .cover-letter-paper-preview .letter-date { color: #706f6c; font-size: 12px; margin-bottom: 16px; text-align: right; }
+        .cover-letter-paper-preview .letter-header { margin-bottom: 24px; }
+        .cover-letter-paper-preview .letter-date { color: #706f6c; font-size: 12px; margin-bottom: 16px; }
         .cover-letter-paper-preview .letter-salutation { font-size: 14px; margin-bottom: 16px; color: #1b1b18; }
         .cover-letter-paper-preview .letter-body { font-size: 13px; line-height: 1.7; color: #1b1b18; }
-        .cover-letter-paper-preview .letter-body p { margin-bottom: 12px; }
+        .cover-letter-paper-preview .letter-body p { margin-bottom: 14px; }
         .cover-letter-paper-preview .letter-closing { margin-top: 24px; }
         .cover-letter-paper-preview .letter-signature { margin-top: 4px; font-weight: 500; color: #1b1b18; }
     `;
@@ -318,9 +464,23 @@ function PersonalInfoTab({ data, setData, errors, photoDataUrl, onPhotoDataUrlCh
     return (
         <div className="flex flex-col gap-6 rounded-xl border border-border bg-card p-4">
             <PhotoUploader
-                currentDataUrl={photoDataUrl}
+                currentDataUrl={photoDataUrl || getDirectImageUrl(data.photo_url) || null}
                 onDataUrlChange={onPhotoDataUrlChange}
             />
+
+            <div className="flex flex-col gap-2">
+                <Label htmlFor="photo_url">Photo URL (optional)</Label>
+                <Input
+                    id="photo_url"
+                    type="url"
+                    value={data.photo_url ?? ''}
+                    onChange={(e) => setData('photo_url', e.target.value)}
+                    placeholder="https://example.com/my-photo.jpg"
+                />
+                <p className="text-xs text-muted-foreground">
+                    Paste an online image URL or upload a local file above.
+                </p>
+            </div>
 
             <div className="flex flex-col gap-2">
                 <Label htmlFor="full_name">Full Name</Label>
@@ -457,6 +617,14 @@ function WorkExperienceTab({ data, setData, onAiPolish }: { data: ResumeProfile;
         setData('work_experience', experiences.filter((_, i) => i !== index));
     }
 
+    function moveExperience(index: number, direction: 'up' | 'down') {
+        const target = direction === 'up' ? index - 1 : index + 1;
+        if (target < 0 || target >= experiences.length) return;
+        const updated = [...experiences];
+        [updated[index], updated[target]] = [updated[target], updated[index]];
+        setData('work_experience', updated);
+    }
+
     return (
         <div className="flex flex-col gap-6">
             {experiences.map((exp, index) => (
@@ -514,7 +682,25 @@ function WorkExperienceTab({ data, setData, onAiPolish }: { data: ResumeProfile;
                             />
                         </div>
                     </div>
-                    <div className="mt-3 flex justify-end">
+                    <div className="mt-3 flex items-center justify-between">
+                        <div className="flex items-center gap-1">
+                            <button
+                                type="button"
+                                onClick={() => moveExperience(index, 'up')}
+                                disabled={index === 0}
+                                className="rounded-sm p-1 text-[#706f6c] hover:bg-[#f5f5f4] hover:text-[#1b1b18] dark:text-[#A1A09A] dark:hover:bg-[#1C1C1A] dark:hover:text-[#EDEDEC] transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                            >
+                                <ArrowUp className="size-4" />
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => moveExperience(index, 'down')}
+                                disabled={index === experiences.length - 1}
+                                className="rounded-sm p-1 text-[#706f6c] hover:bg-[#f5f5f4] hover:text-[#1b1b18] dark:text-[#A1A09A] dark:hover:bg-[#1C1C1A] dark:hover:text-[#EDEDEC] transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                            >
+                                <ArrowDown className="size-4" />
+                            </button>
+                        </div>
                         <Button variant="ghost" size="sm" onClick={() => removeExperience(index)}>
                             Remove
                         </Button>
@@ -546,6 +732,14 @@ function EducationTab({ data, setData }: { data: ResumeProfile; setData: (key: s
 
     function removeEducation(index: number) {
         setData('education', education.filter((_, i) => i !== index));
+    }
+
+    function moveEducation(index: number, direction: 'up' | 'down') {
+        const target = direction === 'up' ? index - 1 : index + 1;
+        if (target < 0 || target >= education.length) return;
+        const updated = [...education];
+        [updated[index], updated[target]] = [updated[target], updated[index]];
+        setData('education', updated);
     }
 
     return (
@@ -583,7 +777,25 @@ function EducationTab({ data, setData }: { data: ResumeProfile; setData: (key: s
                             />
                         </div>
                     </div>
-                    <div className="mt-3 flex justify-end">
+                    <div className="mt-3 flex items-center justify-between">
+                        <div className="flex items-center gap-1">
+                            <button
+                                type="button"
+                                onClick={() => moveEducation(index, 'up')}
+                                disabled={index === 0}
+                                className="rounded-sm p-1 text-[#706f6c] hover:bg-[#f5f5f4] hover:text-[#1b1b18] dark:text-[#A1A09A] dark:hover:bg-[#1C1C1A] dark:hover:text-[#EDEDEC] transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                            >
+                                <ArrowUp className="size-4" />
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => moveEducation(index, 'down')}
+                                disabled={index === education.length - 1}
+                                className="rounded-sm p-1 text-[#706f6c] hover:bg-[#f5f5f4] hover:text-[#1b1b18] dark:text-[#A1A09A] dark:hover:bg-[#1C1C1A] dark:hover:text-[#EDEDEC] transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                            >
+                                <ArrowDown className="size-4" />
+                            </button>
+                        </div>
                         <Button variant="ghost" size="sm" onClick={() => removeEducation(index)}>
                             Remove
                         </Button>
@@ -719,7 +931,7 @@ function ProjectsTab({ data, setData, onAiPolish }: { data: ResumeProfile; setDa
     function addProject() {
         setData('projects', [
             ...projects,
-            { title: '', description: '', url: '', technologies: '' },
+            { title: '', description: '', url: '', github_url: '', technologies: '' },
         ]);
     }
 
@@ -731,6 +943,14 @@ function ProjectsTab({ data, setData, onAiPolish }: { data: ResumeProfile; setDa
 
     function removeProject(index: number) {
         setData('projects', projects.filter((_, i) => i !== index));
+    }
+
+    function moveProject(index: number, direction: 'up' | 'down') {
+        const target = direction === 'up' ? index - 1 : index + 1;
+        if (target < 0 || target >= projects.length) return;
+        const updated = [...projects];
+        [updated[index], updated[target]] = [updated[target], updated[index]];
+        setData('projects', updated);
     }
 
     return (
@@ -769,27 +989,53 @@ function ProjectsTab({ data, setData, onAiPolish }: { data: ResumeProfile; setDa
                                 placeholder="Key features and your role in the project..."
                             />
                         </div>
+                        <div className="flex flex-col gap-2">
+                            <Label>Technologies Used</Label>
+                            <Input
+                                value={project.technologies}
+                                onChange={(e) => updateProject(index, 'technologies', e.target.value)}
+                                onFocus={() => { if (project.technologies === 'Laravel, React, PostgreSQL') updateProject(index, 'technologies', ''); }}
+                                placeholder="Laravel, React, PostgreSQL"
+                            />
+                        </div>
                         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                             <div className="flex flex-col gap-2">
-                                <Label>Technologies Used</Label>
-                                <Input
-                                    value={project.technologies}
-                                    onChange={(e) => updateProject(index, 'technologies', e.target.value)}
-                                    onFocus={() => { if (project.technologies === 'Laravel, React, PostgreSQL') updateProject(index, 'technologies', ''); }}
-                                    placeholder="Laravel, React, PostgreSQL"
-                                />
-                            </div>
-                            <div className="flex flex-col gap-2">
-                                <Label>Project URL (optional)</Label>
+                                <Label>Live Demo URL (optional)</Label>
                                 <Input
                                     value={project.url}
                                     onChange={(e) => updateProject(index, 'url', e.target.value)}
+                                    placeholder="https://myproject.com"
+                                />
+                            </div>
+                            <div className="flex flex-col gap-2">
+                                <Label>GitHub Repository URL (optional)</Label>
+                                <Input
+                                    value={project.github_url || ''}
+                                    onChange={(e) => updateProject(index, 'github_url', e.target.value)}
                                     placeholder="https://github.com/user/project"
                                 />
                             </div>
                         </div>
                     </div>
-                    <div className="mt-3 flex justify-end">
+                    <div className="mt-3 flex items-center justify-between">
+                        <div className="flex items-center gap-1">
+                            <button
+                                type="button"
+                                onClick={() => moveProject(index, 'up')}
+                                disabled={index === 0}
+                                className="rounded-sm p-1 text-[#706f6c] hover:bg-[#f5f5f4] hover:text-[#1b1b18] dark:text-[#A1A09A] dark:hover:bg-[#1C1C1A] dark:hover:text-[#EDEDEC] transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                            >
+                                <ArrowUp className="size-4" />
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => moveProject(index, 'down')}
+                                disabled={index === projects.length - 1}
+                                className="rounded-sm p-1 text-[#706f6c] hover:bg-[#f5f5f4] hover:text-[#1b1b18] dark:text-[#A1A09A] dark:hover:bg-[#1C1C1A] dark:hover:text-[#EDEDEC] transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                            >
+                                <ArrowDown className="size-4" />
+                            </button>
+                        </div>
                         <Button variant="ghost" size="sm" onClick={() => removeProject(index)}>
                             Remove
                         </Button>
@@ -803,15 +1049,37 @@ function ProjectsTab({ data, setData, onAiPolish }: { data: ResumeProfile; setDa
     );
 }
 
+function getDirectImageUrl(url: string | null): string | null {
+    if (!url || !url.trim()) return null;
+
+    const trimmed = url.trim();
+
+    // Check Google Drive file viewer URLs:
+    // e.g. https://drive.google.com/file/d/1dsfk6o2fdsfdsdfsi1lAUiIDvH/view?usp=sharing
+    const driveFileMatch = trimmed.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
+    if (driveFileMatch && driveFileMatch[1]) {
+        return `https://lh3.googleusercontent.com/d/${driveFileMatch[1]}`;
+    }
+
+    // Check Google Drive parameter URLs:
+    // e.g. https://drive.google.com/open?id=1dsfk6o2fdsfdsdfsi1lAUiIDvH or https://drive.google.com/uc?id=...
+    const driveParamMatch = trimmed.match(/drive\.google\.com\/.*[?&]id=([a-zA-Z0-9_-]+)/);
+    if (driveParamMatch && driveParamMatch[1]) {
+        return `https://lh3.googleusercontent.com/d/${driveParamMatch[1]}`;
+    }
+
+    return trimmed;
+}
+
 function PhotoUploader({ currentDataUrl, onDataUrlChange }: {
     currentDataUrl: string | null;
     onDataUrlChange: (url: string | null) => void;
 }) {
-    const [previewUrl, setPreviewUrl] = useState<string | null>(currentDataUrl);
+    const [previewUrl, setPreviewUrl] = useState<string | null>(getDirectImageUrl(currentDataUrl));
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
-        setPreviewUrl(currentDataUrl);
+        setPreviewUrl(getDirectImageUrl(currentDataUrl));
     }, [currentDataUrl]);
 
     function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -844,6 +1112,7 @@ function PhotoUploader({ currentDataUrl, onDataUrlChange }: {
                         <img
                             src={previewUrl}
                             alt="Profile preview"
+                            referrerPolicy="no-referrer"
                             className="h-16 w-16 rounded-full object-cover border border-[#e3e3e0] dark:border-[#3E3E3A]"
                         />
                         <Button type="button" variant="ghost" size="sm" onClick={handleClear}>
@@ -871,6 +1140,12 @@ function PhotoUploader({ currentDataUrl, onDataUrlChange }: {
         </div>
     );
 }
+
+const DEFAULT_COVER_LETTER = `I am writing to express my enthusiastic interest in the Software Developer position at Acme Corp. With a solid foundation in modern web development technologies including Laravel and React, I am confident in my ability to contribute effectively to your team.
+
+Throughout my experience, I have successfully built and maintained scalable web applications, optimized database queries, and collaborated with cross-functional teams to deliver high-quality software solutions. My background aligns closely with the qualifications you are seeking.
+
+Thank you for considering my application. I welcome the opportunity to discuss how my skills and experience can benefit Acme Corp.`;
 
 function ResumePreview({ data, template, photoDataUrl }: { data: ResumeProfile; template: string; photoDataUrl: string | null }) {
     const previewRef = useRef<HTMLDivElement>(null);
@@ -920,7 +1195,7 @@ function ResumePreview({ data, template, photoDataUrl }: { data: ResumeProfile; 
         setSaveDialogOpen(false);
     }
 
-    const photoSrc = photoDataUrl || data.photo_url || '';
+    const photoSrc = getDirectImageUrl(photoDataUrl || data.photo_url) || '';
     const hasPhoto = !!photoSrc;
 
     return (
@@ -931,10 +1206,184 @@ function ResumePreview({ data, template, photoDataUrl }: { data: ResumeProfile; 
             >
                 <style>{scopedStyles}</style>
 
+                {template === 'ats_classic' && (
+                    <>
+                        <div className="ats-header">
+                            {hasPhoto && <img src={photoSrc} alt="" className="photo" referrerPolicy="no-referrer" />}
+                            <div className="ats-name">{data.full_name || 'Your Name'}</div>
+                            <div className="ats-contact-line">
+                                {[
+                                    data.location,
+                                    data.phone,
+                                    data.email,
+                                    data.linkedin_url ? `LinkedIn: ${data.linkedin_url}` : null,
+                                    data.github_url ? `GitHub: ${data.github_url}` : null,
+                                    data.website_url ? `Web: ${data.website_url}` : null,
+                                ].filter(Boolean).join('  •  ')}
+                            </div>
+                        </div>
+
+                        {data.summary && (
+                            <>
+                                <div className="ats-section-title">Professional Summary</div>
+                                <p className="ats-desc">{data.summary}</p>
+                            </>
+                        )}
+
+                        {(data.work_experience?.length ?? 0) > 0 && (
+                            <>
+                                <div className="ats-section-title">Work Experience</div>
+                                {data.work_experience?.map((job, i) => (
+                                    <div key={i} className="ats-item">
+                                        <div className="ats-item-header">
+                                            <span className="ats-title">{job.position || 'Position'}</span>
+                                            <span className="ats-date">{job.duration}</span>
+                                        </div>
+                                        <div className="ats-company">{job.company}</div>
+                                        {job.description && (
+                                            <p className="ats-desc">{job.description}</p>
+                                        )}
+                                    </div>
+                                ))}
+                            </>
+                        )}
+
+                        {(data.education?.length ?? 0) > 0 && (
+                            <>
+                                <div className="ats-section-title">Education</div>
+                                {data.education?.map((edu, i) => (
+                                    <div key={i} className="ats-item">
+                                        <div className="ats-item-header">
+                                            <span className="ats-title">{edu.degree || 'Degree'}</span>
+                                            <span className="ats-date">{edu.year}</span>
+                                        </div>
+                                        <div className="ats-company">{edu.institution}</div>
+                                    </div>
+                                ))}
+                            </>
+                        )}
+
+                        {(data.skills?.length ?? 0) > 0 && (
+                            <>
+                                <div className="ats-section-title">Skills & Technologies</div>
+                                <div className="ats-desc">{data.skills?.join(', ')}</div>
+                            </>
+                        )}
+
+                        {(data.certifications?.length ?? 0) > 0 && (
+                            <>
+                                <div className="ats-section-title">Certifications</div>
+                                <div className="ats-desc">{data.certifications?.join(' | ')}</div>
+                            </>
+                        )}
+
+                        {(data.projects?.length ?? 0) > 0 && (
+                            <>
+                                <div className="ats-section-title">Projects</div>
+                                {data.projects?.map((project, i) => (
+                                    <div key={i} className="ats-item">
+                                        <div className="ats-item-header">
+                                            <span className="ats-title">{project.title}</span>
+                                            {project.technologies && <span className="ats-date">{project.technologies}</span>}
+                                        </div>
+                                        {project.description && <p className="ats-desc">{project.description}</p>}
+                                    </div>
+                                ))}
+                            </>
+                        )}
+                    </>
+                )}
+
+                {template === 'ats_executive' && (
+                    <>
+                        <div className="exec-header">
+                            {hasPhoto && <img src={photoSrc} alt="" className="photo" referrerPolicy="no-referrer" />}
+                            <div className="exec-name">{data.full_name || 'Your Name'}</div>
+                            <div className="exec-contact-line">
+                                {[
+                                    data.location,
+                                    data.phone,
+                                    data.email,
+                                    data.linkedin_url,
+                                    data.github_url,
+                                    data.website_url,
+                                ].filter(Boolean).join('  |  ')}
+                            </div>
+                        </div>
+
+                        {data.summary && (
+                            <>
+                                <div className="exec-section-title">Executive Summary</div>
+                                <p className="job-desc">{data.summary}</p>
+                            </>
+                        )}
+
+                        {(data.work_experience?.length ?? 0) > 0 && (
+                            <>
+                                <div className="exec-section-title">Professional Experience</div>
+                                {data.work_experience?.map((job, i) => (
+                                    <div key={i} className="job">
+                                        <div className="job-row">
+                                            <span className="job-title">{job.position || 'Position'}</span>
+                                            <span className="job-duration">{job.duration}</span>
+                                        </div>
+                                        <div className="job-company">{job.company}</div>
+                                        {job.description && (
+                                            <p className="job-desc">{job.description}</p>
+                                        )}
+                                    </div>
+                                ))}
+                            </>
+                        )}
+
+                        {(data.education?.length ?? 0) > 0 && (
+                            <>
+                                <div className="exec-section-title">Education</div>
+                                {data.education?.map((edu, i) => (
+                                    <div key={i} className="edu">
+                                        <div className="edu-row">
+                                            <span className="edu-degree">{edu.degree || 'Degree'}</span>
+                                            <span className="edu-year">{edu.year}</span>
+                                        </div>
+                                        <div className="edu-institution">{edu.institution}</div>
+                                    </div>
+                                ))}
+                            </>
+                        )}
+
+                        {(data.skills?.length ?? 0) > 0 && (
+                            <>
+                                <div className="exec-section-title">Core Competencies</div>
+                                <div className="skills">{data.skills?.join(', ')}</div>
+                            </>
+                        )}
+
+                        {(data.certifications?.length ?? 0) > 0 && (
+                            <>
+                                <div className="exec-section-title">Certifications</div>
+                                <div className="certs">{data.certifications?.join(' | ')}</div>
+                            </>
+                        )}
+
+                        {(data.projects?.length ?? 0) > 0 && (
+                            <>
+                                <div className="exec-section-title">Featured Projects</div>
+                                {data.projects?.map((project, i) => (
+                                    <div key={i} className="project">
+                                        <div className="project-title">{project.title}</div>
+                                        {project.technologies && <div className="project-tech">{project.technologies}</div>}
+                                        {project.description && <p className="project-desc">{project.description}</p>}
+                                    </div>
+                                ))}
+                            </>
+                        )}
+                    </>
+                )}
+
                 {template === 'clean' && (
                     <>
                         <div className="header">
-                            {hasPhoto && <img src={photoSrc} alt="" className="photo" />}
+                            {hasPhoto && <img src={photoSrc} alt="" className="photo" referrerPolicy="no-referrer" />}
                             <div className="name">{data.full_name || 'Your Name'}</div>
                         </div>
                         <div className="contact">
@@ -1013,6 +1462,14 @@ function ResumePreview({ data, template, photoDataUrl }: { data: ResumeProfile; 
                                     <div key={i} className="project">
                                         <div className="project-title">{project.title}</div>
                                         {project.technologies && <div className="project-tech">{project.technologies}</div>}
+                                        {(project.url || project.github_url) && (
+                                            <div className="project-tech" style={{ fontSize: '11px', opacity: 0.85 }}>
+                                                {[
+                                                    project.url ? `Demo: ${project.url}` : null,
+                                                    project.github_url ? `GitHub: ${project.github_url}` : null,
+                                                ].filter(Boolean).join('  •  ')}
+                                            </div>
+                                        )}
                                         {project.description && <p className="project-desc">{project.description}</p>}
                                     </div>
                                 ))}
@@ -1024,7 +1481,7 @@ function ResumePreview({ data, template, photoDataUrl }: { data: ResumeProfile; 
                 {template === 'modern' && (
                     <>
                         <div className="header">
-                            {hasPhoto && <img src={photoSrc} alt="" className="photo" />}
+                            {hasPhoto && <img src={photoSrc} alt="" className="photo" referrerPolicy="no-referrer" />}
                             <div className="name">{data.full_name || 'Your Name'}</div>
                             <div className="contact">
                                 {data.email && <span>{data.email}</span>}
@@ -1104,6 +1561,14 @@ function ResumePreview({ data, template, photoDataUrl }: { data: ResumeProfile; 
                                         <div key={i} className="project">
                                             <div className="project-title">{project.title}</div>
                                             {project.technologies && <div className="project-tech">{project.technologies}</div>}
+                                            {(project.url || project.github_url) && (
+                                                <div className="project-tech" style={{ fontSize: '11px', opacity: 0.85 }}>
+                                                    {[
+                                                        project.url ? `Demo: ${project.url}` : null,
+                                                        project.github_url ? `GitHub: ${project.github_url}` : null,
+                                                    ].filter(Boolean).join('  •  ')}
+                                                </div>
+                                            )}
                                             {project.description && <p className="project-desc">{project.description}</p>}
                                         </div>
                                     ))}
@@ -1116,11 +1581,11 @@ function ResumePreview({ data, template, photoDataUrl }: { data: ResumeProfile; 
                 {template === 'philippine' && (
                     <>
                         <div className="header">
-                            {hasPhoto && <img src={photoSrc} alt="" className="photo" />}
+                            {hasPhoto && <img src={photoSrc} alt="" className="photo" referrerPolicy="no-referrer" />}
                             <div className="name">{data.full_name || 'Your Name'}</div>
                             <div className="contact">
-                                {data.location && <span>{data.location}</span>}
-                                {data.phone && <span>Tel: {data.phone}</span>}
+                                {data.location && <span>Address: {data.location}</span>}
+                                {data.phone && <span>Contact No: {data.phone}</span>}
                                 {data.email && <span>Email: {data.email}</span>}
                             </div>
                             {data.linkedin_url && (
@@ -1130,20 +1595,21 @@ function ResumePreview({ data, template, photoDataUrl }: { data: ResumeProfile; 
                                 <div className="linkedin">GitHub: {data.github_url}</div>
                             )}
                             {data.website_url && (
-                                <div className="linkedin">Web: {data.website_url}</div>
+                                <div className="linkedin">Portfolio: {data.website_url}</div>
                             )}
                         </div>
 
                         {data.summary && (
                             <>
-                                <h2>Objective</h2>
+                                <h2>I. CAREER OBJECTIVE</h2>
+                                <div className="section-line" />
                                 <p>{data.summary}</p>
                             </>
                         )}
 
                         {(data.work_experience?.length ?? 0) > 0 && (
                             <>
-                                <h2>Work Experience</h2>
+                                <h2>II. WORK EXPERIENCE</h2>
                                 <div className="section-line" />
                                 {data.work_experience?.map((job, i) => (
                                     <div key={i} className="job">
@@ -1162,7 +1628,7 @@ function ResumePreview({ data, template, photoDataUrl }: { data: ResumeProfile; 
 
                         {(data.education?.length ?? 0) > 0 && (
                             <>
-                                <h2>Education</h2>
+                                <h2>III. EDUCATIONAL BACKGROUND</h2>
                                 <div className="section-line" />
                                 {data.education?.map((edu, i) => (
                                     <div key={i} className="edu">
@@ -1178,7 +1644,7 @@ function ResumePreview({ data, template, photoDataUrl }: { data: ResumeProfile; 
 
                         {(data.skills?.length ?? 0) > 0 && (
                             <>
-                                <h2>Skills</h2>
+                                <h2>IV. SKILLS & COMPETENCIES</h2>
                                 <div className="section-line" />
                                 <div className="skills-text">{data.skills?.join(' / ')}</div>
                             </>
@@ -1186,7 +1652,7 @@ function ResumePreview({ data, template, photoDataUrl }: { data: ResumeProfile; 
 
                         {(data.certifications?.length ?? 0) > 0 && (
                             <>
-                                <h2>Certifications</h2>
+                                <h2>V. CERTIFICATIONS & SEMINARS</h2>
                                 <div className="section-line" />
                                 <div className="certs">{data.certifications?.join(' | ')}</div>
                             </>
@@ -1194,26 +1660,48 @@ function ResumePreview({ data, template, photoDataUrl }: { data: ResumeProfile; 
 
                         {(data.projects?.length ?? 0) > 0 && (
                             <>
-                                <h2>Projects</h2>
+                                <h2>VI. KEY PROJECTS</h2>
                                 <div className="section-line" />
                                 {data.projects?.map((project, i) => (
                                     <div key={i} className="project">
                                         <div className="project-title">{project.title}</div>
                                         {project.technologies && <div className="project-tech">{project.technologies}</div>}
+                                        {(project.url || project.github_url) && (
+                                            <div className="project-tech" style={{ fontSize: '11px', opacity: 0.85 }}>
+                                                {[
+                                                    project.url ? `Demo: ${project.url}` : null,
+                                                    project.github_url ? `GitHub: ${project.github_url}` : null,
+                                                ].filter(Boolean).join('  •  ')}
+                                            </div>
+                                        )}
                                         {project.description && <p className="project-desc">{project.description}</p>}
                                     </div>
                                 ))}
                             </>
                         )}
+
+                        <div className="ph-certification-block" style={{ marginTop: '24px', paddingTop: '16px', borderTop: '1px solid #e3e3e0' }}>
+                            <p style={{ fontSize: '11px', fontStyle: 'italic', color: '#706f6c' }}>
+                                I hereby declare that the information contained herein is true and correct to the best of my knowledge and ability.
+                            </p>
+                            <div style={{ marginTop: '32px', display: 'flex', justifyContent: 'flex-end' }}>
+                                <div style={{ textAlign: 'center', minWidth: '200px' }}>
+                                    <div style={{ borderBottom: '1px solid #1b1b18', paddingBottom: '2px', fontWeight: 600, fontSize: '13px' }}>
+                                        {data.full_name || 'Your Name'}
+                                    </div>
+                                    <div style={{ fontSize: '11px', color: '#706f6c', marginTop: '2px' }}>Signature over Printed Name</div>
+                                </div>
+                            </div>
+                        </div>
                     </>
                 )}
             </div>
             <div className="flex justify-end gap-2 w-full max-w-[210mm]">
-                <Button variant="outline" size="sm" onClick={handleSaveVersion}>
+                <Button variant="outline" onClick={handleSaveVersion}>
                     <Save className="mr-2 size-4" />
                     Save Version
                 </Button>
-                <Button variant="outline" onClick={handleDownload}>
+                <Button variant="default" onClick={handleDownload}>
                     <Download className="mr-2 size-4" />
                     Download PDF
                 </Button>
@@ -1264,6 +1752,10 @@ function CoverLetterPreview({ content, template, fullName, targetCompany, target
     const printStyles = getCoverLetterPrintStyles(template);
     const today = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
 
+    const displayContent = content.trim() || DEFAULT_COVER_LETTER;
+    const displayCompany = targetCompany.trim() || 'Acme Corp';
+    const displayJobTitle = targetJobTitle.trim() || 'Software Developer';
+
     function handleDownload() {
         const printWindow = window.open('', '_blank');
         if (!printWindow) return;
@@ -1290,7 +1782,7 @@ function CoverLetterPreview({ content, template, fullName, targetCompany, target
     }
 
     function handleCopy() {
-        navigator.clipboard.writeText(content);
+        navigator.clipboard.writeText(displayContent);
     }
 
     return (
@@ -1305,18 +1797,16 @@ function CoverLetterPreview({ content, template, fullName, targetCompany, target
                     <div className="letter-date">{today}</div>
                 </div>
 
-                {targetCompany && targetJobTitle && (
-                    <div className="letter-recipient" style={{ marginBottom: '16px' }}>
-                        <div>Hiring Manager</div>
-                        <div>{targetCompany}</div>
-                        <div style={{ marginBottom: '16px' }}>Re: {targetJobTitle} Position</div>
-                    </div>
-                )}
+                <div className="letter-recipient" style={{ marginBottom: '16px' }}>
+                    <div>Hiring Manager</div>
+                    <div>{displayCompany}</div>
+                    <div style={{ marginBottom: '16px' }}>Re: {displayJobTitle} Position</div>
+                </div>
 
                 <div className="letter-salutation">Dear Hiring Manager,</div>
 
                 <div className="letter-body">
-                    {content.split('\n').map((paragraph, i) => (
+                    {displayContent.split('\n').map((paragraph, i) => (
                         paragraph.trim() ? <p key={i}>{paragraph}</p> : null
                     ))}
                 </div>
@@ -1327,11 +1817,11 @@ function CoverLetterPreview({ content, template, fullName, targetCompany, target
                 </div>
             </div>
             <div className="flex justify-end gap-2 w-full max-w-[210mm]">
-                <Button variant="outline" size="sm" onClick={handleCopy}>
+                <Button variant="outline" onClick={handleCopy}>
                     <FileText className="mr-2 size-4" />
                     Copy Text
                 </Button>
-                <Button variant="outline" onClick={handleDownload}>
+                <Button variant="default" onClick={handleDownload}>
                     <Download className="mr-2 size-4" />
                     Download PDF
                 </Button>
@@ -1349,8 +1839,8 @@ function CoverLetterBuilder({ profile, template, onTemplateChange, aiLimit, cove
     onCoverLetterContentChange: (content: string) => void;
     onCoverLetterMetaChange: (company: string, jobTitle: string) => void;
 }) {
-    const [jobTitle, setJobTitle] = useState('');
-    const [companyName, setCompanyName] = useState('');
+    const [jobTitle, setJobTitle] = useState('Software Developer');
+    const [companyName, setCompanyName] = useState('Acme Corp');
     const [jobDescription, setJobDescription] = useState('');
     const [generating, setGenerating] = useState(false);
     const [polishingPreset, setPolishingPreset] = useState<string | null>(null);
@@ -1506,6 +1996,7 @@ function CoverLetterBuilder({ profile, template, onTemplateChange, aiLimit, cove
                         id="target_job_title"
                         value={jobTitle}
                         onChange={(e) => setJobTitle(e.target.value)}
+                        onFocus={() => { if (jobTitle === 'Software Developer') setJobTitle(''); }}
                         placeholder="e.g. Senior Software Engineer"
                     />
                 </div>
@@ -1515,6 +2006,7 @@ function CoverLetterBuilder({ profile, template, onTemplateChange, aiLimit, cove
                         id="target_company"
                         value={companyName}
                         onChange={(e) => setCompanyName(e.target.value)}
+                        onFocus={() => { if (companyName === 'Acme Corp') setCompanyName(''); }}
                         placeholder="e.g. TechCorp"
                     />
                 </div>
@@ -1637,6 +2129,7 @@ function CoverLetterBuilder({ profile, template, onTemplateChange, aiLimit, cove
                     id="cover_letter_content"
                     value={coverLetterContent}
                     onChange={(e) => onCoverLetterContentChange(e.target.value)}
+                    onFocus={() => { if (coverLetterContent === DEFAULT_COVER_LETTER) onCoverLetterContentChange(''); }}
                     rows={18}
                     className="w-full flex-1 rounded-md border border-input bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring font-mono leading-relaxed resize-none"
                     placeholder="Write your cover letter here, or use AI Generate to create one from your resume profile and job description..."
@@ -1705,9 +2198,9 @@ export default function DocumentsIndex({ profile, aiLimit }: DocumentsPageProps)
     const [photoDataUrl, setPhotoDataUrl] = useState<string | null>(null);
     const [aiPolishing, setAiPolishing] = useState(false);
     const [aiError, setAiError] = useState<string | null>(null);
-    const [coverLetterContent, setCoverLetterContent] = useState('');
-    const [coverLetterCompany, setCoverLetterCompany] = useState('');
-    const [coverLetterJobTitle, setCoverLetterJobTitle] = useState('');
+    const [coverLetterContent, setCoverLetterContent] = useState(DEFAULT_COVER_LETTER);
+    const [coverLetterCompany, setCoverLetterCompany] = useState('Acme Corp');
+    const [coverLetterJobTitle, setCoverLetterJobTitle] = useState('Software Developer');
 
     const isNew = !profile || !profile.id;
 
@@ -1991,33 +2484,13 @@ export default function DocumentsIndex({ profile, aiLimit }: DocumentsPageProps)
                                     </SelectContent>
                                 </Select>
                             </div>
-                            {coverLetterContent.trim() ? (
-                                <CoverLetterPreview
-                                    content={coverLetterContent}
-                                    template={template}
-                                    fullName={data.full_name}
-                                    targetCompany={coverLetterCompany}
-                                    targetJobTitle={coverLetterJobTitle}
-                                />
-                            ) : (
-                                <div className="flex flex-col items-center justify-center py-12 text-center">
-                                    <BookText className="h-12 w-12 text-muted-foreground mb-4" />
-                                    <h2 className="text-lg font-medium text-foreground mb-2">
-                                        No Cover Letter Yet
-                                    </h2>
-                                    <p className="text-sm text-muted-foreground max-w-md">
-                                        Switch to the Cover Letter Builder tab to write or generate a cover letter. It will appear here with the same template styling as your resume.
-                                    </p>
-                                    <Button
-                                        variant="outline"
-                                        className="mt-4"
-                                        onClick={() => setActiveView('cover-letter-edit')}
-                                    >
-                                        <FilePenLine className="mr-2 size-4" />
-                                        Go to Cover Letter Builder
-                                    </Button>
-                                </div>
-                            )}
+                            <CoverLetterPreview
+                                content={coverLetterContent}
+                                template={template}
+                                fullName={data.full_name}
+                                targetCompany={coverLetterCompany}
+                                targetJobTitle={coverLetterJobTitle}
+                            />
                         </div>
                     )}
                 </div>
