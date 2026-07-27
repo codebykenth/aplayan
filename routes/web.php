@@ -7,6 +7,7 @@ use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\SocialiteController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\FollowUpEmailController;
+use App\Http\Controllers\GoalController;
 use App\Http\Controllers\InterviewPrepController;
 use App\Http\Controllers\JobApplicationAiController;
 use App\Http\Controllers\JobApplicationController;
@@ -62,6 +63,9 @@ Route::middleware('auth')->group(function () {
 
         return back()->with('status', 'Verification link sent!');
     })->middleware('throttle:6,1')->name('verification.send');
+
+    Route::get('goals', [GoalController::class, 'index'])->name('goals.index');
+    Route::patch('goals', [GoalController::class, 'update'])->name('goals.update');
 
     Route::get('job-applications', [JobApplicationController::class, 'index'])->name('job-applications.index');
     Route::get('job-applications/offers', OfferComparisonController::class)->name('job-applications.offers');
