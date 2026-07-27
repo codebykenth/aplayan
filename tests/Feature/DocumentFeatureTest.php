@@ -66,9 +66,9 @@ it('stores a new profile for the authenticated user', function () {
         'certifications' => ['AWS Solutions Architect'],
     ];
 
-    $response = $this->actingAs($this->user)->putJson(route('documents.profile.update'), $data);
+    $response = $this->actingAs($this->user)->put(route('documents.profile.update'), $data);
 
-    $response->assertSuccessful();
+    $response->assertRedirect(route('documents.index'));
     $this->assertDatabaseHas('resume_profiles', [
         'user_id' => $this->user->id,
         'full_name' => 'Juan Dela Cruz',
@@ -90,9 +90,9 @@ it('updates an existing profile for the authenticated user', function () {
         'certifications' => [],
     ];
 
-    $response = $this->actingAs($this->user)->putJson(route('documents.profile.update'), $data);
+    $response = $this->actingAs($this->user)->put(route('documents.profile.update'), $data);
 
-    $response->assertSuccessful();
+    $response->assertRedirect(route('documents.index'));
     $this->assertDatabaseHas('resume_profiles', [
         'user_id' => $this->user->id,
         'full_name' => 'Updated Name',

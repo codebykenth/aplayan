@@ -18,6 +18,7 @@ class UpdateResumeProfileRequest extends FormRequest
             'email' => ['required', 'email', 'max:255'],
             'phone' => ['required', 'string', 'max:50'],
             'location' => ['required', 'string', 'max:255'],
+            'photo_url' => ['nullable', 'url', 'max:500'],
             'linkedin_url' => ['nullable', 'url', 'max:500'],
             'summary' => ['nullable', 'string', 'max:5000'],
             'work_experience' => ['sometimes', 'array'],

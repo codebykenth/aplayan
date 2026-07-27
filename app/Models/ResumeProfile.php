@@ -15,6 +15,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property string $email
  * @property string $phone
  * @property string $location
+ * @property string|null $photo_url
  * @property string|null $linkedin_url
  * @property string|null $summary
  * @property array $work_experience
@@ -35,6 +36,7 @@ class ResumeProfile extends Model
         'email',
         'phone',
         'location',
+        'photo_url',
         'linkedin_url',
         'summary',
         'work_experience',

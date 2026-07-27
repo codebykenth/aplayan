@@ -147,7 +147,7 @@ export default function Dashboard({
                                     No applications yet
                                 </div>
                             ) : (
-                                <ChartContainer config={pieConfig} className="h-[300px] w-full">
+                                <ChartContainer config={pieConfig} className="h-75 w-full">
                                     <PieChart>
                                         <ChartTooltip
                                             content={
@@ -189,7 +189,7 @@ export default function Dashboard({
                                     No data yet
                                 </div>
                             ) : (
-                                <ChartContainer config={barConfig} className="h-[300px] w-full">
+                                <ChartContainer config={barConfig} className="h-75 w-full">
                                     <BarChart data={trend} margin={{ left: 0, right: 0 }}>
                                         <CartesianGrid vertical={false} strokeDasharray="3 3" stroke="hsl(var(--border))" />
                                         <XAxis

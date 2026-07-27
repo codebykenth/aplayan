@@ -213,7 +213,7 @@ export default function Analytics({
                                 </div>
                             ) : (
                                 <>
-                                    <ChartContainer config={funnelConfig} className="h-[300px] w-full">
+                                    <ChartContainer config={funnelConfig} className="h-75 w-full">
                                         <BarChart
                                             data={funnel.map((item, index) => ({
                                                 ...item,
@@ -252,7 +252,7 @@ export default function Analytics({
                                                             return (
                                                                 <>
                                                                     <div
-                                                                        className="h-2.5 w-2.5 shrink-0 rounded-[2px]"
+                                                                        className="h-2.5 w-2.5 shrink-0 rounded-xs"
                                                                         style={{ backgroundColor: p.fill }}
                                                                     />
                                                                     <div className="flex flex-1 justify-between leading-none items-center gap-4">
@@ -311,7 +311,7 @@ export default function Analytics({
                                     No data yet
                                 </div>
                             ) : (
-                                <ChartContainer config={weeklyConfig} className="h-[300px] w-full">
+                                <ChartContainer config={weeklyConfig} className="h-75 w-full">
                                     <BarChart data={weekly_volume} margin={{ left: 0, right: 0 }}>
                                         <CartesianGrid
                                             vertical={false}
@@ -362,7 +362,7 @@ export default function Analytics({
                                     No data yet
                                 </div>
                             ) : (
-                                <ChartContainer config={statusOverTimeConfig} className="h-[300px] w-full">
+                                <ChartContainer config={statusOverTimeConfig} className="h-75 w-full">
                                     <AreaChart data={status_over_time} margin={{ left: 0, right: 0 }}>
                                         <CartesianGrid
                                             strokeDasharray="3 3"
@@ -418,7 +418,7 @@ export default function Analytics({
                                     No salary data yet
                                 </div>
                             ) : (
-                                <ChartContainer config={salaryBandsConfig} className="h-[300px] w-full">
+                                <ChartContainer config={salaryBandsConfig} className="h-75 w-full">
                                     <BarChart data={salary_bands} margin={{ left: 0, right: 0 }}>
                                         <CartesianGrid
                                             vertical={false}
@@ -470,7 +470,7 @@ export default function Analytics({
                                 No response data yet
                             </div>
                         ) : (
-                            <ChartContainer config={responseConfig} className="h-[350px] w-full">
+                            <ChartContainer config={responseConfig} className="h-87.5 w-full">
                                 <BarChart
                                     data={time_to_response.slice(0, 15)}
                                     layout="vertical"

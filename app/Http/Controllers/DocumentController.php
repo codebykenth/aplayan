@@ -8,6 +8,7 @@ use App\Services\GeminiService;
 use App\Services\ResumeProfileService;
 use Illuminate\Http\Client\RequestException;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -28,14 +29,14 @@ class DocumentController extends Controller
         ]);
     }
 
-    public function updateProfile(UpdateResumeProfileRequest $request): JsonResponse
+    public function updateProfile(UpdateResumeProfileRequest $request): RedirectResponse
     {
-        $profile = $this->profileService->updateProfile(
+        $this->profileService->updateProfile(
             auth()->user(),
             $request->validated(),
         );
 
-        return response()->json($profile);
+        return to_route('documents.index')->with('success', 'Resume profile saved successfully.');
     }
 
     public function coverLetter(GenerateCoverLetterRequest $request): JsonResponse
