@@ -44,12 +44,12 @@ class JobApplicationService
         $jobApplication->delete();
     }
 
-    public function updateStatusForUser(JobApplication $jobApplication, JobApplicationStatus $status): JobApplication
+    public function updateStatusForUser(JobApplication $jobApplication, JobApplicationStatus $status, ?string $interviewDate = null): JobApplication
     {
         $data = ['status' => $status->value];
 
-        if ($status === JobApplicationStatus::Interviewing && $jobApplication->interview_date === null) {
-            $data['interview_date'] = now();
+        if ($status === JobApplicationStatus::Interviewing && $interviewDate !== null) {
+            $data['interview_date'] = $interviewDate;
         }
 
         $jobApplication->update($data);

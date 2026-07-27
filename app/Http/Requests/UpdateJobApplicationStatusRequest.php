@@ -17,6 +17,7 @@ class UpdateJobApplicationStatusRequest extends FormRequest
     {
         return [
             'status' => ['required', new Enum(JobApplicationStatus::class)],
+            'interview_date' => ['nullable', 'date'],
         ];
     }
 }

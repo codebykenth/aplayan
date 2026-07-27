@@ -78,7 +78,11 @@ class JobApplicationController extends Controller
     {
         $this->authorize('update', $jobApplication);
 
-        $this->service->updateStatusForUser($jobApplication, JobApplicationStatus::from($request->validated('status')));
+        $this->service->updateStatusForUser(
+            $jobApplication,
+            JobApplicationStatus::from($request->validated('status')),
+            $request->validated('interview_date'),
+        );
 
         return to_route('job-applications.index');
     }

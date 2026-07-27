@@ -92,6 +92,7 @@ export default function ApplicationDetailModal({
     const [prepError, setPrepError] = useState<string | null>(null);
     const [notesSaving, setNotesSaving] = useState(false);
     const [notesError, setNotesError] = useState<string | null>(null);
+    const [interviewDate, setInterviewDate] = useState<string>('');
     const [localApplication, setLocalApplication] = useState<JobApplication | null>(null);
     const [templateDialogOpen, setTemplateDialogOpen] = useState(false);
 
@@ -172,34 +173,40 @@ return;
             }
 
             const result = await response.json();
-            setLocalApplication(result.data);
+            setLocalApplication((prev) => {
+                if (!prev) return prev;
+                return { ...prev, last_contacted_at: result.data.last_contacted_at };
+            });
         } catch (error) {
-            setFollowUpError(
-                error instanceof Error ? error.message : 'An unexpected error occurred',
-            );
         } finally {
             setContacting(false);
         }
     }, [localApplication, application]);
 
-    const handleStatusChange = useCallback(
+const handleStatusChange = useCallback(
         (newStatus: string | null) => {
             if (!application || !newStatus || newStatus === application.status) {
-return;
-}
+                return;
+            }
 
             setUpdating(true);
 
+            const data: { status: string; interview_date?: string } = { status: newStatus };
+
+            if (newStatus === 'interviewing' && interviewDate) {
+                data.interview_date = interviewDate;
+            }
+
             router.patch(
                 updateStatus.url(application.id),
-                { status: newStatus },
+                data,
                 {
                     preserveState: true,
                     onFinish: () => setUpdating(false),
                 },
             );
         },
-        [application],
+        [application, interviewDate],
     );
 
     const handleAnalyzeMatch = useCallback(async () => {
@@ -685,6 +692,20 @@ return;
                         </Select>
                     </div>
 
+                    {app.status === 'interviewing' && (
+                        <div className="flex flex-col gap-3 border-t border-border pt-4">
+                            <span className="text-xs text-muted-foreground">
+                                Interview Date
+                            </span>
+                            <Input
+                                type="date"
+                                value={interviewDate || (app.interview_date ? app.interview_date.split('T')[0] : '')}
+                                onChange={(e) => setInterviewDate(e.target.value)}
+                                className="w-full"
+                            />
+                        </div>
+                    )}
+
                     <div className="flex flex-col gap-3 border-t border-border pt-4">
                         <div className="flex items-center justify-between">
                             <span className="text-xs text-muted-foreground">
@@ -721,55 +742,57 @@ return;
                         )}
                     </div>
 
-                    <div className="flex flex-col gap-3 border-t border-border pt-4">
-                        <div className="flex items-center justify-between">
-                            <span className="text-xs text-muted-foreground">
-                                Follow-Up Draft
-                            </span>
-                            <Button
-                                onClick={handleFetchFollowUpDraft}
-                                disabled={followUpLoading}
-                                variant="outline"
-                                size="sm"
-                            >
-                                {followUpLoading ? (
-                                    <>
-                                        <LoaderIcon className="size-3 animate-spin" />
-                                        Generating...
-                                    </>
-                                ) : (
-                                    <>
-                                        <MailIcon className="size-3" />
-                                        Generate Draft
-                                    </>
-                                )}
-                            </Button>
-                        </div>
-                        {followUpError && (
-                            <p className="text-xs text-destructive">{followUpError}</p>
-                        )}
-                        {followUpDraft && (
-                            <div className="flex flex-col gap-1">
-                                <textarea
-                                    value={followUpDraft}
-                                    readOnly
-                                    rows={6}
-                                    className="w-full resize-none rounded-lg border border-input bg-transparent p-2 text-sm outline-none"
-                                />
-                                <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    onClick={() => {
-                                        navigator.clipboard.writeText(followUpDraft);
-                                    }}
-                                    className="self-end"
-                                >
-                                    <CopyIcon className="size-3" />
-                                    Copy to Clipboard
-                                </Button>
-                            </div>
-                        )}
-                    </div>
+{app.status === 'interviewing' && (
+                     <div className="flex flex-col gap-3 border-t border-border pt-4">
+                         <div className="flex items-center justify-between">
+                             <span className="text-xs text-muted-foreground">
+                                 Follow-Up Draft
+                             </span>
+                             <Button
+                                 onClick={handleFetchFollowUpDraft}
+                                 disabled={followUpLoading}
+                                 variant="outline"
+                                 size="sm"
+                             >
+                                 {followUpLoading ? (
+                                     <>
+                                         <LoaderIcon className="size-3 animate-spin" />
+                                         Generating...
+                                     </>
+                                 ) : (
+                                     <>
+                                         <MailIcon className="size-3" />
+                                         Generate Draft
+                                     </>
+                                 )}
+                             </Button>
+                         </div>
+                         {followUpError && (
+                             <p className="text-xs text-destructive">{followUpError}</p>
+                         )}
+                         {followUpDraft && (
+                             <div className="flex flex-col gap-1">
+                                 <textarea
+                                     value={followUpDraft}
+                                     readOnly
+                                     rows={6}
+                                     className="w-full resize-none rounded-lg border border-input bg-transparent p-2 text-sm outline-none"
+                                 />
+                                 <Button
+                                     variant="ghost"
+                                     size="sm"
+                                     onClick={() => {
+                                         navigator.clipboard.writeText(followUpDraft);
+                                     }}
+                                     className="self-end"
+                                 >
+                                     <CopyIcon className="size-3" />
+                                     Copy to Clipboard
+                                 </Button>
+                             </div>
+                         )}
+                     </div>
+                 )}
 
                       {app.status === 'interviewing' && (
                       <div className="flex flex-col gap-3 border-t border-border pt-4">
