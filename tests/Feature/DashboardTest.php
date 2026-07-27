@@ -23,7 +23,7 @@ it('renders the dashboard page for authenticated users', function () {
         ->get(route('dashboard'))
         ->assertInertia(fn ($page) => $page
             ->component('dashboard')
-            ->hasAll(['total', 'status_counts', 'avg_match_score', 'added_this_week', 'added_this_month', 'trend'])
+            ->hasAll(['total', 'status_counts', 'avg_match_score', 'added_this_week', 'added_this_month', 'trend', 'recent_activities'])
         );
 });
 
@@ -181,5 +181,111 @@ it('scopes data to the authenticated user when another user has applications', f
         ->get(route('dashboard'))
         ->assertInertia(fn ($page) => $page
             ->where('total', 0)
+        );
+});
+
+it('passes recent_activities as an array', function () {
+    $application = JobApplication::factory()->create([
+        'user_id' => $this->user->id,
+    ]);
+
+    $application->activities()->create([
+        'type' => 'note',
+        'description' => 'Test note',
+    ]);
+
+    $this->actingAs($this->user)
+        ->get(route('dashboard'))
+        ->assertInertia(fn ($page) => $page
+            ->has('recent_activities', 1)
+            ->where('recent_activities.0.type', 'note')
+            ->where('recent_activities.0.description', 'Test note')
+            ->where('recent_activities.0.company_name', $application->company_name)
+            ->where('recent_activities.0.job_title', $application->job_title)
+            ->where('recent_activities.0.job_application_id', $application->id)
+        );
+});
+
+it('limits recent_activities to 10 items', function () {
+    $application = JobApplication::factory()->create([
+        'user_id' => $this->user->id,
+    ]);
+
+    for ($i = 0; $i < 15; $i++) {
+        $application->activities()->create([
+            'type' => 'note',
+            'description' => "Activity $i",
+        ]);
+    }
+
+    $this->actingAs($this->user)
+        ->get(route('dashboard'))
+        ->assertInertia(fn ($page) => $page
+            ->has('recent_activities', 10)
+        );
+});
+
+it('scopes recent_activities to the authenticated user', function () {
+    $myApplication = JobApplication::factory()->create([
+        'user_id' => $this->user->id,
+    ]);
+
+    $otherApplication = JobApplication::factory()->create([
+        'user_id' => $this->otherUser->id,
+    ]);
+
+    $myApplication->activities()->create([
+        'type' => 'note',
+        'description' => 'My activity',
+    ]);
+
+    $otherApplication->activities()->create([
+        'type' => 'note',
+        'description' => 'Other user activity',
+    ]);
+
+    $this->actingAs($this->user)
+        ->get(route('dashboard'))
+        ->assertInertia(fn ($page) => $page
+            ->has('recent_activities', 1)
+            ->where('recent_activities.0.description', 'My activity')
+        );
+});
+
+it('orders recent_activities by most recent first', function () {
+    $application = JobApplication::factory()->create([
+        'user_id' => $this->user->id,
+    ]);
+
+    $old = $application->activities()->create([
+        'type' => 'note',
+        'description' => 'Old activity',
+    ]);
+
+    $old->forceFill(['created_at' => now()->subDays(2)])->save();
+
+    $new = $application->activities()->create([
+        'type' => 'status_update',
+        'description' => 'New activity',
+    ]);
+
+    $this->actingAs($this->user)
+        ->get(route('dashboard'))
+        ->assertInertia(fn ($page) => $page
+            ->has('recent_activities', 2)
+            ->where('recent_activities.0.description', 'New activity')
+            ->where('recent_activities.1.description', 'Old activity')
+        );
+});
+
+it('returns empty recent_activities when user has no activities', function () {
+    JobApplication::factory()->create([
+        'user_id' => $this->user->id,
+    ]);
+
+    $this->actingAs($this->user)
+        ->get(route('dashboard'))
+        ->assertInertia(fn ($page) => $page
+            ->where('recent_activities', [])
         );
 });
