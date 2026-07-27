@@ -20,78 +20,75 @@ Aplayan is a free-to-maintain, privacy-first, web-based Job Application Tracker 
 8. As a job seeker, I want to view the AI Match Analysis result (Match Percentage, Strengths, and Qualification Gaps) saved directly on the job application, so that I can review AI insights anytime without re-running the analysis.
 9. As a job seeker in the Philippines, I want to trigger a Salary Reality Check for a job application, so that I can receive a realistic salary estimate range in Philippine Peso (₱) based on job location, role tier, and PH market context.
 10. As a job seeker, I want the Salary Reality Check results saved to the application record, so that I don't incur additional AI API token calls when revisiting the application.
-11. As a job seeker, I want to view a Dashboard with total application count, status breakdown metrics, average match score, and applications added this week and this month, so that I can assess my weekly job hunting momentum.
-12. As a job seeker, I want to view visual charts on my Dashboard representing my status breakdown and application trends, so that I can quickly spot bottlenecks in my interview pipeline.
-13. As a job seeker, I want to update or delete job application details, so that my application tracker remains accurate over time.
-14. As a job seeker, I want to filter or search my job applications by company name or position title, so that I can locate specific applications instantly.
+11. As a job seeker, I want to view a Smart Action Feed at the top of my Dashboard with 6 priority-ranked action items (stale follow-ups, upcoming interviews, high-match wishlist items, missing AI evaluations, salary negotiation opportunities, rejection momentum checks), so that I know what to work on today without recurring AI costs.
+12. As a job seeker, I want a dedicated Analytics page (`/analytics`) with 6 deep-dive charts (Application Funnel, 12-Week Application Volume, Status Distribution Over Time, Salary Insights, Salary Band Distribution, Time-to-Response), so that I can analyze pipeline bottlenecks and market positioning.
+13. As a job seeker, I want a Weekly Goals page (`/goals`) to set manual application targets (e.g. 10/week), track progress bars, build weekly streaks, and view 4-week math benchmarks, so that I stay motivated.
+14. As a job seeker, I want to save reusable application templates and quick-apply presets (`/templates`), so that I can create new applications with minimal effort.
+15. As a job seeker, I want an Interview Prep and Follow-up Email Generator, so that I can generate tailored preparation notes and professional follow-up email drafts.
+16. As a job seeker, I want to export my application data to CSV and import CSV data (`/job-applications/export` & `/import`), so that I maintain data ownership and backup options.
+17. As a job seeker, I want an Offer Comparison Matrix (`/job-applications/offers`), so that I can evaluate multiple job offers side-by-side.
+18. As a job seeker in the Philippines, I want a Philippine Statutory Tax & Take-Home Pay Calculator (`PhilippineTaxCalculatorService`), so that I can estimate net monthly pay under TRAIN Law tax brackets, SSS, PhilHealth, and Pag-IBIG.
+19. As a job seeker, I want a Zero-Storage Dynamic Resume & Cover Letter Builder (`/documents`), so that I can store structured experience data and export ATS-friendly PDFs in 3 visual templates without uploading files to cloud storage.
+20. As a job seeker, I want a Contacts Management module (`/contacts`), so that I can store recruiter and hiring manager records and link them many-to-many to specific job applications.
+21. As a job seeker, I want a read-only Calendar view (`/calendar`), so that I can inspect interview dates, application milestones, and follow-up deadlines on Month and Week schedules.
 
 ## Implementation Decisions
 
 ### Modules & Domain Architecture
-- **Authentication Module**: Utilizing Laravel Breeze with Inertia React for user authentication and session management. Enhanced with Google OAuth social login via Laravel Socialite, Email Verification for standard email registrations, and Forgot Password recovery flows.
-- **Service, Request, Policy & Resource Architecture**: Enforcing a strict OOP Domain Service Layer (`app/Services/`), Form Request validation (`app/Http/Requests/`), Authorization Policies (`app/Policies/`), and Eloquent API Resources (`app/Http/Resources/`). Controllers remain thin HTTP entry points.
-  - `JobApplicationPolicy`: Enforces resource authorization (`$user->id === $jobApplication->user_id`), raising HTTP 403 Forbidden on illegal access.
-  - `JobApplicationResource`: Explicitly transforms model attributes into structured JSON/Inertia prop shapes for frontend React components.
-  - `JobApplicationService`: Encapsulates CRUD operations, user-scoped querying (`$user->jobApplications()`), and status updates.
-  - `GeminiService`: Handles Google Gemini API (`gemini-2.5-flash`) prompt generation, HTTP submission, structured JSON parsing, and error fallbacks.
-  - `DashboardMetricsService`: Computes statistical aggregations and 30-day application trend metrics.
-- **UI Components**: shadcn/ui dialogs, select inputs, cards, and recharts-powered chart components wrapped in responsive Tailwind CSS v4 layouts.
+- **Authentication Module**: Utilizing Laravel Breeze with Inertia React for user authentication. Enhanced with Google OAuth social login via Laravel Socialite, Email Verification, and Forgot Password recovery.
+- **Service Layer Architecture (`app/Services/`)**:
+  - `JobApplicationService`: Application CRUD, user-scoped querying, and status updates.
+  - `GeminiService`: Google Gemini API prompt formatting, HTTP communication, JSON parsing, and fallbacks.
+  - `ActionFeedService`: Computes 6 priority-ranked action items for the Dashboard feed server-side with 0 AI cost.
+  - `AnalyticsService`: Computes 6 deep-dive charts (Funnel, 12-Week Volume, Status Over Time, Salary Insights, Salary Bands, Time-to-Response) via SQL aggregations.
+  - `GoalService`: Computes weekly application progress, streak counters, and 4-week moving average benchmarks.
+  - `ApplicationTemplateService`: Manages preset templates and quick-apply pre-filling.
+  - `PhilippineTaxCalculatorService`: Computes Philippine net take-home pay based on 2026 TRAIN Law tax brackets and statutory contributions (SSS, PhilHealth, Pag-IBIG).
+  - `JobApplicationImportService`: Handles CSV parsing, validation, and batch application creation.
+  - `ContactService`: Manages recruiter/manager records and many-to-many application linking.
+  - `ResumeProfileService`: Manages structured resume experience JSON data for ATS PDF generation.
+  - `CalendarService`: Normalizes application dates and follow-up deadlines into calendar event payloads.
+- **UI Navigation System**: Left collapsible Sidebar (`app-layout.tsx`) hosting 7 core tabs (`Dashboard`, `Applications`, `Offer Comparison`, `Templates`, `Analytics`, `Goals`, `Settings`).
 
 ### Schema & Database Decisions
-- `users`: Standard Laravel user model (id, name, email, password, timestamps).
-- `job_applications`:
-  - `user_id` (foreign key to `users`, indexed)
-  - `company_name` (string)
-  - `job_title` (string)
-  - `job_url` (string, nullable)
-  - `job_description` (text, nullable)
-  - `location` (string, e.g., "Metro Manila", "Cebu", "Remote PH", "Foreign Remote")
-  - `status` (enum: 'wishlist', 'applied', 'interviewing', 'offer', 'rejected', indexed)
-  - `date_applied` (date, nullable)
-  - `expected_salary` (unsigned integer in ₱, nullable)
-  - `offered_salary` (unsigned integer in ₱, nullable)
-  - `notes` (text, nullable)
-  - `ai_match_percentage` (unsigned tinyint 0–100, nullable)
-  - `ai_strengths` (json array of strings, nullable)
-  - `ai_gaps` (json array of strings, nullable)
-  - `ai_salary_min` (unsigned integer in ₱, nullable)
-  - `ai_salary_max` (unsigned integer in ₱, nullable)
-  - `ai_salary_notes` (text, nullable)
-  - `ai_evaluated_at` (timestamp, nullable)
+- `users`: Standard user attributes + `weekly_goal` (integer, default 10) + `goal_streak` (integer, default 0) + `expected_salary` + `job_search_preferences` + `theme`.
+- `job_applications`: Core application attributes + AI evaluation columns (`ai_match_percentage`, `ai_strengths`, `ai_gaps`, `ai_salary_min`, `ai_salary_max`, `ai_salary_notes`, `ai_evaluated_at`) + activity dates (`last_contacted_at`, `interview_date`, `interview_notes`, `ai_interview_prep`).
+- `application_templates`: Reusable preset patterns (`user_id`, `name`, `category`, `default_location`, `default_expected_salary`, `default_job_description_keywords`, `default_notes`).
+- `job_application_activities`: Audit log table (`job_application_id`, `type`, `description`, `created_at`).
+- `contacts`: Recruiter & manager records (`user_id`, `name`, `email`, `phone`, `company_name`, `role`, `notes`, `last_contacted_at`).
+- `contact_job_application`: Pivot table (`contact_id`, `job_application_id`).
+- `resume_profiles`: Structured ATS profile data (`user_id`, `full_name`, `email`, `phone`, `location`, `summary`, `work_experience` JSON, `education` JSON, `skills` JSON, `certifications` JSON).
 
 ### API & Data Contracts
-- **Gemini Match Prompt Schema**: Input: Job Description + Ephemeral Resume Text. Output JSON: `{ "match_percentage": int, "strengths": string[], "gaps": string[] }`.
-- **Gemini Salary Prompt Schema**: Input: Job Title, Location, Job Description. Output JSON: `{ "min_salary_php": int, "max_salary_php": int, "market_context": string }`.
-- **Inertia Dashboard Props Contract**: `{ total: int, status_counts: Record<string, int>, avg_match_score: int|null, added_this_week: int, added_this_month: int, trend_data: Array<{ date: string, count: int }> }`.
+- **Action Feed Contract**: `Array<{ id: string, title: string, priority: 'urgent'|'moderate'|'low', description: string, job_application_id: int, company_name: string, action_label: string, action_route: string }>`
+- **Analytics Props Contract**: `{ funnel: Object, weekly_volume: Array, status_over_time: Array, salary_insights: Object, salary_bands: Array, time_to_response: Object }`
+- **Goals Props Contract**: `{ weekly_goal: int, current_week_count: int, streak_count: int, four_week_avg: int, weekly_history: Array }`
 
-### Serverless Hosting Decision
-- Project is configured for Vercel PHP serverless execution.
-- All AI operations are synchronous within the HTTP request lifecycle.
-- Zero local file storage or disk writes; PDF parsing occurs in-memory via text extraction libraries.
+### Zero-Cost & Serverless Hosting Decision
+- Project is deployed on Vercel serverless PHP architecture.
+- Daily action feed, deep-dive analytics, goals, contacts, and calendar run strictly server-side on database queries with **$0 recurring AI API costs**.
+- Ephemeral in-memory resume processing and dynamic client-side ATS PDF generation guarantee **$0 cloud file storage fees**.
 
 ## Testing Decisions
 
 ### Good Test Criteria
-Tests must verify user-observable behavior and domain constraints—such as authorized access, database mutations, valid status transitions, and correct Inertia page props—without coupling to internal implementation details.
+Tests verify user-observable behavior, authorization boundaries, database state changes, and Inertia page prop contracts using Pest PHP without coupling to internal class mechanics.
 
 ### Tested Modules & Seams
-- **Feature Tests (`tests/Feature/JobApplicationTest.php`)**: Full CRUD lifecycle, search/filter logic, status updates via drag-and-drop endpoint and modal endpoint, ensuring users cannot view/edit another user's applications.
-- **AI Feature Tests (`tests/Feature/JobApplicationAiTest.php`)**: Invoking AI Match Analysis and Salary Reality Check endpoints using `Http::fake()` to verify database persistence of Gemini JSON results.
-- **Dashboard Feature Tests (`tests/Feature/DashboardTest.php`)**: Asserting accurate Eloquent aggregation statistics and trend data passed as Inertia props.
-- **Service Unit Tests (`tests/Unit/GeminiServiceTest.php`)**: Testing prompt construction, JSON parsing, and handling API timeout/rate limit exceptions gracefully.
+- **Feature Tests (`tests/Feature/`)**: `JobApplicationTest.php`, `JobApplicationAiTest.php`, `DashboardTest.php`, `AnalyticsTest.php`, `GoalTest.php`, `ApplicationTemplateTest.php`, `ContactTest.php`, `CalendarTest.php`, `DocumentTest.php`.
+- **Service Unit Tests (`tests/Unit/`)**: `GeminiServiceTest.php`, `PhilippineTaxCalculatorServiceTest.php`, `ActionFeedServiceTest.php`, `GoalServiceTest.php`.
 
 ### Prior Art
-Following standard Pest PHP feature testing syntax (`actingAs($user)`, `get()`, `post()`, `assertDatabaseHas()`, `assertInertia()`) native to Laravel 13 starter kits.
+Using standard Pest PHP syntax (`actingAs($user)`, `get()`, `post()`, `assertDatabaseHas()`, `assertInertia()`).
 
 ## Out of Scope
 
-- Scraping job listings from external websites (JobStreet, LinkedIn, OnlineJobs.ph).
-- Persistent PDF file storage / S3 bucket uploads.
-- Automated background queue workers or websockets.
-- Multi-user / team sharing or recruiter features.
-- Email notifications or automated interview calendar reminders.
+- External job listing scraping from JobStreet, LinkedIn, or OnlineJobs.ph.
+- Binary PDF/DOCX file upload storage in S3 buckets or local disks.
+- Multi-user / employer recruiter portals.
+- Direct external email sending protocols (email drafts are generated for user copy-pasting).
 
 ## Further Notes
 
-- All currency amounts throughout the user interface must be formatted explicitly with the Philippine Peso symbol (`₱`).
-- Gemini API key must be read from environment variables (`GEMINI_API_KEY`).
+- All currency amounts throughout the application must be formatted explicitly with the Philippine Peso symbol (`₱`).
+- Gemini API integration is strictly on-demand on explicit user button triggers (`GEMINI_API_KEY`).

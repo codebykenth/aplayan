@@ -198,25 +198,38 @@ export default function JobApplicationsIndex({
                         />
                     </div>
 
-                    <div className="hidden md:flex flex-wrap gap-1.5">
-                        {STATUS_FILTERS.map(({ value, label }) => (
-                            <button
-                                key={value}
-                                type="button"
-                                onClick={() => setStatusFilter(value)}
-                                className={`rounded-full px-3 py-1 text-xs font-medium transition-colors ${
-                                    statusFilter === value
-                                        ? value !== ALL_STATUS
-                                            ? STATUS_COLORS[value]
-                                            : 'bg-primary text-primary-foreground'
-                                        : 'bg-muted text-muted-foreground hover:bg-accent hover:text-accent-foreground'
-                                }`}
-                            >
-                                {value === ALL_STATUS
-                                    ? label
-                                    : label}
-                            </button>
-                        ))}
+                    <div className="hidden md:flex flex-wrap gap-2">
+                        {STATUS_FILTERS.map(({ value, label }) => {
+                            const count = value === ALL_STATUS
+                                ? applicationList.length
+                                : applicationList.filter((app) => app.status === value).length;
+
+                            return (
+                                <button
+                                    key={value}
+                                    type="button"
+                                    onClick={() => setStatusFilter(value)}
+                                    className={`flex items-center gap-2 whitespace-nowrap rounded-full px-4 py-2 text-sm font-medium transition-colors ${
+                                        statusFilter === value
+                                            ? 'bg-primary text-primary-foreground'
+                                            : 'bg-muted text-muted-foreground hover:bg-muted/80'
+                                    }`}
+                                >
+                                    <span className="capitalize">{label}</span>
+                                    <span
+                                        className={`rounded-full px-2 py-0.5 text-xs font-medium ${
+                                            statusFilter === value
+                                                ? 'bg-primary-foreground/20 text-primary-foreground'
+                                                : value === ALL_STATUS
+                                                    ? 'bg-primary/10 text-primary'
+                                                    : STATUS_COLORS[value]
+                                        }`}
+                                    >
+                                        {count}
+                                    </span>
+                                </button>
+                            );
+                        })}
                     </div>
                 </div>
 

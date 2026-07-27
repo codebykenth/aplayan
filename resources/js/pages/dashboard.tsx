@@ -6,6 +6,8 @@ import {
     ChartContainer,
     ChartTooltip,
     ChartTooltipContent,
+    ChartLegend,
+    ChartLegendContent,
     type ChartConfig,
 } from '@/components/ui/chart';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -65,7 +67,7 @@ export default function Dashboard({
         <>
             <Head title="Dashboard" />
 
-            <div className="flex flex-col gap-6">
+            <div className="flex flex-1 min-h-0 flex-col gap-6 overflow-y-auto pr-2 pb-4">
                 <div>
                     <h1 className="text-2xl font-semibold text-foreground">
                         Dashboard
@@ -126,7 +128,7 @@ export default function Dashboard({
                 </div>
 
                 {/* Charts */}
-                <div className="grid gap-4 lg:grid-cols-2">
+                <div className="grid gap-6 lg:grid-cols-2">
                     {/* Status Distribution Pie Chart */}
                     <Card>
                         <CardHeader>
@@ -138,7 +140,7 @@ export default function Dashboard({
                                     No applications yet
                                 </div>
                             ) : (
-                                <ChartContainer config={pieConfig} className="aspect-square max-h-72">
+                                <ChartContainer config={pieConfig} className="h-[350px] w-full">
                                     <PieChart>
                                         <ChartTooltip
                                             content={
@@ -154,12 +156,15 @@ export default function Dashboard({
                                             nameKey="status"
                                             cx="50%"
                                             cy="50%"
-                                            outerRadius={80}
+                                            outerRadius={100}
                                         >
                                             {statusData.map((entry) => (
                                                 <Cell key={entry.status} fill={entry.fill} />
                                             ))}
                                         </Pie>
+                                        <ChartLegend 
+                                            content={<ChartLegendContent nameKey="status" />} 
+                                        />
                                     </PieChart>
                                 </ChartContainer>
                             )}
@@ -177,7 +182,7 @@ export default function Dashboard({
                                     No data yet
                                 </div>
                             ) : (
-                                <ChartContainer config={barConfig} className="aspect-square max-h-72">
+                                <ChartContainer config={barConfig} className="h-[350px] w-full">
                                     <BarChart data={trend}>
                                         <XAxis
                                             dataKey="date"
@@ -209,6 +214,9 @@ export default function Dashboard({
                                                     }}
                                                 />
                                             }
+                                        />
+                                        <ChartLegend 
+                                            content={<ChartLegendContent />} 
                                         />
                                         <Bar
                                             dataKey="count"

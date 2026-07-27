@@ -55,6 +55,24 @@ A record of a user's application to a specific job opening.
   - `ai_salary_notes` (string/text market context, nullable)
   - `ai_evaluated_at` (timestamp, nullable)
 
+### Action Feed
+A priority-ranked, auto-clearing list of action items (stale follow-ups, upcoming interviews, high-match unactioned, missing AI analysis, salary negotiation opps, rejection momentum check) calculated on the server using pure DB queries (0 AI cost).
+
+### Weekly Application Goal
+A user-defined weekly target for applications submitted (e.g., 10/week) with a streak counter and a 4-week historical average benchmark computed via pure PHP math.
+
+### Analytics Suite
+A dedicated dashboard section/page containing 6 deep-dive charts (Application Funnel, 12-Week Application Volume, Status Distribution Over Time, Salary Insights, Salary Band Distribution, Time-to-Response) computed entirely server-side without external AI API calls.
+
+### Contact
+A recruiter, hiring manager, or interviewer contact record (`name`, `email`, `phone`, `company_name`, `role`, `notes`) linked via a many-to-many relationship (`contact_job_application`) to job applications.
+
+### Calendar Suite
+A read-only calendar view displaying interview dates, follow-up deadlines, and application milestones pulled dynamically from `JobApplication` data without extra storage.
+
+### Dynamic Document Builder
+A structured Resume & Cover Letter generator storing user experience, education, skills, and personal data as structured JSON/DB records. Renders ATS-friendly React templates with instant PDF generation without storing static PDF/Word files in cloud storage.
+
 ---
 
 ## Decisions Log
@@ -71,3 +89,5 @@ A record of a user's application to a specific job opening.
 - **2026-07-26 - AI Integration & Vercel Deployment**: Uses Google Gemini API (`gemini-2.5-flash`) encapsulated in a synchronous `GeminiService` class, tailored for Vercel serverless execution without long-running background queue workers.
 - **2026-07-26 - Dashboard Metrics & Visuals**: Aggregated stats (counts, averages, weekly/monthly trends) are computed via backend `DashboardMetricsService`, passed as Inertia page props, and rendered visually using shadcn/ui charts (`recharts`).
 - **2026-07-26 - Milestone 2 Roadmap**: Planned and initialized issues 10–14 covering Data Export & Import (`10-data-export-and-import.md`), Application Timeline & Activity Log (`11-application-timeline-log.md`), Philippine Statutory Tax & Net Take-Home Pay Calculator (`12-philippine-tax-calculator.md`), Offer Comparison Matrix Page (`13-offer-comparison-matrix.md`), and User Settings & Theme Management (`14-user-settings-and-theme.md`).
+- **2026-07-27 - Zero-AI-Cost Job Search Intelligence Architecture**: Replaced full-dashboard AI charts with a dedicated Analytics page (6 non-AI charts) and a server-side Smart Action Feed on the Dashboard. Goals feature uses manual user targets with pure PHP 4-week math benchmarks. Guarantees $0 recurring AI token costs for daily application tracking.
+- **2026-07-27 - Phase 2 Zero-Storage Documents, Contacts & Calendar**: Planned Phase 2 extensions including Dynamic ATS Resume/Cover Letter Builder (zero cloud file storage), standalone & linked Contacts management, and a read-only Calendar suite with automated follow-up overlays.

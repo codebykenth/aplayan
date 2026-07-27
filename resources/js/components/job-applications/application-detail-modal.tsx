@@ -350,7 +350,7 @@ export default function ApplicationDetailModal({
 
     return (
         <Dialog open={open} onOpenChange={(open) => !open && onClose()}>
-            <DialogContent className="sm:max-w-lg">
+            <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto">
                 <DialogHeader>
                     <DialogTitle className="text-lg">
                         {app.job_title}
@@ -371,7 +371,7 @@ export default function ApplicationDetailModal({
                             )}
                         </div>
                         <Badge
-                            className={`shrink-0 border-0 ${STATUS_COLORS[app.status]}`}
+                            className={`shrink-0 border-0 capitalize ${STATUS_COLORS[app.status]}`}
                         >
                             {JOB_APPLICATION_STATUSES.find(
                                 (s) => s.value === app.status,

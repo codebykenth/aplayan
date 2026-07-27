@@ -219,7 +219,7 @@ export default function JobApplicationCard({
                 </div>
 
                 <Badge
-                    className={`shrink-0 border-0 px-2 py-0 text-[10px] font-medium leading-normal ${STATUS_COLORS[application.status]}`}
+                    className={`shrink-0 border-0 px-2 py-0 text-[10px] font-medium leading-normal capitalize ${STATUS_COLORS[application.status]}`}
                 >
                     {application.status}
                 </Badge>
