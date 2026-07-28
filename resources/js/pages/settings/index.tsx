@@ -1,15 +1,18 @@
 import { Head, router, useForm } from '@inertiajs/react';
-import { Sun, Moon, Monitor, User, KeyRound, Palette, Check } from 'lucide-react';
+import { Sun, Moon, Monitor, User, KeyRound, Palette, Check, Receipt, PlusIcon, TrashIcon } from 'lucide-react';
 import { useState, type ReactNode } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { PageHeader } from '@/components/ui/page-header';
 import { useTheme, useColorTheme } from '@/hooks/use-theme';
 import AppLayout from '@/layouts/app-layout';
 import { cn } from '@/lib/utils';
 import settings from '@/routes/settings';
+import type { TaxSettings, TaxAllowance, TaxCustomDeduction } from '@/types/job-application';
+import { TAX_REGIMES } from '@/types/job-application';
 
 const THEME_OPTIONS = [
     {
@@ -49,6 +52,7 @@ type UserData = {
     job_search_preferences: Record<string, unknown> | null;
     theme: string;
     color_theme: string;
+    tax_settings: TaxSettings | null;
 };
 
 interface SettingsPageProps {
@@ -388,8 +392,236 @@ function AppearanceSection() {
     );
 }
 
+function TaxSettingsSection({ user }: { user: UserData }) {
+    const { data, setData, patch, processing } = useForm({
+        tax_settings: {
+            regime: user.tax_settings?.regime ?? 'ph_regular',
+            allowances: user.tax_settings?.allowances ?? [],
+            custom_deductions: user.tax_settings?.custom_deductions ?? [],
+        },
+    });
+    const taxSettings = data.tax_settings;
+
+    function updateSettings(updater: (prev: typeof taxSettings) => typeof taxSettings) {
+        setData('tax_settings', updater(taxSettings));
+    }
+
+    function handleSave() {
+        patch(settings.tax.update.url(), {
+            preserveScroll: true,
+        });
+    }
+
+    function addAllowance(taxable: boolean) {
+        updateSettings((prev) => ({
+            ...prev,
+            allowances: [...prev.allowances, { name: '', amount: 0, taxable }],
+        }));
+    }
+
+    function removeAllowance(index: number) {
+        updateSettings((prev) => ({
+            ...prev,
+            allowances: prev.allowances.filter((_, i) => i !== index),
+        }));
+    }
+
+    function updateAllowance(index: number, field: keyof TaxAllowance, value: string | number | boolean) {
+        updateSettings((prev) => ({
+            ...prev,
+            allowances: prev.allowances.map((a, i) => (i === index ? { ...a, [field]: value } : a)),
+        }));
+    }
+
+    function addCustomDeduction() {
+        updateSettings((prev) => ({
+            ...prev,
+            custom_deductions: [...prev.custom_deductions, { name: '', amount: 0 }],
+        }));
+    }
+
+    function removeCustomDeduction(index: number) {
+        updateSettings((prev) => ({
+            ...prev,
+            custom_deductions: prev.custom_deductions.filter((_, i) => i !== index),
+        }));
+    }
+
+    function updateCustomDeduction(index: number, field: keyof TaxCustomDeduction, value: string | number) {
+        updateSettings((prev) => ({
+            ...prev,
+            custom_deductions: prev.custom_deductions.map((d, i) => (i === index ? { ...d, [field]: value } : d)),
+        }));
+    }
+
+    return (
+        <Card>
+            <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                    <Receipt className="size-4 text-primary" />
+                    Global Tax Preferences
+                </CardTitle>
+                <CardDescription>
+                    Set default tax regime and standard allowances. These apply to all new offers unless overridden per-offer.
+                </CardDescription>
+            </CardHeader>
+            <CardContent className="flex flex-col gap-4">
+                <div className="flex flex-col gap-1.5">
+                    <Label>Default Tax Regime</Label>
+                        <Select
+                            value={taxSettings.regime}
+                            onValueChange={(value) =>
+                                updateSettings((prev) => ({ ...prev, regime: value as TaxSettings['regime'] }))
+                            }
+                    >
+                        <SelectTrigger className="w-full">
+                            <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                            {TAX_REGIMES.map((regime) => (
+                                <SelectItem key={regime.value} value={regime.value}>
+                                    <div className="flex flex-col">
+                                        <span>{regime.label}</span>
+                                        <span className="text-xs text-muted-foreground">{regime.description}</span>
+                                    </div>
+                                </SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
+                </div>
+
+                <div className="flex flex-col gap-2">
+                    <div className="flex items-center justify-between">
+                        <Label>Non-Taxable Allowances</Label>
+                        <Button type="button" variant="ghost" size="sm" onClick={() => addAllowance(false)}>
+                            <PlusIcon className="size-3.5" />
+                            Add
+                        </Button>
+                    </div>
+                    {taxSettings.allowances.filter((a) => !a.taxable).length === 0 && (
+                        <p className="text-xs text-muted-foreground">No non-taxable allowances configured.</p>
+                    )}
+                    {taxSettings.allowances
+                        .map((a, i) => ({ ...a, originalIndex: i }))
+                        .filter((a) => !a.taxable)
+                        .map((a) => (
+                            <div key={a.originalIndex} className="flex items-center gap-2">
+                                <Input
+                                    placeholder="Name (e.g. Rice Allowance)"
+                                    value={a.name}
+                                    onChange={(e) => updateAllowance(a.originalIndex, 'name', e.target.value)}
+                                    className="flex-1"
+                                />
+                                <Input
+                                    type="number"
+                                    placeholder="Amount"
+                                    value={a.amount || ''}
+                                    onChange={(e) =>
+                                        updateAllowance(a.originalIndex, 'amount', parseFloat(e.target.value) || 0)
+                                    }
+                                    className="w-28"
+                                />
+                                <Button
+                                    type="button"
+                                    variant="ghost"
+                                    size="icon-sm"
+                                    onClick={() => removeAllowance(a.originalIndex)}
+                                >
+                                    <TrashIcon className="size-3.5" />
+                                </Button>
+                            </div>
+                        ))}
+                </div>
+
+                <div className="flex flex-col gap-2">
+                    <div className="flex items-center justify-between">
+                        <Label>Taxable Allowances</Label>
+                        <Button type="button" variant="ghost" size="sm" onClick={() => addAllowance(true)}>
+                            <PlusIcon className="size-3.5" />
+                            Add
+                        </Button>
+                    </div>
+                    {taxSettings.allowances.filter((a) => a.taxable).length === 0 && (
+                        <p className="text-xs text-muted-foreground">No taxable allowances configured.</p>
+                    )}
+                    {taxSettings.allowances
+                        .map((a, i) => ({ ...a, originalIndex: i }))
+                        .filter((a) => a.taxable)
+                        .map((a) => (
+                            <div key={a.originalIndex} className="flex items-center gap-2">
+                                <Input
+                                    placeholder="Name (e.g. Monthly Bonus)"
+                                    value={a.name}
+                                    onChange={(e) => updateAllowance(a.originalIndex, 'name', e.target.value)}
+                                    className="flex-1"
+                                />
+                                <Input
+                                    type="number"
+                                    placeholder="Amount"
+                                    value={a.amount || ''}
+                                    onChange={(e) =>
+                                        updateAllowance(a.originalIndex, 'amount', parseFloat(e.target.value) || 0)
+                                    }
+                                    className="w-28"
+                                />
+                                <Button
+                                    type="button"
+                                    variant="ghost"
+                                    size="icon-sm"
+                                    onClick={() => removeAllowance(a.originalIndex)}
+                                >
+                                    <TrashIcon className="size-3.5" />
+                                </Button>
+                            </div>
+                        ))}
+                </div>
+
+                <div className="flex flex-col gap-2">
+                    <div className="flex items-center justify-between">
+                        <Label>Custom Deductions</Label>
+                        <Button type="button" variant="ghost" size="sm" onClick={addCustomDeduction}>
+                            <PlusIcon className="size-3.5" />
+                            Add
+                        </Button>
+                    </div>
+                    {taxSettings.custom_deductions.length === 0 && (
+                        <p className="text-xs text-muted-foreground">No custom deductions configured.</p>
+                    )}
+                    {taxSettings.custom_deductions.map((d, i) => (
+                        <div key={i} className="flex items-center gap-2">
+                            <Input
+                                placeholder="Name (e.g. HMO Dependent)"
+                                value={d.name}
+                                onChange={(e) => updateCustomDeduction(i, 'name', e.target.value)}
+                                className="flex-1"
+                            />
+                            <Input
+                                type="number"
+                                placeholder="Amount"
+                                value={d.amount || ''}
+                                onChange={(e) =>
+                                    updateCustomDeduction(i, 'amount', parseFloat(e.target.value) || 0)
+                                }
+                                className="w-28"
+                            />
+                            <Button type="button" variant="ghost" size="icon-sm" onClick={() => removeCustomDeduction(i)}>
+                                <TrashIcon className="size-3.5" />
+                            </Button>
+                        </div>
+                    ))}
+                </div>
+            </CardContent>
+            <div className="flex items-center justify-end border-t px-(--card-spacing) py-(--card-spacing)">
+                <Button type="button" onClick={handleSave} disabled={processing}>
+                    {processing ? 'Saving...' : 'Save Tax Settings'}
+                </Button>
+            </div>
+        </Card>
+    );
+}
+
 export default function SettingsIndex({ user }: SettingsPageProps) {
-    const [activeTab, setActiveTab] = useState<'appearance' | 'profile' | 'password'>('appearance');
+    const [activeTab, setActiveTab] = useState<'appearance' | 'profile' | 'password' | 'tax'>('appearance');
 
     return (
         <>
@@ -439,6 +671,19 @@ export default function SettingsIndex({ user }: SettingsPageProps) {
                         <KeyRound className="size-4" />
                         Password & Security
                     </button>
+                    <button
+                        type="button"
+                        onClick={() => setActiveTab('tax')}
+                        className={cn(
+                            'flex items-center gap-2 rounded-lg px-3.5 py-2 text-sm font-medium transition-colors',
+                            activeTab === 'tax'
+                                ? 'bg-primary/10 text-primary'
+                                : 'text-muted-foreground hover:bg-muted hover:text-foreground',
+                        )}
+                    >
+                        <Receipt className="size-4" />
+                        Tax Preferences
+                    </button>
                 </div>
 
                 {/* Main Settings Content Panels */}
@@ -446,6 +691,7 @@ export default function SettingsIndex({ user }: SettingsPageProps) {
                     {activeTab === 'appearance' && <AppearanceSection />}
                     {activeTab === 'profile' && <ProfileSection user={user} />}
                     {activeTab === 'password' && <PasswordSection />}
+                    {activeTab === 'tax' && <TaxSettingsSection user={user} />}
                 </div>
             </div>
         </>

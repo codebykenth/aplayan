@@ -158,27 +158,183 @@ class PhilippineTaxCalculatorService
         return $annualBasic + $taxable13th;
     }
 
-    public function computeMonthlyNetPay(float $monthlySalary): array
-    {
-        $sss = $this->computeMonthlySss($monthlySalary);
-        $philHealth = $this->computeMonthlyPhilHealth($monthlySalary);
-        $pagIbig = $this->computeMonthlyPagIbig($monthlySalary);
-        $birTax = $this->computeMonthlyBirTax($monthlySalary);
+    private const FREELANCE_8_EXEMPTION = 250_000;
 
-        $totalDeductions = $sss + $philHealth + $pagIbig + $birTax;
-        $netPay = round($monthlySalary - $totalDeductions, 2);
+    private const FREELANCE_8_RATE = 0.08;
+
+    public function computeFreelanceEightTax(float $annualGrossIncome): float
+    {
+        if ($annualGrossIncome <= self::FREELANCE_8_EXEMPTION) {
+            return 0;
+        }
+
+        return ($annualGrossIncome - self::FREELANCE_8_EXEMPTION) * self::FREELANCE_8_RATE;
+    }
+
+    public function resolveTaxConfig(?array $offerConfig, ?array $userDefaults): array
+    {
+        $offerConfig = $offerConfig ?? [];
+        $userDefaults = $userDefaults ?? [];
+
+        $resolved = [
+            'regime' => $offerConfig['regime'] ?? $userDefaults['regime'] ?? 'ph_regular',
+            'allowances' => $offerConfig['allowances'] ?? $userDefaults['allowances'] ?? [],
+            'custom_deductions' => $offerConfig['custom_deductions'] ?? $userDefaults['custom_deductions'] ?? [],
+            'manual_net_override' => $offerConfig['manual_net_override'] ?? null,
+        ];
+
+        return $resolved;
+    }
+
+    public function computeMonthlyNetPay(float $monthlySalary, ?array $taxConfig = null, ?array $userDefaults = null): array
+    {
+        $config = $this->resolveTaxConfig($taxConfig, $userDefaults);
+        $regime = $config['regime'];
+
+        if ($config['manual_net_override'] !== null) {
+            $manualNet = (float) $config['manual_net_override'];
+
+            return $this->buildResult(
+                monthlySalary: $monthlySalary,
+                sss: 0,
+                philHealth: 0,
+                pagIbig: 0,
+                birTax: 0,
+                regime: $regime,
+                allowances: $config['allowances'],
+                customDeductions: $config['custom_deductions'],
+                manualNetOverride: $manualNet,
+            );
+        }
+
+        $taxableAllowances = $this->sumAllowances($config['allowances'], taxable: true);
+        $nonTaxableAllowances = $this->sumAllowances($config['allowances'], taxable: false);
+        $totalCustomDeductions = $this->sumCustomDeductions($config['custom_deductions']);
+
+        $effectiveMonthlySalary = $monthlySalary + $taxableAllowances;
+
+        match ($regime) {
+            'ph_regular' => $result = $this->computeRegularEmployee($effectiveMonthlySalary),
+            'ph_freelance_8' => $result = $this->computeFreelanceEmployee($effectiveMonthlySalary),
+            'tax_exempt' => $result = [
+                'sss' => 0,
+                'philhealth' => 0,
+                'pagibig' => 0,
+                'bir_tax' => 0,
+            ],
+            default => $result = [
+                'sss' => 0,
+                'philhealth' => 0,
+                'pagibig' => 0,
+                'bir_tax' => 0,
+            ],
+        };
+
+        $totalStatutoryDeductions = $result['sss'] + $result['philhealth'] + $result['pagibig'] + $result['bir_tax'];
+        $netPay = round($monthlySalary + $nonTaxableAllowances - $totalStatutoryDeductions - $totalCustomDeductions, 2);
+
+        return $this->buildResult(
+            monthlySalary: $monthlySalary,
+            sss: $result['sss'],
+            philHealth: $result['philhealth'],
+            pagIbig: $result['pagibig'],
+            birTax: $result['bir_tax'],
+            regime: $regime,
+            allowances: $config['allowances'],
+            customDeductions: $config['custom_deductions'],
+            netPay: $netPay,
+        );
+    }
+
+    private function computeRegularEmployee(float $monthlySalary): array
+    {
+        return [
+            'sss' => $this->computeMonthlySss($monthlySalary),
+            'philhealth' => $this->computeMonthlyPhilHealth($monthlySalary),
+            'pagibig' => $this->computeMonthlyPagIbig($monthlySalary),
+            'bir_tax' => $this->computeMonthlyBirTax($monthlySalary),
+        ];
+    }
+
+    private function computeFreelanceEmployee(float $monthlySalary): array
+    {
+        $annualGross = $monthlySalary * 12;
+        $annualTax = $this->computeFreelanceEightTax($annualGross);
+
+        return [
+            'sss' => 0,
+            'philhealth' => 0,
+            'pagibig' => 0,
+            'bir_tax' => round($annualTax / 12, 2),
+        ];
+    }
+
+    private function sumAllowances(array $allowances, bool $taxable): float
+    {
+        $total = 0.0;
+        foreach ($allowances as $allowance) {
+            if (($allowance['taxable'] ?? false) === $taxable) {
+                $total += (float) ($allowance['amount'] ?? 0);
+            }
+        }
+
+        return $total;
+    }
+
+    private function sumCustomDeductions(array $deductions): float
+    {
+        $total = 0.0;
+        foreach ($deductions as $deduction) {
+            $total += (float) ($deduction['amount'] ?? 0);
+        }
+
+        return $total;
+    }
+
+    private function buildResult(
+        float $monthlySalary,
+        float $sss,
+        float $philHealth,
+        float $pagIbig,
+        float $birTax,
+        string $regime,
+        array $allowances,
+        array $customDeductions,
+        ?float $netPay = null,
+        ?float $manualNetOverride = null,
+    ): array {
+        $totalStatutory = $sss + $philHealth + $pagIbig + $birTax;
+        $taxableAllowances = $this->sumAllowances($allowances, taxable: true);
+        $nonTaxableAllowances = $this->sumAllowances($allowances, taxable: false);
+        $totalCustomDeductions = $this->sumCustomDeductions($customDeductions);
+        $totalAllowances = $taxableAllowances + $nonTaxableAllowances;
+
+        if ($manualNetOverride !== null) {
+            $netPay = $manualNetOverride;
+        }
+
+        $annualNet = $manualNetOverride !== null
+            ? round(($manualNetOverride * 12) + $this->computeThirteenthMonthPay($monthlySalary), 2)
+            : round(($netPay * 12) + $this->computeThirteenthMonthPay($monthlySalary), 2);
 
         return [
             'monthly_gross' => round($monthlySalary, 2),
+            'regime' => $regime,
             'sss' => $sss,
             'philhealth' => $philHealth,
             'pagibig' => $pagIbig,
             'bir_tax' => $birTax,
-            'total_deductions' => round($totalDeductions, 2),
-            'monthly_net' => $netPay,
+            'total_statutory_deductions' => round($totalStatutory, 2),
+            'taxable_allowances' => round($taxableAllowances, 2),
+            'non_taxable_allowances' => round($nonTaxableAllowances, 2),
+            'total_allowances' => round($totalAllowances, 2),
+            'custom_deductions' => round($totalCustomDeductions, 2),
+            'total_deductions' => round($totalStatutory + $totalCustomDeductions, 2),
+            'monthly_net' => $netPay !== null ? round($netPay, 2) : round($monthlySalary - $totalStatutory - $totalCustomDeductions, 2),
+            'manual_net_override' => $manualNetOverride,
             'thirteenth_month' => round($this->computeThirteenthMonthPay($monthlySalary), 2),
             'annual_gross' => round($monthlySalary * 13, 2),
-            'annual_net' => round(($netPay * 12) + $this->computeThirteenthMonthPay($monthlySalary), 2),
+            'annual_net' => $annualNet,
         ];
     }
 }

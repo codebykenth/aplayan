@@ -9,6 +9,13 @@ function formatSalary(amount: number): string {
     })}`;
 }
 
+const REGIME_LABELS: Record<string, string> = {
+    ph_regular: 'PH Regular',
+    ph_freelance_8: 'Freelancer 8%',
+    tax_exempt: 'Tax-Exempt',
+    custom: 'Custom',
+};
+
 export default function TaxBreakdownCard({ taxBreakdown }: { taxBreakdown: TaxBreakdown }) {
     const [expanded, setExpanded] = useState(false);
     const tb = taxBreakdown;
@@ -31,29 +38,66 @@ export default function TaxBreakdownCard({ taxBreakdown }: { taxBreakdown: TaxBr
             {expanded && (
                 <div className="flex flex-col gap-2 text-sm">
                     <div className="flex items-center justify-between text-muted-foreground">
+                        <span>Regime</span>
+                        <span className="text-xs font-medium">{REGIME_LABELS[tb.regime] ?? tb.regime}</span>
+                    </div>
+                    <hr className="border-border" />
+                    <div className="flex items-center justify-between text-muted-foreground">
                         <span>Monthly Gross</span>
                         <span className="tabular-nums">{formatSalary(tb.monthly_gross)}</span>
                     </div>
-                    <div className="flex items-center justify-between text-destructive">
-                        <span>SSS</span>
-                        <span className="tabular-nums">-{formatSalary(tb.sss)}</span>
-                    </div>
-                    <div className="flex items-center justify-between text-destructive">
-                        <span>PhilHealth</span>
-                        <span className="tabular-nums">-{formatSalary(tb.philhealth)}</span>
-                    </div>
-                    <div className="flex items-center justify-between text-destructive">
-                        <span>Pag-IBIG</span>
-                        <span className="tabular-nums">-{formatSalary(tb.pagibig)}</span>
-                    </div>
-                    <div className="flex items-center justify-between text-destructive">
-                        <span>BIR Tax</span>
-                        <span className="tabular-nums">-{formatSalary(tb.bir_tax)}</span>
-                    </div>
+                    {tb.sss > 0 && (
+                        <div className="flex items-center justify-between text-destructive">
+                            <span>SSS</span>
+                            <span className="tabular-nums">-{formatSalary(tb.sss)}</span>
+                        </div>
+                    )}
+                    {tb.philhealth > 0 && (
+                        <div className="flex items-center justify-between text-destructive">
+                            <span>PhilHealth</span>
+                            <span className="tabular-nums">-{formatSalary(tb.philhealth)}</span>
+                        </div>
+                    )}
+                    {tb.pagibig > 0 && (
+                        <div className="flex items-center justify-between text-destructive">
+                            <span>Pag-IBIG</span>
+                            <span className="tabular-nums">-{formatSalary(tb.pagibig)}</span>
+                        </div>
+                    )}
+                    {tb.bir_tax > 0 && (
+                        <div className="flex items-center justify-between text-destructive">
+                            <span>BIR Tax</span>
+                            <span className="tabular-nums">-{formatSalary(tb.bir_tax)}</span>
+                        </div>
+                    )}
+                    {tb.taxable_allowances > 0 && (
+                        <div className="flex items-center justify-between text-muted-foreground">
+                            <span>Taxable Allowances</span>
+                            <span className="tabular-nums text-foreground">+{formatSalary(tb.taxable_allowances)}</span>
+                        </div>
+                    )}
+                    {tb.non_taxable_allowances > 0 && (
+                        <div className="flex items-center justify-between text-muted-foreground">
+                            <span>Non-Taxable Allowances</span>
+                            <span className="tabular-nums text-foreground">+{formatSalary(tb.non_taxable_allowances)}</span>
+                        </div>
+                    )}
+                    {tb.custom_deductions > 0 && (
+                        <div className="flex items-center justify-between text-destructive">
+                            <span>Custom Deductions</span>
+                            <span className="tabular-nums">-{formatSalary(tb.custom_deductions)}</span>
+                        </div>
+                    )}
                     <hr className="border-border" />
                     <div className="flex items-center justify-between font-semibold text-foreground">
                         <span>Monthly Net Pay</span>
-                        <span className="tabular-nums">{formatSalary(tb.monthly_net)}</span>
+                        <span className="tabular-nums">
+                            {tb.manual_net_override !== null ? (
+                                <span className="text-primary">{formatSalary(tb.monthly_net)} (manual)</span>
+                            ) : (
+                                formatSalary(tb.monthly_net)
+                            )}
+                        </span>
                     </div>
                     <hr className="border-border" />
                     <div className="flex items-center justify-between text-muted-foreground">

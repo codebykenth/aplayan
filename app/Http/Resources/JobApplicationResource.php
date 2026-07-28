@@ -18,7 +18,12 @@ class JobApplicationResource extends JsonResource
         $taxBreakdown = null;
         if ($salary !== null) {
             $taxCalculator = app(PhilippineTaxCalculatorService::class);
-            $taxBreakdown = $taxCalculator->computeMonthlyNetPay((float) $salary);
+            $userDefaults = $this->user?->tax_settings;
+            $taxBreakdown = $taxCalculator->computeMonthlyNetPay(
+                (float) $salary,
+                $this->tax_config,
+                $userDefaults,
+            );
         }
 
         return [
@@ -33,6 +38,7 @@ class JobApplicationResource extends JsonResource
             'date_applied' => $this->date_applied?->toDateString(),
             'expected_salary' => $this->expected_salary,
             'offered_salary' => $this->offered_salary,
+            'tax_config' => $this->tax_config,
             'tax_breakdown' => $taxBreakdown,
             'notes' => $this->notes,
             'last_contacted_at' => $this->last_contacted_at?->toIso8601String(),

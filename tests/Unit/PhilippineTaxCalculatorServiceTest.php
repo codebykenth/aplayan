@@ -131,3 +131,167 @@ it('computes monthly net pay for 50k salary correctly', function () {
 
     expect($result['bir_tax'])->toBe($expectedMonthlyTax);
 });
+
+it('returns ph_regular regime by default', function () {
+    $result = $this->calculator->computeMonthlyNetPay(25_000);
+
+    expect($result['regime'])->toBe('ph_regular');
+});
+
+it('computes tax-exempt regime with zero deductions', function () {
+    $result = $this->calculator->computeMonthlyNetPay(50_000, ['regime' => 'tax_exempt']);
+
+    expect($result['regime'])->toBe('tax_exempt');
+    expect($result['sss'])->toBe(0.0);
+    expect($result['philhealth'])->toBe(0.0);
+    expect($result['pagibig'])->toBe(0.0);
+    expect($result['bir_tax'])->toBe(0.0);
+    expect($result['monthly_net'])->toBe(50_000.00);
+});
+
+it('computes freelance 8% flat tax regime', function () {
+    $result = $this->calculator->computeMonthlyNetPay(50_000, ['regime' => 'ph_freelance_8']);
+
+    expect($result['regime'])->toBe('ph_freelance_8');
+    expect($result['sss'])->toBe(0.0);
+    expect($result['philhealth'])->toBe(0.0);
+    expect($result['pagibig'])->toBe(0.0);
+
+    $annualGross = 50_000 * 12;
+    $expectedTax = ($annualGross - 250_000) * 0.08;
+    expect($result['bir_tax'])->toBe(round($expectedTax / 12, 2));
+});
+
+it('computes freelance 8% with zero tax under 250k annual', function () {
+    $result = $this->calculator->computeMonthlyNetPay(20_000, ['regime' => 'ph_freelance_8']);
+
+    expect($result['bir_tax'])->toBe(0.0);
+    expect($result['monthly_net'])->toBe(20_000.00);
+});
+
+it('includes taxable allowances in gross for tax computation', function () {
+    $config = [
+        'regime' => 'ph_regular',
+        'allowances' => [
+            ['name' => 'Monthly Bonus', 'amount' => 5000, 'taxable' => true],
+        ],
+    ];
+
+    $result = $this->calculator->computeMonthlyNetPay(25_000, $config);
+
+    expect($result['taxable_allowances'])->toBe(5000.00);
+    expect($result['total_allowances'])->toBe(5000.00);
+
+    $withoutAllowance = $this->calculator->computeMonthlyNetPay(25_000);
+    expect($result['bir_tax'])->toBeGreaterThan($withoutAllowance['bir_tax']);
+});
+
+it('adds non-taxable allowances to net pay after deductions', function () {
+    $config = [
+        'regime' => 'ph_regular',
+        'allowances' => [
+            ['name' => 'Rice Allowance', 'amount' => 2500, 'taxable' => false],
+        ],
+    ];
+
+    $result = $this->calculator->computeMonthlyNetPay(25_000, $config);
+    $base = $this->calculator->computeMonthlyNetPay(25_000);
+
+    expect($result['non_taxable_allowances'])->toBe(2500.00);
+    expect($result['monthly_net'])->toBe($base['monthly_net'] + 2500);
+});
+
+it('subtracts custom deductions from net pay', function () {
+    $config = [
+        'regime' => 'ph_regular',
+        'custom_deductions' => [
+            ['name' => 'HMO Dependent', 'amount' => 1200],
+        ],
+    ];
+
+    $result = $this->calculator->computeMonthlyNetPay(25_000, $config);
+    $base = $this->calculator->computeMonthlyNetPay(25_000);
+
+    expect($result['custom_deductions'])->toBe(1200.00);
+    expect($result['monthly_net'])->toBe($base['monthly_net'] - 1200);
+});
+
+it('returns manual net override when provided', function () {
+    $config = [
+        'regime' => 'ph_regular',
+        'manual_net_override' => 30000,
+    ];
+
+    $result = $this->calculator->computeMonthlyNetPay(50_000, $config);
+
+    expect($result['monthly_net'])->toBe(30000.00);
+    expect($result['manual_net_override'])->toBe(30000.00);
+    expect($result['sss'])->toBe(0.0);
+    expect($result['bir_tax'])->toBe(0.0);
+});
+
+it('resolves offer config over user defaults', function () {
+    $userDefaults = [
+        'regime' => 'ph_regular',
+        'allowances' => [
+            ['name' => 'Rice', 'amount' => 2000, 'taxable' => false],
+        ],
+    ];
+
+    $offerConfig = [
+        'regime' => 'tax_exempt',
+        'allowances' => [],
+    ];
+
+    $result = $this->calculator->computeMonthlyNetPay(30_000, $offerConfig, $userDefaults);
+
+    expect($result['regime'])->toBe('tax_exempt');
+    expect($result['monthly_net'])->toBe(30_000.00);
+});
+
+it('falls back to user defaults when offer config is null', function () {
+    $userDefaults = [
+        'regime' => 'ph_freelance_8',
+    ];
+
+    $result = $this->calculator->computeMonthlyNetPay(40_000, null, $userDefaults);
+
+    expect($result['regime'])->toBe('ph_freelance_8');
+    expect($result['sss'])->toBe(0.0);
+});
+
+it('combines taxable and non-taxable allowances with custom deductions', function () {
+    $config = [
+        'regime' => 'ph_regular',
+        'allowances' => [
+            ['name' => 'Bonus', 'amount' => 5000, 'taxable' => true],
+            ['name' => 'Rice', 'amount' => 2500, 'taxable' => false],
+        ],
+        'custom_deductions' => [
+            ['name' => 'HMO', 'amount' => 1200],
+            ['name' => 'Loan', 'amount' => 800],
+        ],
+    ];
+
+    $result = $this->calculator->computeMonthlyNetPay(25_000, $config);
+
+    expect($result['taxable_allowances'])->toBe(5000.00);
+    expect($result['non_taxable_allowances'])->toBe(2500.00);
+    expect($result['total_allowances'])->toBe(7500.00);
+    expect($result['custom_deductions'])->toBe(2000.00);
+});
+
+it('computes annual net with 13th month for regular regime', function () {
+    $result = $this->calculator->computeMonthlyNetPay(25_000);
+
+    $expectedAnnualNet = round(($result['monthly_net'] * 12) + 25_000, 2);
+    expect($result['annual_net'])->toBe($expectedAnnualNet);
+});
+
+it('computes annual net with 13th month for manual override', function () {
+    $config = ['manual_net_override' => 30000];
+    $result = $this->calculator->computeMonthlyNetPay(50_000, $config);
+
+    $expectedAnnualNet = round((30000 * 12) + 50_000, 2);
+    expect($result['annual_net'])->toBe($expectedAnnualNet);
+});

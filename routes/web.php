@@ -92,6 +92,7 @@ Route::middleware('auth')->group(function () {
     Route::patch('settings/theme', [SettingsController::class, 'updateTheme'])->name('settings.theme.update');
     Route::patch('settings/color-theme', [SettingsController::class, 'updateColorTheme'])->name('settings.color-theme.update');
     Route::patch('settings/password', [SettingsController::class, 'updatePassword'])->name('settings.password.update');
+    Route::patch('settings/tax', [SettingsController::class, 'updateTaxSettings'])->name('settings.tax.update');
 
     Route::get('templates', [ApplicationTemplateController::class, 'index'])->name('templates.index');
     Route::post('templates', [ApplicationTemplateController::class, 'store'])->name('templates.store');

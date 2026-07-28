@@ -181,8 +181,81 @@ it('shows a single job application owned by the user', function () {
     expect($response->json('data'))->toHaveKeys([
         'id', 'user_id', 'company_name', 'job_title', 'job_url', 'job_description',
         'location', 'status', 'date_applied', 'expected_salary', 'offered_salary',
+        'tax_config', 'tax_breakdown',
         'notes', 'ai_match_percentage', 'ai_strengths', 'ai_gaps',
         'ai_salary_min', 'ai_salary_max', 'ai_salary_notes', 'ai_evaluated_at',
         'created_at', 'updated_at',
     ]);
+});
+
+it('stores a job application with tax_config', function () {
+    $data = JobApplication::factory()->make(['user_id' => $this->user->id])->toArray();
+    $data['tax_config'] = [
+        'regime' => 'ph_freelance_8',
+        'allowances' => [
+            ['name' => 'Rice', 'amount' => 2500, 'taxable' => false],
+        ],
+        'custom_deductions' => [
+            ['name' => 'HMO', 'amount' => 1200],
+        ],
+    ];
+
+    $response = $this->actingAs($this->user)->post(route('job-applications.store'), $data);
+
+    $response->assertRedirect(route('job-applications.index'));
+    $this->assertDatabaseHas('job_applications', [
+        'company_name' => $data['company_name'],
+        'user_id' => $this->user->id,
+    ]);
+
+    $app = JobApplication::where('company_name', $data['company_name'])->first();
+    expect($app->tax_config)->toBe($data['tax_config']);
+});
+
+it('updates a job application with tax_config', function () {
+    $application = JobApplication::factory()->create(['user_id' => $this->user->id]);
+
+    $taxConfig = [
+        'regime' => 'tax_exempt',
+        'manual_net_override' => 40000,
+    ];
+
+    $response = $this->actingAs($this->user)->putJson(
+        route('job-applications.update', $application),
+        [
+            'company_name' => $application->company_name,
+            'job_title' => $application->job_title,
+            'location' => $application->location,
+            'status' => $application->status,
+            'tax_config' => $taxConfig,
+        ],
+    );
+
+    $response->assertSuccessful();
+    $this->assertDatabaseHas('job_applications', [
+        'id' => $application->id,
+        'tax_config' => json_encode($taxConfig),
+    ]);
+});
+
+it('validates tax_config regime enum', function () {
+    $data = JobApplication::factory()->make(['user_id' => $this->user->id])->toArray();
+    $data['tax_config'] = ['regime' => 'invalid_regime'];
+
+    $response = $this->actingAs($this->user)->postJson(route('job-applications.store'), $data);
+
+    $response->assertJsonValidationErrors(['tax_config.regime']);
+});
+
+it('validates tax_config allowance fields', function () {
+    $data = JobApplication::factory()->make(['user_id' => $this->user->id])->toArray();
+    $data['tax_config'] = [
+        'allowances' => [
+            ['name' => 'Test', 'amount' => -100, 'taxable' => true],
+        ],
+    ];
+
+    $response = $this->actingAs($this->user)->postJson(route('job-applications.store'), $data);
+
+    $response->assertJsonValidationErrors(['tax_config.allowances.0.amount']);
 });

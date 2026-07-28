@@ -121,3 +121,105 @@ it('shows multiple offers sorted by most recent', function () {
         ->where('offers.data.1.id', $oldOffer->id)
     );
 });
+
+it('includes tax_config in offer data', function () {
+    $taxConfig = [
+        'regime' => 'ph_freelance_8',
+        'allowances' => [
+            ['name' => 'Rice', 'amount' => 2500, 'taxable' => false],
+        ],
+        'custom_deductions' => [
+            ['name' => 'HMO', 'amount' => 1200],
+        ],
+    ];
+
+    $app = JobApplication::factory()->create([
+        'user_id' => $this->user->id,
+        'status' => 'offer',
+        'offered_salary' => 50_000,
+        'tax_config' => $taxConfig,
+    ]);
+
+    $response = $this->actingAs($this->user)->get(route('job-applications.offers'));
+
+    $pageProps = $response->inertiaPage()['props'];
+    $offerData = $pageProps['offers']['data'][0] ?? [];
+
+    expect($offerData['tax_config'])->toBe($taxConfig);
+    expect($offerData['tax_breakdown']['regime'])->toBe('ph_freelance_8');
+    expect($offerData['tax_breakdown']['sss'])->toBeGreaterThan(-1);
+    expect((float) $offerData['tax_breakdown']['non_taxable_allowances'])->toBe(2500.0);
+    expect((float) $offerData['tax_breakdown']['custom_deductions'])->toBe(1200.0);
+});
+
+it('uses user default tax settings when offer has no tax_config', function () {
+    $this->user->update([
+        'tax_settings' => [
+            'regime' => 'tax_exempt',
+        ],
+    ]);
+
+    JobApplication::factory()->create([
+        'user_id' => $this->user->id,
+        'status' => 'offer',
+        'offered_salary' => 50_000,
+        'tax_config' => null,
+    ]);
+
+    $response = $this->actingAs($this->user)->get(route('job-applications.offers'));
+
+    $pageProps = $response->inertiaPage()['props'];
+    $offerData = $pageProps['offers']['data'][0] ?? [];
+
+    expect($offerData['tax_breakdown']['regime'])->toBe('tax_exempt');
+    expect((float) $offerData['tax_breakdown']['sss'])->toBe(0.0);
+    expect((float) $offerData['tax_breakdown']['monthly_net'])->toBe(50000.0);
+});
+
+it('offer tax_config overrides user defaults', function () {
+    $this->user->update([
+        'tax_settings' => [
+            'regime' => 'ph_regular',
+        ],
+    ]);
+
+    JobApplication::factory()->create([
+        'user_id' => $this->user->id,
+        'status' => 'offer',
+        'offered_salary' => 50_000,
+        'tax_config' => [
+            'regime' => 'tax_exempt',
+            'allowances' => [],
+            'custom_deductions' => [],
+        ],
+    ]);
+
+    $response = $this->actingAs($this->user)->get(route('job-applications.offers'));
+
+    $pageProps = $response->inertiaPage()['props'];
+    $offerData = $pageProps['offers']['data'][0] ?? [];
+
+    expect($offerData['tax_breakdown']['regime'])->toBe('tax_exempt');
+    expect((float) $offerData['tax_breakdown']['monthly_net'])->toBe(50000.0);
+});
+
+it('returns correct breakdown for manual net override', function () {
+    JobApplication::factory()->create([
+        'user_id' => $this->user->id,
+        'status' => 'offer',
+        'offered_salary' => 50_000,
+        'tax_config' => [
+            'regime' => 'ph_regular',
+            'manual_net_override' => 35000,
+        ],
+    ]);
+
+    $response = $this->actingAs($this->user)->get(route('job-applications.offers'));
+
+    $pageProps = $response->inertiaPage()['props'];
+    $offerData = $pageProps['offers']['data'][0] ?? [];
+
+    expect((float) $offerData['tax_breakdown']['monthly_net'])->toBe(35000.0);
+    expect((float) $offerData['tax_breakdown']['manual_net_override'])->toBe(35000.0);
+    expect((float) $offerData['tax_breakdown']['sss'])->toBe(0.0);
+});
