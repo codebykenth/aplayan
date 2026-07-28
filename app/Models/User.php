@@ -24,13 +24,14 @@ use Illuminate\Support\Carbon;
  * @property int|null $expected_salary
  * @property array|null $job_search_preferences
  * @property string $theme
+ * @property string $color_theme
  * @property int $weekly_goal
  * @property int $goal_streak
  * @property string|null $remember_token
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  */
-#[Fillable(['name', 'email', 'password', 'google_id', 'avatar', 'expected_salary', 'job_search_preferences', 'theme', 'weekly_goal', 'goal_streak'])]
+#[Fillable(['name', 'email', 'password', 'google_id', 'avatar', 'expected_salary', 'job_search_preferences', 'theme', 'color_theme', 'weekly_goal', 'goal_streak'])]
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable implements MustVerifyEmail
 {
@@ -60,11 +61,6 @@ class User extends Authenticatable implements MustVerifyEmail
     public function savedCoverLetters(): HasMany
     {
         return $this->hasMany(SavedCoverLetter::class);
-    }
-
-    public function coverLetterTemplates(): HasMany
-    {
-        return $this->hasMany(CoverLetterTemplate::class);
     }
 
     public function contacts(): HasMany

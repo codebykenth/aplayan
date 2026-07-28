@@ -6,7 +6,7 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/com
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { PageHeader } from '@/components/ui/page-header';
-import { useTheme } from '@/hooks/use-theme';
+import { useTheme, useColorTheme } from '@/hooks/use-theme';
 import AppLayout from '@/layouts/app-layout';
 import settings from '@/routes/settings';
 
@@ -14,6 +14,14 @@ const THEME_OPTIONS = [
     { value: 'light', label: 'Light', icon: Sun },
     { value: 'dark', label: 'Dark', icon: Moon },
     { value: 'system', label: 'System', icon: Monitor },
+] as const;
+
+const COLOR_THEME_OPTIONS = [
+    { value: 'zinc', label: 'Zinc', colors: ['oklch(0.205 0 0)', 'oklch(0.922 0 0)'] },
+    { value: 'emerald', label: 'Emerald', colors: ['oklch(0.448 0.154 164.978)', 'oklch(0.696 0.17 162.48)'] },
+    { value: 'ocean', label: 'Ocean', colors: ['oklch(0.375 0.143 259.433)', 'oklch(0.594 0.184 254.624)'] },
+    { value: 'indigo', label: 'Indigo', colors: ['oklch(0.398 0.154 286.027)', 'oklch(0.612 0.214 282.755)'] },
+    { value: 'sunset', label: 'Sunset', colors: ['oklch(0.544 0.185 22.555)', 'oklch(0.715 0.194 22.555)'] },
 ] as const;
 
 type UserData = {
@@ -24,6 +32,7 @@ type UserData = {
     expected_salary: number | null;
     job_search_preferences: Record<string, unknown> | null;
     theme: string;
+    color_theme: string;
 };
 
 interface SettingsPageProps {
@@ -225,12 +234,20 @@ function PasswordSection() {
 }
 
 function AppearanceSection() {
-    const { theme, setTheme } = useTheme();
+    const { mode, setMode } = useTheme();
+    const { colorTheme, setColorTheme } = useColorTheme();
 
-    function handleThemeChange(value: string) {
-        setTheme(value);
+    function handleModeChange(value: string) {
+        setMode(value as 'light' | 'dark' | 'system');
         router.patch(settings.theme.update.url(), {
             theme: value,
+        });
+    }
+
+    function handleColorThemeChange(value: string) {
+        setColorTheme(value as 'zinc' | 'emerald' | 'ocean' | 'indigo' | 'sunset');
+        router.patch(settings.colorTheme.update.url(), {
+            color_theme: value,
         });
     }
 
@@ -242,39 +259,83 @@ function AppearanceSection() {
                     Appearance
                 </CardTitle>
                 <CardDescription>
-                    Choose your preferred theme. System follows your device settings.
+                    Customize your theme and accent color. System follows your device settings.
                 </CardDescription>
             </CardHeader>
-            <CardContent>
-                <fieldset className="flex flex-col gap-3">
-                    <legend className="sr-only">Theme selection</legend>
-                    {THEME_OPTIONS.map(({ value, label, icon: Icon }) => (
-                        <label
-                            key={value}
-                            className={`flex cursor-pointer items-center gap-3 rounded-lg border p-3 text-sm transition-colors ${
-                                theme === value
-                                    ? 'border-primary bg-accent'
-                                    : 'border-input hover:bg-muted'
-                            }`}
-                        >
-                            <input
-                                type="radio"
-                                name="theme"
-                                value={value}
-                                checked={theme === value}
-                                onChange={() => handleThemeChange(value)}
-                                className="sr-only"
-                            />
-                            <Icon className="size-5 shrink-0 text-muted-foreground" />
-                            <span className="font-medium">{label}</span>
-                            {theme === value && (
-                                <span className="ml-auto text-xs text-primary">
-                                    Active
-                                </span>
-                            )}
-                        </label>
-                    ))}
-                </fieldset>
+            <CardContent className="flex flex-col gap-6">
+                <div className="flex flex-col gap-3">
+                    <Label className="text-sm font-medium">Mode</Label>
+                    <fieldset className="flex flex-col gap-2">
+                        <legend className="sr-only">Theme mode selection</legend>
+                        {THEME_OPTIONS.map(({ value, label, icon: Icon }) => (
+                            <label
+                                key={value}
+                                className={`flex cursor-pointer items-center gap-3 rounded-lg border p-3 text-sm transition-colors ${
+                                    mode === value
+                                        ? 'border-primary bg-accent'
+                                        : 'border-input hover:bg-muted'
+                                }`}
+                            >
+                                <input
+                                    type="radio"
+                                    name="theme"
+                                    value={value}
+                                    checked={mode === value}
+                                    onChange={() => handleModeChange(value)}
+                                    className="sr-only"
+                                />
+                                <Icon className="size-5 shrink-0 text-muted-foreground" />
+                                <span className="font-medium">{label}</span>
+                                {mode === value && (
+                                    <span className="ml-auto text-xs text-primary">
+                                        Active
+                                    </span>
+                                )}
+                            </label>
+                        ))}
+                    </fieldset>
+                </div>
+
+                <div className="flex flex-col gap-3">
+                    <Label className="text-sm font-medium">Accent Color</Label>
+                    <fieldset className="grid grid-cols-5 gap-2">
+                        <legend className="sr-only">Color theme selection</legend>
+                        {COLOR_THEME_OPTIONS.map(({ value, label, colors }) => (
+                            <label
+                                key={value}
+                                className={`group relative flex cursor-pointer flex-col items-center gap-2 rounded-lg border p-3 transition-colors ${
+                                    colorTheme === value
+                                        ? 'border-primary bg-accent'
+                                        : 'border-input hover:bg-muted'
+                                }`}
+                            >
+                                <input
+                                    type="radio"
+                                    name="color_theme"
+                                    value={value}
+                                    checked={colorTheme === value}
+                                    onChange={() => handleColorThemeChange(value)}
+                                    className="sr-only"
+                                />
+                                <div className="flex gap-1">
+                                    {colors.map((color, i) => (
+                                        <div
+                                            key={i}
+                                            className="size-5 rounded-full ring-1 ring-border"
+                                            style={{ backgroundColor: color }}
+                                        />
+                                    ))}
+                                </div>
+                                <span className="text-xs font-medium">{label}</span>
+                                {colorTheme === value && (
+                                    <span className="absolute -top-1 -right-1 size-4 rounded-full bg-primary text-[10px] text-primary-foreground flex items-center justify-center">
+                                        ✓
+                                    </span>
+                                )}
+                            </label>
+                        ))}
+                    </fieldset>
+                </div>
             </CardContent>
         </Card>
     );

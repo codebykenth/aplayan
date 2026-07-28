@@ -17,7 +17,7 @@ class SettingsController extends Controller
         return Inertia::render('settings/index', [
             'user' => $request->user()->fresh()->only([
                 'id', 'name', 'email', 'avatar', 'expected_salary',
-                'job_search_preferences', 'theme',
+                'job_search_preferences', 'theme', 'color_theme',
             ]),
         ]);
     }
@@ -38,6 +38,17 @@ class SettingsController extends Controller
         $request->user()->update($validated);
 
         return to_route('settings.index')->with('success', 'Theme updated successfully.');
+    }
+
+    public function updateColorTheme(Request $request): RedirectResponse
+    {
+        $validated = $request->validate([
+            'color_theme' => ['required', 'string', 'in:zinc,emerald,ocean,indigo,sunset'],
+        ]);
+
+        $request->user()->update($validated);
+
+        return to_route('settings.index')->with('success', 'Color theme updated successfully.');
     }
 
     public function updatePassword(UpdatePasswordRequest $request): RedirectResponse

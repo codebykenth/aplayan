@@ -7,7 +7,6 @@ use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\SocialiteController;
 use App\Http\Controllers\CalendarController;
 use App\Http\Controllers\ContactController;
-use App\Http\Controllers\CoverLetterTemplateController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DocumentController;
 use App\Http\Controllers\FollowUpEmailController;
@@ -91,18 +90,13 @@ Route::middleware('auth')->group(function () {
     Route::get('settings', [SettingsController::class, 'index'])->name('settings.index');
     Route::patch('settings/profile', [SettingsController::class, 'updateProfile'])->name('settings.profile.update');
     Route::patch('settings/theme', [SettingsController::class, 'updateTheme'])->name('settings.theme.update');
+    Route::patch('settings/color-theme', [SettingsController::class, 'updateColorTheme'])->name('settings.color-theme.update');
     Route::patch('settings/password', [SettingsController::class, 'updatePassword'])->name('settings.password.update');
 
     Route::get('templates', [ApplicationTemplateController::class, 'index'])->name('templates.index');
     Route::post('templates', [ApplicationTemplateController::class, 'store'])->name('templates.store');
     Route::match(['put', 'patch'], 'templates/{applicationTemplate}', [ApplicationTemplateController::class, 'update'])->name('templates.update');
     Route::delete('templates/{applicationTemplate}', [ApplicationTemplateController::class, 'destroy'])->name('templates.destroy');
-
-    Route::get('cover-letter-templates', [CoverLetterTemplateController::class, 'index'])->name('cover-letter-templates.index');
-    Route::post('cover-letter-templates', [CoverLetterTemplateController::class, 'store'])->name('cover-letter-templates.store');
-    Route::match(['put', 'patch'], 'cover-letter-templates/{coverLetterTemplate}', [CoverLetterTemplateController::class, 'update'])->name('cover-letter-templates.update');
-    Route::delete('cover-letter-templates/{coverLetterTemplate}', [CoverLetterTemplateController::class, 'destroy'])->name('cover-letter-templates.destroy');
-    Route::get('cover-letter-templates/json', [CoverLetterTemplateController::class, 'json'])->name('cover-letter-templates.json');
 
     Route::get('contacts', [ContactController::class, 'index'])->name('contacts.index');
     Route::post('contacts', [ContactController::class, 'store'])->name('contacts.store');
@@ -118,6 +112,7 @@ Route::middleware('auth')->group(function () {
     Route::post('documents/ai-improve-cover-letter', [DocumentController::class, 'aiImproveCoverLetter'])->middleware('throttle:ai')->name('documents.ai-improve-cover-letter');
     Route::get('documents/saved', [DocumentController::class, 'saved'])->name('documents.saved');
     Route::get('documents/saved-cover-letters', [DocumentController::class, 'savedCoverLettersJson'])->name('documents.saved-cover-letters');
+    Route::get('documents/saved-resumes', [DocumentController::class, 'savedResumesJson'])->name('documents.saved-resumes');
     Route::post('documents/save-resume', [DocumentController::class, 'saveResume'])->name('documents.save-resume');
     Route::post('documents/save-cover-letter', [DocumentController::class, 'saveCoverLetter'])->name('documents.save-cover-letter');
     Route::delete('documents/resume-versions/{savedResume}', [DocumentController::class, 'destroyResumeVersion'])->name('documents.resume-versions.destroy');

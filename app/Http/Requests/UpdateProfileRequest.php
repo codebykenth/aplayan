@@ -19,6 +19,7 @@ class UpdateProfileRequest extends FormRequest
             'expected_salary' => ['nullable', 'integer', 'min:0'],
             'job_search_preferences' => ['nullable', 'array'],
             'theme' => ['required', 'string', 'in:light,dark,system'],
+            'color_theme' => ['required', 'string', 'in:zinc,emerald,ocean,indigo,sunset'],
         ];
     }
 }
