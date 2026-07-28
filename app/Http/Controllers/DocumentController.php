@@ -6,6 +6,7 @@ use App\Http\Requests\AiImproveCoverLetterRequest;
 use App\Http\Requests\AiPolishResumeRequest;
 use App\Http\Requests\GenerateCoverLetterRequest;
 use App\Http\Requests\SaveCoverLetterRequest;
+use App\Http\Requests\SaveResumeRequest;
 use App\Http\Requests\UpdateResumeProfileRequest;
 use App\Models\SavedCoverLetter;
 use App\Models\SavedResume;
@@ -118,16 +119,9 @@ class DocumentController extends Controller
         ]);
     }
 
-    public function saveResume(Request $request): RedirectResponse
+    public function saveResume(SaveResumeRequest $request): RedirectResponse
     {
-        $validated = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'template' => ['required', 'string', 'in:clean,modern,philippine,ats_classic,ats_executive,ats_bullet,ats_single_column,ats_classic_serif'],
-            'profile_data' => ['required', 'array'],
-            'photo_url' => ['nullable', 'string', 'max:500'],
-        ]);
-
-        $request->user()->savedResumes()->create($validated);
+        $request->user()->savedResumes()->create($request->validated());
 
         return to_route('documents.saved')->with('success', 'Resume version saved.');
     }

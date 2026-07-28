@@ -73,23 +73,23 @@ function statusLabel(value: string): string {
 }
 
 export default function Dashboard({
-    total,
-    status_counts,
-    avg_match_score,
-    added_this_week,
-    added_this_month,
-    trend,
-    action_items,
-    recent_activities,
+    total = 0,
+    status_counts = {},
+    avg_match_score = null,
+    added_this_week = 0,
+    added_this_month = 0,
+    trend = [],
+    action_items = [],
+    recent_activities = [],
 }: {
-    total: number;
-    status_counts: Record<string, number>;
-    avg_match_score: number | null;
-    added_this_week: number;
-    added_this_month: number;
-    trend: { date: string; count: number }[];
-    action_items: ActionItem[];
-    recent_activities: RecentActivityItem[];
+    total?: number;
+    status_counts?: Record<string, number>;
+    avg_match_score?: number | null;
+    added_this_week?: number;
+    added_this_month?: number;
+    trend?: { date: string; count: number }[];
+    action_items?: ActionItem[];
+    recent_activities?: RecentActivityItem[];
 }) {
     const [selectedApplication, setSelectedApplication] =
         useState<JobApplication | null>(null);

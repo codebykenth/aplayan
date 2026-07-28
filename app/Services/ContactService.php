@@ -5,7 +5,7 @@ namespace App\Services;
 use App\Models\Contact;
 use App\Models\JobApplication;
 use App\Models\User;
-use Illuminate\Support\Collection;
+use Illuminate\Database\Eloquent\Collection;
 
 class ContactService
 {

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\MarkAsContactedRequest;
 use App\Models\JobApplication;
 use App\Services\AiCacheService;
 use App\Services\JobApplicationService;
@@ -37,15 +38,11 @@ class FollowUpEmailController extends Controller
         return response()->json(['draft' => $draft]);
     }
 
-    public function markAsContacted(JobApplication $jobApplication): JsonResponse
+    public function markAsContacted(MarkAsContactedRequest $request, JobApplication $jobApplication): JsonResponse
     {
         $this->authorize('update', $jobApplication);
 
-        $validated = request()->validate([
-            'date' => ['nullable', 'string'],
-        ]);
-
-        $dateParam = array_key_exists('date', $validated) ? $validated['date'] : 'now';
+        $dateParam = $request->validated('date') ?? 'now';
 
         $service = $this->service ?? app(JobApplicationService::class);
         $updated = $service->markAsContacted($jobApplication, $dateParam);

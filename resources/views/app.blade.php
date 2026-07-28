@@ -19,5 +19,24 @@
     </head>
     <body class="font-sans antialiased">
         <x-inertia::app />
+
+        @if (app()->isProduction())
+        <script>
+            document.addEventListener('contextmenu', function(e) { e.preventDefault(); });
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'F12' ||
+                    (e.ctrlKey && e.shiftKey && ['I', 'J', 'C'].includes(e.key.toUpperCase())) ||
+                    (e.ctrlKey && e.key.toUpperCase() === 'U')) {
+                    e.preventDefault();
+                }
+            });
+            const noop = function() {};
+            console.log = noop;
+            console.warn = noop;
+            console.error = noop;
+            console.debug = noop;
+            console.info = noop;
+        </script>
+        @endif
     </body>
 </html>

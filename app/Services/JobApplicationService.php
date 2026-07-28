@@ -6,7 +6,8 @@ use App\Enums\JobApplicationStatus;
 use App\Models\JobApplication;
 use App\Models\User;
 use Carbon\Carbon;
-use Illuminate\Support\Collection;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\Cache;
 
 class JobApplicationService
 {
@@ -14,9 +15,18 @@ class JobApplicationService
 
     private const int STALE_ALERT_THRESHOLD = 14;
 
-    public function listForUser(User $user): Collection
+    public function listForUser(User $user, ?string $search = null): LengthAwarePaginator
     {
-        return $user->jobApplications()->latest()->get();
+        $query = $user->jobApplications()->latest();
+
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('company_name', 'LIKE', "%{$search}%")
+                    ->orWhere('job_title', 'LIKE', "%{$search}%");
+            });
+        }
+
+        return $query->paginate(25);
     }
 
     public function createForUser(User $user, array $data): JobApplication
@@ -24,6 +34,8 @@ class JobApplicationService
         if (isset($data['status']) && $data['status'] !== 'wishlist' && empty($data['date_applied'])) {
             $data['date_applied'] = now()->toDateString();
         }
+
+        Cache::forget("dashboard:total:{$user->id}");
 
         return $user->jobApplications()->create($data);
     }
@@ -44,12 +56,30 @@ class JobApplicationService
             ]);
         }
 
+        $this->clearUserCache($jobApplication->user_id);
+
         return $jobApplication;
     }
 
     public function deleteForUser(JobApplication $jobApplication): void
     {
+        $userId = $jobApplication->user_id;
+
         $jobApplication->delete();
+
+        $this->clearUserCache($userId);
+    }
+
+    private function clearUserCache(int $userId): void
+    {
+        Cache::forget("dashboard:total:{$userId}");
+        Cache::forget("dashboard:status_counts:{$userId}");
+        Cache::forget("dashboard:avg_match_score:{$userId}");
+        Cache::forget("dashboard:added_this_week:{$userId}");
+        Cache::forget("dashboard:added_this_month:{$userId}");
+        Cache::forget("dashboard:trend:{$userId}");
+        Cache::forget("action_feed:{$userId}");
+        Cache::forget("goals:{$userId}");
     }
 
     private const array STATUS_ORDER = [
@@ -80,6 +110,8 @@ class JobApplicationService
             'description' => "Status changed to {$status->label()}",
         ]);
 
+        $this->clearUserCache($jobApplication->user_id);
+
         return $jobApplication;
     }
 
@@ -106,6 +138,8 @@ class JobApplicationService
             'type' => 'contacted',
             'description' => $description,
         ]);
+
+        $this->clearUserCache($jobApplication->user_id);
 
         return $jobApplication;
     }

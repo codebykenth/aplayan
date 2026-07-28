@@ -21,7 +21,9 @@ class ContactController extends Controller
     {
         $this->authorize('viewAny', Contact::class);
 
-        $contacts = $this->service->listForUser($request->user())->load('jobApplications');
+        $contacts = $this->service->listForUser($request->user());
+        $contacts->load('jobApplications');
+
         $applications = $request->user()->jobApplications()->get();
 
         return Inertia::render('contacts/index', [

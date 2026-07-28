@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Enums\JobApplicationStatus;
 use App\Http\Requests\StoreJobApplicationRequest;
+use App\Http\Requests\UpdateInterviewDateRequest;
 use App\Http\Requests\UpdateJobApplicationRequest;
 use App\Http\Requests\UpdateJobApplicationStatusRequest;
 use App\Http\Resources\JobApplicationResource;
@@ -14,6 +15,7 @@ use App\Services\JobApplicationService;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -25,11 +27,15 @@ class JobApplicationController extends Controller
         private ContactService $contactService,
     ) {}
 
-    public function index(): Response
+    public function index(Request $request): Response
     {
         $this->authorize('viewAny', JobApplication::class);
 
-        $applications = $this->service->listForUser(auth()->user())->load(['activities', 'contacts']);
+        $search = $request->query('search');
+
+        $applications = $this->service->listForUser(auth()->user(), $search);
+        $applications->load(['activities', 'contacts']);
+
         $templates = $this->templateService->listForUser(auth()->user());
         $contacts = $this->contactService->listForUser(auth()->user());
 
@@ -37,6 +43,9 @@ class JobApplicationController extends Controller
             'applications' => JobApplicationResource::collection($applications),
             'templates' => $templates,
             'contacts' => $contacts,
+            'filters' => [
+                'search' => $search,
+            ],
         ]);
     }
 
@@ -97,15 +106,11 @@ class JobApplicationController extends Controller
         return back();
     }
 
-    public function updateInterviewDate(JobApplication $jobApplication): JsonResponse
+    public function updateInterviewDate(UpdateInterviewDateRequest $request, JobApplication $jobApplication): JsonResponse
     {
         $this->authorize('update', $jobApplication);
 
-        $validated = request()->validate([
-            'interview_date' => ['nullable', 'date'],
-        ]);
-
-        $interviewDate = $validated['interview_date'] ?? null;
+        $interviewDate = $request->validated('interview_date');
 
         $jobApplication->update(['interview_date' => $interviewDate ? Carbon::parse($interviewDate)->toDateTimeString() : null]);
 

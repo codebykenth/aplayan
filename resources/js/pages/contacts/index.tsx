@@ -31,6 +31,7 @@ import { Label } from '@/components/ui/label';
 import { PageHeader } from '@/components/ui/page-header';
 import { Textarea } from '@/components/ui/textarea';
 import AppLayout from '@/layouts/app-layout';
+import { contactSchema, validateWithZod } from '@/lib/validations';
 import {
     store as storeContact,
     update as updateContact,
@@ -260,18 +261,19 @@ function ContactCard({
 }
 
 export default function ContactsIndex({
-    contacts,
+    contacts: rawContacts = [],
     applications = [],
 }: {
-    contacts: Contact[];
+    contacts?: Contact[] | null;
     applications?: JobApplication[];
 }) {
+    const contacts = rawContacts ?? [];
     const [search, setSearch] = useState('');
     const [formOpen, setFormOpen] = useState(false);
     const [editingContact, setEditingContact] = useState<Contact | null>(null);
     const [deletingContact, setDeletingContact] = useState<Contact | null>(null);
 
-    const { data, setData, post, put, processing, errors, reset, clearErrors } =
+    const { data, setData, post, put, processing, errors, reset, clearErrors, setError } =
         useForm<ContactFormData>({
             name: '',
             email: '',
@@ -331,6 +333,16 @@ return contacts;
 
     function submit(e: React.FormEvent) {
         e.preventDefault();
+
+        const result = validateWithZod(contactSchema, data);
+
+        if (!result.success) {
+            clearErrors();
+            for (const [field, message] of Object.entries(result.errors)) {
+                setError(field as keyof typeof data, message);
+            }
+            return;
+        }
 
         const payload = {
             ...data,

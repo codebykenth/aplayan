@@ -2,6 +2,7 @@ import { Head, Link, usePage } from '@inertiajs/react';
 import {  useState } from 'react';
 import type {FormEvent} from 'react';
 import type { Auth } from '@/types/auth';
+import { registerSchema, validateWithZod } from '@/lib/validations';
 
 export default function Register() {
     const { errors: pageErrors } = usePage<{ errors: Record<string, string> }>().props;
@@ -10,8 +11,20 @@ export default function Register() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [passwordConfirmation, setPasswordConfirmation] = useState('');
+    const [clientErrors, setClientErrors] = useState<Record<string, string>>({});
 
     function submit(e: FormEvent) {
+        e.preventDefault();
+
+        const validation = validateWithZod(registerSchema, { name, email, password, password_confirmation: passwordConfirmation });
+
+        if (!validation.success) {
+            setClientErrors(validation.errors);
+            return;
+        }
+
+        setClientErrors({});
+
         const form = e.target as HTMLFormElement;
         form.submit();
     }
@@ -43,8 +56,8 @@ export default function Register() {
                             className="mt-1 block w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground placeholder-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
                             placeholder="Your name"
                         />
-                        {pageErrors?.name && (
-                            <p className="mt-1 text-sm text-destructive">{pageErrors.name}</p>
+                        {(clientErrors.name || pageErrors?.name) && (
+                            <p className="mt-1 text-sm text-destructive">{clientErrors.name || pageErrors?.name}</p>
                         )}
                     </div>
 
@@ -62,8 +75,8 @@ export default function Register() {
                             className="mt-1 block w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground placeholder-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
                             placeholder="you@example.com"
                         />
-                        {pageErrors?.email && (
-                            <p className="mt-1 text-sm text-destructive">{pageErrors.email}</p>
+                        {(clientErrors.email || pageErrors?.email) && (
+                            <p className="mt-1 text-sm text-destructive">{clientErrors.email || pageErrors?.email}</p>
                         )}
                     </div>
 
@@ -82,8 +95,8 @@ export default function Register() {
                             className="mt-1 block w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground placeholder-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
                             placeholder="Password"
                         />
-                        {pageErrors?.password && (
-                            <p className="mt-1 text-sm text-destructive">{pageErrors.password}</p>
+                        {(clientErrors.password || pageErrors?.password) && (
+                            <p className="mt-1 text-sm text-destructive">{clientErrors.password || pageErrors?.password}</p>
                         )}
                     </div>
 
@@ -101,6 +114,9 @@ export default function Register() {
                             className="mt-1 block w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground placeholder-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
                             placeholder="Confirm password"
                         />
+                        {(clientErrors.password_confirmation) && (
+                            <p className="mt-1 text-sm text-destructive">{clientErrors.password_confirmation}</p>
+                        )}
                     </div>
 
                     <button

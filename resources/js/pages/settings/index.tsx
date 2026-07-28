@@ -11,6 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useTheme, useColorTheme } from '@/hooks/use-theme';
 import AppLayout from '@/layouts/app-layout';
 import { cn } from '@/lib/utils';
+import { profileSchema, passwordSchema as passwordSchemaZod, validateWithZod } from '@/lib/validations';
 import settings from '@/routes/settings';
 import type { TaxSettings, TaxAllowance, TaxCustomDeduction } from '@/types/job-application';
 import { TAX_REGIMES } from '@/types/job-application';
@@ -63,7 +64,7 @@ interface SettingsPageProps {
 }
 
 function ProfileSection({ user }: { user: UserData }) {
-    const { data, setData, patch, processing, errors, transform } = useForm({
+    const { data, setData, patch, processing, errors, transform, setError, clearErrors } = useForm({
         name: user.name,
         email: user.email,
         expected_salary: user.expected_salary != null ? String(user.expected_salary) : '',
@@ -74,6 +75,16 @@ function ProfileSection({ user }: { user: UserData }) {
 
     function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
+
+        const result = validateWithZod(profileSchema, { name: data.name, email: data.email, expected_salary: Number(data.expected_salary), base_currency: data.base_currency });
+
+        if (!result.success) {
+            clearErrors();
+            for (const [field, message] of Object.entries(result.errors)) {
+                setError(field as keyof typeof data, message);
+            }
+            return;
+        }
 
         transform((formData) => ({
             ...formData,
@@ -126,8 +137,8 @@ function ProfileSection({ user }: { user: UserData }) {
                     <div className="flex flex-col gap-2">
                         <Label htmlFor="base_currency">Base Currency</Label>
                         <Select
-                            value={data.base_currency}
-                            onValueChange={(val) => setData('base_currency', val)}
+                            value={data.base_currency || 'PHP'}
+                            onValueChange={(val) => setData('base_currency', val ?? 'PHP')}
                         >
                             <SelectTrigger id="base_currency" aria-invalid={!!errors.base_currency}>
                                 <SelectValue placeholder="Select currency" />
@@ -147,11 +158,11 @@ function ProfileSection({ user }: { user: UserData }) {
 
                     <div className="flex flex-col gap-2">
                         <Label htmlFor="expected_salary">
-                            Expected Target Salary ({getCurrencySymbol(data.base_currency)})
+                            Expected Target Salary ({getCurrencySymbol(data.base_currency || 'PHP')})
                         </Label>
                         <div className="relative">
                             <span className="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
-                                {getCurrencySymbol(data.base_currency)}
+                                {getCurrencySymbol(data.base_currency || 'PHP')}
                             </span>
                             <Input
                                 id="expected_salary"
@@ -183,7 +194,7 @@ function ProfileSection({ user }: { user: UserData }) {
 }
 
 function PasswordSection() {
-    const { data, setData, patch, processing, errors, reset } = useForm({
+    const { data, setData, patch, processing, errors, reset, setError, clearErrors } = useForm({
         current_password: '',
         password: '',
         password_confirmation: '',
@@ -191,6 +202,17 @@ function PasswordSection() {
 
     function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
+
+        const result = validateWithZod(passwordSchemaZod, data);
+
+        if (!result.success) {
+            clearErrors();
+            for (const [field, message] of Object.entries(result.errors)) {
+                setError(field as keyof typeof data, message);
+            }
+            return;
+        }
+
         patch(settings.password.update.url(), {
             onSuccess: () => reset(),
         });

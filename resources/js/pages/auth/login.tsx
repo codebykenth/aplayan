@@ -2,6 +2,7 @@ import { Head, Link, usePage } from '@inertiajs/react';
 import {  useState } from 'react';
 import type {FormEvent} from 'react';
 import type { Auth } from '@/types/auth';
+import { loginSchema, validateWithZod } from '@/lib/validations';
 
 export default function Login() {
     const { auth, errors: pageErrors } = usePage<{ auth: Auth; errors: Record<string, string> }>().props;
@@ -9,8 +10,20 @@ export default function Login() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [remember, setRemember] = useState(false);
+    const [clientErrors, setClientErrors] = useState<Record<string, string>>({});
 
     function submit(e: FormEvent) {
+        e.preventDefault();
+
+        const validation = validateWithZod(loginSchema, { email, password });
+
+        if (!validation.success) {
+            setClientErrors(validation.errors);
+            return;
+        }
+
+        setClientErrors({});
+
         const form = e.target as HTMLFormElement;
         form.submit();
     }
@@ -48,8 +61,8 @@ export default function Login() {
                             className="mt-1 block w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground placeholder-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
                             placeholder="you@example.com"
                         />
-                        {pageErrors?.email && (
-                            <p className="mt-1 text-sm text-red-600 dark:text-red-400">{pageErrors.email}</p>
+                        {(clientErrors.email || pageErrors?.email) && (
+                            <p className="mt-1 text-sm text-destructive">{clientErrors.email || pageErrors?.email}</p>
                         )}
                     </div>
 

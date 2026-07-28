@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Support\Sanitizer;
 use Illuminate\Foundation\Http\FormRequest;
 
 class UpdateContactRequest extends FormRequest
@@ -9,6 +10,13 @@ class UpdateContactRequest extends FormRequest
     public function authorize(): bool
     {
         return true;
+    }
+
+    protected function prepareForValidation(): void
+    {
+        $this->merge(
+            Sanitizer::sanitizeArray($this->all()),
+        );
     }
 
     public function rules(): array

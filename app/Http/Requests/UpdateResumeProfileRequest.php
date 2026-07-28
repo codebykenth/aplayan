@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Support\Sanitizer;
 use Illuminate\Foundation\Http\FormRequest;
 
 class UpdateResumeProfileRequest extends FormRequest
@@ -9,6 +10,25 @@ class UpdateResumeProfileRequest extends FormRequest
     public function authorize(): bool
     {
         return true;
+    }
+
+    protected function prepareForValidation(): void
+    {
+        $sanitized = Sanitizer::sanitizeArray($this->all());
+
+        if (isset($sanitized['work_experience'])) {
+            $sanitized['work_experience'] = $this->input('work_experience');
+        }
+
+        if (isset($sanitized['education'])) {
+            $sanitized['education'] = $this->input('education');
+        }
+
+        if (isset($sanitized['projects'])) {
+            $sanitized['projects'] = $this->input('projects');
+        }
+
+        $this->merge($sanitized);
     }
 
     public function rules(): array

@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { PageHeader } from '@/components/ui/page-header';
 import AppLayout from '@/layouts/app-layout';
+import { goalSchema, validateWithZod } from '@/lib/validations';
 import goals from '@/routes/goals';
 
 interface WeeklyHistoryItem {
@@ -73,12 +74,23 @@ function ProgressRing({ progress, goal }: { progress: number; goal: number }) {
 }
 
 function GoalUpdateForm({ currentGoal }: { currentGoal: number }) {
-    const { data, setData, patch, processing, errors } = useForm({
+    const { data, setData, patch, processing, errors, setError, clearErrors } = useForm({
         weekly_goal: String(currentGoal),
     });
 
     function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
+
+        const result = validateWithZod(goalSchema, { weekly_goal: data.weekly_goal });
+
+        if (!result.success) {
+            clearErrors();
+            for (const [field, message] of Object.entries(result.errors)) {
+                setError(field as keyof typeof data, message);
+            }
+            return;
+        }
+
         patch(goals.update.url());
     }
 

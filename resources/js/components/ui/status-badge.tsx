@@ -7,7 +7,7 @@ import { cn } from '@/lib/utils';
 interface StatusBadgeProps {
   status: JobApplicationStatus;
   className?: string;
-  onClick?: () => void;
+  onClick?: (e: React.MouseEvent) => void;
 }
 
 const statusLabel: Partial<Record<JobApplicationStatus, string>> = {};

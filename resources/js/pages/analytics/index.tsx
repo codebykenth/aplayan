@@ -150,21 +150,21 @@ interface TimeToResponseItem {
 }
 
 export default function Analytics({
-    funnel,
-    weekly_volume,
-    status_over_time,
-    salary_insights,
-    salary_bands,
-    time_to_response,
+    funnel = [],
+    weekly_volume = [],
+    status_over_time = [],
+    salary_insights = { avg_expected: null, avg_offered: null },
+    salary_bands = [],
+    time_to_response = [],
 }: {
-    funnel: FunnelItem[];
-    weekly_volume: WeeklyVolumeItem[];
-    status_over_time: StatusOverTimeItem[];
-    salary_insights: SalaryInsights;
-    salary_bands: SalaryBandItem[];
-    time_to_response: TimeToResponseItem[];
+    funnel?: FunnelItem[];
+    weekly_volume?: WeeklyVolumeItem[];
+    status_over_time?: StatusOverTimeItem[];
+    salary_insights?: SalaryInsights;
+    salary_bands?: SalaryBandItem[];
+    time_to_response?: TimeToResponseItem[];
 }) {
-    const baseCurrency = salary_insights.base_currency || 'PHP';
+    const baseCurrency = salary_insights?.base_currency || 'PHP';
 
     const funnelConfig: ChartConfig = {};
 

@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\User;
+use Illuminate\Support\Facades\Cache;
 
 class GoalService
 {
@@ -80,12 +81,14 @@ class GoalService
 
     public function forUser(User $user): array
     {
-        return [
-            'weekly_goal' => $user->weekly_goal,
-            'current_streak' => $this->currentStreak($user),
-            'weekly_progress' => $this->weeklyProgress($user),
-            'four_week_average' => $this->fourWeekAverage($user),
-            'weekly_history' => $this->weeklyHistory($user),
-        ];
+        return Cache::remember("goals:{$user->id}", 60, function () use ($user) {
+            return [
+                'weekly_goal' => $user->weekly_goal,
+                'current_streak' => $this->currentStreak($user),
+                'weekly_progress' => $this->weeklyProgress($user),
+                'four_week_average' => $this->fourWeekAverage($user),
+                'weekly_history' => $this->weeklyHistory($user),
+            ];
+        });
     }
 }

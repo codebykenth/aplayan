@@ -1,6 +1,7 @@
 import { createInertiaApp } from '@inertiajs/react';
-import {  useEffect } from 'react';
-import type {ReactNode} from 'react';
+import { createRoot, type Root } from 'react-dom/client';
+import { useEffect } from 'react';
+import type { ReactNode } from 'react';
 import { initTheme, subscribeToThemeChanges } from '@/hooks/use-theme';
 import GuestLayout from './layouts/guest-layout';
 
@@ -22,16 +23,15 @@ createInertiaApp({
     progress: {
         color: '#4B5563',
     },
-    resolve: (name) => {
-        const pages = import.meta.glob('./pages/**/*.tsx', { eager: true });
-        const page = pages[`./pages/${name}.tsx`] as {
-            default: React.ComponentType<Record<string, unknown>> & { layout?: (page: ReactNode) => ReactNode };
-        };
-        page.default.layout ??= (page: ReactNode) => <GuestLayout>{page}</GuestLayout>;
-
-        return page;
-    },
-    withApp(app) {
-        return <ThemeProvider>{app}</ThemeProvider>;
+    layout: () => GuestLayout,
+    setup({ el, App, props }) {
+        if (el == null) return;
+        const root = (el as unknown as { _inertia_root?: Root })._inertia_root ?? createRoot(el);
+        (el as unknown as { _inertia_root: Root })._inertia_root = root;
+        root.render(
+            <ThemeProvider>
+                <App {...props} />
+            </ThemeProvider>,
+        );
     },
 });
