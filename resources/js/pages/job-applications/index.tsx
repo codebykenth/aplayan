@@ -1,9 +1,10 @@
-import { Head, router, useForm } from '@inertiajs/react';
+import { Head, router } from '@inertiajs/react';
 import { SearchIcon, PlusIcon, DownloadIcon, UploadIcon, ZapIcon, Trash2 } from 'lucide-react';
-import { useState, useMemo, useRef, useEffect  } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import type {ReactNode} from 'react';
 import QuickApplyDialog from '@/components/application-templates/quick-apply-dialog';
 import ApplicationDetailModal from '@/components/job-applications/application-detail-modal';
+import ImportModal from '@/components/job-applications/import-modal';
 import JobApplicationForm from '@/components/job-applications/job-application-form';
 import KanbanBoard from '@/components/job-applications/kanban-board';
 import { Button } from '@/components/ui/button';
@@ -11,7 +12,7 @@ import { Input } from '@/components/ui/input';
 import { PageHeader } from '@/components/ui/page-header';
 import { ConfirmDestructiveDialog } from '@/components/ui/confirm-destructive-dialog';
 import AppLayout from '@/layouts/app-layout';
-import { destroy as jobAppDestroy, exportMethod, importMethod } from '@/routes/job-applications';
+import { destroy as jobAppDestroy, exportMethod } from '@/routes/job-applications';
 import type { ApplicationTemplate } from '@/types/application-template';
 import type { Contact } from '@/types/contact';
 import { STATUS_COLORS, JOB_APPLICATION_STATUSES } from '@/types/job-application';
@@ -49,26 +50,7 @@ export default function JobApplicationsIndex({
     const [quickApplyOpen, setQuickApplyOpen] = useState(false);
     const [exportOpen, setExportOpen] = useState(false);
     const [deletingApplication, setDeletingApplication] = useState<JobApplication | null>(null);
-    const fileInputRef = useRef<HTMLInputElement>(null);
-    const importForm = useForm<{ file: File | null }>({ file: null });
-
-    function handleImportChange(e: React.ChangeEvent<HTMLInputElement>) {
-        const file = e.target.files?.[0];
-
-        if (file) {
-            importForm.setData('file', file);
-            importForm.post(importMethod.url(), {
-                onSuccess: () => {
-                    importForm.reset();
-
-                    if (fileInputRef.current) {
-                        fileInputRef.current.value = '';
-                    }
-                },
-                preserveScroll: true,
-            });
-        }
-    }
+    const [importModalOpen, setImportModalOpen] = useState(false);
 
     useEffect(() => {
         if (!exportOpen) {
@@ -163,18 +145,11 @@ return;
                         </div>
                         <Button
                             variant="outline"
-                            onClick={() => fileInputRef.current?.click()}
+                            onClick={() => setImportModalOpen(true)}
                         >
                             <UploadIcon data-icon="inline-start" />
-                            Import CSV
+                            Import Applications
                         </Button>
-                        <input
-                            ref={fileInputRef}
-                            type="file"
-                            accept=".csv,.txt"
-                            onChange={handleImportChange}
-                            className="hidden"
-                        />
                         {templates.length > 0 && (
                             <Button variant="secondary" onClick={() => setQuickApplyOpen(true)}>
                                 <ZapIcon data-icon="inline-start" />
@@ -210,19 +185,19 @@ return;
                                     key={value}
                                     type="button"
                                     onClick={() => setStatusFilter(value)}
-                                    className={`flex items-center gap-2 whitespace-nowrap rounded-full px-4 py-2 text-sm font-medium transition-colors ${
+                                    className={`flex items-center gap-2 whitespace-nowrap rounded-full px-3.5 py-1.5 text-sm font-medium border transition-colors ${
                                         statusFilter === value
-                                            ? 'bg-primary text-primary-foreground'
-                                            : 'bg-muted text-muted-foreground hover:bg-muted/80'
+                                            ? 'bg-primary text-primary-foreground border-primary shadow-xs'
+                                            : 'bg-card text-card-foreground border-border hover:bg-muted hover:text-foreground'
                                     }`}
                                 >
                                     <span className="capitalize">{label}</span>
                                     <span
-                                        className={`rounded-full px-2 py-0.5 text-xs font-medium ${
+                                        className={`rounded-full px-2 py-0.5 text-xs font-semibold ${
                                             statusFilter === value
                                                 ? 'bg-primary-foreground/20 text-primary-foreground'
                                                 : value === ALL_STATUS
-                                                    ? 'bg-primary/10 text-primary'
+                                                    ? 'bg-primary/15 text-primary'
                                                     : STATUS_COLORS[value]
                                         }`}
                                     >
@@ -282,6 +257,11 @@ return;
                 open={quickApplyOpen}
                 onClose={() => setQuickApplyOpen(false)}
                 templates={templates}
+            />
+
+            <ImportModal
+                open={importModalOpen}
+                onClose={() => setImportModalOpen(false)}
             />
 
             <ConfirmDestructiveDialog

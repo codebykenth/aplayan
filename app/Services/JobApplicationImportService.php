@@ -12,7 +12,14 @@ class JobApplicationImportService
 
     public function import(User $user, UploadedFile $file): array
     {
-        $rows = $this->parseCsv($file);
+        $content = file_get_contents($file->getRealPath());
+        $trimmed = ltrim($content ?: '');
+
+        if (str_starts_with($trimmed, '[') || str_starts_with($trimmed, '{')) {
+            $rows = $this->parseJson($file);
+        } else {
+            $rows = $this->parseCsv($file);
+        }
 
         $imported = 0;
         $skipped = 0;
@@ -69,15 +76,35 @@ class JobApplicationImportService
         return $rows;
     }
 
+    private function parseJson(UploadedFile $file): array
+    {
+        $content = file_get_contents($file->getRealPath());
+
+        if ($content === false) {
+            return [];
+        }
+
+        $data = json_decode($content, true);
+
+        if (json_last_error() !== JSON_ERROR_NONE || ! is_array($data)) {
+            return [];
+        }
+
+        return $data;
+    }
+
     private function mapRow(array $row): array
     {
         return [
             'company_name' => $row['company_name'] ?? null,
             'job_title' => $row['job_title'] ?? null,
-            'status' => $row['status'] ?? null,
-            'location' => $row['location'] ?? null,
+            'status' => $row['status'] ?? 'wishlist',
+            'location' => $row['location'] ?? 'Remote',
             'expected_salary' => isset($row['expected_salary']) && $row['expected_salary'] !== '' ? (int) $row['expected_salary'] : null,
             'date_applied' => isset($row['date_applied']) && $row['date_applied'] !== '' ? $row['date_applied'] : null,
+            'job_url' => $row['job_url'] ?? null,
+            'job_description' => $row['job_description'] ?? null,
+            'notes' => $row['notes'] ?? null,
         ];
     }
 
@@ -90,6 +117,9 @@ class JobApplicationImportService
             'location' => ['required', 'string', 'max:255'],
             'expected_salary' => ['nullable', 'integer', 'min:0'],
             'date_applied' => ['nullable', 'date'],
+            'job_url' => ['nullable', 'url', 'max:255'],
+            'job_description' => ['nullable', 'string'],
+            'notes' => ['nullable', 'string'],
         ]);
 
         return ! $validator->fails();

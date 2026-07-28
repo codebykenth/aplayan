@@ -243,6 +243,30 @@ describe('import', function () {
         expect($this->otherUser->jobApplications()->count())->toBe(0);
     });
 
+    it('only imports JSON applications for the authenticated user', function () {
+        $json = json_encode([
+            [
+                'company_name' => 'Acme Corp',
+                'job_title' => 'Software Engineer',
+            ],
+        ]);
+
+        $file = UploadedFile::fake()->createWithContent('applications.json', $json);
+
+        $response = $this->actingAs($this->user)->post(
+            route('job-applications.import'),
+            ['file' => $file],
+        );
+
+        $response->assertRedirect('/job-applications');
+        $this->assertDatabaseCount('job_applications', 1);
+        $this->assertDatabaseHas('job_applications', [
+            'user_id' => $this->user->id,
+            'company_name' => 'Acme Corp',
+        ]);
+        expect($this->otherUser->jobApplications()->count())->toBe(0);
+    });
+
     it('redirects unauthenticated users to login for import', function () {
         $csv = "company_name,job_title,status,location,expected_salary,date_applied\n";
         $csv .= "Acme Corp,Engineer,applied,Remote,50000,2024-01-15\n";
@@ -290,5 +314,195 @@ describe('import', function () {
             'expected_salary' => null,
             'date_applied' => null,
         ]);
+    });
+
+    it('imports job applications from JSON with full fields', function () {
+        $json = json_encode([
+            [
+                'company_name' => 'Acme Corp',
+                'job_title' => 'Software Engineer',
+                'status' => 'applied',
+                'location' => 'Remote',
+                'expected_salary' => 50000,
+                'date_applied' => '2024-01-15',
+                'job_url' => 'https://example.com/job1',
+                'job_description' => 'Senior role',
+                'notes' => 'Applied via referral',
+            ],
+            [
+                'company_name' => 'Globex',
+                'job_title' => 'Product Manager',
+                'status' => 'interviewing',
+                'location' => 'Metro Manila',
+                'expected_salary' => 80000,
+                'date_applied' => '2024-02-20',
+            ],
+        ]);
+
+        $file = UploadedFile::fake()->createWithContent('applications.json', $json);
+
+        $response = $this->actingAs($this->user)->post(
+            route('job-applications.import'),
+            ['file' => $file],
+        );
+
+        $response->assertRedirect('/job-applications');
+        $this->assertDatabaseCount('job_applications', 2);
+        $this->assertDatabaseHas('job_applications', [
+            'user_id' => $this->user->id,
+            'company_name' => 'Acme Corp',
+            'job_title' => 'Software Engineer',
+            'status' => 'applied',
+            'location' => 'Remote',
+            'expected_salary' => 50000,
+            'date_applied' => '2024-01-15',
+            'job_url' => 'https://example.com/job1',
+            'job_description' => 'Senior role',
+            'notes' => 'Applied via referral',
+        ]);
+        $this->assertDatabaseHas('job_applications', [
+            'user_id' => $this->user->id,
+            'company_name' => 'Globex',
+            'job_title' => 'Product Manager',
+            'status' => 'interviewing',
+            'location' => 'Metro Manila',
+            'expected_salary' => 80000,
+            'date_applied' => '2024-02-20',
+        ]);
+    });
+
+    it('imports JSON with minimal required fields using smart defaults', function () {
+        $json = json_encode([
+            [
+                'company_name' => 'Acme Corp',
+                'job_title' => 'Software Engineer',
+            ],
+        ]);
+
+        $file = UploadedFile::fake()->createWithContent('applications.json', $json);
+
+        $response = $this->actingAs($this->user)->post(
+            route('job-applications.import'),
+            ['file' => $file],
+        );
+
+        $response->assertRedirect('/job-applications');
+        $this->assertDatabaseCount('job_applications', 1);
+        $this->assertDatabaseHas('job_applications', [
+            'user_id' => $this->user->id,
+            'company_name' => 'Acme Corp',
+            'job_title' => 'Software Engineer',
+            'status' => 'wishlist',
+            'location' => 'Remote',
+        ]);
+    });
+
+    it('validates JSON syntax and returns errors for invalid JSON', function () {
+        $invalidJson = '{ "company_name": "Acme", "job_title": "Engineer"'; // Missing closing brace
+
+        $file = UploadedFile::fake()->createWithContent('applications.json', $invalidJson);
+
+        $response = $this->actingAs($this->user)->postJson(
+            route('job-applications.import'),
+            ['file' => $file],
+        );
+
+        $response->assertJsonValidationErrors(['file']);
+    });
+
+    it('validates JSON array structure and returns errors for non-array', function () {
+        $json = json_encode(['company_name' => 'Acme', 'job_title' => 'Engineer']);
+
+        $file = UploadedFile::fake()->createWithContent('applications.json', $json);
+
+        $response = $this->actingAs($this->user)->postJson(
+            route('job-applications.import'),
+            ['file' => $file],
+        );
+
+        $response->assertJsonValidationErrors(['file']);
+    });
+
+    it('validates JSON objects have required fields', function () {
+        $json = json_encode([
+            ['company_name' => 'Acme'], // Missing job_title
+        ]);
+
+        $file = UploadedFile::fake()->createWithContent('applications.json', $json);
+
+        $response = $this->actingAs($this->user)->postJson(
+            route('job-applications.import'),
+            ['file' => $file],
+        );
+
+        $response->assertJsonValidationErrors(['file']);
+    });
+
+    it('imports JSON with optional fields job_url, job_description, and notes', function () {
+        $json = json_encode([
+            [
+                'company_name' => 'Acme Corp',
+                'job_title' => 'Software Engineer',
+                'job_url' => 'https://example.com/job',
+                'job_description' => 'Senior role with benefits',
+                'notes' => 'Remote position',
+            ],
+        ]);
+
+        $file = UploadedFile::fake()->createWithContent('applications.json', $json);
+
+        $response = $this->actingAs($this->user)->post(
+            route('job-applications.import'),
+            ['file' => $file],
+        );
+
+        $response->assertRedirect('/job-applications');
+        $this->assertDatabaseHas('job_applications', [
+            'user_id' => $this->user->id,
+            'company_name' => 'Acme Corp',
+            'job_url' => 'https://example.com/job',
+            'job_description' => 'Senior role with benefits',
+            'notes' => 'Remote position',
+        ]);
+    });
+
+    it('imports CSV with optional fields job_url, job_description, and notes', function () {
+        $csv = "company_name,job_title,status,location,expected_salary,date_applied,job_url,job_description,notes\n";
+        $csv .= "Acme Corp,Software Engineer,applied,Remote,50000,2024-01-15,https://example.com/job,Senior role,Applied via referral\n";
+
+        $file = UploadedFile::fake()->createWithContent('applications.csv', $csv);
+
+        $response = $this->actingAs($this->user)->post(
+            route('job-applications.import'),
+            ['file' => $file],
+        );
+
+        $response->assertRedirect('/job-applications');
+        $this->assertDatabaseHas('job_applications', [
+            'user_id' => $this->user->id,
+            'company_name' => 'Acme Corp',
+            'job_url' => 'https://example.com/job',
+            'job_description' => 'Senior role',
+            'notes' => 'Applied via referral',
+        ]);
+    });
+
+    it('accepts JSON file extension for import', function () {
+        $json = json_encode([
+            [
+                'company_name' => 'Acme Corp',
+                'job_title' => 'Software Engineer',
+            ],
+        ]);
+
+        $file = UploadedFile::fake()->createWithContent('applications.json', $json);
+
+        $response = $this->actingAs($this->user)->post(
+            route('job-applications.import'),
+            ['file' => $file],
+        );
+
+        $response->assertRedirect('/job-applications');
+        $this->assertDatabaseCount('job_applications', 1);
     });
 });
