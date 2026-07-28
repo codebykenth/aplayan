@@ -155,3 +155,17 @@ it('can store a cover letter template with dynamic placeholders', function () {
         'content' => 'Dear [Recipient], I am interested in the [Job Title] position at [Company Name]. My name is [Your Name].',
     ]);
 });
+
+it('returns json list of the authenticated users cover letter templates', function () {
+    CoverLetterTemplate::factory()->count(2)->create(['user_id' => $this->user->id]);
+    CoverLetterTemplate::factory()->count(3)->create(['user_id' => $this->otherUser->id]);
+
+    $response = $this->actingAs($this->user)->getJson(route('cover-letter-templates.json'));
+
+    $response->assertSuccessful();
+    $response->assertJsonCount(2, 'templates');
+});
+
+it('returns 401 for unauthenticated users on json endpoint', function () {
+    $this->getJson(route('cover-letter-templates.json'))->assertUnauthorized();
+});

@@ -58,6 +58,8 @@ class CoverLetterTemplateController extends Controller
 
     public function json(Request $request): JsonResponse
     {
+        $this->authorize('viewAny', CoverLetterTemplate::class);
+
         $templates = $this->service->listForUser($request->user());
 
         return response()->json(['templates' => $templates]);
