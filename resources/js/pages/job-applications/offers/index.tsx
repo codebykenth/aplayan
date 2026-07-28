@@ -10,19 +10,9 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { PageHeader } from '@/components/ui/page-header';
 import { StatusBadge } from '@/components/ui/status-badge';
 import AppLayout from '@/layouts/app-layout';
+import { formatSalary, getCurrencySymbol } from '@/utils/currency';
 import type { Contact } from '@/types/contact';
 import type { JobApplication, TaxConfig } from '@/types/job-application';
-
-function formatSalary(amount: number | null): string | null {
-    if (amount === null) {
-        return null;
-    }
-
-    return `₱${amount.toLocaleString('en-PH', {
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 0,
-    })}`;
-}
 
 function formatDate(date: string | null): string | null {
     if (!date) {
@@ -41,10 +31,12 @@ function formatDate(date: string | null): string | null {
 function OfferCard({
     offer,
     userDefaults,
+    baseCurrency,
     onViewDetails,
 }: {
     offer: JobApplication;
     userDefaults: TaxConfig | null;
+    baseCurrency: string;
     onViewDetails: (offer: JobApplication) => void;
 }) {
     const tb = offer.tax_breakdown;
@@ -77,7 +69,7 @@ function OfferCard({
                         <div className="flex items-center justify-between rounded-lg bg-muted/50 px-3 py-2">
                             <span className="text-sm text-muted-foreground">Offered Salary</span>
                             <span className="text-lg font-bold tabular-nums text-foreground">
-                                {formatSalary(offer.offered_salary)}
+                                {formatSalary(offer.offered_salary, offer.currency ?? baseCurrency)}
                             </span>
                         </div>
                     )}
@@ -159,10 +151,12 @@ function OfferCard({
 export default function OfferComparisonIndex({
     offers,
     userDefaults,
+    baseCurrency = 'PHP',
     contacts = [],
 }: {
     offers: { data: JobApplication[] } | JobApplication[];
     userDefaults: TaxConfig | null;
+    baseCurrency?: string;
     contacts?: Contact[];
 }) {
     const offerList = Array.isArray(offers) ? offers : (offers?.data ?? []);
@@ -201,6 +195,7 @@ export default function OfferComparisonIndex({
                                 key={offer.id}
                                 offer={offer}
                                 userDefaults={userDefaults}
+                                baseCurrency={baseCurrency}
                                 onViewDetails={handleViewDetails}
                             />
                         ))}

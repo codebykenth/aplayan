@@ -112,7 +112,7 @@ it('validates theme is required on dedicated endpoint', function () {
 it('validates required fields on profile update', function () {
     $this->actingAs($this->user)
         ->patchJson(route('settings.profile.update'), [])
-        ->assertJsonValidationErrors(['name', 'email', 'theme', 'color_theme']);
+        ->assertJsonValidationErrors(['name', 'email']);
 });
 
 it('validates theme must be valid value on profile endpoint', function () {
@@ -260,4 +260,31 @@ it('accepts all valid color theme values', function () {
             'color_theme' => $colorTheme,
         ]);
     }
+});
+
+it('updates base_currency via profile endpoint', function () {
+    $this->actingAs($this->user)->patch(route('settings.profile.update'), [
+        'name' => $this->user->name,
+        'email' => $this->user->email,
+        'theme' => 'system',
+        'color_theme' => 'zinc',
+        'base_currency' => 'USD',
+    ])->assertRedirect();
+
+    $this->assertDatabaseHas('users', [
+        'id' => $this->user->id,
+        'base_currency' => 'USD',
+    ]);
+});
+
+it('validates base_currency must be supported currency', function () {
+    $this->actingAs($this->user)
+        ->patchJson(route('settings.profile.update'), [
+            'name' => $this->user->name,
+            'email' => $this->user->email,
+            'theme' => 'system',
+            'color_theme' => 'zinc',
+            'base_currency' => 'INVALID',
+        ])
+        ->assertJsonValidationErrors(['base_currency']);
 });

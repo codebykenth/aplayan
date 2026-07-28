@@ -3634,13 +3634,67 @@ function SortableTab({
     );
 }
 
+const VALID_EDITOR_TABS = ['personal', 'work', 'education', 'skills', 'projects', 'certifications', 'additional_info'];
+const VALID_VIEWS = ['resume-edit', 'resume-preview', 'cover-letter', 'cover-letter-preview', 'portfolio'];
+
+function getInitialEditorTab(): string {
+    if (typeof window !== 'undefined') {
+        const urlParams = new URLSearchParams(window.location.search);
+        const urlTab = urlParams.get('tab');
+        if (urlTab && VALID_EDITOR_TABS.includes(urlTab)) {
+            return urlTab;
+        }
+        const savedTab = localStorage.getItem('documents_editor_tab');
+        if (savedTab && VALID_EDITOR_TABS.includes(savedTab)) {
+            return savedTab;
+        }
+    }
+    return 'personal';
+}
+
+function getInitialView(defaultView: string): string {
+    if (typeof window !== 'undefined') {
+        const urlParams = new URLSearchParams(window.location.search);
+        const urlView = urlParams.get('view');
+        if (urlView && VALID_VIEWS.includes(urlView)) {
+            return urlView;
+        }
+        const savedView = localStorage.getItem('documents_active_view');
+        if (savedView && VALID_VIEWS.includes(savedView)) {
+            return savedView;
+        }
+    }
+    return defaultView;
+}
+
 export default function DocumentsIndex({ profile, aiLimit, loadedResume, loadedCoverLetter, flash }: DocumentsPageProps) {
     const initialView = loadedResume ? 'resume-preview' : (loadedCoverLetter ? 'cover-letter-preview' : 'resume-edit');
     const initialTemplate = loadedResume?.template || 'ats_classic';
     const initialCLTemplate = loadedCoverLetter?.template || 'cl_formal';
 
-    const [activeEditorTab, setActiveEditorTab] = useState('personal');
-    const [activeView, setActiveView] = useState<string>(initialView);
+    const [activeEditorTab, setActiveEditorTabState] = useState<string>(getInitialEditorTab);
+    const [activeView, setActiveViewState] = useState<string>(() => getInitialView(initialView));
+
+    const setActiveEditorTab = (tab: string) => {
+        setActiveEditorTabState(tab);
+        if (typeof window !== 'undefined') {
+            localStorage.getItem('documents_editor_tab');
+            localStorage.setItem('documents_editor_tab', tab);
+            const url = new URL(window.location.href);
+            url.searchParams.set('tab', tab);
+            window.history.replaceState({}, '', url.toString());
+        }
+    };
+
+    const setActiveView = (view: string) => {
+        setActiveViewState(view);
+        if (typeof window !== 'undefined') {
+            localStorage.setItem('documents_active_view', view);
+            const url = new URL(window.location.href);
+            url.searchParams.set('view', view);
+            window.history.replaceState({}, '', url.toString());
+        }
+    };
     const [template, setTemplate] = useState<string>(initialTemplate);
     const [clTemplate, setCLTemplate] = useState<string>(initialCLTemplate);
     const [photoDataUrl, setPhotoDataUrl] = useState<string | null>(null);

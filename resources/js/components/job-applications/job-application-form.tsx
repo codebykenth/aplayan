@@ -1,4 +1,4 @@
-import { useForm } from '@inertiajs/react';
+import { useForm, usePage } from '@inertiajs/react';
 import { useCallback, useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import {
@@ -19,7 +19,7 @@ import {
     SelectValue,
 } from '@/components/ui/select';
 import { store as jobAppStore, update as jobAppUpdate } from '@/routes/job-applications';
-import { CURRENCIES, getCurrencySymbol } from '@/utils/currency';
+import { CURRENCIES, getCurrencySymbol, convertCurrency } from '@/utils/currency';
 import { JOB_APPLICATION_STATUSES } from '@/types/job-application';
 import type { JobApplication } from '@/types/job-application';
 
@@ -47,6 +47,8 @@ export default function JobApplicationForm({
     application?: JobApplication | null;
 }) {
     const isEditing = !!application;
+    const { auth } = usePage<{ auth?: { user?: { base_currency?: string } } }>().props;
+    const userBaseCurrency = auth?.user?.base_currency || 'PHP';
 
     const { data, setData, post, put, processing, errors, reset, transform, clearErrors } =
         useForm<FormData>({
@@ -65,7 +67,7 @@ export default function JobApplicationForm({
                 application?.offered_salary != null
                     ? String(application.offered_salary)
                     : '',
-            currency: application?.currency ?? 'PHP',
+            currency: application?.currency ?? userBaseCurrency,
             notes: application?.notes ?? '',
         });
 
@@ -240,10 +242,34 @@ setData('status', value);
                             <Label>Currency</Label>
                             <Select
                                 value={data.currency}
-                                onValueChange={(value: string | null) => {
-                                    if (value) {
-                                        setData('currency', value);
+                                onValueChange={(newCurrency: string | null) => {
+                                    if (!newCurrency) return;
+                                    const oldCurrency = data.currency || 'PHP';
+                                    if (oldCurrency === newCurrency) return;
+
+                                    let newExpected = data.expected_salary;
+                                    let newOffered = data.offered_salary;
+
+                                    if (data.expected_salary && !isNaN(Number(data.expected_salary))) {
+                                        const val = Number(data.expected_salary);
+                                        if (val > 0) {
+                                            newExpected = String(convertCurrency(val, oldCurrency, newCurrency));
+                                        }
                                     }
+
+                                    if (data.offered_salary && !isNaN(Number(data.offered_salary))) {
+                                        const val = Number(data.offered_salary);
+                                        if (val > 0) {
+                                            newOffered = String(convertCurrency(val, oldCurrency, newCurrency));
+                                        }
+                                    }
+
+                                    setData((prev) => ({
+                                        ...prev,
+                                        currency: newCurrency,
+                                        expected_salary: newExpected,
+                                        offered_salary: newOffered,
+                                    }));
                                 }}
                             >
                                 <SelectTrigger>

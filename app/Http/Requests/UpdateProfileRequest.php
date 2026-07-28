@@ -17,9 +17,10 @@ class UpdateProfileRequest extends FormRequest
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'email', 'max:255', 'unique:users,email,'.$this->user()->id],
             'expected_salary' => ['nullable', 'integer', 'min:0'],
+            'base_currency' => ['nullable', 'string', 'in:PHP,USD,EUR,GBP,AUD,CAD,SGD,JPY,AED,NZD'],
             'job_search_preferences' => ['nullable', 'array'],
-            'theme' => ['required', 'string', 'in:light,dark,system'],
-            'color_theme' => ['required', 'string', 'in:zinc,emerald,ocean,indigo,sunset'],
+            'theme' => ['sometimes', 'string', 'in:light,dark,system'],
+            'color_theme' => ['sometimes', 'string', 'in:zinc,emerald,ocean,indigo,sunset'],
         ];
     }
 }

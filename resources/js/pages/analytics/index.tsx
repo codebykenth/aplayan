@@ -26,6 +26,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import AppLayout from '@/layouts/app-layout';
 import { JOB_APPLICATION_STATUSES } from '@/types/job-application';
 import type { JobApplicationStatus } from '@/types/job-application';
+import { formatSalary } from '@/utils/currency';
 
 const STATUS_CHART_COLORS: Record<JobApplicationStatus, string> = {
     wishlist: '#94a3b8',
@@ -129,6 +130,7 @@ interface StatusOverTimeItem {
 interface SalaryInsights {
     avg_expected: number | null;
     avg_offered: number | null;
+    base_currency?: string;
 }
 
 interface SalaryBandItem {
@@ -162,6 +164,8 @@ export default function Analytics({
     salary_bands: SalaryBandItem[];
     time_to_response: TimeToResponseItem[];
 }) {
+    const baseCurrency = salary_insights.base_currency || 'PHP';
+
     const funnelConfig: ChartConfig = {};
 
     for (const item of funnel) {
@@ -214,14 +218,14 @@ export default function Analytics({
                     <Card>
                         <CardHeader className="flex flex-row items-center justify-between pb-2">
                             <CardTitle className="text-sm font-medium text-muted-foreground">
-                                Avg Expected Salary
+                                Avg Expected Salary ({baseCurrency})
                             </CardTitle>
-                            <ChartInfoTooltip description="Calculated as the average expected salary across all job applications where an expected salary was set." />
+                            <ChartInfoTooltip description="Calculated as the average expected salary across all job applications, converted into your preferred base currency." />
                         </CardHeader>
                         <CardContent>
                             <p className="text-3xl font-bold text-foreground">
                                 {salary_insights.avg_expected !== null
-                                    ? `₱${salary_insights.avg_expected.toLocaleString()}`
+                                    ? formatSalary(salary_insights.avg_expected, baseCurrency)
                                     : '—'}
                             </p>
                         </CardContent>
@@ -229,14 +233,14 @@ export default function Analytics({
                     <Card>
                         <CardHeader className="flex flex-row items-center justify-between pb-2">
                             <CardTitle className="text-sm font-medium text-muted-foreground">
-                                Avg Offered Salary
+                                Avg Offered Salary ({baseCurrency})
                             </CardTitle>
-                            <ChartInfoTooltip description="Calculated as the average offered salary across all job applications that reached the offer stage." />
+                            <ChartInfoTooltip description="Calculated as the average offered salary across all job applications that reached the offer stage, converted into your preferred base currency." />
                         </CardHeader>
                         <CardContent>
                             <p className="text-3xl font-bold text-foreground">
                                 {salary_insights.avg_offered !== null
-                                    ? `₱${salary_insights.avg_offered.toLocaleString()}`
+                                    ? formatSalary(salary_insights.avg_offered, baseCurrency)
                                     : '—'}
                             </p>
                         </CardContent>

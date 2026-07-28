@@ -22,6 +22,7 @@ class JobApplicationResource extends JsonResource
             $taxCalculator = app(PhilippineTaxCalculatorService::class);
             $fxService = app(FxExchangeService::class);
             $userDefaults = $this->user?->tax_settings;
+            $baseCurrency = $this->user?->base_currency ?? 'PHP';
 
             $salaryInPhp = $fxService->convertToPhp((float) $salary, $currency);
 
@@ -36,6 +37,11 @@ class JobApplicationResource extends JsonResource
                 $taxBreakdown['original_monthly_gross'] = (float) $salary;
                 $taxBreakdown['converted_monthly_gross'] = $salaryInPhp;
                 $taxBreakdown['conversion_rate'] = $fxService->convert(1, $currency, 'PHP');
+            }
+
+            if ($baseCurrency !== 'PHP') {
+                $taxBreakdown['base_currency'] = $baseCurrency;
+                $taxBreakdown['base_monthly_net'] = $fxService->convert($taxBreakdown['monthly_net'], 'PHP', $baseCurrency);
             }
         }
 

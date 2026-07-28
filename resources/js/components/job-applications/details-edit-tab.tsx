@@ -9,7 +9,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
-import { CURRENCIES, getCurrencySymbol } from '@/utils/currency';
+import { CURRENCIES, getCurrencySymbol, convertCurrency } from '@/utils/currency';
 import { JOB_APPLICATION_STATUSES } from '@/types/job-application';
 import type { JobApplication, TaxConfig } from '@/types/job-application';
 
@@ -161,7 +161,27 @@ export default function DetailsEditTab({
                 <Label className="text-xs">Currency</Label>
                 <Select
                     value={formData.currency}
-                    onValueChange={(value) => onFieldChange('currency', value)}
+                    onValueChange={(newCurrency) => {
+                        if (!newCurrency) return;
+                        const oldCurrency = formData.currency || 'PHP';
+                        if (oldCurrency === newCurrency) return;
+
+                        onFieldChange('currency', newCurrency);
+
+                        if (formData.expected_salary && !isNaN(Number(formData.expected_salary))) {
+                            const val = Number(formData.expected_salary);
+                            if (val > 0) {
+                                onFieldChange('expected_salary', String(convertCurrency(val, oldCurrency, newCurrency)));
+                            }
+                        }
+
+                        if (formData.offered_salary && !isNaN(Number(formData.offered_salary))) {
+                            const val = Number(formData.offered_salary);
+                            if (val > 0) {
+                                onFieldChange('offered_salary', String(convertCurrency(val, oldCurrency, newCurrency)));
+                            }
+                        }
+                    }}
                     disabled={disabled}
                 >
                     <SelectTrigger className="h-8 text-xs" aria-invalid={!!errors.currency}>

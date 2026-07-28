@@ -31,6 +31,7 @@ class OfferComparisonController extends Controller
         return Inertia::render('job-applications/offers/index', [
             'offers' => JobApplicationResource::collection($applications),
             'userDefaults' => $request->user()->tax_settings,
+            'baseCurrency' => $request->user()->base_currency ?? 'PHP',
             'contacts' => $contacts,
         ]);
     }

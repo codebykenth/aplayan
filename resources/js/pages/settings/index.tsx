@@ -14,6 +14,7 @@ import { cn } from '@/lib/utils';
 import settings from '@/routes/settings';
 import type { TaxSettings, TaxAllowance, TaxCustomDeduction } from '@/types/job-application';
 import { TAX_REGIMES } from '@/types/job-application';
+import { CURRENCIES, getCurrencySymbol } from '@/utils/currency';
 
 const THEME_OPTIONS = [
     {
@@ -50,6 +51,7 @@ type UserData = {
     email: string;
     avatar?: string;
     expected_salary: number | null;
+    base_currency?: string;
     job_search_preferences: Record<string, unknown> | null;
     theme: string;
     color_theme: string;
@@ -65,7 +67,9 @@ function ProfileSection({ user }: { user: UserData }) {
         name: user.name,
         email: user.email,
         expected_salary: user.expected_salary != null ? String(user.expected_salary) : '',
+        base_currency: user.base_currency || 'PHP',
         theme: user.theme,
+        color_theme: user.color_theme,
     });
 
     function handleSubmit(e: React.FormEvent) {
@@ -88,7 +92,7 @@ function ProfileSection({ user }: { user: UserData }) {
                         Profile Preferences
                     </CardTitle>
                     <CardDescription>
-                        Update your public name, email address, and target compensation.
+                        Update your public name, email address, default currency, and target compensation.
                     </CardDescription>
                 </CardHeader>
                 <CardContent className="flex flex-col gap-4">
@@ -120,18 +124,40 @@ function ProfileSection({ user }: { user: UserData }) {
                     </div>
 
                     <div className="flex flex-col gap-2">
+                        <Label htmlFor="base_currency">Base Currency</Label>
+                        <Select
+                            value={data.base_currency}
+                            onValueChange={(val) => setData('base_currency', val)}
+                        >
+                            <SelectTrigger id="base_currency" aria-invalid={!!errors.base_currency}>
+                                <SelectValue placeholder="Select currency" />
+                            </SelectTrigger>
+                            <SelectContent side="bottom">
+                                {CURRENCIES.map((c) => (
+                                    <SelectItem key={c.code} value={c.code}>
+                                        {c.symbol} {c.name} ({c.code})
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                        {errors.base_currency && (
+                            <p className="text-xs text-destructive">{errors.base_currency}</p>
+                        )}
+                    </div>
+
+                    <div className="flex flex-col gap-2">
                         <Label htmlFor="expected_salary">
-                            Expected Target Salary (₱)
+                            Expected Target Salary ({getCurrencySymbol(data.base_currency)})
                         </Label>
                         <div className="relative">
                             <span className="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
-                                ₱
+                                {getCurrencySymbol(data.base_currency)}
                             </span>
                             <Input
                                 id="expected_salary"
                                 type="number"
                                 min={0}
-                                className="pl-6"
+                                className="pl-7"
                                 value={data.expected_salary}
                                 onChange={(e) =>
                                     setData('expected_salary', e.target.value)
@@ -625,8 +651,36 @@ function TaxSettingsSection({ user }: { user: UserData }) {
     );
 }
 
+const VALID_TABS = ['appearance', 'profile', 'password', 'tax'] as const;
+type SettingsTab = typeof VALID_TABS[number];
+
+function getInitialSettingsTab(): SettingsTab {
+    if (typeof window !== 'undefined') {
+        const urlParams = new URLSearchParams(window.location.search);
+        const urlTab = urlParams.get('tab') as SettingsTab | null;
+        if (urlTab && VALID_TABS.includes(urlTab)) {
+            return urlTab;
+        }
+        const savedTab = localStorage.getItem('settings_active_tab') as SettingsTab | null;
+        if (savedTab && VALID_TABS.includes(savedTab)) {
+            return savedTab;
+        }
+    }
+    return 'appearance';
+}
+
 export default function SettingsIndex({ user }: SettingsPageProps) {
-    const [activeTab, setActiveTab] = useState<'appearance' | 'profile' | 'password' | 'tax'>('appearance');
+    const [activeTab, setActiveTabState] = useState<SettingsTab>(getInitialSettingsTab);
+
+    const handleTabChange = (tab: SettingsTab) => {
+        setActiveTabState(tab);
+        if (typeof window !== 'undefined') {
+            localStorage.setItem('settings_active_tab', tab);
+            const url = new URL(window.location.href);
+            url.searchParams.set('tab', tab);
+            window.history.replaceState({}, '', url.toString());
+        }
+    };
 
     return (
         <>
@@ -639,7 +693,7 @@ export default function SettingsIndex({ user }: SettingsPageProps) {
                 <div className="flex items-center gap-1 border-b border-border pb-1">
                     <button
                         type="button"
-                        onClick={() => setActiveTab('appearance')}
+                        onClick={() => handleTabChange('appearance')}
                         className={cn(
                             'flex items-center gap-2 rounded-lg px-3.5 py-2 text-sm font-medium transition-colors',
                             activeTab === 'appearance'
@@ -652,7 +706,7 @@ export default function SettingsIndex({ user }: SettingsPageProps) {
                     </button>
                     <button
                         type="button"
-                        onClick={() => setActiveTab('profile')}
+                        onClick={() => handleTabChange('profile')}
                         className={cn(
                             'flex items-center gap-2 rounded-lg px-3.5 py-2 text-sm font-medium transition-colors',
                             activeTab === 'profile'
@@ -665,7 +719,7 @@ export default function SettingsIndex({ user }: SettingsPageProps) {
                     </button>
                     <button
                         type="button"
-                        onClick={() => setActiveTab('password')}
+                        onClick={() => handleTabChange('password')}
                         className={cn(
                             'flex items-center gap-2 rounded-lg px-3.5 py-2 text-sm font-medium transition-colors',
                             activeTab === 'password'
@@ -678,7 +732,7 @@ export default function SettingsIndex({ user }: SettingsPageProps) {
                     </button>
                     <button
                         type="button"
-                        onClick={() => setActiveTab('tax')}
+                        onClick={() => handleTabChange('tax')}
                         className={cn(
                             'flex items-center gap-2 rounded-lg px-3.5 py-2 text-sm font-medium transition-colors',
                             activeTab === 'tax'

@@ -39,6 +39,33 @@ export function formatSalary(amount: number | null, currency: string = 'PHP'): s
     return `${symbol}${formatted}`;
 }
 
+export const RATES_TO_PHP: Record<string, number> = {
+    PHP: 1.0,
+    USD: 57.50,
+    EUR: 62.00,
+    GBP: 73.00,
+    AUD: 37.50,
+    CAD: 41.50,
+    SGD: 42.50,
+    JPY: 0.38,
+    AED: 15.65,
+    NZD: 34.50,
+};
+
+export function convertCurrency(amount: number, fromCurrency: string, toCurrency: string): number {
+    if (!amount || fromCurrency === toCurrency) {
+        return amount;
+    }
+
+    const fromRate = RATES_TO_PHP[fromCurrency] ?? 1.0;
+    const toRate = RATES_TO_PHP[toCurrency] ?? 1.0;
+
+    const amountInPhp = amount * fromRate;
+    const converted = amountInPhp / toRate;
+
+    return Math.round(converted);
+}
+
 export function formatSalaryWithPeriod(amount: number | null, currency: string = 'PHP'): string | null {
     const formatted = formatSalary(amount, currency);
 

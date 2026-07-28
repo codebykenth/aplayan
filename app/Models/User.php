@@ -22,6 +22,7 @@ use Illuminate\Support\Carbon;
  * @property string|null $google_id
  * @property string|null $avatar
  * @property int|null $expected_salary
+ * @property string $base_currency
  * @property array|null $job_search_preferences
  * @property string $theme
  * @property string $color_theme
@@ -31,7 +32,7 @@ use Illuminate\Support\Carbon;
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  */
-#[Fillable(['name', 'email', 'password', 'google_id', 'avatar', 'expected_salary', 'job_search_preferences', 'theme', 'color_theme', 'weekly_goal', 'goal_streak', 'tax_settings'])]
+#[Fillable(['name', 'email', 'password', 'google_id', 'avatar', 'expected_salary', 'base_currency', 'job_search_preferences', 'theme', 'color_theme', 'weekly_goal', 'goal_streak', 'tax_settings'])]
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable implements MustVerifyEmail
 {
