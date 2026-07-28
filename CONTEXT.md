@@ -44,14 +44,14 @@ The authenticated account owner tracking their job hunt.
 
 ### Job Application
 A record of a user's application to a specific job opening.
-- **Core Fields**: `company_name`, `job_title`, `job_url` (optional), `job_description` (optional text for AI analysis), `location` (Metro Manila, Cebu, Davao, Remote, etc.), `status`, `date_applied`, `expected_salary` (in ₱), `offered_salary` (in ₱), `notes`.
+- **Core Fields**: `company_name`, `job_title`, `job_url` (optional), `job_description` (optional text for AI analysis), `location` (Metro Manila, Cebu, Davao, Remote, etc.), `status`, `date_applied`, `currency` (ISO 4217 code, e.g., `PHP`, `USD`, `EUR`, default `PHP`), `expected_salary`, `offered_salary`, `notes`.
 - **Statuses**: `wishlist`, `applied`, `interviewing`, `offer`, `rejected`, `withdrawn`.
 - **AI Evaluation Fields**:
   - `ai_match_percentage` (0–100, nullable)
   - `ai_strengths` (JSON array of strings, nullable)
   - `ai_gaps` (JSON array of strings, nullable)
-  - `ai_salary_min` (integer in ₱, nullable)
-  - `ai_salary_max` (integer in ₱, nullable)
+  - `ai_salary_min` (integer in native currency, nullable)
+  - `ai_salary_max` (integer in native currency, nullable)
   - `ai_salary_notes` (string/text market context, nullable)
   - `ai_evaluated_at` (timestamp, nullable)
 
@@ -65,7 +65,7 @@ A chronological stream of activity events across a user's job applications (stat
 A user-defined weekly target for applications submitted (e.g., 10/week) with a streak counter and a 4-week historical average benchmark computed via pure PHP math.
 
 ### Analytics Suite
-A dedicated dashboard section/page containing 6 deep-dive charts (Application Funnel, 12-Week Application Volume, Status Distribution Over Time, Salary Insights, Salary Band Distribution, Time-to-Response) computed entirely server-side without external AI API calls.
+A dedicated dashboard section/page containing 6 deep-dive charts (Application Funnel, 12-Week Application Volume, Status Distribution Over Time, Salary Insights, Salary Band Distribution, Time-to-Response) computed server-side, with multi-currency offers dynamically normalized to the user's base currency using cached daily live foreign exchange rates.
 
 ### Contact
 A recruiter, hiring manager, or interviewer contact record (`name`, `email`, `phone`, `company_name`, `role`, `notes`) linked via a many-to-many relationship (`contact_job_application`) to job applications.
@@ -83,7 +83,7 @@ An optional headline displayed prominently in the resume header indicating the s
 A bulleted section storing key-value pairs or text items (e.g., `Languages: English, Filipino.`, `Certificates of Completion: ...`) displayed cleanly at the bottom of ATS resume templates.
 
 ### Tax Configuration & Net Pay Engine
-A flexible, zero-cost salary evaluation engine for job offers. Supports multiple tax regimes (PH Regular Employee, PH Freelancer 8% Flat Tax, Tax-Exempt / Overseas, and Custom Net Override), itemized taxable and non-taxable allowances, itemized custom deductions (HMO dependent, insurance, loans), and global user-level tax defaults with per-offer overrides.
+A flexible, zero-cost salary evaluation engine for job offers. Supports multiple tax regimes (PH Regular Employee, PH Freelancer 8% Flat Tax, Tax-Exempt / Overseas, and Custom Net Override), itemized taxable and non-taxable allowances, itemized custom deductions (HMO dependent, insurance, loans), global user-level tax defaults with per-offer overrides, and automatic conversion of foreign currency offers to local currency (PHP) for accurate statutory net pay computation.
 
 ---
 
@@ -109,3 +109,4 @@ A flexible, zero-cost salary evaluation engine for job offers. Supports multiple
 - **2026-07-28 - Automated & Customizable Offer Net Take-Home Pay Engine**: Implemented hybrid zero-cost tax engine architecture. Supports PH statutory employee tax auto-calc, 8% freelancer flat tax, tax-exempt/overseas, itemized allowances/deductions, manual statutory overrides (SSS, PhilHealth, Pag-IBIG, BIR tax), strict input validation error handling, global user tax defaults (`users.tax_settings`), per-offer JSON overrides (`job_applications.tax_config`), interactive "Customize Net Pay" card modal, and 1-click default resets. (See `docs/adr/0009-offer-net-take-home-pay-and-tax-calculator.md`).
 - **2026-07-28 - Tabbed Job Application Detail & Edit Modal Refactoring**: Designed 3-tab modal layout (`Details & Edit`, `AI Copilot`, `Contacts & Activity`). Introduces full inline editing for core application fields and Net Take-Home tax configurations (tax regime, allowances, deductions, manual net overrides), auto-expanding when status is `offer` or `offered_salary` is present, pristine form dirtiness tracking (`isDirty`), header-placed "Save as Template" action, and persistent footer "Delete Application" action using standard `AlertDialog` confirmation.
 - **2026-07-28 - ATS Single-Column Bulleted & Executive Serif Resume Templates Architecture**: Introduced `ats_single_column` (Modern Sans-Serif ATS Bulleted) and `ats_classic_serif` (Executive Serif ATS) templates matching Philippine tech & corporate standards. Supports free-form text date ranges (`2025-PRESENT`), categorized skills (`Category: Skill 1, Skill 2`), project dates, Markdown bold bullet highlighting (`**key terms**`), and a dedicated `additional_info` schema section for languages, certificates, and extra highlights.
+- **2026-07-28 - Multi-Currency & Live FX Rate Integration Architecture**: Introduced per-application ISO currency codes (`job_applications.currency`, e.g., `USD`, `EUR`, `PHP`), user default currency (`users.currency`), curated list of major currencies with symbol formatting (`₱`, `$`, `€`, `£`, `A$`, `S$`, etc.), live exchange rate caching (24-hour TTL) with hardcoded fallbacks, automatic FX conversion in multi-currency analytics charts, and dynamic conversion for Net Take-Home tax engine calculations.

@@ -90,7 +90,7 @@ function OfferCard({
                         type="button"
                         variant="outline"
                         size="sm"
-                        className="w-full justify-center gap-1.5 border-primary/30 bg-primary/5 text-xs font-medium text-primary shadow-2xs hover:bg-primary/10 hover:text-primary dark:border-primary/40 dark:bg-primary/10 dark:text-primary-foreground dark:hover:bg-primary/20"
+                        className="w-full justify-center gap-1.5 border-primary/30 bg-primary/5 text-xs font-medium text-primary shadow-2xs hover:bg-primary/10 hover:text-primary dark:border-primary/40 dark:bg-primary/10 dark:hover:bg-primary/20"
                         onClick={() => setCustomizeOpen(true)}
                     >
                         <SettingsIcon className="size-3.5" />

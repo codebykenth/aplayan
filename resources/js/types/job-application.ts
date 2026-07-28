@@ -25,6 +25,10 @@ export interface TaxBreakdown {
     thirteenth_month: number;
     annual_gross: number;
     annual_net: number;
+    original_currency?: string;
+    original_monthly_gross?: number;
+    converted_monthly_gross?: number;
+    conversion_rate?: number;
 }
 
 export interface TaxAllowance {
@@ -73,6 +77,7 @@ export interface JobApplication {
     date_applied: string | null;
     expected_salary: number | null;
     offered_salary: number | null;
+    currency: string;
     tax_config: TaxConfig | null;
     tax_breakdown: TaxBreakdown | null;
     notes: string | null;

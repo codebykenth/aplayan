@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Services\FxExchangeService;
 use App\Services\JobApplicationService;
 use App\Services\PhilippineTaxCalculatorService;
 use Illuminate\Http\Request;
@@ -14,16 +15,28 @@ class JobApplicationResource extends JsonResource
         $service = app(JobApplicationService::class);
 
         $salary = $this->offered_salary ?? $this->expected_salary;
+        $currency = $this->currency ?? 'PHP';
 
         $taxBreakdown = null;
         if ($salary !== null) {
             $taxCalculator = app(PhilippineTaxCalculatorService::class);
+            $fxService = app(FxExchangeService::class);
             $userDefaults = $this->user?->tax_settings;
+
+            $salaryInPhp = $fxService->convertToPhp((float) $salary, $currency);
+
             $taxBreakdown = $taxCalculator->computeMonthlyNetPay(
-                (float) $salary,
+                $salaryInPhp,
                 $this->tax_config,
                 $userDefaults,
             );
+
+            if ($currency !== 'PHP') {
+                $taxBreakdown['original_currency'] = $currency;
+                $taxBreakdown['original_monthly_gross'] = (float) $salary;
+                $taxBreakdown['converted_monthly_gross'] = $salaryInPhp;
+                $taxBreakdown['conversion_rate'] = $fxService->convert(1, $currency, 'PHP');
+            }
         }
 
         return [
@@ -38,6 +51,7 @@ class JobApplicationResource extends JsonResource
             'date_applied' => $this->date_applied?->toDateString(),
             'expected_salary' => $this->expected_salary,
             'offered_salary' => $this->offered_salary,
+            'currency' => $this->currency ?? 'PHP',
             'tax_config' => $this->tax_config,
             'tax_breakdown' => $taxBreakdown,
             'notes' => $this->notes,

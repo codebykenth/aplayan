@@ -26,6 +26,7 @@ class JobApplicationFactory extends Factory
             'date_applied' => fake()->optional()->date(),
             'expected_salary' => fake()->optional()->numberBetween(20000, 200000),
             'offered_salary' => fake()->optional()->numberBetween(20000, 200000),
+            'currency' => 'PHP',
             'notes' => fake()->optional()->sentence(),
             'ai_match_percentage' => null,
             'ai_strengths' => null,

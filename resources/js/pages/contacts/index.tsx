@@ -362,7 +362,7 @@ return contacts;
             <Head title="Contacts" />
 
             <div className="flex flex-1 min-h-0 flex-col gap-6">
-                <PageHeader title="Contacts">
+                <PageHeader title="Contacts" description="Manage your professional network, recruiters, and hiring managers">
                     <Button onClick={openCreate}>
                         <PlusIcon data-icon="inline-start" />
                         New Contact

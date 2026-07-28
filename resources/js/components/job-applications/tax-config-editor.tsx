@@ -118,11 +118,13 @@ export default function TaxConfigEditor({
                             disabled={disabled}
                         >
                             <SelectTrigger className="h-8 text-xs">
-                                <SelectValue placeholder="Select regime" />
+                                <span className="flex flex-1 text-left line-clamp-1">
+                                    {config.regime ? TAX_REGIMES.find(r => r.value === config.regime)?.label : "Select regime"}
+                                </span>
                             </SelectTrigger>
                             <SelectContent>
                                 {TAX_REGIMES.map((regime) => (
-                                    <SelectItem key={regime.value} value={regime.value}>
+                                    <SelectItem key={regime.value} value={regime.value} label={regime.label}>
                                         {regime.label}
                                     </SelectItem>
                                 ))}
@@ -158,14 +160,14 @@ export default function TaxConfigEditor({
                         <button
                             type="button"
                             onClick={() => setOverridesExpanded(!overridesExpanded)}
-                            className="flex items-center justify-between text-xs text-muted-foreground hover:text-foreground"
+                            className="flex w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-xs font-medium text-foreground hover:bg-accent hover:text-accent-foreground transition-colors"
                             disabled={disabled}
                         >
-                            <span className="font-medium">Statutory Deduction Overrides</span>
+                            <span>Statutory Deduction Overrides</span>
                             {overridesExpanded ? (
-                                <ChevronUpIcon className="size-3.5" />
+                                <ChevronUpIcon className="size-3.5 text-muted-foreground" />
                             ) : (
-                                <ChevronDownIcon className="size-3.5" />
+                                <ChevronDownIcon className="size-3.5 text-muted-foreground" />
                             )}
                         </button>
 

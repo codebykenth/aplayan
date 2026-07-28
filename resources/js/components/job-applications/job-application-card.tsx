@@ -8,18 +8,8 @@ import {
 import { useState, useRef, useEffect } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { StatusBadge } from '@/components/ui/status-badge';
+import { formatSalary } from '@/utils/currency';
 import type { JobApplication } from '@/types/job-application';
-
-function formatSalary(amount: number | null): string | null {
-    if (amount === null) {
-return null;
-}
-
-    return `₱${amount.toLocaleString('en-PH', {
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 0,
-    })}`;
-}
 
 function formatDate(date: string | null): string | null {
     if (!date) {
@@ -254,7 +244,7 @@ export default function JobApplicationCard({
                     <span>{formatDate(application.date_applied)}</span>
                 )}
                 {application.expected_salary !== null && (
-                    <span>Expected {formatSalary(application.expected_salary)}</span>
+                    <span>Expected {formatSalary(application.expected_salary, application.currency)}</span>
                 )}
                 {application.ai_match_percentage !== null && (
                     <span

@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Services\AiCacheService;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 
@@ -42,6 +43,7 @@ class HandleInertiaRequests extends Middleware
                 'user' => $request->user(),
             ],
             'csrf_token' => csrf_token(),
+            'aiLimit' => fn () => $request->user() ? app(AiCacheService::class)->getRateLimitInfo($request->user()->id) : null,
         ];
     }
 }

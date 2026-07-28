@@ -1,3 +1,4 @@
+import { router, usePage } from '@inertiajs/react';
 import {
     SparklesIcon,
     PhilippinePesoIcon,
@@ -9,6 +10,7 @@ import {
 } from 'lucide-react';
 import { useState, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import type { JobApplication } from '@/types/job-application';
 
 interface AiCopilotTabProps {
@@ -33,6 +35,7 @@ return null;
 export default function AiCopilotTab({
     application,
 }: AiCopilotTabProps) {
+    const { aiLimit } = usePage<{ aiLimit?: { remaining: number; total: number; exhausted: boolean } }>().props;
     const [resumeText, setResumeText] = useState('');
     const [analyzing, setAnalyzing] = useState(false);
     const [analyzeError, setAnalyzeError] = useState<string | null>(null);
@@ -70,7 +73,7 @@ return;
             }
 
             const result = await response.json();
-            window.location.reload();
+            router.reload();
         } catch (error) {
             setAnalyzeError(error instanceof Error ? error.message : 'An unexpected error occurred');
         } finally {
@@ -97,7 +100,7 @@ return;
                 throw new Error(errorData.message || 'Salary check failed. Please try again.');
             }
 
-            window.location.reload();
+            router.reload();
         } catch (error) {
             setSalaryError(error instanceof Error ? error.message : 'An unexpected error occurred');
         } finally {
@@ -124,7 +127,7 @@ return;
                 throw new Error(errorData.message || 'Failed to generate interview prep.');
             }
 
-            window.location.reload();
+            router.reload();
         } catch (error) {
             setPrepError(error instanceof Error ? error.message : 'An unexpected error occurred');
         } finally {
@@ -162,6 +165,29 @@ return;
 
     return (
         <div className="flex flex-col gap-5">
+            {aiLimit && (
+                <div className="flex items-center justify-between rounded-lg border border-border bg-muted/40 px-3 py-2 text-xs">
+                    <span className="flex items-center gap-1.5 font-medium text-foreground">
+                        <SparklesIcon className="size-3.5 text-amber-500" />
+                        Daily AI Quota: <span className="font-bold">{aiLimit.remaining}/{aiLimit.total} remaining</span>
+                    </span>
+                    <TooltipProvider>
+                        <Tooltip>
+                            <TooltipTrigger
+                                render={
+                                    <span className="cursor-help text-[11px] text-muted-foreground underline decoration-dotted">
+                                        Shared quota info
+                                    </span>
+                                }
+                            />
+                            <TooltipContent side="bottom" className="max-w-xs text-xs">
+                                10 uncached requests/day shared across AI Assist & Document Generator. Repeat queries hit the cache instantly for free.
+                            </TooltipContent>
+                        </Tooltip>
+                    </TooltipProvider>
+                </div>
+            )}
+
             <div className="flex flex-col gap-3">
                 <span className="text-xs text-muted-foreground">
                     Run AI Resume Match

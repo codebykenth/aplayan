@@ -9,6 +9,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
+import { CURRENCIES, getCurrencySymbol } from '@/utils/currency';
 import { JOB_APPLICATION_STATUSES } from '@/types/job-application';
 import type { JobApplication, TaxConfig } from '@/types/job-application';
 
@@ -22,6 +23,7 @@ interface DetailsEditTabProps {
         date_applied: string;
         expected_salary: string;
         offered_salary: string;
+        currency: string;
         job_url: string;
         job_description: string;
         notes: string;
@@ -105,11 +107,13 @@ export default function DetailsEditTab({
                         disabled={disabled}
                     >
                         <SelectTrigger className="h-8 text-xs" aria-invalid={!!errors.status}>
-                            <SelectValue placeholder="Select status" />
+                            <span className="flex flex-1 text-left line-clamp-1">
+                                {JOB_APPLICATION_STATUSES.find(s => s.value === formData.status)?.label || "Select status"}
+                            </span>
                         </SelectTrigger>
                         <SelectContent>
                             {JOB_APPLICATION_STATUSES.map((status) => (
-                                <SelectItem key={status.value} value={status.value}>
+                                <SelectItem key={status.value} value={status.value} label={status.label}>
                                     {status.label}
                                 </SelectItem>
                             ))}
@@ -153,12 +157,37 @@ export default function DetailsEditTab({
                 </div>
             </div>
 
+            <div className="flex flex-col gap-2">
+                <Label className="text-xs">Currency</Label>
+                <Select
+                    value={formData.currency}
+                    onValueChange={(value) => onFieldChange('currency', value)}
+                    disabled={disabled}
+                >
+                    <SelectTrigger className="h-8 text-xs" aria-invalid={!!errors.currency}>
+                        <span className="flex flex-1 text-left line-clamp-1">
+                            {CURRENCIES.find(c => c.code === formData.currency)?.name || 'Select currency'}
+                        </span>
+                    </SelectTrigger>
+                    <SelectContent>
+                        {CURRENCIES.map((currency) => (
+                            <SelectItem key={currency.code} value={currency.code} label={`${currency.symbol} ${currency.name}`}>
+                                {currency.symbol} {currency.name}
+                            </SelectItem>
+                        ))}
+                    </SelectContent>
+                </Select>
+                {errors.currency && (
+                    <p className="text-xs text-destructive">{errors.currency}</p>
+                )}
+            </div>
+
             <div className="grid grid-cols-2 gap-4">
                 <div className="flex flex-col gap-2">
-                    <Label htmlFor="expected_salary" className="text-xs">Expected Salary (₱)</Label>
+                    <Label htmlFor="expected_salary" className="text-xs">Expected Salary ({getCurrencySymbol(formData.currency)})</Label>
                     <div className="relative">
                         <span className="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
-                            ₱
+                            {getCurrencySymbol(formData.currency)}
                         </span>
                         <Input
                             id="expected_salary"
@@ -177,10 +206,10 @@ export default function DetailsEditTab({
                 </div>
 
                 <div className="flex flex-col gap-2">
-                    <Label htmlFor="offered_salary" className="text-xs">Offered Salary (₱)</Label>
+                    <Label htmlFor="offered_salary" className="text-xs">Offered Salary ({getCurrencySymbol(formData.currency)})</Label>
                     <div className="relative">
                         <span className="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
-                            ₱
+                            {getCurrencySymbol(formData.currency)}
                         </span>
                         <Input
                             id="offered_salary"

@@ -39,6 +39,7 @@ interface FormData {
     date_applied: string;
     expected_salary: string;
     offered_salary: string;
+    currency: string;
     job_url: string;
     job_description: string;
     notes: string;
@@ -55,6 +56,7 @@ function createFormData(application: JobApplication): FormData {
         date_applied: application.date_applied ?? '',
         expected_salary: application.expected_salary != null ? String(application.expected_salary) : '',
         offered_salary: application.offered_salary != null ? String(application.offered_salary) : '',
+        currency: application.currency ?? 'PHP',
         job_url: application.job_url ?? '',
         job_description: application.job_description ?? '',
         notes: application.notes ?? '',
@@ -150,6 +152,7 @@ return;
                     date_applied: formData.date_applied || null,
                     expected_salary: formData.expected_salary ? Number(formData.expected_salary) : null,
                     offered_salary: formData.offered_salary ? Number(formData.offered_salary) : null,
+                    currency: formData.currency,
                     job_url: formData.job_url || null,
                     job_description: formData.job_description || null,
                     notes: formData.notes || null,
@@ -170,7 +173,7 @@ return;
                 throw new Error(errorData.message || 'Failed to update application.');
             }
 
-            window.location.reload();
+            router.reload();
         } catch (error) {
         } finally {
             setUpdating(false);
@@ -227,7 +230,7 @@ return;
                     <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value ?? 'details')} className="flex flex-col flex-1 min-h-0">
                         <TabsList variant="line" className="mx-6 shrink-0">
                             <TabsTrigger value="details">Details & Edit</TabsTrigger>
-                            <TabsTrigger value="ai">AI Copilot</TabsTrigger>
+                            <TabsTrigger value="ai">AI Assist</TabsTrigger>
                             <TabsTrigger value="activity">Contacts & Activity</TabsTrigger>
                         </TabsList>
 

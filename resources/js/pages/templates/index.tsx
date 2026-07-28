@@ -42,7 +42,7 @@ export default function TemplatesIndex({
             <Head title="Templates" />
 
             <div className="flex flex-1 min-h-0 flex-col gap-6">
-                <PageHeader title="Templates" />
+                <PageHeader title="Templates" description="Manage reusable application presets and defaults for fast job entries" />
 
                 <ApplicationTemplatesTab templates={templates} />
             </div>

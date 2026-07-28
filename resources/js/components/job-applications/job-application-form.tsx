@@ -19,6 +19,7 @@ import {
     SelectValue,
 } from '@/components/ui/select';
 import { store as jobAppStore, update as jobAppUpdate } from '@/routes/job-applications';
+import { CURRENCIES, getCurrencySymbol } from '@/utils/currency';
 import { JOB_APPLICATION_STATUSES } from '@/types/job-application';
 import type { JobApplication } from '@/types/job-application';
 
@@ -32,6 +33,7 @@ interface FormData {
     date_applied: string;
     expected_salary: string;
     offered_salary: string;
+    currency: string;
     notes: string;
 }
 
@@ -63,6 +65,7 @@ export default function JobApplicationForm({
                 application?.offered_salary != null
                     ? String(application.offered_salary)
                     : '',
+            currency: application?.currency ?? 'PHP',
             notes: application?.notes ?? '',
         });
 
@@ -84,6 +87,7 @@ export default function JobApplicationForm({
                     application?.offered_salary != null
                         ? String(application.offered_salary)
                         : '',
+                currency: application.currency ?? 'PHP',
                 notes: application.notes ?? '',
             });
         }
@@ -232,14 +236,45 @@ setData('status', value);
                             </div>
                         </div>
 
+                        <div className="flex flex-col gap-2">
+                            <Label>Currency</Label>
+                            <Select
+                                value={data.currency}
+                                onValueChange={(value: string | null) => {
+                                    if (value) {
+                                        setData('currency', value);
+                                    }
+                                }}
+                            >
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Select currency" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {CURRENCIES.map((currency) => (
+                                        <SelectItem
+                                            key={currency.code}
+                                            value={currency.code}
+                                        >
+                                            {currency.symbol} {currency.name}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                            {errors.currency && (
+                                <p className="text-xs text-destructive">
+                                    {errors.currency}
+                                </p>
+                            )}
+                        </div>
+
                         <div className="grid grid-cols-2 gap-4">
                             <div className="flex flex-col gap-2">
                                 <Label htmlFor="expected_salary">
-                                    Expected Salary (₱)
+                                    Expected Salary ({getCurrencySymbol(data.currency)})
                                 </Label>
                                 <div className="relative">
                                     <span className="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
-                                        ₱
+                                        {getCurrencySymbol(data.currency)}
                                     </span>
                                     <Input
                                         id="expected_salary"
@@ -262,11 +297,11 @@ setData('status', value);
 
                             <div className="flex flex-col gap-2">
                                 <Label htmlFor="offered_salary">
-                                    Offered Salary (₱)
+                                    Offered Salary ({getCurrencySymbol(data.currency)})
                                 </Label>
                                 <div className="relative">
                                     <span className="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
-                                        ₱
+                                        {getCurrencySymbol(data.currency)}
                                     </span>
                                     <Input
                                         id="offered_salary"

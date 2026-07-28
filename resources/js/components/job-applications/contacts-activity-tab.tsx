@@ -54,7 +54,7 @@ export default function ContactsActivityTab({
             }
 
             const result = await response.json();
-            window.location.reload();
+            router.reload();
         } catch (error) {
         } finally {
             setContacting(false);

@@ -1,7 +1,8 @@
 import { Head, Link, usePage } from '@inertiajs/react';
-import { BarChart3, Briefcase, CalendarIcon, ChevronLeft, ChevronRight, LayoutDashboard, LogOut, Menu, Settings, BookmarkIcon, GitCompareArrowsIcon, Target, FileText, Archive, Users } from 'lucide-react';
+import { BarChart3, Briefcase, CalendarIcon, ChevronLeft, ChevronRight, LayoutDashboard, LogOut, Menu, Settings, BookmarkIcon, GitCompareArrowsIcon, Target, FileText, Archive, Users, Sun, Moon, Monitor } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { useTheme } from '@/hooks/use-theme';
 import type { Auth } from '@/types/auth';
 
 const sidebarLinks = [
@@ -15,7 +16,6 @@ const sidebarLinks = [
     { href: '/documents', label: 'Documents', icon: FileText },
     { href: '/documents/saved', label: 'Saved Documents', icon: Archive },
     { href: '/templates', label: 'Templates', icon: BookmarkIcon },
-    { href: '/settings', label: 'Settings', icon: Settings },
 ];
 
 function UserAvatar({ user, compact }: { user: Auth['user']; compact?: boolean }) {
@@ -37,6 +37,111 @@ function UserAvatar({ user, compact }: { user: Auth['user']; compact?: boolean }
     );
 }
 
+function UserProfileMenu({ user, isExpanded }: { user: Auth['user']; isExpanded: boolean }) {
+    const [open, setOpen] = useState(false);
+    const { mode, setMode } = useTheme();
+
+    useEffect(() => {
+        if (!open) return;
+        const close = (e: MouseEvent) => {
+            if (!(e.target as Element).closest('.user-profile-menu-container')) {
+                setOpen(false);
+            }
+        };
+        document.addEventListener('click', close);
+        return () => document.removeEventListener('click', close);
+    }, [open]);
+
+    return (
+        <div className="user-profile-menu-container relative w-full">
+            {/* The Trigger */}
+            <button 
+                type="button"
+                onClick={() => setOpen(!open)}
+                className={`flex w-full items-center gap-3 rounded-md transition-colors hover:bg-muted ${isExpanded ? 'p-2' : 'p-2 justify-center'}`}
+            >
+                <UserAvatar user={user} compact={!isExpanded} />
+                {isExpanded && (
+                    <div className="min-w-0 flex-1 text-left">
+                        <p className="truncate text-sm font-medium text-foreground">
+                            {user?.name}
+                        </p>
+                        <p className="truncate text-xs text-muted-foreground">
+                            {user?.email}
+                        </p>
+                    </div>
+                )}
+            </button>
+
+            {/* The Dropdown */}
+            {open && (
+                <div className={`absolute z-50 w-64 rounded-xl border border-border bg-popover text-popover-foreground shadow-md p-1 overflow-hidden ${
+                    isExpanded 
+                        ? 'bottom-full left-0 mb-2' 
+                        : 'bottom-0 left-full ml-4'
+                }`}>
+                    <div className="px-3 py-2 border-b border-border mb-1">
+                        <p className="truncate text-sm font-medium">{user?.name}</p>
+                        <p className="truncate text-xs text-muted-foreground">{user?.email}</p>
+                    </div>
+                    
+                    <Link
+                        href="/settings"
+                        className="flex w-full items-center gap-2 rounded-sm px-3 py-2 text-sm transition-colors hover:bg-muted"
+                        onClick={() => setOpen(false)}
+                    >
+                        <Settings className="h-4 w-4" />
+                        Settings
+                    </Link>
+
+                    <div className="px-3 py-2">
+                        <p className="text-xs font-medium text-muted-foreground mb-2">Theme Mode</p>
+                        <div className="flex bg-muted/50 rounded-lg p-0.5">
+                            <button
+                                type="button"
+                                onClick={() => { setMode('light'); setOpen(false); }}
+                                className={`flex-1 flex justify-center py-1.5 rounded-md transition-all text-xs ${mode === 'light' ? 'bg-background shadow-xs text-foreground' : 'text-muted-foreground hover:text-foreground'}`}
+                                aria-label="Light mode"
+                            >
+                                <Sun className="h-3.5 w-3.5" />
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => { setMode('dark'); setOpen(false); }}
+                                className={`flex-1 flex justify-center py-1.5 rounded-md transition-all text-xs ${mode === 'dark' ? 'bg-background shadow-xs text-foreground' : 'text-muted-foreground hover:text-foreground'}`}
+                                aria-label="Dark mode"
+                            >
+                                <Moon className="h-3.5 w-3.5" />
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => { setMode('system'); setOpen(false); }}
+                                className={`flex-1 flex justify-center py-1.5 rounded-md transition-all text-xs ${mode === 'system' ? 'bg-background shadow-xs text-foreground' : 'text-muted-foreground hover:text-foreground'}`}
+                                aria-label="System mode"
+                            >
+                                <Monitor className="h-3.5 w-3.5" />
+                            </button>
+                        </div>
+                    </div>
+
+                    <div className="border-t border-border mt-1 pt-1">
+                        <Link
+                            href="/logout"
+                            method="post"
+                            as="button"
+                            onClick={() => setOpen(false)}
+                            className="flex w-full items-center gap-2 rounded-sm px-3 py-2 text-sm text-destructive hover:bg-destructive/10 transition-colors"
+                        >
+                            <LogOut className="h-4 w-4" />
+                            Logout
+                        </Link>
+                    </div>
+                </div>
+            )}
+        </div>
+    );
+}
+
 export default function AppLayout({ children }: { children: React.ReactNode }) {
     const { auth } = usePage<{ auth: Auth }>().props;
     const { url } = usePage();
@@ -48,6 +153,8 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
             setSidebarOpen(false);
         }
     }, []);
+
+    const isExpanded = sidebarOpen || mobileSidebarOpen;
 
     return (
         <div className="flex h-screen w-full min-w-0 overflow-hidden bg-background">
@@ -73,7 +180,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
             >
                 {/* Sidebar header */}
                 <div className="flex h-16 shrink-0 items-center border-b border-border px-4">
-                    {sidebarOpen && (
+                    {isExpanded && (
                         <>
                             <Link href="/dashboard" className="text-lg font-semibold text-foreground">
                                 Aplayan
@@ -99,7 +206,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                             </TooltipProvider>
                         </>
                     )}
-                    {!sidebarOpen && (
+                    {!isExpanded && (
                         <TooltipProvider delay={100}>
                             <Tooltip>
                                 <TooltipTrigger
@@ -134,7 +241,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                             return active;
                         }, '');
 
-                        return sidebarOpen ? (
+                        return isExpanded ? (
                             <>
                                 {sidebarLinks.map(({ href, label, icon: Icon }) => {
                                     const isActive = activeLink === href;
@@ -188,50 +295,9 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                 </nav>
 
                 {/* User profile footer */}
-                {sidebarOpen && (
-                    <div className="shrink-0 border-t border-border p-3">
-                        <div className="flex items-center gap-3">
-                            <UserAvatar user={auth.user} />
-                            <div className="min-w-0 flex-1">
-                                <p className="truncate text-sm font-medium text-foreground">
-                                    {auth.user?.name}
-                                </p>
-                                <p className="truncate text-xs text-muted-foreground">
-                                    {auth.user?.email}
-                                </p>
-                            </div>
-                        </div>
-                        <Link
-                            href="/logout"
-                            method="post"
-                            as="button"
-                            className="mt-2 flex w-full items-center gap-2 rounded-sm px-3 py-2 text-sm text-muted-foreground hover:bg-muted hover:text-foreground"
-                        >
-                            <LogOut className="h-4 w-4" />
-                            Logout
-                        </Link>
-                    </div>
-                )}
-
-                {/* User avatar only when collapsed */}
-                {!sidebarOpen && (
-                    <div className="shrink-0 border-t border-border p-2">
-                        <TooltipProvider delay={100}>
-                            <Tooltip>
-                                <TooltipTrigger
-                                    render={
-                                        <div className="cursor-pointer">
-                                            <UserAvatar user={auth.user} compact />
-                                        </div>
-                                    }
-                                />
-                                <TooltipContent side="right" sideOffset={12}>
-                                    {auth.user?.name ?? 'User Account'}
-                                </TooltipContent>
-                            </Tooltip>
-                        </TooltipProvider>
-                    </div>
-                )}
+                <div className={`shrink-0 border-t border-border ${isExpanded ? 'p-2' : 'p-2 flex justify-center'}`}>
+                    <UserProfileMenu user={auth.user} isExpanded={isExpanded} />
+                </div>
             </aside>
 
             {/* Main content area */}

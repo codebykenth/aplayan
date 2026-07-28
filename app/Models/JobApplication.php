@@ -22,6 +22,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property string|null $date_applied
  * @property int|null $expected_salary
  * @property int|null $offered_salary
+ * @property string $currency
  * @property string|null $notes
  * @property int|null $ai_match_percentage
  * @property array|null $ai_strengths
@@ -53,6 +54,7 @@ class JobApplication extends Model
         'date_applied',
         'expected_salary',
         'offered_salary',
+        'currency',
         'tax_config',
         'notes',
         'last_contacted_at',

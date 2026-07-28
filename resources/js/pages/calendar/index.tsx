@@ -101,6 +101,7 @@ export default function Calendar({
     const [viewingApplication, setViewingApplication] = useState<JobApplication | null>(null);
     const [currentMonth, setCurrentMonth] = useState(month);
     const [currentYear, setCurrentYear] = useState(year);
+    const [currentDay, setCurrentDay] = useState(1);
 
     const eventsByDate = useMemo(() => {
         const map = new Map<string, CalendarEvent[]>();
@@ -118,21 +119,37 @@ export default function Calendar({
         return map;
     }, [events]);
 
-    const prevMonth = () => {
-        if (currentMonth === 1) {
-            setCurrentMonth(12);
-            setCurrentYear(currentYear - 1);
+    const handlePrev = () => {
+        if (view === 'month') {
+            if (currentMonth === 1) {
+                setCurrentMonth(12);
+                setCurrentYear(currentYear - 1);
+            } else {
+                setCurrentMonth(currentMonth - 1);
+            }
+            setCurrentDay(1);
         } else {
-            setCurrentMonth(currentMonth - 1);
+            const date = new Date(currentYear, currentMonth - 1, currentDay - 7);
+            setCurrentYear(date.getFullYear());
+            setCurrentMonth(date.getMonth() + 1);
+            setCurrentDay(date.getDate());
         }
     };
 
-    const nextMonth = () => {
-        if (currentMonth === 12) {
-            setCurrentMonth(1);
-            setCurrentYear(currentYear + 1);
+    const handleNext = () => {
+        if (view === 'month') {
+            if (currentMonth === 12) {
+                setCurrentMonth(1);
+                setCurrentYear(currentYear + 1);
+            } else {
+                setCurrentMonth(currentMonth + 1);
+            }
+            setCurrentDay(1);
         } else {
-            setCurrentMonth(currentMonth + 1);
+            const date = new Date(currentYear, currentMonth - 1, currentDay + 7);
+            setCurrentYear(date.getFullYear());
+            setCurrentMonth(date.getMonth() + 1);
+            setCurrentDay(date.getDate());
         }
     };
 
@@ -164,21 +181,16 @@ export default function Calendar({
 
     const weekDays = useMemo(() => {
         if (view !== 'week') {
-return [];
-}
-
-        let dayToUse = 1;
-
-        if (selectedDate) {
-            const [y, m, d] = selectedDate.split('-');
-
-            if (parseInt(y) === currentYear && parseInt(m) === currentMonth) {
-                dayToUse = parseInt(d);
-            }
+            return [];
         }
 
-        return getWeekDays(currentYear, currentMonth, dayToUse);
-    }, [view, currentYear, currentMonth, selectedDate]);
+        return getWeekDays(currentYear, currentMonth, currentDay);
+    }, [view, currentYear, currentMonth, currentDay]);
+
+    const activeWeekNumber = useMemo(() => {
+        const firstDay = new Date(currentYear, currentMonth - 1, 1).getDay();
+        return Math.ceil((currentDay + firstDay) / 7);
+    }, [currentYear, currentMonth, currentDay]);
 
     const weeks = view === 'month' ? getWeeksInMonth(currentYear, currentMonth) : [];
 
@@ -196,15 +208,17 @@ return [];
             <Head title="Calendar" />
 
             <div className="flex flex-1 min-h-0 flex-col gap-6 overflow-y-auto">
-                <PageHeader title="Calendar">
+                <PageHeader title="Calendar" description="Track upcoming interviews, follow-ups, and application dates">
                     <div className="flex items-center gap-2">
-                        <Button variant="outline" size="sm" onClick={prevMonth}>
+                        <Button variant="outline" size="sm" onClick={handlePrev}>
                             <ChevronLeftIcon className="size-4" />
                         </Button>
                         <span className="min-w-[140px] text-center text-sm sm:text-base font-semibold text-foreground">
-                            {formatMonthYear(currentYear, currentMonth)}
+                            {view === 'week' 
+                                ? `Week ${activeWeekNumber} - ${formatMonthYear(currentYear, currentMonth)}`
+                                : formatMonthYear(currentYear, currentMonth)}
                         </span>
-                        <Button variant="outline" size="sm" onClick={nextMonth}>
+                        <Button variant="outline" size="sm" onClick={handleNext}>
                             <ChevronRightIcon className="size-4" />
                         </Button>
                     </div>
@@ -264,6 +278,7 @@ return [];
                                                 onClick={() => {
                                                     if (day) {
                                                         setSelectedDate(dateStr);
+                                                        setCurrentDay(day);
                                                     }
                                                 }}
                                             >
@@ -331,9 +346,17 @@ return [];
                                     return (
                                         <div
                                             key={date}
-                                            className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 rounded-lg border bg-card p-3 hover:bg-muted/50 transition-colors"
+                                            className={`flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 rounded-lg border p-3 hover:bg-muted/50 transition-colors cursor-pointer ${
+                                                selectedDate === date
+                                                    ? 'border-primary bg-primary/10 ring-1 ring-primary'
+                                                    : 'bg-card'
+                                            }`}
+                                            onClick={() => {
+                                                setSelectedDate(date);
+                                                setCurrentDay(parseInt(date.split('-')[2]));
+                                            }}
                                         >
-                                            <span className="w-full sm:w-24 text-xs sm:text-sm font-semibold text-foreground shrink-0">
+                                            <span className={`w-full sm:w-24 text-xs sm:text-sm font-semibold shrink-0 ${selectedDate === date ? 'text-primary' : 'text-foreground'}`}>
                                                 {label}
                                             </span>
                                             <div className="flex flex-wrap gap-1.5">
@@ -343,7 +366,10 @@ return [];
                                                             key={`${event.id}-${event.type}`}
                                                             status={event.status as JobApplicationStatus}
                                                             className="cursor-pointer text-xs"
-                                                            onClick={() => openApplicationDetailById(event.id)}
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                openApplicationDetailById(event.id);
+                                                            }}
                                                         />
                                                     ))
                                                 ) : (

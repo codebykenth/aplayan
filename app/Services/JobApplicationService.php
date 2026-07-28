@@ -21,6 +21,10 @@ class JobApplicationService
 
     public function createForUser(User $user, array $data): JobApplication
     {
+        if (isset($data['status']) && $data['status'] !== 'wishlist' && empty($data['date_applied'])) {
+            $data['date_applied'] = now()->toDateString();
+        }
+
         return $user->jobApplications()->create($data);
     }
 
@@ -60,6 +64,10 @@ class JobApplicationService
         $this->validateStatusTransition($jobApplication->status, $status->value);
 
         $data = ['status' => $status->value];
+
+        if ($status !== JobApplicationStatus::Wishlist && empty($jobApplication->date_applied)) {
+            $data['date_applied'] = now()->toDateString();
+        }
 
         if ($status === JobApplicationStatus::Interviewing && $interviewDate !== null) {
             $data['interview_date'] = $interviewDate;

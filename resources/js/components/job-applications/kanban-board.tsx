@@ -2,9 +2,8 @@ import {
     DndContext,
     DragOverlay,
     useDroppable,
-    useDraggable
-    
-    
+    useDraggable,
+    pointerWithin
 } from '@dnd-kit/core';
 import type {DragEndEvent, DragStartEvent} from '@dnd-kit/core';
 import { router } from '@inertiajs/react';
@@ -130,6 +129,48 @@ function KanbanCardOverlay({ application }: { application: JobApplication }) {
     );
 }
 
+function MobileTabDroppable({
+    status,
+    label,
+    activeTab,
+    count,
+    onClick,
+}: {
+    status: JobApplicationStatus;
+    label: string;
+    activeTab: string;
+    count: number;
+    onClick: () => void;
+}) {
+    const { setNodeRef, isOver } = useDroppable({ id: `mobile-${status}` });
+
+    return (
+        <button
+            ref={setNodeRef}
+            type="button"
+            onClick={onClick}
+            className={`flex items-center gap-2 whitespace-nowrap rounded-full px-4 py-2 text-sm font-medium transition-all duration-200 ${
+                isOver ? 'ring-2 ring-primary ring-offset-2 ring-offset-background bg-primary/10' : ''
+            } ${
+                activeTab === status
+                    ? 'bg-primary text-primary-foreground'
+                    : 'bg-muted text-muted-foreground hover:bg-muted/80'
+            }`}
+        >
+            {label}
+            <span
+                className={`rounded-full px-2 py-0.5 text-xs font-medium ${
+                    activeTab === status
+                        ? 'bg-primary-foreground/20 text-primary-foreground'
+                        : STATUS_COLORS[status]
+                }`}
+            >
+                {count}
+            </span>
+        </button>
+    );
+}
+
 export default function KanbanBoard({
     applications,
     onView,
@@ -193,23 +234,27 @@ export default function KanbanBoard({
             const { active, over } = event;
 
             if (!over) {
-return;
-}
+                return;
+            }
 
             const app = active.data.current as JobApplication;
-            const newStatus = over.id as JobApplicationStatus;
+            let newStatus = over.id as JobApplicationStatus | string;
+
+            if (newStatus.startsWith('mobile-')) {
+                newStatus = newStatus.replace('mobile-', '') as JobApplicationStatus;
+            }
 
             if (app.status === newStatus) {
-return;
-}
+                return;
+            }
 
-            if (!COLUMN_IDS.includes(newStatus)) {
+            if (!COLUMN_IDS.includes(newStatus as JobApplicationStatus)) {
                 return;
             }
 
             setLocalApplications((prev) =>
                 prev.map((a) =>
-                    a.id === app.id ? { ...a, status: newStatus } : a,
+                    a.id === app.id ? { ...a, status: newStatus as JobApplicationStatus } : a,
                 ),
             );
 
@@ -237,31 +282,19 @@ return;
         <DndContext
             onDragStart={handleDragStart}
             onDragEnd={handleDragEnd}
+            collisionDetection={pointerWithin}
         >
             {/* Mobile Tab Navigation */}
             <div className="mb-4 flex shrink-0 gap-2 overflow-x-auto pb-2 md:hidden [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
                 {JOB_APPLICATION_STATUSES.map(({ value, label }) => (
-                    <button
+                    <MobileTabDroppable
                         key={value}
-                        type="button"
+                        status={value}
+                        label={label}
+                        activeTab={activeTab}
+                        count={grouped[value].length}
                         onClick={() => setActiveTab(value)}
-                        className={`flex items-center gap-2 whitespace-nowrap rounded-full px-4 py-2 text-sm font-medium transition-colors ${
-                            activeTab === value
-                                ? 'bg-primary text-primary-foreground'
-                                : 'bg-muted text-muted-foreground hover:bg-muted/80'
-                        }`}
-                    >
-                        {label}
-                        <span
-                            className={`rounded-full px-2 py-0.5 text-xs font-medium ${
-                                activeTab === value
-                                    ? 'bg-primary-foreground/20 text-primary-foreground'
-                                    : STATUS_COLORS[value]
-                            }`}
-                        >
-                            {grouped[value].length}
-                        </span>
-                    </button>
+                    />
                 ))}
                 <button
                     type="button"

@@ -106,61 +106,59 @@ return;
             <Head title="Job Applications" />
 
             <div className="flex flex-1 min-h-0 flex-col gap-4 sm:gap-6">
-                <PageHeader title="Job Applications">
-                        <div className="flex items-center gap-2">
-                            <div className="relative">
-                                <Button
-                                    variant="outline"
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        setExportOpen(!exportOpen);
-                                    }}
-                                >
-                                    <DownloadIcon data-icon="inline-start" />
-                                    Export Data
-                                </Button>
-                            {exportOpen && (
-                                <div
-                                    className="absolute right-0 top-full z-50 mt-1 min-w-36 rounded-lg border bg-popover p-1 shadow-md"
-                                    onClick={(e) => e.stopPropagation()}
-                                >
-                                    <a
-                                        href={exportMethod.url({ query: { format: 'csv' } })}
-                                        download
-                                        className="block w-full rounded-md px-3 py-2 text-left text-sm hover:bg-accent hover:text-accent-foreground"
-                                        onClick={() => setExportOpen(false)}
-                                    >
-                                        Export as CSV
-                                    </a>
-                                    <a
-                                        href={exportMethod.url({ query: { format: 'json' } })}
-                                        download
-                                        className="block w-full rounded-md px-3 py-2 text-left text-sm hover:bg-accent hover:text-accent-foreground"
-                                        onClick={() => setExportOpen(false)}
-                                    >
-                                        Export as JSON
-                                    </a>
-                                </div>
-                            )}
-                        </div>
+                <PageHeader title="Job Applications" description="Track and manage your active job search pipeline">
+                    <div className="relative">
                         <Button
                             variant="outline"
-                            onClick={() => setImportModalOpen(true)}
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                setExportOpen(!exportOpen);
+                            }}
                         >
-                            <UploadIcon data-icon="inline-start" />
-                            Import Applications
+                            <DownloadIcon data-icon="inline-start" />
+                            Export Data
                         </Button>
-                        {templates.length > 0 && (
-                            <Button variant="secondary" onClick={() => setQuickApplyOpen(true)}>
-                                <ZapIcon data-icon="inline-start" />
-                                Quick Apply
-                            </Button>
+                        {exportOpen && (
+                            <div
+                                className="absolute right-0 top-full z-50 mt-1 min-w-36 rounded-lg border bg-popover p-1 shadow-md"
+                                onClick={(e) => e.stopPropagation()}
+                            >
+                                <a
+                                    href={exportMethod.url({ query: { format: 'csv' } })}
+                                    download
+                                    className="block w-full rounded-md px-3 py-2 text-left text-sm hover:bg-accent hover:text-accent-foreground"
+                                    onClick={() => setExportOpen(false)}
+                                >
+                                    Export as CSV
+                                </a>
+                                <a
+                                    href={exportMethod.url({ query: { format: 'json' } })}
+                                    download
+                                    className="block w-full rounded-md px-3 py-2 text-left text-sm hover:bg-accent hover:text-accent-foreground"
+                                    onClick={() => setExportOpen(false)}
+                                >
+                                    Export as JSON
+                                </a>
+                            </div>
                         )}
-                        <Button onClick={openCreate}>
-                            <PlusIcon data-icon="inline-start" />
-                            New Application
-                        </Button>
                     </div>
+                    <Button
+                        variant="outline"
+                        onClick={() => setImportModalOpen(true)}
+                    >
+                        <UploadIcon data-icon="inline-start" />
+                        Import Applications
+                    </Button>
+                    {templates.length > 0 && (
+                        <Button variant="secondary" onClick={() => setQuickApplyOpen(true)}>
+                            <ZapIcon data-icon="inline-start" />
+                            Quick Apply
+                        </Button>
+                    )}
+                    <Button onClick={openCreate}>
+                        <PlusIcon data-icon="inline-start" />
+                        New Application
+                    </Button>
                 </PageHeader>
 
                 <div className="flex shrink-0 flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
@@ -174,39 +172,7 @@ return;
                         />
                     </div>
 
-                    <div className="hidden md:flex flex-wrap gap-2">
-                        {STATUS_FILTERS.map(({ value, label }) => {
-                            const count = value === ALL_STATUS
-                                ? applicationList.length
-                                : applicationList.filter((app) => app.status === value).length;
 
-                            return (
-                                <button
-                                    key={value}
-                                    type="button"
-                                    onClick={() => setStatusFilter(value)}
-                                    className={`flex items-center gap-2 whitespace-nowrap rounded-full px-3.5 py-1.5 text-sm font-medium border transition-colors ${
-                                        statusFilter === value
-                                            ? 'bg-primary text-primary-foreground border-primary shadow-xs'
-                                            : 'bg-card text-card-foreground border-border hover:bg-muted hover:text-foreground'
-                                    }`}
-                                >
-                                    <span className="capitalize">{label}</span>
-                                    <span
-                                        className={`rounded-full px-2 py-0.5 text-xs font-semibold ${
-                                            statusFilter === value
-                                                ? 'bg-primary-foreground/20 text-primary-foreground'
-                                                : value === ALL_STATUS
-                                                    ? 'bg-primary/15 text-primary'
-                                                    : STATUS_COLORS[value]
-                                        }`}
-                                    >
-                                        {count}
-                                    </span>
-                                </button>
-                            );
-                        })}
-                    </div>
                 </div>
 
                 {filtered.length === 0 ? (

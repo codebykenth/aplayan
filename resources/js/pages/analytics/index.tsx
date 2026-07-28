@@ -1,4 +1,5 @@
 import { Head } from '@inertiajs/react';
+import { InfoIcon } from 'lucide-react';
 import type { ReactNode } from 'react';
 import {
     BarChart,
@@ -21,6 +22,7 @@ import {
 } from '@/components/ui/chart';
 import type {ChartConfig} from '@/components/ui/chart';
 import { PageHeader } from '@/components/ui/page-header';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import AppLayout from '@/layouts/app-layout';
 import { JOB_APPLICATION_STATUSES } from '@/types/job-application';
 import type { JobApplicationStatus } from '@/types/job-application';
@@ -49,6 +51,29 @@ const RESPONSE_COLORS = [
     '#f97316',
     '#ef4444',
 ];
+
+function ChartInfoTooltip({ description }: { description: string }) {
+    return (
+        <TooltipProvider>
+            <Tooltip>
+                <TooltipTrigger
+                    render={
+                        <button
+                            type="button"
+                            className="text-muted-foreground/70 hover:text-foreground transition-colors p-0.5 rounded-sm focus:outline-hidden focus:ring-1 focus:ring-ring"
+                            aria-label="Chart information"
+                        >
+                            <InfoIcon className="size-4" />
+                        </button>
+                    }
+                />
+                <TooltipContent side="top" className="max-w-64 text-xs font-normal">
+                    {description}
+                </TooltipContent>
+            </Tooltip>
+        </TooltipProvider>
+    );
+}
 
 function statusLabel(value: string): string {
     return JOB_APPLICATION_STATUSES.find((s) => s.value === value)?.label ?? value;
@@ -116,6 +141,10 @@ interface TimeToResponseItem {
     company: string;
     job_title: string;
     days: number;
+    applied_date: string;
+    first_response_date: string;
+    last_contact_date: string | null;
+    last_contact_days: number | null;
 }
 
 export default function Analytics({
@@ -187,6 +216,7 @@ export default function Analytics({
                             <CardTitle className="text-sm font-medium text-muted-foreground">
                                 Avg Expected Salary
                             </CardTitle>
+                            <ChartInfoTooltip description="Calculated as the average expected salary across all job applications where an expected salary was set." />
                         </CardHeader>
                         <CardContent>
                             <p className="text-3xl font-bold text-foreground">
@@ -201,6 +231,7 @@ export default function Analytics({
                             <CardTitle className="text-sm font-medium text-muted-foreground">
                                 Avg Offered Salary
                             </CardTitle>
+                            <ChartInfoTooltip description="Calculated as the average offered salary across all job applications that reached the offer stage." />
                         </CardHeader>
                         <CardContent>
                             <p className="text-3xl font-bold text-foreground">
@@ -216,8 +247,9 @@ export default function Analytics({
                 <div className="grid gap-6 md:grid-cols-2 shrink-0">
                     {/* 1. Application Funnel */}
                     <Card>
-                        <CardHeader>
+                        <CardHeader className="flex flex-row items-center justify-between">
                             <CardTitle>Application Funnel</CardTitle>
+                            <ChartInfoTooltip description="Shows total applications grouped by stage (Wishlist, Applied, Interviewing, Offer). Excludes rejected applications." />
                         </CardHeader>
                         <CardContent>
                             {funnel.length === 0 || funnel.every((f) => f.value === 0) ? (
@@ -316,8 +348,9 @@ export default function Analytics({
 
                     {/* 2. 12-Week Application Volume */}
                     <Card>
-                        <CardHeader>
+                        <CardHeader className="flex flex-row items-center justify-between">
                             <CardTitle>12-Week Application Volume</CardTitle>
+                            <ChartInfoTooltip description="Displays total job applications submitted per week over the last 12 weeks to track search consistency." />
                         </CardHeader>
                         <CardContent>
                             {!hasWeeklyData ? (
@@ -367,8 +400,9 @@ export default function Analytics({
 
                     {/* 3. Status Distribution Over Time */}
                     <Card>
-                        <CardHeader>
+                        <CardHeader className="flex flex-row items-center justify-between">
                             <CardTitle>Status Distribution Over Time</CardTitle>
+                            <ChartInfoTooltip description="A stacked timeline showing how your application statuses evolved week-by-week over the past 12 weeks." />
                         </CardHeader>
                         <CardContent>
                             {!hasStatusOverTime ? (
@@ -423,8 +457,9 @@ export default function Analytics({
 
                     {/* 4. Salary Band Distribution */}
                     <Card>
-                        <CardHeader>
+                        <CardHeader className="flex flex-row items-center justify-between">
                             <CardTitle>Salary Band Distribution</CardTitle>
+                            <ChartInfoTooltip description="Compares expected vs. offered salaries grouped into salary ranges (e.g., ₱0–30k, ₱30–60k, ₱60–90k, ₱90–120k, ₱120k+)." />
                         </CardHeader>
                         <CardContent>
                             {!hasSalaryBands ? (
@@ -475,8 +510,9 @@ export default function Analytics({
 
                 {/* 5. Time-to-Response (full width) */}
                 <Card className="shrink-0">
-                    <CardHeader>
+                    <CardHeader className="flex flex-row items-center justify-between">
                         <CardTitle>Time to Response</CardTitle>
+                        <ChartInfoTooltip description="Main bar shows days from application date to first employer response. Hover over any bar for full date breakdown." />
                     </CardHeader>
                     <CardContent>
                         {time_to_response.length === 0 ? (
@@ -486,9 +522,12 @@ export default function Analytics({
                         ) : (
                             <ChartContainer config={responseConfig} className="h-87.5 w-full">
                                 <BarChart
-                                    data={time_to_response.slice(0, 15)}
+                                    data={time_to_response.slice(0, 15).map((item) => ({
+                                        ...item,
+                                        fill: responseColor(item.days),
+                                    }))}
                                     layout="vertical"
-                                    margin={{ left: 0, right: 40, bottom: 20 }}
+                                    margin={{ left: -10, right: 30, bottom: 20 }}
                                 >
                                     <CartesianGrid
                                         horizontal={false}
@@ -515,25 +554,48 @@ export default function Analytics({
                                         tickLine={false}
                                         axisLine={false}
                                         fontSize={11}
-                                        width={130}
+                                        width={90}
                                     />
                                     <ChartTooltip
-                                        content={
-                                            <ChartTooltipContent
-                                                labelKey="company"
-                                                labelFormatter={(_label, payload) => {
-                                                    const item = payload?.[0]?.payload as
-                                                        | TimeToResponseItem
-                                                        | undefined;
+                                        content={({ active, payload }) => {
+                                            if (!active || !payload?.length) {
+                                                return null;
+                                            }
 
-                                                    return item
-                                                        ? `${item.company} — ${item.job_title}`
-                                                        : '';
-                                                }}
-                                            />
-                                        }
+                                            const item = payload[0].payload as TimeToResponseItem;
+                                            const dotColor = responseColor(item.days);
+
+                                            return (
+                                                <div className="grid min-w-48 items-start gap-1.5 rounded-lg border border-border/50 bg-background px-3 py-2 text-xs shadow-xl">
+                                                    <div className="font-semibold text-foreground border-b border-border/40 pb-1">
+                                                        {item.company} <span className="text-muted-foreground font-normal">— {item.job_title}</span>
+                                                    </div>
+                                                    <div className="flex items-center justify-between gap-4 pt-0.5">
+                                                        <div className="flex items-center gap-1.5 text-muted-foreground font-medium">
+                                                            <div
+                                                                className="h-2 w-2 rounded-[2px]"
+                                                                style={{ backgroundColor: dotColor }}
+                                                            />
+                                                            First Response:
+                                                        </div>
+                                                        <span className="font-mono font-medium text-foreground">
+                                                            {item.days} {item.days === 1 ? 'day' : 'days'}
+                                                        </span>
+                                                    </div>
+                                                    <div className="text-[11px] text-muted-foreground space-y-0.5 pt-1 border-t border-border/20">
+                                                        <div>• Applied: {item.applied_date}</div>
+                                                        <div>• Responded: {item.first_response_date}</div>
+                                                        {item.last_contact_date && item.last_contact_days !== null && (
+                                                            <div className="text-primary font-medium pt-0.5">
+                                                                • Last Contact: {item.last_contact_date} ({item.last_contact_days}d total)
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            );
+                                        }}
                                     />
-                                    <Bar dataKey="days" radius={[0, 4, 4, 0]} barSize={22} minPointSize={2}>
+                                    <Bar dataKey="days" name="Days" radius={[0, 4, 4, 0]} barSize={22} minPointSize={2}>
                                         {time_to_response.slice(0, 15).map((item, index) => (
                                             <Cell key={index} fill={responseColor(item.days)} />
                                         ))}

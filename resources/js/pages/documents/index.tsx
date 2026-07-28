@@ -3855,12 +3855,14 @@ return;
                     <div className="flex items-center gap-2">
                         <TooltipProvider>
                             <Tooltip>
-                                <TooltipTrigger asChild>
-                                    <span className="inline-flex cursor-help items-center gap-1.5 rounded-full border border-border bg-card px-3 py-1 text-xs text-muted-foreground transition-colors hover:text-foreground">
-                                        <Sparkles className="size-3 text-amber-500" />
-                                        {aiLimit.remaining}/{aiLimit.total} AI uses today
-                                    </span>
-                                </TooltipTrigger>
+                                <TooltipTrigger
+                                    render={
+                                        <span className="inline-flex cursor-help items-center gap-1.5 rounded-full border border-border bg-card px-3 py-1 text-xs text-muted-foreground transition-colors hover:text-foreground">
+                                            <Sparkles className="size-3 text-amber-500" />
+                                            {aiLimit.remaining}/{aiLimit.total} AI uses today
+                                        </span>
+                                    }
+                                />
                                 <TooltipContent side="bottom" className="max-w-xs text-xs">
                                     Shared daily limit (10 uncached requests/day) across AI Assist and Document Generator. Cached requests are unlimited and free.
                                 </TooltipContent>

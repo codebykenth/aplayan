@@ -23,6 +23,7 @@ class StoreJobApplicationRequest extends FormRequest
             'date_applied' => ['nullable', 'date'],
             'expected_salary' => ['nullable', 'integer', 'min:0'],
             'offered_salary' => ['nullable', 'integer', 'min:0'],
+            'currency' => ['nullable', 'string', 'in:PHP,USD,EUR,GBP,AUD,CAD,SGD,JPY,AED,NZD'],
             'tax_config' => ['nullable', 'array'],
             'tax_config.regime' => ['nullable', 'string', 'in:ph_regular,ph_freelance_8,tax_exempt,custom'],
             'tax_config.allowances' => ['nullable', 'array'],

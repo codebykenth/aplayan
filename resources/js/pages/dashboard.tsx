@@ -1,5 +1,5 @@
 import { Head } from '@inertiajs/react';
-import { Briefcase, TrendingUp, CalendarDays } from 'lucide-react';
+import { Briefcase, TrendingUp, CalendarDays, InfoIcon } from 'lucide-react';
 import { useState, useCallback  } from 'react';
 import type {ReactNode} from 'react';
 import {
@@ -27,6 +27,7 @@ import {
 } from '@/components/ui/chart';
 import type { ChartConfig } from '@/components/ui/chart';
 import { PageHeader } from '@/components/ui/page-header';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import AppLayout from '@/layouts/app-layout';
 import { show as showRoute } from '@/routes/job-applications';
 import { JOB_APPLICATION_STATUSES } from '@/types/job-application';
@@ -41,6 +42,29 @@ const STATUS_CHART_COLORS: Record<JobApplicationStatus, string> = {
     rejected: '#ef4444',
     withdrawn: '#64748b',
 };
+
+function ChartInfoTooltip({ description }: { description: string }) {
+    return (
+        <TooltipProvider>
+            <Tooltip>
+                <TooltipTrigger
+                    render={
+                        <button
+                            type="button"
+                            className="text-muted-foreground/70 hover:text-foreground transition-colors p-0.5 rounded-sm focus:outline-hidden focus:ring-1 focus:ring-ring"
+                            aria-label="Card information"
+                        >
+                            <InfoIcon className="size-4" />
+                        </button>
+                    }
+                />
+                <TooltipContent side="top" className="max-w-64 text-xs font-normal">
+                    {description}
+                </TooltipContent>
+            </Tooltip>
+        </TooltipProvider>
+    );
+}
 
 function statusLabel(value: string): string {
     return (
@@ -131,11 +155,12 @@ throw new Error('Failed to fetch application');
                         {/* Metric Cards */}
                         <div className="grid gap-4 sm:grid-cols-3">
                             <Card>
-                                <CardHeader>
+                                <CardHeader className="flex flex-row items-center justify-between pb-2">
                                     <CardTitle className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
                                         <Briefcase className="size-4" />
                                         Total Applications
                                     </CardTitle>
+                                    <ChartInfoTooltip description="Total count of all job applications tracked across all stages in your pipeline." />
                                 </CardHeader>
                                 <CardContent>
                                     <p className="text-3xl font-bold text-foreground">
@@ -145,11 +170,12 @@ throw new Error('Failed to fetch application');
                             </Card>
 
                             <Card>
-                                <CardHeader>
+                                <CardHeader className="flex flex-row items-center justify-between pb-2">
                                     <CardTitle className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
                                         <TrendingUp className="size-4" />
                                         Avg Match Score
                                     </CardTitle>
+                                    <ChartInfoTooltip description="Average AI match score rating calculated across applications with match evaluations." />
                                 </CardHeader>
                                 <CardContent>
                                     <p className="text-3xl font-bold text-foreground">
@@ -161,11 +187,12 @@ throw new Error('Failed to fetch application');
                             </Card>
 
                             <Card>
-                                <CardHeader>
+                                <CardHeader className="flex flex-row items-center justify-between pb-2">
                                     <CardTitle className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
                                         <CalendarDays className="size-4" />
                                         Added This Month
                                     </CardTitle>
+                                    <ChartInfoTooltip description="Number of new job applications created during the current calendar month and week." />
                                 </CardHeader>
                                 <CardContent>
                                     <p className="text-3xl font-bold text-foreground">
@@ -182,8 +209,9 @@ throw new Error('Failed to fetch application');
                         <div className="grid gap-6 lg:grid-cols-2">
                             {/* Status Distribution Pie Chart */}
                             <Card>
-                                <CardHeader>
+                                <CardHeader className="flex flex-row items-center justify-between">
                                     <CardTitle>Status Distribution</CardTitle>
+                                    <ChartInfoTooltip description="Breakdown of your current job applications grouped by status (Wishlist, Applied, Interviewing, Offer, etc.)." />
                                 </CardHeader>
                                 <CardContent>
                                     {statusData.length === 0 ? (
@@ -232,10 +260,11 @@ throw new Error('Failed to fetch application');
 
                             {/* 30-Day Trend Bar Chart */}
                             <Card>
-                                <CardHeader>
+                                <CardHeader className="flex flex-row items-center justify-between">
                                     <CardTitle>
                                         30-Day Application Trend
                                     </CardTitle>
+                                    <ChartInfoTooltip description="Daily application submission counts over the past 30 days to track application momentum." />
                                 </CardHeader>
                                 <CardContent>
                                     {trend.length === 0 ? (

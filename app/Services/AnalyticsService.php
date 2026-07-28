@@ -10,6 +10,10 @@ use Illuminate\Support\Facades\DB;
 
 class AnalyticsService
 {
+    public function __construct(
+        private readonly FxExchangeService $fxService = new FxExchangeService,
+    ) {}
+
     public function funnel(User $user): Collection
     {
         $counts = $user->jobApplications()
@@ -82,45 +86,78 @@ class AnalyticsService
         return collect(array_values($weekRows));
     }
 
-    public function salaryInsights(User $user): array
+    public function salaryInsights(User $user, string $baseCurrency = 'PHP'): array
     {
-        $expected = $user->jobApplications()
-            ->whereNotNull('expected_salary')
-            ->avg('expected_salary');
+        $applications = $user->jobApplications()
+            ->where(function ($query) {
+                $query->whereNotNull('expected_salary')
+                    ->orWhereNotNull('offered_salary');
+            })
+            ->get(['expected_salary', 'offered_salary', 'currency']);
 
-        $offered = $user->jobApplications()
-            ->whereNotNull('offered_salary')
-            ->avg('offered_salary');
+        $expectedTotal = 0;
+        $expectedCount = 0;
+        $offeredTotal = 0;
+        $offeredCount = 0;
+
+        foreach ($applications as $app) {
+            $currency = $app->currency ?? 'PHP';
+
+            if ($app->expected_salary !== null) {
+                $expectedTotal += $this->fxService->convert($app->expected_salary, $currency, $baseCurrency);
+                $expectedCount++;
+            }
+
+            if ($app->offered_salary !== null) {
+                $offeredTotal += $this->fxService->convert($app->offered_salary, $currency, $baseCurrency);
+                $offeredCount++;
+            }
+        }
 
         return [
-            'avg_expected' => $expected !== null ? round((float) $expected) : null,
-            'avg_offered' => $offered !== null ? round((float) $offered) : null,
+            'avg_expected' => $expectedCount > 0 ? round($expectedTotal / $expectedCount) : null,
+            'avg_offered' => $offeredCount > 0 ? round($offeredTotal / $offeredCount) : null,
+            'base_currency' => $baseCurrency,
         ];
     }
 
-    public function salaryBands(User $user): Collection
+    public function salaryBands(User $user, string $baseCurrency = 'PHP'): Collection
     {
+        $symbol = $this->fxService->getCurrencySymbol($baseCurrency);
+
         $bands = [
-            ['label' => '₱0–30k', 'min' => 0, 'max' => 30_000],
-            ['label' => '₱30–60k', 'min' => 30_001, 'max' => 60_000],
-            ['label' => '₱60–90k', 'min' => 60_001, 'max' => 90_000],
-            ['label' => '₱90–120k', 'min' => 90_001, 'max' => 120_000],
-            ['label' => '₱120k+', 'min' => 120_001, 'max' => PHP_INT_MAX],
+            ['label' => "{$symbol}0–30k", 'min' => 0, 'max' => 30_000],
+            ['label' => "{$symbol}30–60k", 'min' => 30_001, 'max' => 60_000],
+            ['label' => "{$symbol}60–90k", 'min' => 60_001, 'max' => 90_000],
+            ['label' => "{$symbol}90–120k", 'min' => 90_001, 'max' => 120_000],
+            ['label' => "{$symbol}120k+", 'min' => 120_001, 'max' => PHP_INT_MAX],
         ];
 
-        $expectedCounts = $user->jobApplications()
-            ->whereNotNull('expected_salary')
-            ->select('expected_salary')
-            ->get()
-            ->groupBy(fn ($app) => $this->bandLabel($bands, $app->expected_salary))
-            ->map->count();
+        $applications = $user->jobApplications()
+            ->where(function ($query) {
+                $query->whereNotNull('expected_salary')
+                    ->orWhereNotNull('offered_salary');
+            })
+            ->get(['expected_salary', 'offered_salary', 'currency']);
 
-        $offeredCounts = $user->jobApplications()
-            ->whereNotNull('offered_salary')
-            ->select('offered_salary')
-            ->get()
-            ->groupBy(fn ($app) => $this->bandLabel($bands, $app->offered_salary))
-            ->map->count();
+        $expectedCounts = collect();
+        $offeredCounts = collect();
+
+        foreach ($applications as $app) {
+            $currency = $app->currency ?? 'PHP';
+
+            if ($app->expected_salary !== null) {
+                $converted = $this->fxService->convert($app->expected_salary, $currency, $baseCurrency);
+                $label = $this->bandLabel($bands, (int) $converted);
+                $expectedCounts[$label] = ($expectedCounts[$label] ?? 0) + 1;
+            }
+
+            if ($app->offered_salary !== null) {
+                $converted = $this->fxService->convert($app->offered_salary, $currency, $baseCurrency);
+                $label = $this->bandLabel($bands, (int) $converted);
+                $offeredCounts[$label] = ($offeredCounts[$label] ?? 0) + 1;
+            }
+        }
 
         return collect($bands)->map(fn (array $band) => [
             'band' => $band['label'],
@@ -133,23 +170,41 @@ class AnalyticsService
     {
         return $user->jobApplications()
             ->whereNotNull('date_applied')
-            ->whereHas('activities', fn ($q) => $q->where('type', 'status_update'))
-            ->with(['activities' => fn ($q) => $q->where('type', 'status_update')->oldest()])
+            ->where(function ($query) {
+                $query->whereNotNull('last_contacted_at')
+                    ->orWhereHas('activities', fn ($q) => $q->where('type', 'status_update'));
+            })
+            ->with(['activities' => fn ($q) => $q->whereIn('type', ['status_update', 'contacted'])->oldest()])
             ->get()
             ->map(function ($application) {
-                $firstActivity = $application->activities->first();
-                if ($firstActivity === null) {
+                $responseActivity = $application->activities
+                    ->first(fn ($act) => ! str_contains($act->description, 'Status changed to Applied') && ! str_contains($act->description, 'Status changed to Wishlist'))
+                    ?? $application->activities->first();
+
+                if ($responseActivity === null && $application->last_contacted_at === null) {
                     return null;
                 }
 
                 $appliedDate = Carbon::parse($application->date_applied);
-                $responseDate = $firstActivity->created_at;
-                $days = $appliedDate->diffInDays($responseDate);
+                $firstResponseDate = $responseActivity ? $responseActivity->created_at : $application->last_contacted_at;
+                $firstResponseDays = (int) $appliedDate->diffInDays($firstResponseDate);
+
+                $lastContactDays = null;
+                $lastContactDate = null;
+
+                if ($application->last_contacted_at !== null) {
+                    $lastContactDays = (int) $appliedDate->diffInDays(Carbon::parse($application->last_contacted_at));
+                    $lastContactDate = Carbon::parse($application->last_contacted_at)->format('M j, Y');
+                }
 
                 return [
                     'company' => $application->company_name,
                     'job_title' => $application->job_title,
-                    'days' => $days,
+                    'days' => $firstResponseDays,
+                    'applied_date' => $appliedDate->format('M j, Y'),
+                    'first_response_date' => Carbon::parse($firstResponseDate)->format('M j, Y'),
+                    'last_contact_date' => $lastContactDate,
+                    'last_contact_days' => $lastContactDays,
                 ];
             })
             ->filter()

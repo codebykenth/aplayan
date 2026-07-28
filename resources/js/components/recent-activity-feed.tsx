@@ -9,13 +9,20 @@ import {
     History,
     ExternalLink,
     ArrowRight,
+    Bookmark,
+    Send,
+    Users,
+    CheckCircle2,
+    XCircle,
+    X,
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 import { index as jobAppsIndex } from '@/routes/job-applications';
-import type { JobApplicationActivity } from '@/types/job-application';
+import { STATUS_COLORS } from '@/types/job-application';
+import type { JobApplicationActivity, JobApplicationStatus } from '@/types/job-application';
 
 export interface RecentActivityItem extends Omit<
     JobApplicationActivity,
@@ -34,6 +41,23 @@ const ACTIVITY_ICONS: Record<string, typeof Clock> = {
     contacted: Phone,
     ai_evaluated: Sparkles,
 };
+
+const STATUS_ICONS: Record<JobApplicationStatus, typeof Clock> = {
+    wishlist: Bookmark,
+    applied: Send,
+    interviewing: Users,
+    offer: CheckCircle2,
+    rejected: XCircle,
+    withdrawn: X,
+};
+
+function getStatusFromDescription(description: string): JobApplicationStatus | null {
+    const match = description.match(/Status changed to (Wishlist|Applied|Interviewing|Offer|Rejected|Withdrawn)/i);
+    if (match) {
+        return match[1].toLowerCase() as JobApplicationStatus;
+    }
+    return null;
+}
 
 const ACTIVITY_LABELS: Record<string, string> = {
     status_update: 'Status Update',
@@ -103,9 +127,18 @@ function ActivityCard({
     item: RecentActivityItem;
     onSelect: (applicationId: number) => void;
 }) {
-    const Icon = ACTIVITY_ICONS[item.type] ?? Clock;
-    const iconColor =
-        ACTIVITY_COLORS[item.type] ?? 'bg-muted text-muted-foreground';
+    let Icon = ACTIVITY_ICONS[item.type] ?? Clock;
+    let iconColor = ACTIVITY_COLORS[item.type] ?? 'bg-muted text-muted-foreground';
+    let customBadgeClass = '';
+
+    if (item.type === 'status_update') {
+        const status = getStatusFromDescription(item.description);
+        if (status) {
+            Icon = STATUS_ICONS[status] ?? RefreshCw;
+            iconColor = STATUS_COLORS[status] ?? iconColor;
+            customBadgeClass = STATUS_COLORS[status] ?? '';
+        }
+    }
 
     return (
         <button
@@ -127,14 +160,18 @@ function ActivityCard({
                     <span className="truncate text-sm font-medium text-foreground">
                         {item.company_name}
                     </span>
-                    <Badge
-                        variant={
-                            ACTIVITY_BADGE_VARIANTS[item.type] ?? 'outline'
-                        }
-                        className="shrink-0 text-[10px] leading-none"
-                    >
-                        {ACTIVITY_LABELS[item.type] ?? item.type}
-                    </Badge>
+                    {customBadgeClass ? (
+                        <div className={cn("inline-flex items-center rounded-full border px-2.5 py-0.5 text-[10px] font-semibold transition-colors focus:outline-hidden focus:ring-2 focus:ring-ring focus:ring-offset-2 shrink-0 leading-none", customBadgeClass)}>
+                            {ACTIVITY_LABELS[item.type] ?? item.type}
+                        </div>
+                    ) : (
+                        <Badge
+                            variant={ACTIVITY_BADGE_VARIANTS[item.type] ?? 'outline'}
+                            className="shrink-0 text-[10px] leading-none"
+                        >
+                            {ACTIVITY_LABELS[item.type] ?? item.type}
+                        </Badge>
+                    )}
                 </div>
                 <p className="line-clamp-1 text-xs text-muted-foreground">
                     {item.description}
