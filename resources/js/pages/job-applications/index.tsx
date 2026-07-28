@@ -1,5 +1,5 @@
 import { Head, router, useForm } from '@inertiajs/react';
-import { SearchIcon, PlusIcon, DownloadIcon, UploadIcon, ZapIcon } from 'lucide-react';
+import { SearchIcon, PlusIcon, DownloadIcon, UploadIcon, ZapIcon, Trash2 } from 'lucide-react';
 import { useState, useMemo, useRef, useEffect  } from 'react';
 import type {ReactNode} from 'react';
 import QuickApplyDialog from '@/components/application-templates/quick-apply-dialog';
@@ -9,6 +9,7 @@ import KanbanBoard from '@/components/job-applications/kanban-board';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { PageHeader } from '@/components/ui/page-header';
+import { ConfirmDestructiveDialog } from '@/components/ui/confirm-destructive-dialog';
 import AppLayout from '@/layouts/app-layout';
 import { destroy as jobAppDestroy, exportMethod, importMethod } from '@/routes/job-applications';
 import type { ApplicationTemplate } from '@/types/application-template';
@@ -47,6 +48,7 @@ export default function JobApplicationsIndex({
         useState<JobApplication | null>(null);
     const [quickApplyOpen, setQuickApplyOpen] = useState(false);
     const [exportOpen, setExportOpen] = useState(false);
+    const [deletingApplication, setDeletingApplication] = useState<JobApplication | null>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
     const importForm = useForm<{ file: File | null }>({ file: null });
 
@@ -114,15 +116,7 @@ return;
     }
 
     function handleDelete(app: JobApplication) {
-        if (
-            !window.confirm(
-                `Delete application for ${app.job_title} at ${app.company_name}?`,
-            )
-        ) {
-            return;
-        }
-
-        router.delete(jobAppDestroy.url(app.id));
+        setDeletingApplication(app);
     }
 
     return (
@@ -288,6 +282,18 @@ return;
                 open={quickApplyOpen}
                 onClose={() => setQuickApplyOpen(false)}
                 templates={templates}
+            />
+
+            <ConfirmDestructiveDialog
+                open={deletingApplication !== null}
+                onOpenChange={(open) => !open && setDeletingApplication(null)}
+                title="Delete Application?"
+                description={deletingApplication && `Are you sure you want to delete your application for ${deletingApplication.job_title} at ${deletingApplication.company_name}? This action cannot be undone.`}
+                onConfirm={() => {
+                    if (deletingApplication) {
+                        router.delete(jobAppDestroy.url(deletingApplication.id));
+                    }
+                }}
             />
         </>
     );

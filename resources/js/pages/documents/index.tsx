@@ -1,5 +1,5 @@
 import { Head, Link, useForm, router } from '@inertiajs/react';
-import { User, Briefcase, GraduationCap, Wrench, Award, FolderGit2, FileText, Download, Mail, Camera, Save, Sparkles, Eye, Edit3, FilePenLine, Wand2, Loader2, AlertCircle, BookText, ArrowUp, ArrowDown, GripVertical, BookmarkIcon } from 'lucide-react';
+import { User, Briefcase, GraduationCap, Wrench, Award, FolderGit2, FileText, Download, Mail, Camera, Save, Sparkles, Eye, Edit3, FilePenLine, Wand2, Loader2, AlertCircle, BookText, ArrowUp, ArrowDown, GripVertical, BookmarkIcon, Trash2 } from 'lucide-react';
 import {
     DndContext,
     closestCenter,
@@ -21,6 +21,7 @@ import type { ReactNode } from 'react';
 import { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
+import { ConfirmDestructiveDialog } from '@/components/ui/confirm-destructive-dialog';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogClose } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -89,6 +90,8 @@ interface SavedCoverLetterProp {
     target_company: string | null;
     target_job_title: string | null;
     template: string | null;
+    job_description: string | null;
+    recipient: string | null;
 }
 
 interface DocumentsPageProps {
@@ -724,6 +727,11 @@ setData('full_name', '');
                     id="target_role"
                     value={data.target_role ?? ''}
                     onChange={(e) => setData('target_role', e.target.value)}
+                    onFocus={() => {
+                        if (data.target_role === 'Senior Software Developer') {
+                            setData('target_role', '');
+                        }
+                    }}
                     placeholder="e.g. Senior Software Developer"
                     aria-invalid={!!errors.target_role}
                 />
@@ -1973,16 +1981,10 @@ return null;
                                 {data.email && <a href={`mailto:${data.email}`} style={{ color: 'inherit', textDecoration: 'underline' }}>{data.email}</a>}
                                 {data.phone && <span>{data.phone}</span>}
                                 {data.location && <span>{data.location}</span>}
+                                {data.linkedin_url && <span>{renderLink(data.linkedin_url)}</span>}
+                                {data.github_url && <span>{renderLink(data.github_url)}</span>}
+                                {data.website_url && <span>{renderLink(data.website_url)}</span>}
                             </div>
-                            {data.linkedin_url && (
-                                <div className="linkedin">{renderLink(data.linkedin_url)}</div>
-                            )}
-                            {data.github_url && (
-                                <div className="linkedin">{renderLink(data.github_url)}</div>
-                            )}
-                            {data.website_url && (
-                                <div className="linkedin">{renderLink(data.website_url)}</div>
-                            )}
 
                             {data.summary && (
                                 <>
@@ -2376,12 +2378,14 @@ acc.push(<span key={`psep-${i}`}>  •  </span>);
     );
 }
 
-function CoverLetterPreview({ content, template, fullName, targetCompany, targetJobTitle }: {
+function CoverLetterPreview({ content, template, fullName, targetCompany, targetJobTitle, jobDescription, recipient }: {
     content: string;
     template: string;
     fullName: string;
     targetCompany: string;
     targetJobTitle: string;
+    jobDescription: string;
+    recipient: string;
 }) {
     const previewRef = useRef<HTMLDivElement>(null);
     const scopedStyles = getScopedCoverLetterStyles(template);
@@ -2391,6 +2395,7 @@ function CoverLetterPreview({ content, template, fullName, targetCompany, target
     const displayContent = content.trim() || DEFAULT_COVER_LETTER;
     const displayCompany = targetCompany.trim() || 'Acme Corp';
     const displayJobTitle = targetJobTitle.trim() || 'Software Developer';
+    const displayRecipient = recipient.trim() || 'Hiring Manager';
 
     function handleDownload() {
         const printWindow = window.open('', '_blank');
@@ -2423,8 +2428,15 @@ return;
         }, 300);
     }
 
-    function handleCopy() {
-        navigator.clipboard.writeText(displayContent);
+    function handleSaveVersion() {
+        router.post('/documents/save-cover-letter', {
+            content: displayContent,
+            target_company: displayCompany,
+            target_job_title: displayJobTitle,
+            template,
+            job_description: jobDescription,
+            recipient: displayRecipient,
+        });
     }
 
     return (
@@ -2440,12 +2452,12 @@ return;
                 </div>
 
                 <div className="letter-recipient" style={{ marginBottom: '16px' }}>
-                    <div>Hiring Manager</div>
+                    <div>{displayRecipient}</div>
                     <div>{displayCompany}</div>
                     <div style={{ marginBottom: '16px' }}>Re: {displayJobTitle} Position</div>
                 </div>
 
-                <div className="letter-salutation">Dear Hiring Manager,</div>
+                <div className="letter-salutation">Dear {displayRecipient},</div>
 
                 <div className="letter-body">
                     {displayContent.split('\n').map((paragraph, i) => (
@@ -2459,9 +2471,9 @@ return;
                 </div>
             </div>
             <div className="flex justify-end gap-2 w-full max-w-[210mm]">
-                <Button variant="outline" onClick={handleCopy}>
-                    <FileText className="mr-2 size-4" />
-                    Copy Text
+                <Button variant="outline" onClick={handleSaveVersion}>
+                    <Save className="mr-2 size-4" />
+                    Save Version
                 </Button>
                 <Button variant="default" onClick={handleDownload}>
                     <Download className="mr-2 size-4" />
@@ -2472,7 +2484,21 @@ return;
     );
 }
 
-function CoverLetterBuilder({ profile, template, onTemplateChange, aiLimit, coverLetterContent, onCoverLetterContentChange, onCoverLetterMetaChange }: {
+function CoverLetterBuilder({
+    profile,
+    template,
+    onTemplateChange,
+    aiLimit,
+    coverLetterContent,
+    onCoverLetterContentChange,
+    onCoverLetterMetaChange,
+    jobDescription,
+    onJobDescriptionChange,
+    initialCompany,
+    initialJobTitle,
+    initialRecipient,
+    onRecipientChange,
+}: {
     profile: ResumeProfile;
     template: string;
     onTemplateChange: (t: string) => void;
@@ -2480,10 +2506,16 @@ function CoverLetterBuilder({ profile, template, onTemplateChange, aiLimit, cove
     coverLetterContent: string;
     onCoverLetterContentChange: (content: string) => void;
     onCoverLetterMetaChange: (company: string, jobTitle: string) => void;
+    jobDescription: string;
+    onJobDescriptionChange: (val: string) => void;
+    initialCompany: string;
+    initialJobTitle: string;
+    initialRecipient: string;
+    onRecipientChange: (val: string) => void;
 }) {
-    const [jobTitle, setJobTitle] = useState('Software Developer');
-    const [companyName, setCompanyName] = useState('Acme Corp');
-    const [jobDescription, setJobDescription] = useState('');
+    const [jobTitle, setJobTitle] = useState(initialJobTitle);
+    const [companyName, setCompanyName] = useState(initialCompany);
+    const [recipient, setRecipient] = useState(initialRecipient);
     const [generating, setGenerating] = useState(false);
     const [polishingPreset, setPolishingPreset] = useState<string | null>(null);
     const [polishing, setPolishing] = useState(false);
@@ -2493,17 +2525,14 @@ function CoverLetterBuilder({ profile, template, onTemplateChange, aiLimit, cove
     const [loadDialogOpen, setLoadDialogOpen] = useState(false);
     const [savedLetters, setSavedLetters] = useState<Array<{ id: number; content: string; target_company: string | null; target_job_title: string | null; created_at: string }>>([]);
     const [loadingLetters, setLoadingLetters] = useState(false);
-    const [loadTemplateDialogOpen, setLoadTemplateDialogOpen] = useState(false);
-    const [savedTemplates, setSavedTemplates] = useState<Array<{ id: number; title: string; recipient: string | null; content: string }>>([]);
-    const [loadingTemplates, setLoadingTemplates] = useState(false);
-    const [saveAsTemplateDialogOpen, setSaveAsTemplateDialogOpen] = useState(false);
-    const [templateTitle, setTemplateTitle] = useState('');
-    const [templateRecipient, setTemplateRecipient] = useState('');
-    const [savingAsTemplate, setSavingAsTemplate] = useState(false);
 
     useEffect(() => {
         onCoverLetterMetaChange(companyName, jobTitle);
     }, [companyName, jobTitle, onCoverLetterMetaChange]);
+
+    useEffect(() => {
+        onRecipientChange(recipient);
+    }, [recipient, onRecipientChange]);
 
     async function handleGenerate() {
         if (!jobDescription.trim()) {
@@ -2603,6 +2632,7 @@ return;
                     target_company: companyName,
                     target_job_title: jobTitle,
                     template,
+                    recipient,
                 }),
             });
 
@@ -2623,6 +2653,9 @@ return;
     }
 
     function handleClear() {
+        setJobTitle('Software Developer');
+        setCompanyName('Acme Corp');
+        setRecipient('Hiring Manager');
         onCoverLetterContentChange('');
         setError(null);
     }
@@ -2664,91 +2697,6 @@ return;
         setLoadDialogOpen(false);
     }
 
-    async function handleOpenLoadTemplate() {
-        setLoadTemplateDialogOpen(true);
-        setLoadingTemplates(true);
-        setError(null);
-
-        try {
-            const token = (document.querySelector('meta[name="csrf-token"]') as HTMLMetaElement)?.content ?? '';
-            const response = await fetch('/cover-letter-templates/json', {
-                headers: {
-                    'Accept': 'application/json',
-                    'X-CSRF-TOKEN': token,
-                },
-            });
-            const isJson = response.headers.get('content-type')?.includes('application/json');
-            const data = isJson ? await response.json() : null;
-            setSavedTemplates(data?.templates ?? []);
-        } catch {
-            setError('Failed to load cover letter templates.');
-        } finally {
-            setLoadingTemplates(false);
-        }
-    }
-
-    function handleLoadTemplate(template: { id: number; title: string; recipient: string | null; content: string }) {
-        let content = template.content;
-
-        if (template.recipient) {
-            content = content.replaceAll('[Recipient]', template.recipient);
-        }
-
-        content = content
-            .replaceAll('[Company Name]', companyName || 'Target Company')
-            .replaceAll('[Job Title]', jobTitle || 'Software Developer')
-            .replaceAll('[Your Name]', profile?.full_name || 'Applicant')
-            .replaceAll('[Date]', new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }));
-
-        onCoverLetterContentChange(content);
-        setLoadTemplateDialogOpen(false);
-    }
-
-    function handleOpenSaveAsTemplate() {
-        setTemplateTitle('');
-        setTemplateRecipient('');
-        setSaveAsTemplateDialogOpen(true);
-    }
-
-    async function handleSaveAsTemplate() {
-        if (!coverLetterContent.trim() || !templateTitle.trim()) {
-            return;
-        }
-
-        setSavingAsTemplate(true);
-        setError(null);
-
-        try {
-            const token = (document.querySelector('meta[name="csrf-token"]') as HTMLMetaElement)?.content ?? '';
-            const response = await fetch('/cover-letter-templates', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json',
-                    'X-CSRF-TOKEN': token,
-                },
-                body: JSON.stringify({
-                    title: templateTitle,
-                    recipient: templateRecipient || null,
-                    content: coverLetterContent,
-                }),
-            });
-
-            if (!response.ok) {
-                const isJson = response.headers.get('content-type')?.includes('application/json');
-                const data = isJson ? await response.json() : null;
-                throw new Error(data?.message || `Save failed (HTTP ${response.status})`);
-            }
-
-            setSaveAsTemplateDialogOpen(false);
-            setSaveSuccess(true);
-            setTimeout(() => setSaveSuccess(false), 5000);
-        } catch (err) {
-            setError(err instanceof Error ? err.message : 'Failed to save as template');
-        } finally {
-            setSavingAsTemplate(false);
-        }
-    }
 
     const polishPresets = [
         { id: 'polish', label: 'Polish & Grammar', icon: Wand2 },
@@ -2763,14 +2711,29 @@ return;
     }
 
     return (
-        <div className="flex flex-col gap-4 h-full">
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+        <Card className="flex flex-col h-full">
+            <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                    <FileText className="size-4" />
+                    Cover Letter Editor
+                </CardTitle>
+                <CardDescription>
+                    Provide target job details and use AI to generate or polish your cover letter.
+                </CardDescription>
+            </CardHeader>
+            <CardContent className="flex flex-col gap-4 flex-1 min-h-0">
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
                 <div className="flex flex-col gap-2">
                     <Label htmlFor="target_job_title">Target Job Title</Label>
                     <Input
                         id="target_job_title"
                         value={jobTitle}
                         onChange={(e) => setJobTitle(e.target.value)}
+                        onFocus={() => {
+                            if (jobTitle === 'Software Developer') {
+                                setJobTitle('');
+                            }
+                        }}
                         placeholder="e.g. Senior Software Engineer"
                     />
                 </div>
@@ -2780,14 +2743,35 @@ return;
                         id="target_company"
                         value={companyName}
                         onChange={(e) => setCompanyName(e.target.value)}
+                        onFocus={() => {
+                            if (companyName === 'Acme Corp') {
+                                setCompanyName('');
+                            }
+                        }}
                         placeholder="e.g. TechCorp"
                     />
                 </div>
                 <div className="flex flex-col gap-2">
+                    <Label htmlFor="recipient">Address To / Recipient</Label>
+                    <Input
+                        id="recipient"
+                        value={recipient}
+                        onChange={(e) => setRecipient(e.target.value)}
+                        onFocus={() => {
+                            if (recipient === 'Hiring Manager') {
+                                setRecipient('');
+                            }
+                        }}
+                        placeholder="e.g. Hiring Manager"
+                    />
+                </div>
+                <div className="flex flex-col gap-2 sm:col-span-3 lg:col-span-1">
                     <Label>Cover Letter Style</Label>
                     <Select value={template} onValueChange={(value: string | null) => value && handleTemplateSelect(value)}>
                         <SelectTrigger>
-                            <SelectValue placeholder="Select style" />
+                            <SelectValue placeholder="Select style">
+                                {COVER_LETTER_TEMPLATES.find(t => t.id === template)?.name || "Select style"}
+                            </SelectValue>
                         </SelectTrigger>
                         <SelectContent>
                             {COVER_LETTER_TEMPLATES.map((t) => (
@@ -2805,89 +2789,13 @@ return;
                 <Textarea
                     id="job_description"
                     value={jobDescription}
-                    onChange={(e) => setJobDescription(e.target.value)}
+                    onChange={(e) => onJobDescriptionChange(e.target.value)}
                     rows={3}
                     placeholder="Paste the job description here to generate a tailored cover letter..."
                 />
             </div>
 
-            <div className="flex flex-wrap items-center gap-2">
-                <Button
-                    type="button"
-                    variant="default"
-                    size="sm"
-                    onClick={handleGenerate}
-                    disabled={generating || !jobDescription.trim() || aiLimit.exhausted}
-                >
-                    {generating ? (
-                        <Loader2 className="mr-2 size-4 animate-spin" />
-                    ) : (
-                        <Sparkles className="mr-2 size-4" />
-                    )}
-                    {generating ? 'Generating...' : 'AI Generate'}
-                </Button>
-
-                <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={handleClear}
-                    disabled={!coverLetterContent.trim()}
-                >
-                    Clear / Start Manual
-                </Button>
-
-                <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={handleOpenLoad}
-                >
-                    <FolderGit2 className="mr-2 size-4" />
-                    Load Saved
-                </Button>
-
-                <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={handleOpenLoadTemplate}
-                >
-                    <FileText className="mr-2 size-4" />
-                    Load Template
-                </Button>
-
-                <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={handleSave}
-                    disabled={saving || !coverLetterContent.trim()}
-                >
-                    {saving ? (
-                        <Loader2 className="mr-2 size-4 animate-spin" />
-                    ) : (
-                        <Save className="mr-2 size-4" />
-                    )}
-                    {saving ? 'Saving...' : 'Save'}
-                </Button>
-
-                <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={handleOpenSaveAsTemplate}
-                    disabled={!coverLetterContent.trim()}
-                >
-                    <BookmarkIcon className="mr-2 size-4" />
-                    Save as Template
-                </Button>
-
-                <div className="ml-auto flex items-center gap-1 text-xs text-muted-foreground">
-                    <Sparkles className="size-3" />
-                    <span>{aiLimit.remaining}/{aiLimit.total} AI uses today</span>
-                </div>
-            </div>
+            {/* Action buttons moved to bottom footer */}
 
             {error && (
                 <div className="flex items-center gap-2 rounded-lg border border-destructive/20 bg-destructive/5 p-3 text-sm text-destructive">
@@ -2933,6 +2841,67 @@ return;
                     className="flex-1 font-mono leading-relaxed resize-none"
                     placeholder="Write your cover letter here, or select a template to load predefined text..."
                 />
+            </div>
+            </CardContent>
+
+            <div className="flex items-center justify-between border-t px-(--card-spacing) py-(--card-spacing)">
+                <div className="flex items-center gap-2">
+                    <Button
+                        type="button"
+                        variant="default"
+                        onClick={handleGenerate}
+                        disabled={generating || !jobDescription.trim() || aiLimit.exhausted}
+                    >
+                        {generating ? (
+                            <Loader2 className="mr-2 size-4 animate-spin" />
+                        ) : (
+                            <Sparkles className="mr-2 size-4" />
+                        )}
+                        {generating ? 'Generating...' : 'AI Generate'}
+                    </Button>
+                    <div className="hidden sm:flex items-center gap-1 text-xs text-muted-foreground">
+                        <Sparkles className="size-3" />
+                        <span>{aiLimit.remaining}/{aiLimit.total} AI uses today</span>
+                    </div>
+                </div>
+                <div className="flex items-center gap-2">
+                    <Button
+                        type="button"
+                        variant="outline"
+                        onClick={handleOpenLoad}
+                    >
+                        <FolderGit2 className="mr-2 size-4" />
+                        Load Saved
+                    </Button>
+                    <ConfirmDestructiveDialog
+                        title="Clear Cover Letter?"
+                        description="This will erase your current content and reset the cover letter fields to their default values. This action cannot be undone."
+                        confirmLabel="Clear Letter"
+                        onConfirm={handleClear}
+                        trigger={
+                            <Button
+                                type="button"
+                                variant="destructive"
+                                disabled={!coverLetterContent.trim()}
+                            >
+                                Clear Letter
+                            </Button>
+                        }
+                    />
+                    <Button
+                        type="button"
+                        variant="default"
+                        onClick={handleSave}
+                        disabled={saving || !coverLetterContent.trim()}
+                    >
+                        {saving ? (
+                            <Loader2 className="mr-2 size-4 animate-spin" />
+                        ) : (
+                            <Save className="mr-2 size-4" />
+                        )}
+                        {saving ? 'Saving...' : 'Save Letter'}
+                    </Button>
+                </div>
             </div>
 
             <Dialog open={loadDialogOpen} onOpenChange={setLoadDialogOpen}>
@@ -2987,117 +2956,7 @@ return;
                 </DialogContent>
             </Dialog>
 
-            <Dialog open={loadTemplateDialogOpen} onOpenChange={setLoadTemplateDialogOpen}>
-                <DialogContent className="max-w-lg max-h-[70vh] flex flex-col">
-                    <DialogHeader>
-                        <DialogTitle className="flex items-center gap-2">
-                            <FileText className="size-4" />
-                            Load Cover Letter Template
-                        </DialogTitle>
-                        <DialogDescription>
-                            Select a saved template to insert into your cover letter with placeholders replaced.
-                        </DialogDescription>
-                    </DialogHeader>
-                    <div className="flex-1 overflow-y-auto min-h-0">
-                        {loadingTemplates ? (
-                            <div className="flex items-center justify-center py-8">
-                                <Loader2 className="size-6 animate-spin text-muted-foreground" />
-                            </div>
-                        ) : savedTemplates.length === 0 ? (
-                            <div className="flex flex-col items-center justify-center py-8 text-center">
-                                <FileText className="h-8 w-8 text-muted-foreground mb-2" />
-                                <p className="text-sm text-muted-foreground">No cover letter templates yet.</p>
-                                <p className="text-xs text-muted-foreground mt-1">
-                                    Create templates on the Templates page or use "Save as Template" here.
-                                </p>
-                            </div>
-                        ) : (
-                            <div className="flex flex-col gap-2">
-                                {savedTemplates.map((tmpl) => (
-                                    <button
-                                        key={tmpl.id}
-                                        type="button"
-                                        onClick={() => handleLoadTemplate(tmpl)}
-                                        className="flex flex-col gap-1 rounded-lg border border-border bg-card p-3 text-left text-sm hover:bg-[#f5f5f4] dark:hover:bg-[#1C1C1A] transition-colors"
-                                    >
-                                        <div className="flex items-center justify-between">
-                                            <span className="font-medium text-foreground">
-                                                {tmpl.title}
-                                            </span>
-                                            {tmpl.recipient && (
-                                                <span className="text-xs text-muted-foreground">
-                                                    To: {tmpl.recipient}
-                                                </span>
-                                            )}
-                                        </div>
-                                        <p className="text-xs text-muted-foreground line-clamp-2">
-                                            {tmpl.content}
-                                        </p>
-                                    </button>
-                                ))}
-                            </div>
-                        )}
-                    </div>
-                    <DialogFooter>
-                        <DialogClose render={<Button variant="outline">Cancel</Button>} />
-                    </DialogFooter>
-                </DialogContent>
-            </Dialog>
-
-            <Dialog open={saveAsTemplateDialogOpen} onOpenChange={setSaveAsTemplateDialogOpen}>
-                <DialogContent className="sm:max-w-lg">
-                    <DialogHeader>
-                        <DialogTitle className="flex items-center gap-2">
-                            <BookmarkIcon className="size-4" />
-                            Save as Cover Letter Template
-                        </DialogTitle>
-                        <DialogDescription>
-                            Save your current cover letter as a reusable template for future applications.
-                        </DialogDescription>
-                    </DialogHeader>
-                    <div className="flex flex-col gap-4">
-                        <div className="flex flex-col gap-2">
-                            <Label htmlFor="save_template_title">Template Title</Label>
-                            <Input
-                                id="save_template_title"
-                                value={templateTitle}
-                                onChange={(e) => setTemplateTitle(e.target.value)}
-                                placeholder="e.g. General Cover Letter, Tech Role Application"
-                            />
-                        </div>
-                        <div className="flex flex-col gap-2">
-                            <Label htmlFor="save_template_recipient">Recipient (optional)</Label>
-                            <Input
-                                id="save_template_recipient"
-                                value={templateRecipient}
-                                onChange={(e) => setTemplateRecipient(e.target.value)}
-                                placeholder="e.g. Hiring Manager, HR Team"
-                            />
-                        </div>
-                        <div className="flex flex-col gap-2">
-                            <Label>Preview</Label>
-                            <div className="max-h-32 overflow-y-auto rounded-lg border border-border bg-muted p-3 text-xs text-muted-foreground font-mono">
-                                {coverLetterContent.slice(0, 300)}{coverLetterContent.length > 300 ? '...' : ''}
-                            </div>
-                        </div>
-                    </div>
-                    <DialogFooter>
-                        <DialogClose render={<Button variant="outline">Cancel</Button>} />
-                        <Button
-                            onClick={handleSaveAsTemplate}
-                            disabled={savingAsTemplate || !templateTitle.trim() || !coverLetterContent.trim()}
-                        >
-                            {savingAsTemplate ? (
-                                <Loader2 className="mr-2 size-4 animate-spin" />
-                            ) : (
-                                <BookmarkIcon className="mr-2 size-4" />
-                            )}
-                            {savingAsTemplate ? 'Saving...' : 'Save Template'}
-                        </Button>
-                    </DialogFooter>
-                </DialogContent>
-            </Dialog>
-        </div>
+        </Card>
     );
 }
 
@@ -3162,8 +3021,8 @@ function SortableTab({
 
 export default function DocumentsIndex({ profile, aiLimit, loadedResume, loadedCoverLetter, flash }: DocumentsPageProps) {
     const initialView = loadedResume ? 'resume-preview' : (loadedCoverLetter ? 'cover-letter-preview' : 'resume-edit');
-    const initialTemplate = loadedResume?.template || 'clean';
-    const initialCLTemplate = loadedCoverLetter?.template || 'cl_modern';
+    const initialTemplate = loadedResume?.template || 'ats_classic';
+    const initialCLTemplate = loadedCoverLetter?.template || 'cl_formal';
 
     const [activeEditorTab, setActiveEditorTab] = useState('personal');
     const [activeView, setActiveView] = useState<string>(initialView);
@@ -3175,6 +3034,11 @@ export default function DocumentsIndex({ profile, aiLimit, loadedResume, loadedC
     const [coverLetterContent, setCoverLetterContent] = useState(loadedCoverLetter?.content || DEFAULT_COVER_LETTER);
     const [coverLetterCompany, setCoverLetterCompany] = useState(loadedCoverLetter?.target_company || 'Acme Corp');
     const [coverLetterJobTitle, setCoverLetterJobTitle] = useState(loadedCoverLetter?.target_job_title || 'Software Developer');
+    const [coverLetterJobDescription, setCoverLetterJobDescription] = useState(loadedCoverLetter?.job_description || '');
+    const [coverLetterRecipient, setCoverLetterRecipient] = useState(loadedCoverLetter?.recipient || 'Hiring Manager');
+    const [loadResumeDialogOpen, setLoadResumeDialogOpen] = useState(false);
+    const [savedResumes, setSavedResumes] = useState<Array<{ id: number; name: string; template: string; profile_data: ResumeProfile; created_at: string }>>([]);
+    const [loadingResumes, setLoadingResumes] = useState(false);
 
     const isNew = !profile || !profile.id;
     const activeProfileData = loadedResume?.profile_data || profile;
@@ -3188,33 +3052,33 @@ export default function DocumentsIndex({ profile, aiLimit, loadedResume, loadedC
         linkedin_url: activeProfileData?.linkedin_url ?? (isNew ? 'https://linkedin.com/in/juandelacruz' : ''),
         github_url: activeProfileData?.github_url ?? (isNew ? 'https://github.com/juandelacruz' : ''),
         website_url: activeProfileData?.website_url ?? (isNew ? 'https://juanportfolio.com' : ''),
-        target_role: activeProfileData?.target_role ?? (isNew ? '' : ''),
-        summary: activeProfileData?.summary ?? (isNew ? 'Experienced software developer with expertise in building scalable web applications...' : ''),
-        work_experience: activeProfileData?.work_experience ?? (isNew ? [
+        target_role: activeProfileData?.target_role || 'Senior Software Developer',
+        summary: activeProfileData?.summary || 'Experienced software developer with expertise in building scalable web applications...',
+        work_experience: (activeProfileData?.work_experience?.length ?? 0) > 0 ? (activeProfileData?.work_experience || []) : [
             {
                 company: 'Acme Corp',
                 position: 'Software Developer',
                 duration: '2020 - 2023',
                 description: 'Developed and maintained various web applications using Laravel and React.'
             }
-        ] : []),
-        education: activeProfileData?.education ?? (isNew ? [
+        ],
+        education: (activeProfileData?.education?.length ?? 0) > 0 ? (activeProfileData?.education || []) : [
             {
                 institution: 'UP Diliman',
                 degree: 'BS Computer Science',
                 year: '2020'
             }
-        ] : []),
-        skills: activeProfileData?.skills ?? (isNew ? ['PHP', 'Laravel', 'React', 'TypeScript'] : []),
-        certifications: activeProfileData?.certifications ?? (isNew ? ['AWS Certified Solutions Architect'] : []),
-        projects: activeProfileData?.projects ?? (isNew ? [
+        ],
+        skills: (activeProfileData?.skills?.length ?? 0) > 0 ? (activeProfileData?.skills || []) : ['PHP', 'Laravel', 'React', 'TypeScript'],
+        certifications: (activeProfileData?.certifications?.length ?? 0) > 0 ? (activeProfileData?.certifications || []) : ['AWS Certified Solutions Architect'],
+        projects: (activeProfileData?.projects?.length ?? 0) > 0 ? (activeProfileData?.projects || []) : [
             {
                 title: 'E-commerce Platform',
                 description: 'Built a full-stack e-commerce platform with Next.js and Stripe.',
                 url: '',
                 technologies: 'Laravel, React, PostgreSQL'
             }
-        ] : []),
+        ],
         section_order: activeProfileData?.section_order ?? ['personal', 'work', 'education', 'skills', 'projects', 'certifications'],
     });
 
@@ -3224,6 +3088,51 @@ export default function DocumentsIndex({ profile, aiLimit, loadedResume, loadedC
             preserveScroll: true,
             preserveState: true,
         });
+    }
+
+    async function handleOpenLoadResume() {
+        setLoadResumeDialogOpen(true);
+        setLoadingResumes(true);
+
+        try {
+            const token = (document.querySelector('meta[name="csrf-token"]') as HTMLMetaElement)?.content ?? '';
+            const response = await fetch('/documents/saved-resumes', {
+                headers: {
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': token,
+                },
+            });
+            const isJson = response.headers.get('content-type')?.includes('application/json');
+            const data = isJson ? await response.json() : null;
+            setSavedResumes(data?.resumes ?? []);
+        } catch {
+            console.error('Failed to load saved resumes.');
+        } finally {
+            setLoadingResumes(false);
+        }
+    }
+
+    function handleLoadResume(resume: { template: string; profile_data: ResumeProfile }) {
+        setTemplate(resume.template);
+        setData({
+            full_name: resume.profile_data.full_name || '',
+            email: resume.profile_data.email || '',
+            phone: resume.profile_data.phone || '',
+            location: resume.profile_data.location || '',
+            photo_url: resume.profile_data.photo_url || '',
+            linkedin_url: resume.profile_data.linkedin_url || '',
+            github_url: resume.profile_data.github_url || '',
+            website_url: resume.profile_data.website_url || '',
+            target_role: resume.profile_data.target_role || '',
+            summary: resume.profile_data.summary || '',
+            work_experience: resume.profile_data.work_experience || [],
+            education: resume.profile_data.education || [],
+            skills: resume.profile_data.skills || [],
+            certifications: resume.profile_data.certifications || [],
+            projects: resume.profile_data.projects || [],
+            section_order: resume.profile_data.section_order || ['personal', 'work', 'education', 'skills', 'projects', 'certifications']
+        });
+        setLoadResumeDialogOpen(false);
     }
 
     const sensors = useSensors(
@@ -3470,9 +3379,72 @@ return;
                                             </span>
                                         )}
                                     </div>
-                                    <Button type="submit" disabled={processing}>
-                                        {processing ? 'Saving...' : 'Save Profile'}
-                                    </Button>
+                                    <div className="flex items-center gap-2">
+                                        <Button
+                                            type="button"
+                                            variant="outline"
+                                            onClick={handleOpenLoadResume}
+                                        >
+                                            <FolderGit2 className="mr-2 size-4" />
+                                            Load Saved
+                                        </Button>
+                                        <ConfirmDestructiveDialog
+                                            title="Clear Resume?"
+                                            description="This will erase all your current progress and restore the builder fields to their default dummy data. This action cannot be undone."
+                                            confirmLabel="Clear Resume"
+                                            trigger={
+                                                <Button
+                                                    type="button"
+                                                    variant="destructive"
+                                                >
+                                                    Clear Resume
+                                                </Button>
+                                            }
+                                            onConfirm={() => {
+                                                setData({
+                                                    full_name: 'Juan Dela Cruz',
+                                                    email: 'juan@example.com',
+                                                    phone: '+63 917 123 4567',
+                                                    location: 'Metro Manila',
+                                                    photo_url: '',
+                                                    linkedin_url: 'https://linkedin.com/in/juandelacruz',
+                                                    github_url: 'https://github.com/juandelacruz',
+                                                    website_url: 'https://juanportfolio.com',
+                                                    target_role: 'Senior Software Developer',
+                                                    summary: 'Experienced software developer with expertise in building scalable web applications...',
+                                                    work_experience: [
+                                                        {
+                                                            company: 'Acme Corp',
+                                                            position: 'Software Developer',
+                                                            duration: '2020 - 2023',
+                                                            description: 'Developed and maintained various web applications using Laravel and React.'
+                                                        }
+                                                    ],
+                                                    education: [
+                                                        {
+                                                            institution: 'UP Diliman',
+                                                            degree: 'BS Computer Science',
+                                                            year: '2020'
+                                                        }
+                                                    ],
+                                                    skills: ['PHP', 'Laravel', 'React', 'TypeScript'],
+                                                    certifications: ['AWS Certified Solutions Architect'],
+                                                    projects: [
+                                                        {
+                                                            title: 'E-commerce Platform',
+                                                            description: 'Built a full-stack e-commerce platform with Next.js and Stripe.',
+                                                            url: '',
+                                                            technologies: 'Laravel, React, PostgreSQL'
+                                                        }
+                                                    ],
+                                                    section_order: ['personal', 'work', 'education', 'skills', 'projects', 'certifications']
+                                                });
+                                            }}
+                                        />
+                                        <Button type="submit" disabled={processing}>
+                                            {processing ? 'Saving...' : 'Save Profile'}
+                                        </Button>
+                                    </div>
                                 </div>
                             </Card>
                         </form>
@@ -3490,6 +3462,12 @@ return;
                                 setCoverLetterCompany(company);
                                 setCoverLetterJobTitle(jobTitle);
                             }}
+                            jobDescription={coverLetterJobDescription}
+                            onJobDescriptionChange={setCoverLetterJobDescription}
+                            initialCompany={coverLetterCompany}
+                            initialJobTitle={coverLetterJobTitle}
+                            initialRecipient={coverLetterRecipient}
+                            onRecipientChange={setCoverLetterRecipient}
                         />
                     )}
 
@@ -3499,7 +3477,9 @@ return;
                                 <Label>Template</Label>
                                 <Select value={template} onValueChange={(value: string | null) => value && setTemplate(value)}>
                                     <SelectTrigger className="w-[180px]">
-                                        <SelectValue placeholder="Select template" />
+                                        <SelectValue placeholder="Select template">
+                                            {TEMPLATES.find(t => t.id === template)?.name || "Select template"}
+                                        </SelectValue>
                                     </SelectTrigger>
                                     <SelectContent>
                                         {TEMPLATES.map((t) => (
@@ -3520,7 +3500,9 @@ return;
                                 <Label>Cover Letter Style</Label>
                                 <Select value={clTemplate} onValueChange={(value: string | null) => value && setCLTemplate(value)}>
                                     <SelectTrigger className="w-[200px]">
-                                        <SelectValue placeholder="Select style" />
+                                        <SelectValue placeholder="Select style">
+                                            {COVER_LETTER_TEMPLATES.find(t => t.id === clTemplate)?.name || "Select style"}
+                                        </SelectValue>
                                     </SelectTrigger>
                                     <SelectContent>
                                         {COVER_LETTER_TEMPLATES.map((t) => (
@@ -3537,9 +3519,61 @@ return;
                                 fullName={data.full_name}
                                 targetCompany={coverLetterCompany}
                                 targetJobTitle={coverLetterJobTitle}
+                                jobDescription={coverLetterJobDescription}
+                                recipient={coverLetterRecipient}
                             />
                         </div>
                     )}
+
+                    <Dialog open={loadResumeDialogOpen} onOpenChange={setLoadResumeDialogOpen}>
+                        <DialogContent className="max-w-lg max-h-[70vh] flex flex-col">
+                            <DialogHeader>
+                                <DialogTitle className="flex items-center gap-2">
+                                    <FolderGit2 className="size-4" />
+                                    Load Saved Resume
+                                </DialogTitle>
+                                <DialogDescription>
+                                    Select a previously saved resume profile to load into the editor.
+                                </DialogDescription>
+                            </DialogHeader>
+                            <div className="flex-1 overflow-y-auto min-h-0">
+                                {loadingResumes ? (
+                                    <div className="flex items-center justify-center py-8">
+                                        <Loader2 className="size-6 animate-spin text-muted-foreground" />
+                                    </div>
+                                ) : savedResumes.length === 0 ? (
+                                    <div className="flex flex-col items-center justify-center py-8 text-center">
+                                        <FileText className="h-8 w-8 text-muted-foreground mb-2" />
+                                        <p className="text-sm text-muted-foreground">No saved resumes yet.</p>
+                                    </div>
+                                ) : (
+                                    <div className="flex flex-col gap-2">
+                                        {savedResumes.map((resume) => (
+                                            <button
+                                                key={resume.id}
+                                                type="button"
+                                                onClick={() => handleLoadResume(resume)}
+                                                className="flex flex-col gap-1 rounded-lg border border-border bg-card p-3 text-left text-sm hover:bg-[#f5f5f4] dark:hover:bg-[#1C1C1A] transition-colors"
+                                            >
+                                                <div className="flex items-center justify-between">
+                                                    <span className="font-medium text-foreground">
+                                                        {resume.name || 'Resume'}
+                                                    </span>
+                                                    <span className="text-xs text-muted-foreground">{resume.created_at}</span>
+                                                </div>
+                                                <p className="text-xs text-muted-foreground line-clamp-2">
+                                                    Target Role: {resume.profile_data?.target_role || 'Not specified'}
+                                                </p>
+                                            </button>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+                            <DialogFooter>
+                                <DialogClose render={<Button variant="outline">Cancel</Button>} />
+                            </DialogFooter>
+                        </DialogContent>
+                    </Dialog>
                 </div>
             </div>
         </>

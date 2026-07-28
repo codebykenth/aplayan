@@ -17,11 +17,10 @@ class ActionFeedService
             ->concat($this->staleFollowUps($applications))
             ->concat($this->upcomingInterviews($applications))
             ->concat($this->highMatchWishlist($applications))
-            ->concat($this->missingAiEvaluations($applications))
             ->concat($this->salaryNegotiations($applications))
             ->concat($this->rejectionMomentum($applications));
 
-        return $items->sortByDesc('priority_score')->values();
+        return $items->sortByDesc('priority_score')->take(12)->values();
     }
 
     private function staleFollowUps(Collection $applications): Collection
@@ -95,23 +94,6 @@ class ActionFeedService
                     priority: 'moderate',
                     priorityScore: 50,
                     message: "You're a strong match ({$app->ai_match_percentage}%) for {$app->job_title} at {$app->company_name}. Consider applying.",
-                    application: $app,
-                );
-            })
-            ->values();
-    }
-
-    private function missingAiEvaluations(Collection $applications): Collection
-    {
-        return $applications
-            ->filter(fn (JobApplication $app) => $app->status !== 'rejected' && $app->status !== 'offer')
-            ->filter(fn (JobApplication $app) => $app->ai_evaluated_at === null)
-            ->map(function (JobApplication $app) {
-                return $this->buildItem(
-                    type: 'missing_ai_evaluation',
-                    priority: 'low',
-                    priorityScore: 40,
-                    message: "Run an AI match evaluation for {$app->job_title} at {$app->company_name} to see how you compare.",
                     application: $app,
                 );
             })

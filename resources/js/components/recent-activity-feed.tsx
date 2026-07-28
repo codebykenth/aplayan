@@ -143,13 +143,15 @@ function ActivityCard({
 export default function RecentActivityFeed({
     items,
     onSelectApplication,
+    className,
 }: {
     items: RecentActivityItem[];
     onSelectApplication: (applicationId: number) => void;
+    className?: string;
 }) {
     return (
-        <Card size="sm">
-            <CardHeader>
+        <Card size="sm" className={cn("flex flex-col h-full max-h-[520px] min-h-0", className)}>
+            <CardHeader className="shrink-0">
                 <CardTitle className="flex items-center gap-2">
                     <div className="flex size-5 items-center justify-center rounded-md bg-foreground/5">
                         <History className="size-3 text-foreground/70" />
@@ -157,7 +159,7 @@ export default function RecentActivityFeed({
                     Recent Activity
                 </CardTitle>
             </CardHeader>
-            <CardContent className="px-0">
+            <CardContent className="flex-1 min-h-0 max-h-[460px] overflow-y-auto px-0">
                 {items.length === 0 ? (
                     <div className="flex flex-col items-center gap-3 px-(--card-spacing) py-8 text-center">
                         <div className="flex size-10 items-center justify-center rounded-full bg-muted">
@@ -180,7 +182,7 @@ export default function RecentActivityFeed({
                         </Link>
                     </div>
                 ) : (
-                    <div className="flex flex-col gap-0">
+                    <div className="flex flex-col gap-0 px-1">
                         {items.map((item) => (
                             <ActivityCard
                                 key={`${item.id}`}

@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogClose } from '@/components/ui/dialog';
+import { ConfirmDestructiveDialog } from '@/components/ui/confirm-destructive-dialog';
 import AppLayout from '@/layouts/app-layout';
 
 type SavedResume = {
@@ -35,6 +36,9 @@ type SavedResume = {
 type SavedCoverLetter = {
     id: number;
     job_description: string;
+    target_company: string | null;
+    target_job_title: string | null;
+    recipient: string | null;
     content: string;
     created_at: string;
 };
@@ -127,24 +131,13 @@ function ResumeCard({ resume, onDelete }: { resume: SavedResume; onDelete: (id: 
                 </CardFooter>
             </Card>
 
-            <Dialog open={deleteOpen} onOpenChange={setDeleteOpen}>
-                <DialogContent className="max-w-sm">
-                    <DialogHeader>
-                        <DialogTitle>Delete Resume Version</DialogTitle>
-                        <DialogDescription>
-                            Are you sure you want to delete "{resume.name}"? This action cannot be undone.
-                        </DialogDescription>
-                    </DialogHeader>
-                    <DialogFooter>
-                        <DialogClose render={<Button type="button" variant="outline" />}>
-                            Cancel
-                        </DialogClose>
-                        <Button variant="destructive" onClick={handleDelete}>
-                            Delete
-                        </Button>
-                    </DialogFooter>
-                </DialogContent>
-            </Dialog>
+            <ConfirmDestructiveDialog
+                open={deleteOpen}
+                onOpenChange={setDeleteOpen}
+                title="Delete Resume Version?"
+                description={`Are you sure you want to delete "${resume.name}"? This action cannot be undone.`}
+                onConfirm={handleDelete}
+            />
 
             <Dialog open={previewOpen} onOpenChange={setPreviewOpen}>
                 <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
@@ -246,15 +239,26 @@ function CoverLetterCard({ letter, onDelete }: { letter: SavedCoverLetter; onDel
                 <CardHeader>
                     <CardTitle className="flex items-center gap-2 text-base">
                         <Mail className="h-4 w-4 text-[#706f6c]" />
-                        Cover Letter
+                        {letter.target_company || letter.target_job_title
+                            ? [letter.target_job_title, letter.target_company].filter(Boolean).join(' at ')
+                            : 'Cover Letter'}
                     </CardTitle>
                     <CardDescription>
                         {formatDate(letter.created_at)}
                     </CardDescription>
                 </CardHeader>
                 <CardContent>
+                    {letter.recipient && (
+                        <p className="mb-2 text-sm font-medium text-[#1b1b18] dark:text-[#EDEDEC]">
+                            To: {letter.recipient}
+                        </p>
+                    )}
                     <p className="text-xs text-[#706f6c] line-clamp-2 dark:text-[#A1A09A]">
-                        {letter.job_description.slice(0, 200)}{letter.job_description.length > 200 ? '...' : ''}
+                        {letter.job_description ? (
+                            <>{letter.job_description.slice(0, 200)}{letter.job_description.length > 200 ? '...' : ''}</>
+                        ) : (
+                            <span className="italic">No job description provided</span>
+                        )}
                     </p>
                 </CardContent>
                 <CardFooter className="flex justify-end gap-2">
@@ -271,24 +275,13 @@ function CoverLetterCard({ letter, onDelete }: { letter: SavedCoverLetter; onDel
                 </CardFooter>
             </Card>
 
-            <Dialog open={deleteOpen} onOpenChange={setDeleteOpen}>
-                <DialogContent className="max-w-sm">
-                    <DialogHeader>
-                        <DialogTitle>Delete Cover Letter</DialogTitle>
-                        <DialogDescription>
-                            Are you sure you want to delete this cover letter? This action cannot be undone.
-                        </DialogDescription>
-                    </DialogHeader>
-                    <DialogFooter>
-                        <DialogClose render={<Button type="button" variant="outline" />}>
-                            Cancel
-                        </DialogClose>
-                        <Button variant="destructive" onClick={handleDelete}>
-                            Delete
-                        </Button>
-                    </DialogFooter>
-                </DialogContent>
-            </Dialog>
+            <ConfirmDestructiveDialog
+                open={deleteOpen}
+                onOpenChange={setDeleteOpen}
+                title="Delete Cover Letter?"
+                description="Are you sure you want to delete this cover letter? This action cannot be undone."
+                onConfirm={handleDelete}
+            />
 
             <Dialog open={previewOpen} onOpenChange={setPreviewOpen}>
                 <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">

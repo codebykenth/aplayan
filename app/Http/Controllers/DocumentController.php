@@ -132,16 +132,40 @@ class DocumentController extends Controller
         return to_route('documents.saved')->with('success', 'Resume version saved.');
     }
 
-    public function saveCoverLetter(SaveCoverLetterRequest $request): JsonResponse
+    public function saveCoverLetter(SaveCoverLetterRequest $request)
     {
-        $coverLetter = $request->user()->savedCoverLetters()->create(
-            $request->validated(),
-        );
+        $data = $request->validated();
+        if (! isset($data['job_description'])) {
+            $data['job_description'] = '';
+        }
+
+        $coverLetter = $request->user()->savedCoverLetters()->create($data);
+
+        if ($request->header('X-Inertia')) {
+            return to_route('documents.saved')->with('success', 'Cover letter version saved.');
+        }
 
         return response()->json([
             'message' => 'Cover letter saved.',
             'cover_letter' => $coverLetter,
         ]);
+    }
+
+    public function savedResumesJson(): JsonResponse
+    {
+        $resumes = auth()->user()->savedResumes()
+            ->latest()
+            ->take(20)
+            ->get()
+            ->map(fn ($resume) => [
+                'id' => $resume->id,
+                'name' => $resume->name,
+                'template' => $resume->template,
+                'created_at' => $resume->created_at->diffForHumans(),
+                'profile_data' => $resume->profile_data,
+            ]);
+
+        return response()->json(['resumes' => $resumes]);
     }
 
     public function savedCoverLettersJson(): JsonResponse

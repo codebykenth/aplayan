@@ -317,7 +317,7 @@ export default function Dashboard({
                     </div>
 
                     {/* Right Sidebar - Recent Activity */}
-                    <div className="flex flex-col gap-4">
+                    <div className="flex min-h-0 flex-col">
                         <RecentActivityFeed
                             items={recent_activities}
                             onSelectApplication={handleSelectApplication}

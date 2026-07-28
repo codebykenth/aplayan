@@ -19,6 +19,7 @@ class SavedCoverLetter extends Model
         'target_job_title',
         'content',
         'template',
+        'recipient',
     ];
 
     public function user(): BelongsTo

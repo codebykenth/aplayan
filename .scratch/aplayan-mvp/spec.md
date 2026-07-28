@@ -25,7 +25,7 @@ Aplayan is a free-to-maintain, privacy-first, web-based Job Application Tracker 
 13. As a job seeker, I want a Weekly Goals page (`/goals`) to set manual application targets (e.g. 10/week), track progress bars, build weekly streaks, and view 4-week math benchmarks, so that I stay motivated.
 14. As a job seeker, I want to save reusable application templates and quick-apply presets (`/templates`), so that I can create new applications with minimal effort.
 15. As a job seeker, I want an Interview Prep and Follow-up Email Generator, so that I can generate tailored preparation notes and professional follow-up email drafts.
-16. As a job seeker, I want to export my application data to CSV and import CSV data (`/job-applications/export` & `/import`), so that I maintain data ownership and backup options.
+16. As a job seeker, I want to export my application data to CSV/JSON and import CSV/JSON data with format instructions and sample template downloads (`/job-applications/export` & `/import`), so that I maintain data ownership and backup options.
 17. As a job seeker, I want an Offer Comparison Matrix (`/job-applications/offers`), so that I can evaluate multiple job offers side-by-side.
 18. As a job seeker in the Philippines, I want a Philippine Statutory Tax & Take-Home Pay Calculator (`PhilippineTaxCalculatorService`), so that I can estimate net monthly pay under TRAIN Law tax brackets, SSS, PhilHealth, and Pag-IBIG.
 19. As a job seeker, I want a Zero-Storage Dynamic Resume & Cover Letter Builder (`/documents`), so that I can store structured experience data and export ATS-friendly PDFs in 3 visual templates without uploading files to cloud storage.

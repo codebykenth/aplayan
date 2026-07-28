@@ -4,12 +4,15 @@ import {
     Clock,
     CalendarDays,
     Crosshair,
-    Search,
     PhilippinePeso,
     TrendingDown,
     ArrowRight,
+    ChevronLeft,
+    ChevronRight,
 } from 'lucide-react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { show as showRoute } from '@/routes/job-applications';
 
@@ -28,7 +31,6 @@ const ACTION_ICONS: Record<string, typeof Clock> = {
     stale_follow_up: Clock,
     upcoming_interview: CalendarDays,
     high_match_wishlist: Crosshair,
-    missing_ai_evaluation: Search,
     salary_negotiation: PhilippinePeso,
     rejection_momentum: TrendingDown,
 };
@@ -61,7 +63,7 @@ function ActionCard({ item }: { item: ActionItem }) {
     return (
         <div
             className={cn(
-                'flex items-start gap-3 border-l-[3px] bg-card py-3 pl-4 pr-3 ring-1 ring-foreground/10 rounded-r-xl',
+                'flex h-full items-start gap-3 rounded-r-xl border-l-[3px] bg-card py-3 pl-4 pr-3 ring-1 ring-foreground/10',
                 style.border,
                 item.priority === 'urgent' && 'animate-pulse-border',
             )}
@@ -69,9 +71,12 @@ function ActionCard({ item }: { item: ActionItem }) {
             <div
                 className={cn(
                     'mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-lg',
-                    item.priority === 'urgent' && 'bg-rose-100 text-rose-600 dark:bg-rose-900/30 dark:text-rose-300',
-                    item.priority === 'moderate' && 'bg-amber-100 text-amber-600 dark:bg-amber-900/30 dark:text-amber-300',
-                    item.priority === 'low' && 'bg-sky-100 text-sky-600 dark:bg-sky-900/30 dark:text-sky-300',
+                    item.priority === 'urgent' &&
+                        'bg-rose-100 text-rose-600 dark:bg-rose-900/30 dark:text-rose-300',
+                    item.priority === 'moderate' &&
+                        'bg-amber-100 text-amber-600 dark:bg-amber-900/30 dark:text-amber-300',
+                    item.priority === 'low' &&
+                        'bg-sky-100 text-sky-600 dark:bg-sky-900/30 dark:text-sky-300',
                 )}
             >
                 <Icon className="size-4" />
@@ -79,21 +84,21 @@ function ActionCard({ item }: { item: ActionItem }) {
 
             <div className="flex min-w-0 flex-1 flex-col gap-1">
                 <div className="flex items-center gap-2 flex-wrap">
-                    <span className="text-sm font-medium text-foreground truncate">
+                    <span className="truncate text-sm font-medium text-foreground">
                         {item.company_name}
                     </span>
                     <Badge variant={style.badge} className="shrink-0">
                         {style.label}
                     </Badge>
                 </div>
-                <p className="text-xs text-muted-foreground leading-relaxed">
+                <p className="line-clamp-2 text-xs leading-relaxed text-muted-foreground">
                     {item.message}
                 </p>
             </div>
 
             <Link
                 href={showRoute.url(item.application_id)}
-                className="mt-1 flex shrink-0 items-center gap-1 rounded-lg px-2 py-1 text-xs font-medium text-foreground hover:bg-muted transition-colors"
+                className="mt-1 flex shrink-0 items-center gap-1 rounded-lg px-2 py-1 text-xs font-medium text-foreground transition-colors hover:bg-muted"
             >
                 View
                 <ArrowRight className="size-3" />
@@ -103,15 +108,48 @@ function ActionCard({ item }: { item: ActionItem }) {
 }
 
 export default function ActionFeed({ items }: { items: ActionItem[] }) {
+    const scrollContainerRef = useRef<HTMLDivElement>(null);
+    const [canScrollLeft, setCanScrollLeft] = useState(false);
+    const [canScrollRight, setCanScrollRight] = useState(false);
+
+    const updateScrollState = useCallback(() => {
+        const el = scrollContainerRef.current;
+        if (!el) return;
+
+        const left = el.scrollLeft;
+        const maxScroll = el.scrollWidth - el.clientWidth;
+
+        setCanScrollLeft(left > 2);
+        setCanScrollRight(left < maxScroll - 2);
+    }, []);
+
+    useEffect(() => {
+        updateScrollState();
+        window.addEventListener('resize', updateScrollState);
+        return () => window.removeEventListener('resize', updateScrollState);
+    }, [items, updateScrollState]);
+
     if (items.length === 0) {
         return null;
     }
 
     const urgentCount = items.filter((i) => i.priority === 'urgent').length;
 
+    function scrollLeft() {
+        const el = scrollContainerRef.current;
+        if (!el) return;
+        el.scrollBy({ left: -el.clientWidth, behavior: 'smooth' });
+    }
+
+    function scrollRight() {
+        const el = scrollContainerRef.current;
+        if (!el) return;
+        el.scrollBy({ left: el.clientWidth, behavior: 'smooth' });
+    }
+
     return (
-        <section>
-            <div className="flex items-center gap-2 mb-3">
+        <section className="flex flex-col gap-2.5">
+            <div className="flex items-center gap-2">
                 <div className="flex size-6 items-center justify-center rounded-md bg-foreground/5">
                     <Bell className="size-3.5 text-foreground/70" />
                 </div>
@@ -119,18 +157,50 @@ export default function ActionFeed({ items }: { items: ActionItem[] }) {
                     Today's Action Feed
                 </h2>
                 {urgentCount > 0 && (
-                    <span className="rounded-full bg-rose-100 px-1.5 py-0.5 text-[11px] font-medium text-rose-600 dark:bg-rose-900/30 dark:text-rose-300 leading-none">
+                    <span className="rounded-full bg-rose-100 px-1.5 py-0.5 text-[11px] font-medium leading-none text-rose-600 dark:bg-rose-900/30 dark:text-rose-300">
                         {urgentCount} urgent
                     </span>
                 )}
-                <span className="text-[11px] text-muted-foreground ml-auto">
-                    {items.length} item{items.length !== 1 ? 's' : ''}
+                <span className="text-[11px] text-muted-foreground">
+                    ({items.length} item{items.length !== 1 ? 's' : ''})
                 </span>
+
+                {(canScrollLeft || canScrollRight) && (
+                    <div className="ml-auto flex items-center gap-1">
+                        <Button
+                            variant="outline"
+                            size="icon-xs"
+                            onClick={scrollLeft}
+                            disabled={!canScrollLeft}
+                            aria-label="Previous actions"
+                        >
+                            <ChevronLeft className="size-3.5" />
+                        </Button>
+                        <Button
+                            variant="outline"
+                            size="icon-xs"
+                            onClick={scrollRight}
+                            disabled={!canScrollRight}
+                            aria-label="Next actions"
+                        >
+                            <ChevronRight className="size-3.5" />
+                        </Button>
+                    </div>
+                )}
             </div>
 
-            <div className="flex flex-col gap-2">
+            <div
+                ref={scrollContainerRef}
+                onScroll={updateScrollState}
+                className="flex gap-3 overflow-x-auto scroll-smooth snap-x snap-mandatory p-0.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+            >
                 {items.map((item) => (
-                    <ActionCard key={`${item.type}-${item.application_id}`} item={item} />
+                    <div
+                        key={`${item.type}-${item.application_id}`}
+                        className="w-full shrink-0 snap-start sm:w-[calc((100%-0.75rem)/2)] lg:w-[calc((100%-1.5rem)/3)]"
+                    >
+                        <ActionCard item={item} />
+                    </div>
                 ))}
             </div>
         </section>

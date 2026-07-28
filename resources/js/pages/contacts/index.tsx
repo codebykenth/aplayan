@@ -25,6 +25,7 @@ import {
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog';
+import { ConfirmDestructiveDialog } from '@/components/ui/confirm-destructive-dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
@@ -268,6 +269,7 @@ export default function ContactsIndex({
     const [search, setSearch] = useState('');
     const [formOpen, setFormOpen] = useState(false);
     const [editingContact, setEditingContact] = useState<Contact | null>(null);
+    const [deletingContact, setDeletingContact] = useState<Contact | null>(null);
 
     const { data, setData, post, put, processing, errors, reset, clearErrors } =
         useForm<ContactFormData>({
@@ -352,11 +354,7 @@ return contacts;
     }
 
     function handleDelete(contact: Contact) {
-        if (!window.confirm(`Delete contact "${contact.name}"?`)) {
-return;
-}
-
-        router.delete(deleteContact.url(contact.id));
+        setDeletingContact(contact);
     }
 
     return (
@@ -533,6 +531,18 @@ return;
                     </form>
                 </DialogContent>
             </Dialog>
+
+            <ConfirmDestructiveDialog
+                open={deletingContact !== null}
+                onOpenChange={(open) => !open && setDeletingContact(null)}
+                title="Delete Contact?"
+                description={deletingContact && `Are you sure you want to delete "${deletingContact.name}"? This action cannot be undone.`}
+                onConfirm={() => {
+                    if (deletingContact) {
+                        router.delete(deleteContact.url(deletingContact.id));
+                    }
+                }}
+            />
         </>
     );
 }

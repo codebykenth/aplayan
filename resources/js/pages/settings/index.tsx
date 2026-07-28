@@ -1,6 +1,6 @@
 import { Head, router, useForm } from '@inertiajs/react';
-import { Sun, Moon, Monitor, User, KeyRound, Palette } from 'lucide-react';
-import type { ReactNode } from 'react';
+import { Sun, Moon, Monitor, User, KeyRound, Palette, Check } from 'lucide-react';
+import { useState, type ReactNode } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -8,12 +8,28 @@ import { Label } from '@/components/ui/label';
 import { PageHeader } from '@/components/ui/page-header';
 import { useTheme, useColorTheme } from '@/hooks/use-theme';
 import AppLayout from '@/layouts/app-layout';
+import { cn } from '@/lib/utils';
 import settings from '@/routes/settings';
 
 const THEME_OPTIONS = [
-    { value: 'light', label: 'Light', icon: Sun },
-    { value: 'dark', label: 'Dark', icon: Moon },
-    { value: 'system', label: 'System', icon: Monitor },
+    {
+        value: 'light',
+        label: 'Light',
+        description: 'Clean light interface',
+        icon: Sun,
+    },
+    {
+        value: 'dark',
+        label: 'Dark',
+        description: 'Easy on the eyes',
+        icon: Moon,
+    },
+    {
+        value: 'system',
+        label: 'System',
+        description: 'Matches device settings',
+        icon: Monitor,
+    },
 ] as const;
 
 const COLOR_THEME_OPTIONS = [
@@ -63,16 +79,16 @@ function ProfileSection({ user }: { user: UserData }) {
             <Card>
                 <CardHeader>
                     <CardTitle className="flex items-center gap-2">
-                        <User className="size-4" />
-                        Profile
+                        <User className="size-4 text-primary" />
+                        Profile Preferences
                     </CardTitle>
                     <CardDescription>
-                        Update your name, email, and job search preferences.
+                        Update your public name, email address, and target compensation.
                     </CardDescription>
                 </CardHeader>
                 <CardContent className="flex flex-col gap-4">
                     <div className="flex flex-col gap-2">
-                        <Label htmlFor="name">Name</Label>
+                        <Label htmlFor="name">Full Name</Label>
                         <Input
                             id="name"
                             value={data.name}
@@ -85,7 +101,7 @@ function ProfileSection({ user }: { user: UserData }) {
                     </div>
 
                     <div className="flex flex-col gap-2">
-                        <Label htmlFor="email">Email</Label>
+                        <Label htmlFor="email">Email Address</Label>
                         <Input
                             id="email"
                             type="email"
@@ -100,7 +116,7 @@ function ProfileSection({ user }: { user: UserData }) {
 
                     <div className="flex flex-col gap-2">
                         <Label htmlFor="expected_salary">
-                            Expected Salary (₱)
+                            Expected Target Salary (₱)
                         </Label>
                         <div className="relative">
                             <span className="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
@@ -127,7 +143,7 @@ function ProfileSection({ user }: { user: UserData }) {
                 </CardContent>
                 <div className="flex items-center justify-end border-t px-(--card-spacing) py-(--card-spacing)">
                     <Button type="submit" disabled={processing}>
-                        {processing ? 'Saving...' : 'Save Changes'}
+                        {processing ? 'Saving...' : 'Save Profile'}
                     </Button>
                 </div>
             </Card>
@@ -154,7 +170,7 @@ function PasswordSection() {
             <Card>
                 <CardHeader>
                     <CardTitle className="flex items-center gap-2">
-                        <KeyRound className="size-4" />
+                        <KeyRound className="size-4 text-primary" />
                         Password & Security
                     </CardTitle>
                     <CardDescription>
@@ -252,88 +268,119 @@ function AppearanceSection() {
     }
 
     return (
-        <Card>
+        <Card id="appearance-section">
             <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                    <Palette className="size-4" />
-                    Appearance
+                    <Palette className="size-4 text-primary" />
+                    Theme & Appearance
                 </CardTitle>
                 <CardDescription>
-                    Customize your theme and accent color. System follows your device settings.
+                    Customize your interface theme mode and primary color scheme.
                 </CardDescription>
             </CardHeader>
             <CardContent className="flex flex-col gap-6">
+                {/* Mode Selector */}
                 <div className="flex flex-col gap-3">
-                    <Label className="text-sm font-medium">Mode</Label>
-                    <fieldset className="flex flex-col gap-2">
+                    <div className="flex items-center justify-between">
+                        <Label className="text-sm font-semibold">Theme Mode</Label>
+                        <span className="text-xs text-muted-foreground">Select interface style</span>
+                    </div>
+                    <fieldset className="grid grid-cols-1 gap-3 sm:grid-cols-3">
                         <legend className="sr-only">Theme mode selection</legend>
-                        {THEME_OPTIONS.map(({ value, label, icon: Icon }) => (
-                            <label
-                                key={value}
-                                className={`flex cursor-pointer items-center gap-3 rounded-lg border p-3 text-sm transition-colors ${
-                                    mode === value
-                                        ? 'border-primary bg-accent'
-                                        : 'border-input hover:bg-muted'
-                                }`}
-                            >
-                                <input
-                                    type="radio"
-                                    name="theme"
-                                    value={value}
-                                    checked={mode === value}
-                                    onChange={() => handleModeChange(value)}
-                                    className="sr-only"
-                                />
-                                <Icon className="size-5 shrink-0 text-muted-foreground" />
-                                <span className="font-medium">{label}</span>
-                                {mode === value && (
-                                    <span className="ml-auto text-xs text-primary">
-                                        Active
-                                    </span>
-                                )}
-                            </label>
-                        ))}
+                        {THEME_OPTIONS.map(({ value, label, description, icon: Icon }) => {
+                            const isSelected = mode === value;
+                            return (
+                                <label
+                                    key={value}
+                                    className={cn(
+                                        'group relative flex cursor-pointer flex-col gap-3 rounded-xl border p-4 transition-all',
+                                        isSelected
+                                            ? 'border-primary bg-primary/5 ring-2 ring-primary/20'
+                                            : 'border-border bg-card hover:border-foreground/20 hover:bg-muted/50',
+                                    )}
+                                >
+                                    <input
+                                        type="radio"
+                                        name="theme"
+                                        value={value}
+                                        checked={isSelected}
+                                        onChange={() => handleModeChange(value)}
+                                        className="sr-only"
+                                    />
+                                    <div className="flex items-center justify-between">
+                                        <div
+                                            className={cn(
+                                                'flex size-9 items-center justify-center rounded-lg border transition-colors',
+                                                isSelected
+                                                    ? 'border-primary/30 bg-primary/10 text-primary'
+                                                    : 'border-border bg-muted text-muted-foreground group-hover:text-foreground',
+                                            )}
+                                        >
+                                            <Icon className="size-4" />
+                                        </div>
+                                        {isSelected && (
+                                            <span className="flex size-5 items-center justify-center rounded-full bg-primary text-primary-foreground">
+                                                <Check className="size-3 stroke-[3]" />
+                                            </span>
+                                        )}
+                                    </div>
+
+                                    <div>
+                                        <p className="text-sm font-medium text-foreground">{label}</p>
+                                        <p className="text-xs text-muted-foreground">{description}</p>
+                                    </div>
+                                </label>
+                            );
+                        })}
                     </fieldset>
                 </div>
 
-                <div className="flex flex-col gap-3">
-                    <Label className="text-sm font-medium">Accent Color</Label>
-                    <fieldset className="grid grid-cols-5 gap-2">
+                {/* Accent Color Selector */}
+                <div className="flex flex-col gap-3 border-t pt-5">
+                    <div className="flex items-center justify-between">
+                        <Label className="text-sm font-semibold">Accent Color</Label>
+                        <span className="text-xs text-muted-foreground">Personalize highlight colors</span>
+                    </div>
+                    <fieldset className="grid grid-cols-2 gap-3 sm:grid-cols-5">
                         <legend className="sr-only">Color theme selection</legend>
-                        {COLOR_THEME_OPTIONS.map(({ value, label, colors }) => (
-                            <label
-                                key={value}
-                                className={`group relative flex cursor-pointer flex-col items-center gap-2 rounded-lg border p-3 transition-colors ${
-                                    colorTheme === value
-                                        ? 'border-primary bg-accent'
-                                        : 'border-input hover:bg-muted'
-                                }`}
-                            >
-                                <input
-                                    type="radio"
-                                    name="color_theme"
-                                    value={value}
-                                    checked={colorTheme === value}
-                                    onChange={() => handleColorThemeChange(value)}
-                                    className="sr-only"
-                                />
-                                <div className="flex gap-1">
-                                    {colors.map((color, i) => (
-                                        <div
-                                            key={i}
-                                            className="size-5 rounded-full ring-1 ring-border"
-                                            style={{ backgroundColor: color }}
-                                        />
-                                    ))}
-                                </div>
-                                <span className="text-xs font-medium">{label}</span>
-                                {colorTheme === value && (
-                                    <span className="absolute -top-1 -right-1 size-4 rounded-full bg-primary text-[10px] text-primary-foreground flex items-center justify-center">
-                                        ✓
-                                    </span>
-                                )}
-                            </label>
-                        ))}
+                        {COLOR_THEME_OPTIONS.map(({ value, label, colors }) => {
+                            const isSelected = colorTheme === value;
+                            return (
+                                <label
+                                    key={value}
+                                    className={cn(
+                                        'group relative flex cursor-pointer flex-col items-center gap-2.5 rounded-xl border p-3.5 transition-all text-center',
+                                        isSelected
+                                            ? 'border-primary bg-primary/5 ring-2 ring-primary/20'
+                                            : 'border-border bg-card hover:border-foreground/20 hover:bg-muted/50',
+                                    )}
+                                >
+                                    <input
+                                        type="radio"
+                                        name="color_theme"
+                                        value={value}
+                                        checked={isSelected}
+                                        onChange={() => handleColorThemeChange(value)}
+                                        className="sr-only"
+                                    />
+                                    <div className="flex items-center gap-1.5">
+                                        {colors.map((color, i) => (
+                                            <div
+                                                key={i}
+                                                className="size-5 rounded-full ring-1 ring-black/10 dark:ring-white/20 shadow-xs"
+                                                style={{ backgroundColor: color }}
+                                            />
+                                        ))}
+                                    </div>
+                                    <span className="text-xs font-medium text-foreground">{label}</span>
+                                    {isSelected && (
+                                        <span className="absolute -top-1 -right-1 flex size-5 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-xs">
+                                            <Check className="size-3 stroke-[3]" />
+                                        </span>
+                                    )}
+                                </label>
+                            );
+                        })}
                     </fieldset>
                 </div>
             </CardContent>
@@ -342,17 +389,63 @@ function AppearanceSection() {
 }
 
 export default function SettingsIndex({ user }: SettingsPageProps) {
+    const [activeTab, setActiveTab] = useState<'appearance' | 'profile' | 'password'>('appearance');
+
     return (
         <>
             <Head title="Settings" />
 
-            <div className="flex flex-col gap-6">
-                <PageHeader title="Settings" description="Manage your account settings and preferences." />
+            <div className="flex min-h-0 flex-1 flex-col gap-6 overflow-y-auto pr-2 pb-8">
+                <PageHeader title="Settings" description="Manage your account settings, password, and theme preferences." />
 
-                <div className="flex flex-col gap-6 max-w-2xl">
-                    <ProfileSection user={user} />
-                    <PasswordSection />
-                    <AppearanceSection />
+                {/* Tab Navigation Controls */}
+                <div className="flex items-center gap-1 border-b border-border pb-1">
+                    <button
+                        type="button"
+                        onClick={() => setActiveTab('appearance')}
+                        className={cn(
+                            'flex items-center gap-2 rounded-lg px-3.5 py-2 text-sm font-medium transition-colors',
+                            activeTab === 'appearance'
+                                ? 'bg-primary/10 text-primary'
+                                : 'text-muted-foreground hover:bg-muted hover:text-foreground',
+                        )}
+                    >
+                        <Palette className="size-4" />
+                        Appearance & Theme
+                    </button>
+                    <button
+                        type="button"
+                        onClick={() => setActiveTab('profile')}
+                        className={cn(
+                            'flex items-center gap-2 rounded-lg px-3.5 py-2 text-sm font-medium transition-colors',
+                            activeTab === 'profile'
+                                ? 'bg-primary/10 text-primary'
+                                : 'text-muted-foreground hover:bg-muted hover:text-foreground',
+                        )}
+                    >
+                        <User className="size-4" />
+                        Profile
+                    </button>
+                    <button
+                        type="button"
+                        onClick={() => setActiveTab('password')}
+                        className={cn(
+                            'flex items-center gap-2 rounded-lg px-3.5 py-2 text-sm font-medium transition-colors',
+                            activeTab === 'password'
+                                ? 'bg-primary/10 text-primary'
+                                : 'text-muted-foreground hover:bg-muted hover:text-foreground',
+                        )}
+                    >
+                        <KeyRound className="size-4" />
+                        Password & Security
+                    </button>
+                </div>
+
+                {/* Main Settings Content Panels */}
+                <div className="max-w-2xl">
+                    {activeTab === 'appearance' && <AppearanceSection />}
+                    {activeTab === 'profile' && <ProfileSection user={user} />}
+                    {activeTab === 'password' && <PasswordSection />}
                 </div>
             </div>
         </>

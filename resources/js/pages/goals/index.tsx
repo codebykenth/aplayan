@@ -106,7 +106,7 @@ function GoalUpdateForm({ currentGoal }: { currentGoal: number }) {
                                 aria-invalid={!!errors.weekly_goal}
                                 className="max-w-28"
                             />
-                            <Button type="submit" disabled={processing}>
+                            <Button type="submit" disabled={processing || data.weekly_goal === String(currentGoal)}>
                                 <Save className="size-4" />
                                 {processing ? 'Saving...' : 'Save'}
                             </Button>
