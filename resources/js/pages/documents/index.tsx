@@ -1,5 +1,22 @@
 import { Head, Link, useForm, router } from '@inertiajs/react';
-import { User, Briefcase, GraduationCap, Wrench, Award, FolderGit2, FileText, Download, Mail, Camera, Save, Sparkles, Eye, Edit3, FilePenLine, Wand2, Loader2, AlertCircle, BookText, ArrowUp, ArrowDown } from 'lucide-react';
+import { User, Briefcase, GraduationCap, Wrench, Award, FolderGit2, FileText, Download, Mail, Camera, Save, Sparkles, Eye, Edit3, FilePenLine, Wand2, Loader2, AlertCircle, BookText, ArrowUp, ArrowDown, GripVertical } from 'lucide-react';
+import {
+    DndContext,
+    closestCenter,
+    KeyboardSensor,
+    PointerSensor,
+    useSensor,
+    useSensors,
+    DragEndEvent,
+} from '@dnd-kit/core';
+import {
+    arrayMove,
+    SortableContext,
+    sortableKeyboardCoordinates,
+    horizontalListSortingStrategy,
+    useSortable,
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 import type { ReactNode } from 'react';
 import { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
@@ -49,6 +66,7 @@ type ResumeProfile = {
     skills: string[];
     certifications: string[];
     projects: Project[];
+    section_order?: string[];
 };
 
 type AiLimit = {
@@ -427,7 +445,7 @@ function getScopedResumeStyles(template: string): string {
             .resume-paper-preview .target-role { font-size: 14px; color: white; opacity: 0.9; margin-top: 2px; }
             .resume-paper-preview .contact { display: flex; gap: 12px; flex-wrap: wrap; font-size: 13px; margin-top: 8px; opacity: 0.9; color: white; }
             .resume-paper-preview .linkedin { font-size: 12px; margin-top: 4px; opacity: 0.75; color: white; }
-            .resume-paper-preview .body { padding: 0; }
+            .resume-paper-preview .body { padding: 0; display: flex; flex-direction: column; }
             .resume-paper-preview h2 { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; color: #706f6c; margin-bottom: 8px; margin-top: 16px; }
             .resume-paper-preview .job, .resume-paper-preview .edu { margin-bottom: 12px; padding-left: 12px; border-left: 2px solid #1b1b18; }
             .resume-paper-preview .job-row, .resume-paper-preview .edu-row { display: flex; justify-content: space-between; align-items: baseline; }
@@ -1583,425 +1601,479 @@ return null;
             </ul>
         );
     }
-
     const photoSrc = getDirectImageUrl(photoDataUrl || data.photo_url) || '';
     const hasPhoto = !!photoSrc;
 
+    const sectionOrder = data.section_order || ['personal', 'work', 'education', 'skills', 'projects', 'certifications'];
+    const getOrder = (id: string) => sectionOrder.indexOf(id);
+
+    const SectionWrapper = ({ id, children, className }: { id: string; children: React.ReactNode; className?: string }) => (
+        <div style={{ order: getOrder(id) }} className={className}>{children}</div>
+    );
+
     return (
-        <div className="flex flex-col items-center gap-4">
+        <div className="flex flex-col items-center gap-4 min-w-0 max-w-full overflow-x-auto overflow-y-hidden pb-4">
             <div
                 ref={previewRef}
-                className={`resume-paper-preview template-${template} w-full max-w-[210mm] min-h-[297mm] bg-white text-[#1b1b18] shadow-lg ring-1 ring-black/5 rounded-xl p-8`}
+                className={`resume-paper-preview template-${template} w-full min-w-[210mm] max-w-[210mm] min-h-[297mm] bg-white text-[#1b1b18] shadow-lg ring-1 ring-black/5 rounded-xl p-8 flex flex-col`}
             >
                 <style>{scopedStyles}</style>
 
                 {template === 'ats_classic' && (
                     <>
-                        <div className="ats-header">
-                            {hasPhoto && <img src={photoSrc} alt="" className="photo" referrerPolicy="no-referrer" />}
-                            <div className="ats-name">{data.full_name || 'Your Name'}</div>
-                            {data.target_role && <div className="target-role">{data.target_role}</div>}
-                            <div className="ats-contact-line">
-                                {[
-                                    data.location ? <span key="loc">{data.location}</span> : null,
-                                    data.phone ? <span key="phone">{data.phone}</span> : null,
-                                    data.email ? <a key="email" href={`mailto:${data.email}`} style={{ color: 'inherit', textDecoration: 'underline' }}>{data.email}</a> : null,
-                                    data.linkedin_url ? <span key="li">{renderLink(data.linkedin_url)}</span> : null,
-                                    data.github_url ? <span key="gh">{renderLink(data.github_url)}</span> : null,
-                                    data.website_url ? <span key="web">{renderLink(data.website_url)}</span> : null,
-                                ].filter(Boolean).reduce((acc: React.ReactNode[], curr, i, arr) => {
-                                    acc.push(curr);
+                        <SectionWrapper id="personal">
+                            <div className="ats-header">
+                                {hasPhoto && <img src={photoSrc} alt="" className="photo" referrerPolicy="no-referrer" />}
+                                <div className="ats-name">{data.full_name || 'Your Name'}</div>
+                                {data.target_role && <div className="target-role">{data.target_role}</div>}
+                                <div className="ats-contact-line">
+                                    {[
+                                        data.location ? <span key="loc">{data.location}</span> : null,
+                                        data.phone ? <span key="phone">{data.phone}</span> : null,
+                                        data.email ? <a key="email" href={`mailto:${data.email}`} style={{ color: 'inherit', textDecoration: 'underline' }}>{data.email}</a> : null,
+                                        data.linkedin_url ? <span key="li">{renderLink(data.linkedin_url)}</span> : null,
+                                        data.github_url ? <span key="gh">{renderLink(data.github_url)}</span> : null,
+                                        data.website_url ? <span key="web">{renderLink(data.website_url)}</span> : null,
+                                    ].filter(Boolean).reduce((acc: React.ReactNode[], curr, i, arr) => {
+                                        acc.push(curr);
 
-                                    if (i < arr.length - 1) {
-acc.push(<span key={`sep-${i}`}>  •  </span>);
-}
+                                        if (i < arr.length - 1) {
+    acc.push(<span key={`sep-${i}`}>  •  </span>);
+    }
 
-                                    return acc;
-                                }, [])}
+                                        return acc;
+                                    }, [])}
+                                </div>
                             </div>
-                        </div>
 
-                        {data.summary && (
-                            <>
-                                <div className="ats-section-title">Professional Summary</div>
-                                <p className="ats-desc">{data.summary}</p>
-                            </>
-                        )}
+                            {data.summary && (
+                                <>
+                                    <div className="ats-section-title">Professional Summary</div>
+                                    <p className="ats-desc">{data.summary}</p>
+                                </>
+                            )}
+                        </SectionWrapper>
 
-                        {(data.work_experience?.length ?? 0) > 0 && (
-                            <>
-                                <div className="ats-section-title">Work Experience</div>
-                                {data.work_experience?.map((job, i) => (
-                                    <div key={i} className="ats-item">
-                                        <div className="ats-item-header">
-                                            <span className="ats-title">{job.position || 'Position'}</span>
-                                            <span className="ats-date">{job.duration}</span>
+                        <SectionWrapper id="work">
+                            {(data.work_experience?.length ?? 0) > 0 && (
+                                <>
+                                    <div className="ats-section-title">Work Experience</div>
+                                    {data.work_experience?.map((job, i) => (
+                                        <div key={i} className="ats-item">
+                                            <div className="ats-item-header">
+                                                <span className="ats-title">{job.position || 'Position'}</span>
+                                                <span className="ats-date">{job.duration}</span>
+                                            </div>
+                                            <div className="ats-company">{job.company}</div>
+                                            {job.description && (
+                                                <p className="ats-desc">{job.description}</p>
+                                            )}
                                         </div>
-                                        <div className="ats-company">{job.company}</div>
-                                        {job.description && (
-                                            <p className="ats-desc">{job.description}</p>
-                                        )}
-                                    </div>
-                                ))}
-                            </>
-                        )}
+                                    ))}
+                                </>
+                            )}
+                        </SectionWrapper>
 
-                        {(data.education?.length ?? 0) > 0 && (
-                            <>
-                                <div className="ats-section-title">Education</div>
-                                {data.education?.map((edu, i) => (
-                                    <div key={i} className="ats-item">
-                                        <div className="ats-item-header">
-                                            <span className="ats-title">{edu.degree || 'Degree'}</span>
-                                            <span className="ats-date">{edu.year}</span>
+                        <SectionWrapper id="education">
+                            {(data.education?.length ?? 0) > 0 && (
+                                <>
+                                    <div className="ats-section-title">Education</div>
+                                    {data.education?.map((edu, i) => (
+                                        <div key={i} className="ats-item">
+                                            <div className="ats-item-header">
+                                                <span className="ats-title">{edu.degree || 'Degree'}</span>
+                                                <span className="ats-date">{edu.year}</span>
+                                            </div>
+                                            <div className="ats-company">{edu.institution}</div>
                                         </div>
-                                        <div className="ats-company">{edu.institution}</div>
-                                    </div>
-                                ))}
-                            </>
-                        )}
+                                    ))}
+                                </>
+                            )}
+                        </SectionWrapper>
 
-                        {(data.skills?.length ?? 0) > 0 && (
-                            <>
-                                <div className="ats-section-title">Skills & Technologies</div>
-                                <div className="ats-desc">{data.skills?.join(', ')}</div>
-                            </>
-                        )}
+                        <SectionWrapper id="skills">
+                            {(data.skills?.length ?? 0) > 0 && (
+                                <>
+                                    <div className="ats-section-title">Skills & Technologies</div>
+                                    <div className="ats-desc">{data.skills?.join(', ')}</div>
+                                </>
+                            )}
+                        </SectionWrapper>
 
-                        {(data.certifications?.length ?? 0) > 0 && (
-                            <>
-                                <div className="ats-section-title">Certifications</div>
-                                <div className="ats-desc">{data.certifications?.join(' | ')}</div>
-                            </>
-                        )}
+                        <SectionWrapper id="certifications">
+                            {(data.certifications?.length ?? 0) > 0 && (
+                                <>
+                                    <div className="ats-section-title">Certifications</div>
+                                    <div className="ats-desc">{data.certifications?.join(' | ')}</div>
+                                </>
+                            )}
+                        </SectionWrapper>
 
-                        {(data.projects?.length ?? 0) > 0 && (
-                            <>
-                                <div className="ats-section-title">Projects</div>
-                                {data.projects?.map((project, i) => (
-                                    <div key={i} className="ats-item">
-                                        <div className="ats-item-header">
-                                            <span className="ats-title">{project.title}</span>
-                                            {project.technologies && <span className="ats-date">{project.technologies}</span>}
+                        <SectionWrapper id="projects">
+                            {(data.projects?.length ?? 0) > 0 && (
+                                <>
+                                    <div className="ats-section-title">Projects</div>
+                                    {data.projects?.map((project, i) => (
+                                        <div key={i} className="ats-item">
+                                            <div className="ats-item-header">
+                                                <span className="ats-title">{project.title}</span>
+                                                {project.technologies && <span className="ats-date">{project.technologies}</span>}
+                                            </div>
+                                            {project.description && <p className="ats-desc">{project.description}</p>}
                                         </div>
-                                        {project.description && <p className="ats-desc">{project.description}</p>}
-                                    </div>
-                                ))}
-                            </>
-                        )}
+                                    ))}
+                                </>
+                            )}
+                        </SectionWrapper>
                     </>
                 )}
 
                 {template === 'ats_executive' && (
                     <>
-                        <div className="exec-header">
-                            {hasPhoto && <img src={photoSrc} alt="" className="photo" referrerPolicy="no-referrer" />}
-                            <div className="exec-name">{data.full_name || 'Your Name'}</div>
-                            {data.target_role && <div className="target-role">{data.target_role}</div>}
-                            <div className="exec-contact-line">
-                                {[
-                                    data.location ? <span key="loc">{data.location}</span> : null,
-                                    data.phone ? <span key="phone">{data.phone}</span> : null,
-                                    data.email ? <a key="email" href={`mailto:${data.email}`} style={{ color: 'inherit', textDecoration: 'underline' }}>{data.email}</a> : null,
-                                    data.linkedin_url ? <span key="li">{renderLink(data.linkedin_url)}</span> : null,
-                                    data.github_url ? <span key="gh">{renderLink(data.github_url)}</span> : null,
-                                    data.website_url ? <span key="web">{renderLink(data.website_url)}</span> : null,
-                                ].filter(Boolean).reduce((acc: React.ReactNode[], curr, i, arr) => {
-                                    acc.push(curr);
+                        <SectionWrapper id="personal">
+                            <div className="exec-header">
+                                {hasPhoto && <img src={photoSrc} alt="" className="photo" referrerPolicy="no-referrer" />}
+                                <div className="exec-name">{data.full_name || 'Your Name'}</div>
+                                {data.target_role && <div className="target-role">{data.target_role}</div>}
+                                <div className="exec-contact-line">
+                                    {[
+                                        data.location ? <span key="loc">{data.location}</span> : null,
+                                        data.phone ? <span key="phone">{data.phone}</span> : null,
+                                        data.email ? <a key="email" href={`mailto:${data.email}`} style={{ color: 'inherit', textDecoration: 'underline' }}>{data.email}</a> : null,
+                                        data.linkedin_url ? <span key="li">{renderLink(data.linkedin_url)}</span> : null,
+                                        data.github_url ? <span key="gh">{renderLink(data.github_url)}</span> : null,
+                                        data.website_url ? <span key="web">{renderLink(data.website_url)}</span> : null,
+                                    ].filter(Boolean).reduce((acc: React.ReactNode[], curr, i, arr) => {
+                                        acc.push(curr);
 
-                                    if (i < arr.length - 1) {
-acc.push(<span key={`sep-${i}`}>  |  </span>);
-}
+                                        if (i < arr.length - 1) {
+    acc.push(<span key={`sep-${i}`}>  |  </span>);
+    }
 
-                                    return acc;
-                                }, [])}
+                                        return acc;
+                                    }, [])}
+                                </div>
                             </div>
-                        </div>
 
-                        {data.summary && (
-                            <>
-                                <div className="exec-section-title">Executive Summary</div>
-                                <p className="job-desc">{data.summary}</p>
-                            </>
-                        )}
+                            {data.summary && (
+                                <>
+                                    <div className="exec-section-title">Executive Summary</div>
+                                    <p className="job-desc">{data.summary}</p>
+                                </>
+                            )}
+                        </SectionWrapper>
 
-                        {(data.work_experience?.length ?? 0) > 0 && (
-                            <>
-                                <div className="exec-section-title">Professional Experience</div>
-                                {data.work_experience?.map((job, i) => (
-                                    <div key={i} className="job">
-                                        <div className="job-row">
-                                            <span className="job-title">{job.position || 'Position'}</span>
-                                            <span className="job-duration">{job.duration}</span>
+                        <SectionWrapper id="work">
+                            {(data.work_experience?.length ?? 0) > 0 && (
+                                <>
+                                    <div className="exec-section-title">Professional Experience</div>
+                                    {data.work_experience?.map((job, i) => (
+                                        <div key={i} className="job">
+                                            <div className="job-row">
+                                                <span className="job-title">{job.position || 'Position'}</span>
+                                                <span className="job-duration">{job.duration}</span>
+                                            </div>
+                                            <div className="job-company">{job.company}</div>
+                                            {job.description && (
+                                                <p className="job-desc">{job.description}</p>
+                                            )}
                                         </div>
-                                        <div className="job-company">{job.company}</div>
-                                        {job.description && (
-                                            <p className="job-desc">{job.description}</p>
-                                        )}
-                                    </div>
-                                ))}
-                            </>
-                        )}
+                                    ))}
+                                </>
+                            )}
+                        </SectionWrapper>
 
-                        {(data.education?.length ?? 0) > 0 && (
-                            <>
-                                <div className="exec-section-title">Education</div>
-                                {data.education?.map((edu, i) => (
-                                    <div key={i} className="edu">
-                                        <div className="edu-row">
-                                            <span className="edu-degree">{edu.degree || 'Degree'}</span>
-                                            <span className="edu-year">{edu.year}</span>
+                        <SectionWrapper id="education">
+                            {(data.education?.length ?? 0) > 0 && (
+                                <>
+                                    <div className="exec-section-title">Education</div>
+                                    {data.education?.map((edu, i) => (
+                                        <div key={i} className="edu">
+                                            <div className="edu-row">
+                                                <span className="edu-degree">{edu.degree || 'Degree'}</span>
+                                                <span className="edu-year">{edu.year}</span>
+                                            </div>
+                                            <div className="edu-institution">{edu.institution}</div>
                                         </div>
-                                        <div className="edu-institution">{edu.institution}</div>
-                                    </div>
-                                ))}
-                            </>
-                        )}
+                                    ))}
+                                </>
+                            )}
+                        </SectionWrapper>
 
-                        {(data.skills?.length ?? 0) > 0 && (
-                            <>
-                                <div className="exec-section-title">Core Competencies</div>
-                                <div className="skills">{data.skills?.join(', ')}</div>
-                            </>
-                        )}
+                        <SectionWrapper id="skills">
+                            {(data.skills?.length ?? 0) > 0 && (
+                                <>
+                                    <div className="exec-section-title">Core Competencies</div>
+                                    <div className="skills">{data.skills?.join(', ')}</div>
+                                </>
+                            )}
+                        </SectionWrapper>
 
-                        {(data.certifications?.length ?? 0) > 0 && (
-                            <>
-                                <div className="exec-section-title">Certifications</div>
-                                <div className="certs">{data.certifications?.join(' | ')}</div>
-                            </>
-                        )}
+                        <SectionWrapper id="certifications">
+                            {(data.certifications?.length ?? 0) > 0 && (
+                                <>
+                                    <div className="exec-section-title">Certifications</div>
+                                    <div className="certs">{data.certifications?.join(' | ')}</div>
+                                </>
+                            )}
+                        </SectionWrapper>
 
-                        {(data.projects?.length ?? 0) > 0 && (
-                            <>
-                                <div className="exec-section-title">Featured Projects</div>
-                                {data.projects?.map((project, i) => (
-                                    <div key={i} className="project">
-                                        <div className="project-title">{project.title}</div>
-                                        {project.technologies && <div className="project-tech">{project.technologies}</div>}
-                                        {project.description && <p className="project-desc">{project.description}</p>}
-                                    </div>
-                                ))}
-                            </>
-                        )}
+                        <SectionWrapper id="projects">
+                            {(data.projects?.length ?? 0) > 0 && (
+                                <>
+                                    <div className="exec-section-title">Featured Projects</div>
+                                    {data.projects?.map((project, i) => (
+                                        <div key={i} className="project">
+                                            <div className="project-title">{project.title}</div>
+                                            {project.technologies && <div className="project-tech">{project.technologies}</div>}
+                                            {project.description && <p className="project-desc">{project.description}</p>}
+                                        </div>
+                                    ))}
+                                </>
+                            )}
+                        </SectionWrapper>
                     </>
                 )}
 
                 {template === 'ats_bullet' && (
                     <>
-                        <div className="bullet-header">
-                            {hasPhoto && <img src={photoSrc} alt="" className="photo" referrerPolicy="no-referrer" />}
-                            <div className="bullet-name">{data.full_name || 'Your Name'}</div>
-                            {data.target_role && <div className="target-role">{data.target_role}</div>}
-                            <div className="bullet-contact">
-                                {[
-                                    data.location ? <span key="loc">{data.location}</span> : null,
-                                    data.phone ? <span key="phone">{data.phone}</span> : null,
-                                    data.email ? <a key="email" href={`mailto:${data.email}`} style={{ color: 'inherit', textDecoration: 'underline' }}>{data.email}</a> : null,
-                                    data.linkedin_url ? <span key="li">{renderLink(data.linkedin_url)}</span> : null,
-                                    data.github_url ? <span key="gh">{renderLink(data.github_url)}</span> : null,
-                                    data.website_url ? <span key="web">{renderLink(data.website_url)}</span> : null,
-                                ].filter(Boolean).reduce((acc: React.ReactNode[], curr, i, arr) => {
-                                    acc.push(curr);
+                        <SectionWrapper id="personal">
+                            <div className="bullet-header">
+                                {hasPhoto && <img src={photoSrc} alt="" className="photo" referrerPolicy="no-referrer" />}
+                                <div className="bullet-name">{data.full_name || 'Your Name'}</div>
+                                {data.target_role && <div className="target-role">{data.target_role}</div>}
+                                <div className="bullet-contact">
+                                    {[
+                                        data.location ? <span key="loc">{data.location}</span> : null,
+                                        data.phone ? <span key="phone">{data.phone}</span> : null,
+                                        data.email ? <a key="email" href={`mailto:${data.email}`} style={{ color: 'inherit', textDecoration: 'underline' }}>{data.email}</a> : null,
+                                        data.linkedin_url ? <span key="li">{renderLink(data.linkedin_url)}</span> : null,
+                                        data.github_url ? <span key="gh">{renderLink(data.github_url)}</span> : null,
+                                        data.website_url ? <span key="web">{renderLink(data.website_url)}</span> : null,
+                                    ].filter(Boolean).reduce((acc: React.ReactNode[], curr, i, arr) => {
+                                        acc.push(curr);
 
-                                    if (i < arr.length - 1) {
-acc.push(<span key={`sep-${i}`}>  •  </span>);
-}
+                                        if (i < arr.length - 1) {
+    acc.push(<span key={`sep-${i}`}>  •  </span>);
+    }
 
-                                    return acc;
-                                }, [])}
+                                        return acc;
+                                    }, [])}
+                                </div>
                             </div>
-                        </div>
 
-                        {data.summary && (
-                            <>
-                                <div className="bullet-section-title">Professional Summary</div>
-                                {renderAsBullets(data.summary)}
-                            </>
-                        )}
+                            {data.summary && (
+                                <>
+                                    <div className="bullet-section-title">Professional Summary</div>
+                                    {renderAsBullets(data.summary)}
+                                </>
+                            )}
+                        </SectionWrapper>
 
-                        {(data.work_experience?.length ?? 0) > 0 && (
-                            <>
-                                <div className="bullet-section-title">Work Experience</div>
-                                {data.work_experience?.map((job, i) => (
-                                    <div key={i} className="bullet-item">
-                                        <div className="bullet-item-header">
-                                            <span className="bullet-title">{job.position || 'Position'}</span>
-                                            <span className="bullet-date">{job.duration}</span>
-                                        </div>
-                                        <div className="bullet-company">{job.company}</div>
-                                        {job.description && renderAsBullets(job.description)}
-                                    </div>
-                                ))}
-                            </>
-                        )}
-
-                        {(data.education?.length ?? 0) > 0 && (
-                            <>
-                                <div className="bullet-section-title">Education</div>
-                                {data.education?.map((edu, i) => (
-                                    <div key={i} className="bullet-item">
-                                        <div className="bullet-item-header">
-                                            <span className="bullet-title">{edu.degree || 'Degree'}</span>
-                                            <span className="bullet-date">{edu.year}</span>
-                                        </div>
-                                        <div className="bullet-company">{edu.institution}</div>
-                                    </div>
-                                ))}
-                            </>
-                        )}
-
-                        {(data.skills?.length ?? 0) > 0 && (
-                            <>
-                                <div className="bullet-section-title">Skills & Core Competencies</div>
-                                <ul className="bullet-list">
-                                    {data.skills?.map((skill, i) => (
-                                        <li key={i}>{skill}</li>
-                                    ))}
-                                </ul>
-                            </>
-                        )}
-
-                        {(data.certifications?.length ?? 0) > 0 && (
-                            <>
-                                <div className="bullet-section-title">Certifications</div>
-                                <ul className="bullet-list">
-                                    {data.certifications?.map((cert, i) => (
-                                        <li key={i}>{cert}</li>
-                                    ))}
-                                </ul>
-                            </>
-                        )}
-
-                        {(data.projects?.length ?? 0) > 0 && (
-                            <>
-                                <div className="bullet-section-title">Projects</div>
-                                {data.projects?.map((project, i) => (
-                                    <div key={i} className="bullet-item">
-                                        <div className="bullet-item-header">
-                                            <span className="bullet-title">{project.title}</span>
-                                            {project.technologies && <span className="bullet-date">{project.technologies}</span>}
-                                        </div>
-                                        {(project.url || project.github_url) && (
-                                            <div className="bullet-company" style={{ fontSize: '11px' }}>
-                                                {[
-                                                    project.url ? `Demo: ${project.url}` : null,
-                                                    project.github_url ? `GitHub: ${project.github_url}` : null,
-                                                ].filter(Boolean).join('  •  ')}
+                        <SectionWrapper id="work">
+                            {(data.work_experience?.length ?? 0) > 0 && (
+                                <>
+                                    <div className="bullet-section-title">Work Experience</div>
+                                    {data.work_experience?.map((job, i) => (
+                                        <div key={i} className="bullet-item">
+                                            <div className="bullet-item-header">
+                                                <span className="bullet-title">{job.position || 'Position'}</span>
+                                                <span className="bullet-date">{job.duration}</span>
                                             </div>
-                                        )}
-                                        {project.description && renderAsBullets(project.description)}
-                                    </div>
-                                ))}
-                            </>
-                        )}
+                                            <div className="bullet-company">{job.company}</div>
+                                            {job.description && renderAsBullets(job.description)}
+                                        </div>
+                                    ))}
+                                </>
+                            )}
+                        </SectionWrapper>
+
+                        <SectionWrapper id="education">
+                            {(data.education?.length ?? 0) > 0 && (
+                                <>
+                                    <div className="bullet-section-title">Education</div>
+                                    {data.education?.map((edu, i) => (
+                                        <div key={i} className="bullet-item">
+                                            <div className="bullet-item-header">
+                                                <span className="bullet-title">{edu.degree || 'Degree'}</span>
+                                                <span className="bullet-date">{edu.year}</span>
+                                            </div>
+                                            <div className="bullet-company">{edu.institution}</div>
+                                        </div>
+                                    ))}
+                                </>
+                            )}
+                        </SectionWrapper>
+
+                        <SectionWrapper id="skills">
+                            {(data.skills?.length ?? 0) > 0 && (
+                                <>
+                                    <div className="bullet-section-title">Skills & Core Competencies</div>
+                                    <ul className="bullet-list">
+                                        {data.skills?.map((skill, i) => (
+                                            <li key={i}>{skill}</li>
+                                        ))}
+                                    </ul>
+                                </>
+                            )}
+                        </SectionWrapper>
+
+                        <SectionWrapper id="certifications">
+                            {(data.certifications?.length ?? 0) > 0 && (
+                                <>
+                                    <div className="bullet-section-title">Certifications</div>
+                                    <ul className="bullet-list">
+                                        {data.certifications?.map((cert, i) => (
+                                            <li key={i}>{cert}</li>
+                                        ))}
+                                    </ul>
+                                </>
+                            )}
+                        </SectionWrapper>
+
+                        <SectionWrapper id="projects">
+                            {(data.projects?.length ?? 0) > 0 && (
+                                <>
+                                    <div className="bullet-section-title">Projects</div>
+                                    {data.projects?.map((project, i) => (
+                                        <div key={i} className="bullet-item">
+                                            <div className="bullet-item-header">
+                                                <span className="bullet-title">{project.title}</span>
+                                                {project.technologies && <span className="bullet-date">{project.technologies}</span>}
+                                            </div>
+                                            {(project.url || project.github_url) && (
+                                                <div className="bullet-company" style={{ fontSize: '11px' }}>
+                                                    {[
+                                                        project.url ? `Demo: ${project.url}` : null,
+                                                        project.github_url ? `GitHub: ${project.github_url}` : null,
+                                                    ].filter(Boolean).join('  •  ')}
+                                                </div>
+                                            )}
+                                            {project.description && renderAsBullets(project.description)}
+                                        </div>
+                                    ))}
+                                </>
+                            )}
+                        </SectionWrapper>
                     </>
                 )}
 
                 {template === 'clean' && (
                     <>
-                        <div className="header">
-                            {hasPhoto && <img src={photoSrc} alt="" className="photo" referrerPolicy="no-referrer" />}
-                            <div className="name">{data.full_name || 'Your Name'}</div>
-                            {data.target_role && <div className="target-role">{data.target_role}</div>}
-                        </div>
-                        <div className="contact">
-                            {data.email && <a href={`mailto:${data.email}`} style={{ color: 'inherit', textDecoration: 'underline' }}>{data.email}</a>}
-                            {data.phone && <span>{data.phone}</span>}
-                            {data.location && <span>{data.location}</span>}
-                        </div>
-                        {data.linkedin_url && (
-                            <div className="linkedin">{renderLink(data.linkedin_url)}</div>
-                        )}
-                        {data.github_url && (
-                            <div className="linkedin">{renderLink(data.github_url)}</div>
-                        )}
-                        {data.website_url && (
-                            <div className="linkedin">{renderLink(data.website_url)}</div>
-                        )}
+                        <SectionWrapper id="personal">
+                            <div className="header">
+                                {hasPhoto && <img src={photoSrc} alt="" className="photo" referrerPolicy="no-referrer" />}
+                                <div className="name">{data.full_name || 'Your Name'}</div>
+                                {data.target_role && <div className="target-role">{data.target_role}</div>}
+                            </div>
+                            <div className="contact">
+                                {data.email && <a href={`mailto:${data.email}`} style={{ color: 'inherit', textDecoration: 'underline' }}>{data.email}</a>}
+                                {data.phone && <span>{data.phone}</span>}
+                                {data.location && <span>{data.location}</span>}
+                            </div>
+                            {data.linkedin_url && (
+                                <div className="linkedin">{renderLink(data.linkedin_url)}</div>
+                            )}
+                            {data.github_url && (
+                                <div className="linkedin">{renderLink(data.github_url)}</div>
+                            )}
+                            {data.website_url && (
+                                <div className="linkedin">{renderLink(data.website_url)}</div>
+                            )}
 
-                        {data.summary && (
-                            <>
-                                <h2>Summary</h2>
-                                <p>{data.summary}</p>
-                            </>
-                        )}
+                            {data.summary && (
+                                <>
+                                    <h2>Summary</h2>
+                                    <p>{data.summary}</p>
+                                </>
+                            )}
+                        </SectionWrapper>
 
-                        {(data.work_experience?.length ?? 0) > 0 && (
-                            <>
-                                <h2>Work Experience</h2>
-                                {data.work_experience?.map((job, i) => (
-                                    <div key={i} className="job">
-                                        <div className="job-row">
-                                            <span className="job-title">{job.position || 'Position'}</span>
-                                            <span className="job-duration">{job.duration}</span>
-                                        </div>
-                                        <div className="job-company">{job.company}</div>
-                                        {job.description && (
-                                            <p className="job-desc">{job.description}</p>
-                                        )}
-                                    </div>
-                                ))}
-                            </>
-                        )}
-
-                        {(data.education?.length ?? 0) > 0 && (
-                            <>
-                                <h2>Education</h2>
-                                {data.education?.map((edu, i) => (
-                                    <div key={i} className="edu">
-                                        <div className="edu-row">
-                                            <span className="edu-degree">{edu.degree || 'Degree'}</span>
-                                            <span className="edu-year">{edu.year}</span>
-                                        </div>
-                                        <div className="edu-institution">{edu.institution}</div>
-                                    </div>
-                                ))}
-                            </>
-                        )}
-
-                        {(data.skills?.length ?? 0) > 0 && (
-                            <>
-                                <h2>Skills</h2>
-                                <div className="skills">{data.skills?.join(', ')}</div>
-                            </>
-                        )}
-
-                        {(data.certifications?.length ?? 0) > 0 && (
-                            <>
-                                <h2>Certifications</h2>
-                                <div className="certs">{data.certifications?.join(' | ')}</div>
-                            </>
-                        )}
-
-                        {(data.projects?.length ?? 0) > 0 && (
-                            <>
-                                <h2>Projects</h2>
-                                {data.projects?.map((project, i) => (
-                                    <div key={i} className="project">
-                                        <div className="project-title">{project.title}</div>
-                                        {project.technologies && <div className="project-tech">{project.technologies}</div>}
-                                        {(project.url || project.github_url) && (
-                                            <div className="project-tech" style={{ fontSize: '11px', opacity: 0.85 }}>
-                                                {[
-                                                    project.url ? <span key="demo">{renderLink(project.url)}</span> : null,
-                                                    project.github_url ? <span key="gh">{renderLink(project.github_url)}</span> : null,
-                                                ].filter(Boolean).reduce((acc: React.ReactNode[], curr, i, arr) => {
-                                                    acc.push(curr);
-
-                                                    if (i < arr.length - 1) {
-acc.push(<span key={`psep-${i}`}>  •  </span>);
-}
-
-                                                    return acc;
-                                                }, [])}
+                        <SectionWrapper id="work">
+                            {(data.work_experience?.length ?? 0) > 0 && (
+                                <>
+                                    <h2>Work Experience</h2>
+                                    {data.work_experience?.map((job, i) => (
+                                        <div key={i} className="job">
+                                            <div className="job-row">
+                                                <span className="job-title">{job.position || 'Position'}</span>
+                                                <span className="job-duration">{job.duration}</span>
                                             </div>
-                                        )}
-                                        {project.description && <p className="project-desc">{project.description}</p>}
-                                    </div>
-                                ))}
-                            </>
-                        )}
+                                            <div className="job-company">{job.company}</div>
+                                            {job.description && (
+                                                <p className="job-desc">{job.description}</p>
+                                            )}
+                                        </div>
+                                    ))}
+                                </>
+                            )}
+                        </SectionWrapper>
+
+                        <SectionWrapper id="education">
+                            {(data.education?.length ?? 0) > 0 && (
+                                <>
+                                    <h2>Education</h2>
+                                    {data.education?.map((edu, i) => (
+                                        <div key={i} className="edu">
+                                            <div className="edu-row">
+                                                <span className="edu-degree">{edu.degree || 'Degree'}</span>
+                                                <span className="edu-year">{edu.year}</span>
+                                            </div>
+                                            <div className="edu-institution">{edu.institution}</div>
+                                        </div>
+                                    ))}
+                                </>
+                            )}
+                        </SectionWrapper>
+
+                        <SectionWrapper id="skills">
+                            {(data.skills?.length ?? 0) > 0 && (
+                                <>
+                                    <h2>Skills</h2>
+                                    <div className="skills">{data.skills?.join(', ')}</div>
+                                </>
+                            )}
+                        </SectionWrapper>
+
+                        <SectionWrapper id="certifications">
+                            {(data.certifications?.length ?? 0) > 0 && (
+                                <>
+                                    <h2>Certifications</h2>
+                                    <div className="certs">{data.certifications?.join(' | ')}</div>
+                                </>
+                            )}
+                        </SectionWrapper>
+
+                        <SectionWrapper id="projects">
+                            {(data.projects?.length ?? 0) > 0 && (
+                                <>
+                                    <h2>Projects</h2>
+                                    {data.projects?.map((project, i) => (
+                                        <div key={i} className="project">
+                                            <div className="project-title">{project.title}</div>
+                                            {project.technologies && <div className="project-tech">{project.technologies}</div>}
+                                            {(project.url || project.github_url) && (
+                                                <div className="project-tech" style={{ fontSize: '11px', opacity: 0.85 }}>
+                                                    {[
+                                                        project.url ? <span key="demo">{renderLink(project.url)}</span> : null,
+                                                        project.github_url ? <span key="gh">{renderLink(project.github_url)}</span> : null,
+                                                    ].filter(Boolean).reduce((acc: React.ReactNode[], curr, i, arr) => {
+                                                        acc.push(curr);
+
+                                                        if (i < arr.length - 1) {
+    acc.push(<span key={`psep-${i}`}>  •  </span>);
+    }
+
+                                                        return acc;
+                                                    }, [])}
+                                                </div>
+                                            )}
+                                            {project.description && <p className="project-desc">{project.description}</p>}
+                                        </div>
+                                    ))}
+                                </>
+                            )}
+                        </SectionWrapper>
                     </>
                 )}
 
@@ -2028,64 +2100,75 @@ acc.push(<span key={`psep-${i}`}>  •  </span>);
                         </div>
 
                         <div className="body">
-                            {data.summary && (
-                                <>
-                                    <h2>Summary</h2>
-                                    <p>{data.summary}</p>
-                                </>
-                            )}
+                            <SectionWrapper id="personal">
+                                {data.summary && (
+                                    <>
+                                        <h2>Summary</h2>
+                                        <p>{data.summary}</p>
+                                    </>
+                                )}
+                            </SectionWrapper>
 
-                            {(data.work_experience?.length ?? 0) > 0 && (
-                                <>
-                                    <h2>Work Experience</h2>
-                                    {data.work_experience?.map((job, i) => (
-                                        <div key={i} className="job">
-                                            <div className="job-row">
-                                                <span className="job-title">{job.position || 'Position'}</span>
-                                                <span className="job-duration">{job.duration}</span>
+                            <SectionWrapper id="work">
+                                {(data.work_experience?.length ?? 0) > 0 && (
+                                    <>
+                                        <h2>Work Experience</h2>
+                                        {data.work_experience?.map((job, i) => (
+                                            <div key={i} className="job">
+                                                <div className="job-row">
+                                                    <span className="job-title">{job.position || 'Position'}</span>
+                                                    <span className="job-duration">{job.duration}</span>
+                                                </div>
+                                                <div className="job-company">{job.company}</div>
+                                                {job.description && (
+                                                    <p className="job-desc">{job.description}</p>
+                                                )}
                                             </div>
-                                            <div className="job-company">{job.company}</div>
-                                            {job.description && (
-                                                <p className="job-desc">{job.description}</p>
-                                            )}
-                                        </div>
-                                    ))}
-                                </>
-                            )}
+                                        ))}
+                                    </>
+                                )}
+                            </SectionWrapper>
 
-                            {(data.education?.length ?? 0) > 0 && (
-                                <>
-                                    <h2>Education</h2>
-                                    {data.education?.map((edu, i) => (
-                                        <div key={i} className="edu">
-                                            <div className="edu-row">
-                                                <span className="edu-degree">{edu.degree || 'Degree'}</span>
-                                                <span className="edu-year">{edu.year}</span>
+                            <SectionWrapper id="education">
+                                {(data.education?.length ?? 0) > 0 && (
+                                    <>
+                                        <h2>Education</h2>
+                                        {data.education?.map((edu, i) => (
+                                            <div key={i} className="edu">
+                                                <div className="edu-row">
+                                                    <span className="edu-degree">{edu.degree || 'Degree'}</span>
+                                                    <span className="edu-year">{edu.year}</span>
+                                                </div>
+                                                <div className="edu-institution">{edu.institution}</div>
                                             </div>
-                                            <div className="edu-institution">{edu.institution}</div>
-                                        </div>
-                                    ))}
-                                </>
-                            )}
+                                        ))}
+                                    </>
+                                )}
+                            </SectionWrapper>
 
-                            {(data.skills?.length ?? 0) > 0 && (
-                                <>
-                                    <h2>Skills</h2>
-                                    <div className="skills">{data.skills?.join(', ')}</div>
-                                </>
-                            )}
+                            <SectionWrapper id="skills">
+                                {(data.skills?.length ?? 0) > 0 && (
+                                    <>
+                                        <h2>Skills</h2>
+                                        <div className="skills">{data.skills?.join(', ')}</div>
+                                    </>
+                                )}
+                            </SectionWrapper>
 
-                            {(data.certifications?.length ?? 0) > 0 && (
-                                <>
-                                    <h2>Certifications</h2>
-                                    <div className="certs">{data.certifications?.join(' | ')}</div>
-                                </>
-                            )}
+                            <SectionWrapper id="certifications">
+                                {(data.certifications?.length ?? 0) > 0 && (
+                                    <>
+                                        <h2>Certifications</h2>
+                                        <div className="certs">{data.certifications?.join(' | ')}</div>
+                                    </>
+                                )}
+                            </SectionWrapper>
 
-                            {(data.projects?.length ?? 0) > 0 && (
-                                <>
-                                    <h2>Projects</h2>
-                                    {data.projects?.map((project, i) => (
+                            <SectionWrapper id="projects">
+                                {(data.projects?.length ?? 0) > 0 && (
+                                    <>
+                                        <h2>Projects</h2>
+                                        {data.projects?.map((project, i) => (
                                         <div key={i} className="project">
                                             <div className="project-title">{project.title}</div>
                                             {project.technologies && <div className="project-tech">{project.technologies}</div>}
@@ -2110,112 +2193,125 @@ acc.push(<span key={`psep-${i}`}>  •  </span>);
                                     ))}
                                 </>
                             )}
+                            </SectionWrapper>
                         </div>
                     </>
                 )}
 
                 {template === 'philippine' && (
                     <>
-                        <div className="header">
-                            {hasPhoto && <img src={photoSrc} alt="" className="photo" referrerPolicy="no-referrer" />}
-                            <div className="name">{data.full_name || 'Your Name'}</div>
-                            {data.target_role && <div className="target-role">{data.target_role}</div>}
-                            <div className="contact">
-                                {data.location && <span>{data.location}</span>}
-                                {data.phone && <span>{data.phone}</span>}
-                                {data.email && <a href={`mailto:${data.email}`} style={{ color: 'inherit', textDecoration: 'underline' }}>{data.email}</a>}
+                        <SectionWrapper id="personal">
+                            <div className="header">
+                                {hasPhoto && <img src={photoSrc} alt="" className="photo" referrerPolicy="no-referrer" />}
+                                <div className="name">{data.full_name || 'Your Name'}</div>
+                                {data.target_role && <div className="target-role">{data.target_role}</div>}
+                                <div className="contact">
+                                    {data.location && <span>{data.location}</span>}
+                                    {data.phone && <span>{data.phone}</span>}
+                                    {data.email && <a href={`mailto:${data.email}`} style={{ color: 'inherit', textDecoration: 'underline' }}>{data.email}</a>}
+                                </div>
+                                {data.linkedin_url && (
+                                    <div className="linkedin">{renderLink(data.linkedin_url)}</div>
+                                )}
+                                {data.github_url && (
+                                    <div className="linkedin">{renderLink(data.github_url)}</div>
+                                )}
+                                {data.website_url && (
+                                    <div className="linkedin">{renderLink(data.website_url)}</div>
+                                )}
                             </div>
-                            {data.linkedin_url && (
-                                <div className="linkedin">{renderLink(data.linkedin_url)}</div>
+
+                            {data.summary && (
+                                <>
+                                    <h2>I. CAREER OBJECTIVE</h2>
+                                    <div className="section-line" />
+                                    <p>{data.summary}</p>
+                                </>
                             )}
-                            {data.github_url && (
-                                <div className="linkedin">{renderLink(data.github_url)}</div>
-                            )}
-                            {data.website_url && (
-                                <div className="linkedin">{renderLink(data.website_url)}</div>
-                            )}
-                        </div>
+                        </SectionWrapper>
 
-                        {data.summary && (
-                            <>
-                                <h2>I. CAREER OBJECTIVE</h2>
-                                <div className="section-line" />
-                                <p>{data.summary}</p>
-                            </>
-                        )}
-
-                        {(data.work_experience?.length ?? 0) > 0 && (
-                            <>
-                                <h2>II. WORK EXPERIENCE</h2>
-                                <div className="section-line" />
-                                {data.work_experience?.map((job, i) => (
-                                    <div key={i} className="job">
-                                        <div className="job-company">{job.company || 'Company'}</div>
-                                        <div className="job-row">
-                                            <span className="job-position">{job.position}</span>
-                                            <span className="job-duration">{job.duration}</span>
-                                        </div>
-                                        {job.description && (
-                                            <p className="job-desc">{job.description}</p>
-                                        )}
-                                    </div>
-                                ))}
-                            </>
-                        )}
-
-                        {(data.education?.length ?? 0) > 0 && (
-                            <>
-                                <h2>III. EDUCATIONAL BACKGROUND</h2>
-                                <div className="section-line" />
-                                {data.education?.map((edu, i) => (
-                                    <div key={i} className="edu">
-                                        <div className="edu-row">
-                                            <span className="edu-degree">{edu.degree || 'Degree'}</span>
-                                            <span className="edu-year">{edu.year}</span>
-                                        </div>
-                                        <div className="edu-institution">{edu.institution}</div>
-                                    </div>
-                                ))}
-                            </>
-                        )}
-
-                        {(data.skills?.length ?? 0) > 0 && (
-                            <>
-                                <h2>IV. SKILLS & COMPETENCIES</h2>
-                                <div className="section-line" />
-                                <div className="skills-text">{data.skills?.join(' / ')}</div>
-                            </>
-                        )}
-
-                        {(data.certifications?.length ?? 0) > 0 && (
-                            <>
-                                <h2>V. CERTIFICATIONS & SEMINARS</h2>
-                                <div className="section-line" />
-                                <div className="certs">{data.certifications?.join(' | ')}</div>
-                            </>
-                        )}
-
-                        {(data.projects?.length ?? 0) > 0 && (
-                            <>
-                                <h2>VI. KEY PROJECTS</h2>
-                                <div className="section-line" />
-                                {data.projects?.map((project, i) => (
-                                    <div key={i} className="project">
-                                        <div className="project-title">{project.title}</div>
-                                        {project.technologies && <div className="project-tech">{project.technologies}</div>}
-                                        {(project.url || project.github_url) && (
-                                            <div className="project-tech" style={{ fontSize: '11px', opacity: 0.85 }}>
-                                                {[
-                                                    project.url ? `Demo: ${project.url}` : null,
-                                                    project.github_url ? `GitHub: ${project.github_url}` : null,
-                                                ].filter(Boolean).join('  •  ')}
+                        <SectionWrapper id="work">
+                            {(data.work_experience?.length ?? 0) > 0 && (
+                                <>
+                                    <h2>II. WORK EXPERIENCE</h2>
+                                    <div className="section-line" />
+                                    {data.work_experience?.map((job, i) => (
+                                        <div key={i} className="job">
+                                            <div className="job-company">{job.company || 'Company'}</div>
+                                            <div className="job-row">
+                                                <span className="job-position">{job.position}</span>
+                                                <span className="job-duration">{job.duration}</span>
                                             </div>
-                                        )}
-                                        {project.description && <p className="project-desc">{project.description}</p>}
-                                    </div>
-                                ))}
-                            </>
-                        )}
+                                            {job.description && (
+                                                <p className="job-desc">{job.description}</p>
+                                            )}
+                                        </div>
+                                    ))}
+                                </>
+                            )}
+                        </SectionWrapper>
+
+                        <SectionWrapper id="education">
+                            {(data.education?.length ?? 0) > 0 && (
+                                <>
+                                    <h2>III. EDUCATIONAL BACKGROUND</h2>
+                                    <div className="section-line" />
+                                    {data.education?.map((edu, i) => (
+                                        <div key={i} className="edu">
+                                            <div className="edu-row">
+                                                <span className="edu-degree">{edu.degree || 'Degree'}</span>
+                                                <span className="edu-year">{edu.year}</span>
+                                            </div>
+                                            <div className="edu-institution">{edu.institution}</div>
+                                        </div>
+                                    ))}
+                                </>
+                            )}
+                        </SectionWrapper>
+
+                        <SectionWrapper id="skills">
+                            {(data.skills?.length ?? 0) > 0 && (
+                                <>
+                                    <h2>IV. SKILLS & COMPETENCIES</h2>
+                                    <div className="section-line" />
+                                    <div className="skills-text">{data.skills?.join(' / ')}</div>
+                                </>
+                            )}
+                        </SectionWrapper>
+
+                        <SectionWrapper id="certifications">
+                            {(data.certifications?.length ?? 0) > 0 && (
+                                <>
+                                    <h2>V. CERTIFICATIONS & SEMINARS</h2>
+                                    <div className="section-line" />
+                                    <div className="certs">{data.certifications?.join(' | ')}</div>
+                                </>
+                            )}
+                        </SectionWrapper>
+
+                        <SectionWrapper id="projects">
+                            {(data.projects?.length ?? 0) > 0 && (
+                                <>
+                                    <h2>VI. KEY PROJECTS</h2>
+                                    <div className="section-line" />
+                                    {data.projects?.map((project, i) => (
+                                        <div key={i} className="project">
+                                            <div className="project-title">{project.title}</div>
+                                            {project.technologies && <div className="project-tech">{project.technologies}</div>}
+                                            {(project.url || project.github_url) && (
+                                                <div className="project-tech" style={{ fontSize: '11px', opacity: 0.85 }}>
+                                                    {[
+                                                        project.url ? `Demo: ${project.url}` : null,
+                                                        project.github_url ? `GitHub: ${project.github_url}` : null,
+                                                    ].filter(Boolean).join('  •  ')}
+                                                </div>
+                                            )}
+                                            {project.description && <p className="project-desc">{project.description}</p>}
+                                        </div>
+                                    ))}
+                                </>
+                            )}
+                        </SectionWrapper>
 
                         <div className="ph-certification-block" style={{ marginTop: '24px', paddingTop: '16px', borderTop: '1px solid #e3e3e0' }}>
                             <p style={{ fontSize: '11px', fontStyle: 'italic', color: '#706f6c' }}>
@@ -2777,6 +2873,65 @@ setJobTitle(letter.target_job_title);
     );
 }
 
+function SortableTab({
+    id,
+    label,
+    icon: Icon,
+    isActive,
+    onClick,
+    isFirst,
+}: {
+    id: string;
+    label: string;
+    icon: React.ElementType;
+    isActive: boolean;
+    onClick: () => void;
+    isFirst: boolean;
+}) {
+    const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+        id,
+        disabled: isFirst, // disable dragging for the first item (personal)
+    });
+
+    const style = {
+        transform: CSS.Transform.toString(transform),
+        transition,
+        opacity: isDragging ? 0.5 : 1,
+        zIndex: isDragging ? 1 : 0,
+    };
+
+    return (
+        <div
+            ref={setNodeRef}
+            style={style}
+            className={`flex items-center gap-1 rounded-md transition-colors ${
+                isActive
+                    ? 'bg-white text-[#1b1b18] shadow-sm dark:bg-[#161615] dark:text-[#EDEDEC]'
+                    : 'text-[#706f6c] hover:text-[#1b1b18] dark:text-[#A1A09A] dark:hover:text-[#EDEDEC]'
+            }`}
+        >
+            {!isFirst && (
+                <button
+                    type="button"
+                    className="pl-2 pr-1 py-1.5 cursor-grab active:cursor-grabbing text-muted-foreground hover:text-foreground touch-none"
+                    {...attributes}
+                    {...listeners}
+                >
+                    <GripVertical className="size-3.5" />
+                </button>
+            )}
+            <button
+                type="button"
+                onClick={onClick}
+                className={`flex items-center gap-1.5 py-1.5 text-xs font-medium ${isFirst ? 'px-3' : 'pr-3 pl-1'}`}
+            >
+                <Icon className="size-3.5" />
+                {label}
+            </button>
+        </div>
+    );
+}
+
 export default function DocumentsIndex({ profile, aiLimit, loadedResume, loadedCoverLetter, flash }: DocumentsPageProps) {
     const initialView = loadedResume ? 'resume-preview' : (loadedCoverLetter ? 'cover-letter-preview' : 'resume-edit');
     const initialTemplate = loadedResume?.template || 'clean';
@@ -2805,6 +2960,7 @@ export default function DocumentsIndex({ profile, aiLimit, loadedResume, loadedC
         linkedin_url: activeProfileData?.linkedin_url ?? (isNew ? 'https://linkedin.com/in/juandelacruz' : ''),
         github_url: activeProfileData?.github_url ?? (isNew ? 'https://github.com/juandelacruz' : ''),
         website_url: activeProfileData?.website_url ?? (isNew ? 'https://juanportfolio.com' : ''),
+        target_role: activeProfileData?.target_role ?? (isNew ? '' : ''),
         summary: activeProfileData?.summary ?? (isNew ? 'Experienced software developer with expertise in building scalable web applications...' : ''),
         work_experience: activeProfileData?.work_experience ?? (isNew ? [
             {
@@ -2831,6 +2987,7 @@ export default function DocumentsIndex({ profile, aiLimit, loadedResume, loadedC
                 technologies: 'Laravel, React, PostgreSQL'
             }
         ] : []),
+        section_order: activeProfileData?.section_order ?? ['personal', 'work', 'education', 'skills', 'projects', 'certifications'],
     });
 
     function handleSubmit(e: React.FormEvent) {
@@ -2839,6 +2996,34 @@ export default function DocumentsIndex({ profile, aiLimit, loadedResume, loadedC
             preserveScroll: true,
             preserveState: true,
         });
+    }
+
+    const sensors = useSensors(
+        useSensor(PointerSensor, {
+            activationConstraint: {
+                distance: 5,
+            },
+        }),
+        useSensor(KeyboardSensor, {
+            coordinateGetter: sortableKeyboardCoordinates,
+        })
+    );
+
+    function handleDragEnd(event: DragEndEvent) {
+        const { active, over } = event;
+
+        if (over && active.id !== over.id) {
+            const currentOrder = data.section_order || ['personal', 'work', 'education', 'skills', 'projects', 'certifications'];
+            const oldIndex = currentOrder.indexOf(active.id as string);
+            const newIndex = currentOrder.indexOf(over.id as string);
+
+            // Prevent dragging the 'personal' tab or dragging anything to the 'personal' position
+            if (oldIndex === 0 || newIndex === 0) {
+                return;
+            }
+
+            setData('section_order', arrayMove(currentOrder, oldIndex, newIndex));
+        }
     }
 
     async function handleAiPolish(section: string, content: string) {
@@ -2973,7 +3158,7 @@ return;
                     ))}
                 </div>
 
-                <div className="flex-1 min-h-0 overflow-y-auto">
+                <div className="flex-1 min-w-0 min-h-0 overflow-y-auto overflow-x-hidden">
                     {activeView === 'resume-edit' && (
                         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
                             <Card>
@@ -2988,21 +3173,28 @@ return;
                                 </CardHeader>
                                 <CardContent className="flex flex-col gap-4">
                                     <div className="flex flex-wrap gap-1 rounded-lg bg-[#f5f5f4] p-1 dark:bg-[#1C1C1A]">
-                                        {TABS.map(({ id, label, icon: Icon }) => (
-                                            <button
-                                                key={id}
-                                                type="button"
-                                                onClick={() => setActiveEditorTab(id)}
-                                                className={`flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition-colors ${
-                                                    activeEditorTab === id
-                                                        ? 'bg-white text-[#1b1b18] shadow-sm dark:bg-[#161615] dark:text-[#EDEDEC]'
-                                                        : 'text-[#706f6c] hover:text-[#1b1b18] dark:text-[#A1A09A] dark:hover:text-[#EDEDEC]'
-                                                }`}
+                                        <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+                                            <SortableContext
+                                                items={data.section_order || ['personal', 'work', 'education', 'skills', 'projects', 'certifications']}
+                                                strategy={horizontalListSortingStrategy}
                                             >
-                                                <Icon className="size-3.5" />
-                                                {label}
-                                            </button>
-                                        ))}
+                                                {(data.section_order || ['personal', 'work', 'education', 'skills', 'projects', 'certifications']).map((id, index) => {
+                                                    const tab = TABS.find(t => t.id === id);
+                                                    if (!tab) return null;
+                                                    return (
+                                                        <SortableTab
+                                                            key={id}
+                                                            id={id}
+                                                            label={tab.label}
+                                                            icon={tab.icon}
+                                                            isActive={activeEditorTab === id}
+                                                            onClick={() => setActiveEditorTab(id)}
+                                                            isFirst={index === 0}
+                                                        />
+                                                    );
+                                                })}
+                                            </SortableContext>
+                                        </DndContext>
                                     </div>
 
                                     <div className="min-h-[300px]">

@@ -144,7 +144,7 @@ function BenchmarkTip({ fourWeekAverage, weeklyGoal }: { fourWeekAverage: number
             </CardHeader>
             <CardContent>
                 <p className="text-2xl font-bold text-foreground">{fourWeekAverage}</p>
-                <p className="text-xs text-muted-foreground">avg applications per week</p>
+                <p className="text-xs text-muted-foreground">Avg Applications Per Week</p>
                 <p className="mt-2 text-sm text-muted-foreground">{tip}</p>
             </CardContent>
         </Card>

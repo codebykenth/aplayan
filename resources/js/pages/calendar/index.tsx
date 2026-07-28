@@ -160,13 +160,22 @@ export default function Calendar({
         }
     };
 
-    const weekDays = view === 'week' && events.length > 0
-        ? getWeekDays(currentYear, currentMonth, events[0].date ? parseInt(events[0].date_display) : 1)
-        : [];
+    const [selectedDate, setSelectedDate] = useState<string | null>(null);
+
+    const weekDays = useMemo(() => {
+        if (view !== 'week') return [];
+        let dayToUse = 1;
+        if (selectedDate) {
+            const [y, m, d] = selectedDate.split('-');
+            if (parseInt(y) === currentYear && parseInt(m) === currentMonth) {
+                dayToUse = parseInt(d);
+            }
+        }
+        return getWeekDays(currentYear, currentMonth, dayToUse);
+    }, [view, currentYear, currentMonth, selectedDate]);
 
     const weeks = view === 'month' ? getWeeksInMonth(currentYear, currentMonth) : [];
 
-    const [selectedDate, setSelectedDate] = useState<string | null>(null);
 
     const selectedDayEvents = useMemo(() => {
         if (!selectedDate) return [];
@@ -211,7 +220,7 @@ export default function Calendar({
                     </Button>
                 </div>
 
-                <Card className="overflow-hidden">
+                <Card className="shrink-0 overflow-hidden">
                     <CardContent className="p-2 sm:p-4">
                         {view === 'month' ? (
                             <div className="grid grid-cols-7 gap-1">
@@ -246,9 +255,6 @@ export default function Calendar({
                                                 onClick={() => {
                                                     if (day) {
                                                         setSelectedDate(dateStr);
-                                                        if (dayEvents && dayEvents.length > 0 && window.innerWidth >= 640) {
-                                                            openApplicationDetailById(dayEvents[0].id);
-                                                        }
                                                     }
                                                 }}
                                             >
@@ -345,7 +351,7 @@ export default function Calendar({
 
                 {/* Selected Date Agenda (Mobile & Quick Detail) */}
                 {selectedDate && (
-                    <Card>
+                    <Card className="shrink-0">
                         <CardContent className="p-4 flex flex-col gap-3">
                             <div className="flex items-center justify-between">
                                 <h3 className="text-sm font-semibold text-foreground">
@@ -364,11 +370,11 @@ export default function Calendar({
                                             onClick={() => openApplicationDetailById(event.id)}
                                             className="flex cursor-pointer items-center justify-between rounded-lg border border-border bg-card p-3 transition-colors hover:bg-accent"
                                         >
-                                            <div className="flex flex-col gap-0.5">
-                                                <span className="text-sm font-semibold text-foreground">
+                                            <div className="flex flex-col gap-0.5 min-w-0 flex-1 mr-4">
+                                                <span className="text-sm font-semibold text-foreground truncate">
                                                     {event.job_title}
                                                 </span>
-                                                <span className="text-xs text-muted-foreground">
+                                                <span className="text-xs text-muted-foreground truncate">
                                                     {event.company_name}
                                                 </span>
                                             </div>
