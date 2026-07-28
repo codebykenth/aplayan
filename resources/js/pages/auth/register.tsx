@@ -1,17 +1,20 @@
 import { Head, Link, usePage } from '@inertiajs/react';
-import {  useState } from 'react';
-import type {FormEvent} from 'react';
+import { useRef, useState } from 'react';
+import type { FormEvent } from 'react';
 import type { Auth } from '@/types/auth';
 import { registerSchema, validateWithZod } from '@/lib/validations';
+import Turnstile from '@/components/Turnstile';
 
 export default function Register() {
     const { errors: pageErrors } = usePage<{ errors: Record<string, string> }>().props;
+    const turnstileRef = useRef<{ execute: () => Promise<string | null> }>(null);
 
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [passwordConfirmation, setPasswordConfirmation] = useState('');
     const [clientErrors, setClientErrors] = useState<Record<string, string>>({});
+    const [turnstileToken, setTurnstileToken] = useState('');
 
     function submit(e: FormEvent) {
         e.preventDefault();
@@ -24,9 +27,15 @@ export default function Register() {
         }
 
         setClientErrors({});
+        submitForm();
+    }
 
-        const form = e.target as HTMLFormElement;
-        form.submit();
+    async function submitForm() {
+        setTurnstileToken('');
+        const token = await turnstileRef.current?.execute();
+        setTurnstileToken(token ?? '');
+        const form = document.querySelector('form[action="/register"]') as HTMLFormElement | null;
+        form?.submit();
     }
 
     return (
@@ -40,6 +49,7 @@ export default function Register() {
 
                 <form action="/register" method="POST" onSubmit={submit} className="space-y-4">
                     <input type="hidden" name="_token" value={usePage().props.csrf_token as string} />
+                    {turnstileToken && <input type="hidden" name="turnstile" value={turnstileToken} />}
 
                     <div>
                         <label htmlFor="name" className="block text-sm font-medium text-foreground">
@@ -117,6 +127,13 @@ export default function Register() {
                         {(clientErrors.password_confirmation) && (
                             <p className="mt-1 text-sm text-destructive">{clientErrors.password_confirmation}</p>
                         )}
+                    </div>
+
+                    <div className="mt-4">
+                        <Turnstile
+                            siteKey={usePage().props.turnstile_site_key as string}
+                            ref={turnstileRef}
+                        />
                     </div>
 
                     <button

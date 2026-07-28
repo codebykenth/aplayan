@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Services\TurnstileVerifyService;
 use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -15,16 +16,29 @@ use Inertia\Response;
 
 class ForgotPasswordController extends Controller
 {
+    public function __construct(
+        private TurnstileVerifyService $turnstile,
+    ) {}
+
     public function forgotPassword(): Response
     {
-        return Inertia::render('auth/forgot-password');
+        return Inertia::render('auth/forgot-password', [
+            'turnstile_site_key' => config('services.turnstile.site_key'),
+        ]);
     }
 
     public function sendResetLink(Request $request): RedirectResponse
     {
-        $request->validate([
+        $data = $request->validate([
             'email' => ['required', 'email'],
+            'turnstile' => ['required', 'string'],
         ]);
+
+        if (!$this->turnstile->verify($data['turnstile'])) {
+            return back()->withErrors([
+                'security_check_failed' => 'Please complete the security check, then try again.',
+            ]);
+        }
 
         $status = Password::sendResetLink(
             $request->only('email')

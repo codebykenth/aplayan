@@ -3,6 +3,7 @@
 use App\Http\Resources\JobApplicationResource;
 use App\Models\JobApplication;
 use App\Models\User;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\URL;
 
 it('passes applications prop as a plain array to the Inertia page', function () {
@@ -19,6 +20,14 @@ it('passes applications prop as a plain array to the Inertia page', function () 
 });
 
 it('redirects authenticated users to job-applications after login', function () {
+    Http::preventStrayRequests();
+
+    Http::fake([
+        'challenges.cloudflare.com/turnstile/v0/siteverify' => Http::response([
+            'success' => true,
+        ]),
+    ]);
+
     $user = User::factory()->create([
         'email' => 'test@example.com',
         'password' => bcrypt('password'),
@@ -27,23 +36,41 @@ it('redirects authenticated users to job-applications after login', function () 
     $this->post(route('login'), [
         'email' => 'test@example.com',
         'password' => 'password',
+        'turnstile' => 'valid-turnstile-token',
     ])->assertRedirect(route('job-applications.index'));
 
     $this->assertAuthenticatedAs($user);
 });
 
 it('redirects authenticated users to job-applications after registration', function () {
+    Http::preventStrayRequests();
+
+    Http::fake([
+        'challenges.cloudflare.com/turnstile/v0/siteverify' => Http::response([
+            'success' => true,
+        ]),
+    ]);
+
     $this->post(route('register'), [
         'name' => 'Test User',
         'email' => 'test@example.com',
         'password' => 'Password123!',
         'password_confirmation' => 'Password123!',
+        'turnstile' => 'valid-turnstile-token',
     ])->assertRedirect(route('job-applications.index'));
 
     $this->assertAuthenticated();
 });
 
 it('redirects authenticated users to job-applications after socialite login', function () {
+    Http::preventStrayRequests();
+
+    Http::fake([
+        'challenges.cloudflare.com/turnstile/v0/siteverify' => Http::response([
+            'success' => true,
+        ]),
+    ]);
+
     $googleUser = Mockery::mock('Laravel\Socialite\Contracts\User');
     $googleUser->shouldReceive('getId')->andReturn('google-id-123');
     $googleUser->shouldReceive('getName')->andReturn('Google User');
@@ -76,3 +103,4 @@ it('redirects to job-applications after email verification', function () {
         ->get($uri)
         ->assertRedirect(route('job-applications.index'));
 });
+

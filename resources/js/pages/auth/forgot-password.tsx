@@ -1,15 +1,26 @@
 import { Head, Link, usePage } from '@inertiajs/react';
-import {  useState } from 'react';
-import type {FormEvent} from 'react';
+import { useRef, useState } from 'react';
+import type { FormEvent } from 'react';
+import Turnstile from '@/components/Turnstile';
 
 export default function ForgotPassword() {
     const { status, errors: pageErrors } = usePage<{ status?: string; errors: Record<string, string> }>().props;
+    const turnstileRef = useRef<{ execute: () => Promise<string | null> }>(null);
 
     const [email, setEmail] = useState('');
+    const [turnstileToken, setTurnstileToken] = useState('');
 
     function submit(e: FormEvent) {
-        const form = e.target as HTMLFormElement;
-        form.submit();
+        e.preventDefault();
+        submitForm();
+    }
+
+    async function submitForm() {
+        setTurnstileToken('');
+        const token = await turnstileRef.current?.execute();
+        setTurnstileToken(token ?? '');
+        const form = document.querySelector('form[action="/forgot-password"]') as HTMLFormElement | null;
+        form?.submit();
     }
 
     return (
@@ -32,6 +43,7 @@ export default function ForgotPassword() {
 
                 <form action="/forgot-password" method="POST" onSubmit={submit} className="space-y-4">
                     <input type="hidden" name="_token" value={usePage().props.csrf_token as string} />
+                    {turnstileToken && <input type="hidden" name="turnstile" value={turnstileToken} />}
 
                     <div>
                         <label htmlFor="email" className="block text-sm font-medium text-foreground">
@@ -51,6 +63,13 @@ export default function ForgotPassword() {
                         {pageErrors?.email && (
                             <p className="mt-1 text-sm text-destructive">{pageErrors.email}</p>
                         )}
+                    </div>
+
+                    <div className="mt-4">
+                        <Turnstile
+                            siteKey={usePage().props.turnstile_site_key as string}
+                            ref={turnstileRef}
+                        />
                     </div>
 
                     <button
