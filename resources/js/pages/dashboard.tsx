@@ -1,7 +1,7 @@
 import { Head } from '@inertiajs/react';
 import { Briefcase, TrendingUp, CalendarDays } from 'lucide-react';
-import { useState, useCallback, type ReactNode } from 'react';
-import { show as showRoute } from '@/routes/job-applications';
+import { useState, useCallback  } from 'react';
+import type {ReactNode} from 'react';
 import {
     BarChart,
     Bar,
@@ -14,10 +14,9 @@ import {
 } from 'recharts';
 import ActionFeed from '@/components/action-feed';
 import type { ActionItem } from '@/components/action-feed';
-import RecentActivityFeed from '@/components/recent-activity-feed';
-import type { RecentActivityItem } from '@/components/recent-activity-feed';
 import ApplicationDetailModal from '@/components/job-applications/application-detail-modal';
-import type { JobApplication } from '@/types/job-application';
+import type { RecentActivityItem } from '@/components/recent-activity-feed';
+import RecentActivityFeed from '@/components/recent-activity-feed';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
     ChartContainer,
@@ -29,7 +28,9 @@ import {
 import type { ChartConfig } from '@/components/ui/chart';
 import { PageHeader } from '@/components/ui/page-header';
 import AppLayout from '@/layouts/app-layout';
+import { show as showRoute } from '@/routes/job-applications';
 import { JOB_APPLICATION_STATUSES } from '@/types/job-application';
+import type { JobApplication } from '@/types/job-application';
 import type { JobApplicationStatus } from '@/types/job-application';
 
 const STATUS_CHART_COLORS: Record<JobApplicationStatus, string> = {
@@ -73,12 +74,16 @@ export default function Dashboard({
     const handleSelectApplication = useCallback(
         async (applicationId: number) => {
             setIsLoadingApplication(true);
+
             try {
                 const response = await fetch(showRoute.url(applicationId), {
                     headers: { Accept: 'application/json' },
                 });
-                if (!response.ok)
-                    throw new Error('Failed to fetch application');
+
+                if (!response.ok) {
+throw new Error('Failed to fetch application');
+}
+
                 const json = await response.json();
                 setSelectedApplication(json.data as JobApplication);
             } catch {

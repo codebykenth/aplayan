@@ -6,8 +6,8 @@ import ApplicationDetailModal from '@/components/job-applications/application-de
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { StatusBadge } from '@/components/ui/status-badge';
 import { PageHeader } from '@/components/ui/page-header';
+import { StatusBadge } from '@/components/ui/status-badge';
 import AppLayout from '@/layouts/app-layout';
 import type { JobApplication } from '@/types/job-application';
 import type { JobApplicationStatus } from '@/types/job-application';
@@ -163,14 +163,20 @@ export default function Calendar({
     const [selectedDate, setSelectedDate] = useState<string | null>(null);
 
     const weekDays = useMemo(() => {
-        if (view !== 'week') return [];
+        if (view !== 'week') {
+return [];
+}
+
         let dayToUse = 1;
+
         if (selectedDate) {
             const [y, m, d] = selectedDate.split('-');
+
             if (parseInt(y) === currentYear && parseInt(m) === currentMonth) {
                 dayToUse = parseInt(d);
             }
         }
+
         return getWeekDays(currentYear, currentMonth, dayToUse);
     }, [view, currentYear, currentMonth, selectedDate]);
 
@@ -178,7 +184,10 @@ export default function Calendar({
 
 
     const selectedDayEvents = useMemo(() => {
-        if (!selectedDate) return [];
+        if (!selectedDate) {
+return [];
+}
+
         return eventsByDate.get(selectedDate) ?? [];
     }, [selectedDate, eventsByDate]);
 

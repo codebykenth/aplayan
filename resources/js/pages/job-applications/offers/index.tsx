@@ -1,20 +1,22 @@
 import { Head, Link } from '@inertiajs/react';
 import { MapPinIcon, ExternalLinkIcon, TrendingUp, CalendarDays, Briefcase, PhilippinePesoIcon, SettingsIcon } from 'lucide-react';
 import { useState } from 'react';
-import type {ReactNode} from 'react';
-import TaxBreakdownCard from '@/components/job-applications/tax-breakdown-card';
+import type { ReactNode } from 'react';
+import ApplicationDetailModal from '@/components/job-applications/application-detail-modal';
 import CustomizeNetPayModal from '@/components/job-applications/customize-net-pay-modal';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { StatusBadge } from '@/components/ui/status-badge';
-import { PageHeader } from '@/components/ui/page-header';
+import TaxBreakdownCard from '@/components/job-applications/tax-breakdown-card';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { PageHeader } from '@/components/ui/page-header';
+import { StatusBadge } from '@/components/ui/status-badge';
 import AppLayout from '@/layouts/app-layout';
+import type { Contact } from '@/types/contact';
 import type { JobApplication, TaxConfig } from '@/types/job-application';
 
 function formatSalary(amount: number | null): string | null {
     if (amount === null) {
-return null;
-}
+        return null;
+    }
 
     return `₱${amount.toLocaleString('en-PH', {
         minimumFractionDigits: 0,
@@ -24,8 +26,8 @@ return null;
 
 function formatDate(date: string | null): string | null {
     if (!date) {
-return null;
-}
+        return null;
+    }
 
     const d = new Date(date);
 
@@ -36,7 +38,15 @@ return null;
     });
 }
 
-function OfferCard({ offer, userDefaults }: { offer: JobApplication; userDefaults: TaxConfig | null }) {
+function OfferCard({
+    offer,
+    userDefaults,
+    onViewDetails,
+}: {
+    offer: JobApplication;
+    userDefaults: TaxConfig | null;
+    onViewDetails: (offer: JobApplication) => void;
+}) {
     const tb = offer.tax_breakdown;
     const [customizeOpen, setCustomizeOpen] = useState(false);
 
@@ -78,13 +88,13 @@ function OfferCard({ offer, userDefaults }: { offer: JobApplication; userDefault
 
                     <Button
                         type="button"
-                        variant="ghost"
+                        variant="outline"
                         size="sm"
-                        className="w-full justify-start gap-1.5 text-xs text-muted-foreground"
+                        className="w-full justify-center gap-1.5 border-primary/30 bg-primary/5 text-xs font-medium text-primary shadow-2xs hover:bg-primary/10 hover:text-primary dark:border-primary/40 dark:bg-primary/10 dark:text-primary-foreground dark:hover:bg-primary/20"
                         onClick={() => setCustomizeOpen(true)}
                     >
                         <SettingsIcon className="size-3.5" />
-                        Customize Net Pay
+                        Customize Net Pay & Deductions
                     </Button>
 
                     {offer.ai_match_percentage !== null && (
@@ -122,13 +132,16 @@ function OfferCard({ offer, userDefaults }: { offer: JobApplication; userDefault
                                 View Job Posting
                             </a>
                         )}
-                        <Link
-                                    href={`/job-applications`}
-                                    className="inline-flex items-center justify-center gap-1.5 rounded-lg border border-border bg-background px-3 py-1.5 text-xs font-medium text-foreground hover:bg-muted hover:text-foreground"
-                                >
-                                    <Briefcase className="size-3.5" />
-                                    View Details
-                                </Link>
+                        <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            className="w-full justify-center gap-1.5 text-xs font-medium"
+                            onClick={() => onViewDetails(offer)}
+                        >
+                            <Briefcase className="size-3.5" />
+                            View Details
+                        </Button>
                     </div>
                 </CardContent>
             </Card>
@@ -146,11 +159,20 @@ function OfferCard({ offer, userDefaults }: { offer: JobApplication; userDefault
 export default function OfferComparisonIndex({
     offers,
     userDefaults,
+    contacts = [],
 }: {
     offers: { data: JobApplication[] } | JobApplication[];
     userDefaults: TaxConfig | null;
+    contacts?: Contact[];
 }) {
     const offerList = Array.isArray(offers) ? offers : (offers?.data ?? []);
+    const [selectedOffer, setSelectedOffer] = useState<JobApplication | null>(null);
+    const [detailModalOpen, setDetailModalOpen] = useState(false);
+
+    const handleViewDetails = (offer: JobApplication) => {
+        setSelectedOffer(offer);
+        setDetailModalOpen(true);
+    };
 
     return (
         <>
@@ -175,11 +197,26 @@ export default function OfferComparisonIndex({
                 ) : (
                     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                         {offerList.map((offer) => (
-                            <OfferCard key={offer.id} offer={offer} userDefaults={userDefaults} />
+                            <OfferCard
+                                key={offer.id}
+                                offer={offer}
+                                userDefaults={userDefaults}
+                                onViewDetails={handleViewDetails}
+                            />
                         ))}
                     </div>
                 )}
             </div>
+
+            <ApplicationDetailModal
+                open={detailModalOpen}
+                onClose={() => {
+                    setDetailModalOpen(false);
+                    setSelectedOffer(null);
+                }}
+                application={selectedOffer}
+                availableContacts={contacts}
+            />
         </>
     );
 }

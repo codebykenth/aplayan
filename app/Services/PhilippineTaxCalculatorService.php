@@ -230,6 +230,19 @@ class PhilippineTaxCalculatorService
             ],
         };
 
+        if (isset($config['override_sss']) && $config['override_sss'] !== null) {
+            $result['sss'] = (float) $config['override_sss'];
+        }
+        if (isset($config['override_philhealth']) && $config['override_philhealth'] !== null) {
+            $result['philhealth'] = (float) $config['override_philhealth'];
+        }
+        if (isset($config['override_pagibig']) && $config['override_pagibig'] !== null) {
+            $result['pagibig'] = (float) $config['override_pagibig'];
+        }
+        if (isset($config['override_bir_tax']) && $config['override_bir_tax'] !== null) {
+            $result['bir_tax'] = (float) $config['override_bir_tax'];
+        }
+
         $totalStatutoryDeductions = $result['sss'] + $result['philhealth'] + $result['pagibig'] + $result['bir_tax'];
         $netPay = round($monthlySalary + $nonTaxableAllowances - $totalStatutoryDeductions - $totalCustomDeductions, 2);
 

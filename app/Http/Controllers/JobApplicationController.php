@@ -68,7 +68,7 @@ class JobApplicationController extends Controller
             return new JobApplicationResource($updated);
         }
 
-        return to_route('job-applications.index');
+        return back();
     }
 
     public function destroy(JobApplication $jobApplication): RedirectResponse
@@ -94,7 +94,7 @@ class JobApplicationController extends Controller
             return back()->withErrors(['status' => $e->getMessage()]);
         }
 
-        return to_route('job-applications.index');
+        return back();
     }
 
     public function updateInterviewDate(JobApplication $jobApplication): JsonResponse

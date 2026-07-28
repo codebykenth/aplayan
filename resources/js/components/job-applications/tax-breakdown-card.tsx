@@ -28,10 +28,10 @@ export default function TaxBreakdownCard({ taxBreakdown }: { taxBreakdown: TaxBr
                 className="flex items-center justify-between text-xs text-muted-foreground hover:text-foreground"
             >
                 <span className="flex items-center gap-1 font-medium">
-                    <PhilippinePesoIcon className="size-3.5" />
-                    Net Take-Home Pay Breakdown
+                    <PhilippinePesoIcon className="size-3.5 text-emerald-600 dark:text-emerald-400" />
+                    Net Take-Home Pay
                 </span>
-                <span className="text-sm tabular-nums font-bold text-foreground">
+                <span className="text-sm tabular-nums font-bold text-emerald-600 dark:text-emerald-400">
                     {formatSalary(tb.monthly_net)} / mo
                 </span>
             </button>

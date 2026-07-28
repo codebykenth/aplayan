@@ -9,6 +9,7 @@ type ColorTheme = 'zinc' | 'emerald' | 'ocean' | 'indigo' | 'sunset';
 function getStoredMode(): Mode | null {
     try {
         const stored = localStorage.getItem(THEME_STORAGE_KEY);
+
         return stored ? (stored as Mode) : null;
     } catch {
         return null;
@@ -26,6 +27,7 @@ function setStoredMode(mode: Mode): void {
 function getStoredColorTheme(): ColorTheme | null {
     try {
         const stored = localStorage.getItem(COLOR_THEME_STORAGE_KEY);
+
         return stored ? (stored as ColorTheme) : null;
     } catch {
         return null;

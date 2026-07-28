@@ -1,8 +1,8 @@
 import { useForm } from '@inertiajs/react';
 import { UploadIcon, FileTextIcon, FileJsonIcon, DownloadIcon, XIcon } from 'lucide-react';
 import { useState, useRef, useCallback } from 'react';
-import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import {
     Dialog,
     DialogContent,
@@ -40,6 +40,7 @@ function generateSampleCsv(): string {
         ['Globex', 'Product Manager', 'interviewing', 'Metro Manila', '80000', '2024-02-20', '', '', ''],
     ];
     const csvRows = rows.map(row => row.map(field => `"${field}"`).join(',')).join('\n');
+
     return `${headers.join(',')}\n${csvRows}`;
 }
 
@@ -65,6 +66,7 @@ function generateSampleJson(): string {
             date_applied: '2024-02-20',
         },
     ];
+
     return JSON.stringify(data, null, 2);
 }
 
@@ -121,8 +123,10 @@ export default function ImportModal({
         setIsDragActive(false);
 
         const files = e.dataTransfer.files;
+
         if (files && files.length > 0) {
             const file = files[0];
+
             if (isValidFileType(file)) {
                 setSelectedFile(file);
             }
@@ -131,6 +135,7 @@ export default function ImportModal({
 
     function handleFileSelect(e: React.ChangeEvent<HTMLInputElement>) {
         const file = e.target.files?.[0];
+
         if (file) {
             setSelectedFile(file);
         }
@@ -140,11 +145,14 @@ export default function ImportModal({
         const validTypes = ['text/csv', 'text/plain', 'application/json', 'text/json'];
         const validExtensions = ['.csv', '.txt', '.json'];
         const extension = '.' + file.name.split('.').pop()?.toLowerCase();
+
         return validTypes.includes(file.type) || validExtensions.includes(extension);
     }
 
     function handleSubmit() {
-        if (!selectedFile) return;
+        if (!selectedFile) {
+return;
+}
 
         importForm.setData('file', selectedFile);
         importForm.post(importMethod.url(), {

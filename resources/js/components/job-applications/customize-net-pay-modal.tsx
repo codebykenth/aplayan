@@ -1,9 +1,7 @@
 import { useForm } from '@inertiajs/react';
-import { PlusIcon, TrashIcon, RotateCcwIcon } from 'lucide-react';
+import { PlusIcon, TrashIcon, RotateCcwIcon, ChevronDownIcon, ChevronUpIcon, AlertCircleIcon } from 'lucide-react';
+import { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import {
     Dialog,
     DialogContent,
@@ -12,6 +10,9 @@ import {
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import type { JobApplication, TaxConfig, TaxAllowance, TaxCustomDeduction } from '@/types/job-application';
 import { TAX_REGIMES } from '@/types/job-application';
 
@@ -34,6 +35,10 @@ const DEFAULT_CONFIG: TaxConfig = {
     allowances: [],
     custom_deductions: [],
     manual_net_override: null,
+    override_sss: null,
+    override_philhealth: null,
+    override_pagibig: null,
+    override_bir_tax: null,
 };
 
 export default function CustomizeNetPayModal({ offer, userDefaults, open, onOpenChange }: CustomizeNetPayModalProps) {
@@ -43,23 +48,66 @@ export default function CustomizeNetPayModal({ offer, userDefaults, open, onOpen
             ? { ...DEFAULT_CONFIG, ...userDefaults }
             : DEFAULT_CONFIG;
 
-    const { data, setData, patch, processing } = useForm({
+    const { data, setData, patch, processing, errors } = useForm({
         tax_config: initialConfig,
     });
     const config = data.tax_config;
+    const [showOverrides, setShowOverrides] = useState(
+        Boolean(config.override_sss || config.override_philhealth || config.override_pagibig || config.override_bir_tax)
+    );
+    const [clientError, setClientError] = useState<string | null>(null);
 
     function updateConfig(updater: (prev: TaxConfig) => TaxConfig) {
+        setClientError(null);
         setData('tax_config', updater(config));
     }
 
     function handleSave() {
+        setClientError(null);
+
+        // Validate allowances
+        for (const [i, a] of config.allowances.entries()) {
+            if (!a.name || a.name.trim() === '') {
+                setClientError(`Allowance #${i + 1} requires a valid description.`);
+
+                return;
+            }
+
+            if (!a.amount || Number.isNaN(a.amount) || a.amount <= 0) {
+                setClientError(`Allowance "${a.name}" requires a valid amount greater than 0.`);
+
+                return;
+            }
+        }
+
+        // Validate custom deductions
+        for (const [i, d] of config.custom_deductions.entries()) {
+            if (!d.name || d.name.trim() === '') {
+                setClientError(`Custom deduction #${i + 1} requires a valid description.`);
+
+                return;
+            }
+
+            if (!d.amount || Number.isNaN(d.amount) || d.amount <= 0) {
+                setClientError(`Custom deduction "${d.name}" requires a valid amount greater than 0.`);
+
+                return;
+            }
+        }
+
         patch(`/job-applications/${offer.id}`, {
             preserveScroll: true,
             onSuccess: () => onOpenChange(false),
+            onError: (errs) => {
+                if (errs['tax_config']) {
+                    setClientError(errs['tax_config']);
+                }
+            },
         });
     }
 
     function handleReset() {
+        setClientError(null);
         setData('tax_config', userDefaults ? { ...DEFAULT_CONFIG, ...userDefaults } : DEFAULT_CONFIG);
     }
 
@@ -107,13 +155,20 @@ export default function CustomizeNetPayModal({ offer, userDefaults, open, onOpen
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="sm:max-w-md">
+            <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-md">
                 <DialogHeader>
                     <DialogTitle>Customize Net Pay</DialogTitle>
                     <DialogDescription>
                         Configure tax settings for this offer. Overrides global defaults.
                     </DialogDescription>
                 </DialogHeader>
+
+                {clientError && (
+                    <div className="flex items-center gap-2 rounded-md bg-destructive/10 p-2.5 text-xs text-destructive">
+                        <AlertCircleIcon className="size-4 shrink-0" />
+                        <span>{clientError}</span>
+                    </div>
+                )}
 
                 <div className="flex flex-col gap-4">
                     <div className="flex flex-col gap-1.5">
@@ -125,9 +180,11 @@ export default function CustomizeNetPayModal({ offer, userDefaults, open, onOpen
                             }
                         >
                             <SelectTrigger className="w-full">
-                                <SelectValue />
+                                <SelectValue>
+                                    {TAX_REGIMES.find((r) => r.value === config.regime)?.label ?? 'Select Tax Regime'}
+                                </SelectValue>
                             </SelectTrigger>
-                            <SelectContent>
+                            <SelectContent alignItemWithTrigger={false} side="bottom" sideOffset={4}>
                                 {TAX_REGIMES.map((regime) => (
                                     <SelectItem key={regime.value} value={regime.value}>
                                         <div className="flex flex-col">
@@ -157,18 +214,21 @@ export default function CustomizeNetPayModal({ offer, userDefaults, open, onOpen
                             .map((a) => (
                                 <div key={a.originalIndex} className="flex items-center gap-2">
                                     <Input
-                                        placeholder="Name"
+                                        placeholder="Description (e.g. Rice)"
                                         value={a.name}
                                         onChange={(e) => updateAllowance(a.originalIndex, 'name', e.target.value)}
                                         className="flex-1"
                                     />
                                     <Input
                                         type="number"
+                                        min="0"
+                                        step="any"
                                         placeholder="Amount"
                                         value={a.amount || ''}
-                                        onChange={(e) =>
-                                            updateAllowance(a.originalIndex, 'amount', parseFloat(e.target.value) || 0)
-                                        }
+                                        onChange={(e) => {
+                                            const val = e.target.value === '' ? 0 : parseFloat(e.target.value);
+                                            updateAllowance(a.originalIndex, 'amount', Number.isNaN(val) ? 0 : val);
+                                        }}
                                         className="w-28"
                                     />
                                     <Button
@@ -200,18 +260,21 @@ export default function CustomizeNetPayModal({ offer, userDefaults, open, onOpen
                             .map((a) => (
                                 <div key={a.originalIndex} className="flex items-center gap-2">
                                     <Input
-                                        placeholder="Name"
+                                        placeholder="Description (e.g. Bonus)"
                                         value={a.name}
                                         onChange={(e) => updateAllowance(a.originalIndex, 'name', e.target.value)}
                                         className="flex-1"
                                     />
                                     <Input
                                         type="number"
+                                        min="0"
+                                        step="any"
                                         placeholder="Amount"
                                         value={a.amount || ''}
-                                        onChange={(e) =>
-                                            updateAllowance(a.originalIndex, 'amount', parseFloat(e.target.value) || 0)
-                                        }
+                                        onChange={(e) => {
+                                            const val = e.target.value === '' ? 0 : parseFloat(e.target.value);
+                                            updateAllowance(a.originalIndex, 'amount', Number.isNaN(val) ? 0 : val);
+                                        }}
                                         className="w-28"
                                     />
                                     <Button
@@ -240,18 +303,21 @@ export default function CustomizeNetPayModal({ offer, userDefaults, open, onOpen
                         {config.custom_deductions.map((d, i) => (
                             <div key={i} className="flex items-center gap-2">
                                 <Input
-                                    placeholder="Name"
+                                    placeholder="Description (e.g. HMO Dependent)"
                                     value={d.name}
                                     onChange={(e) => updateCustomDeduction(i, 'name', e.target.value)}
                                     className="flex-1"
                                 />
                                 <Input
                                     type="number"
+                                    min="0"
+                                    step="any"
                                     placeholder="Amount"
                                     value={d.amount || ''}
-                                    onChange={(e) =>
-                                        updateCustomDeduction(i, 'amount', parseFloat(e.target.value) || 0)
-                                    }
+                                    onChange={(e) => {
+                                        const val = e.target.value === '' ? 0 : parseFloat(e.target.value);
+                                        updateCustomDeduction(i, 'amount', Number.isNaN(val) ? 0 : val);
+                                    }}
                                     className="w-28"
                                 />
                                 <Button type="button" variant="ghost" size="icon-sm" onClick={() => removeCustomDeduction(i)}>
@@ -259,6 +325,90 @@ export default function CustomizeNetPayModal({ offer, userDefaults, open, onOpen
                                 </Button>
                             </div>
                         ))}
+                    </div>
+
+                    <div className="rounded-lg border border-border bg-muted/20 p-3">
+                        <button
+                            type="button"
+                            onClick={() => setShowOverrides(!showOverrides)}
+                            className="flex w-full items-center justify-between text-xs font-medium text-muted-foreground hover:text-foreground"
+                        >
+                            <span>Statutory Deduction Overrides (Optional)</span>
+                            {showOverrides ? <ChevronUpIcon className="size-3.5" /> : <ChevronDownIcon className="size-3.5" />}
+                        </button>
+                        {showOverrides && (
+                            <div className="mt-3 flex flex-col gap-3">
+                                <p className="text-xs text-muted-foreground">
+                                    Override statutory calculations with manual amounts. Leave empty to use auto-calculation.
+                                </p>
+                                <div className="grid grid-cols-2 gap-2">
+                                    <div className="flex flex-col gap-1">
+                                        <Label className="text-xs text-muted-foreground">SSS Override (₱)</Label>
+                                        <Input
+                                            type="number"
+                                            min="0"
+                                            step="any"
+                                            placeholder="Auto"
+                                            value={config.override_sss ?? ''}
+                                            onChange={(e) =>
+                                                updateConfig((prev) => ({
+                                                    ...prev,
+                                                    override_sss: e.target.value === '' ? null : parseFloat(e.target.value),
+                                                }))
+                                            }
+                                        />
+                                    </div>
+                                    <div className="flex flex-col gap-1">
+                                        <Label className="text-xs text-muted-foreground">PhilHealth Override (₱)</Label>
+                                        <Input
+                                            type="number"
+                                            min="0"
+                                            step="any"
+                                            placeholder="Auto"
+                                            value={config.override_philhealth ?? ''}
+                                            onChange={(e) =>
+                                                updateConfig((prev) => ({
+                                                    ...prev,
+                                                    override_philhealth: e.target.value === '' ? null : parseFloat(e.target.value),
+                                                }))
+                                            }
+                                        />
+                                    </div>
+                                    <div className="flex flex-col gap-1">
+                                        <Label className="text-xs text-muted-foreground">Pag-IBIG Override (₱)</Label>
+                                        <Input
+                                            type="number"
+                                            min="0"
+                                            step="any"
+                                            placeholder="Auto"
+                                            value={config.override_pagibig ?? ''}
+                                            onChange={(e) =>
+                                                updateConfig((prev) => ({
+                                                    ...prev,
+                                                    override_pagibig: e.target.value === '' ? null : parseFloat(e.target.value),
+                                                }))
+                                            }
+                                        />
+                                    </div>
+                                    <div className="flex flex-col gap-1">
+                                        <Label className="text-xs text-muted-foreground">BIR Tax Override (₱)</Label>
+                                        <Input
+                                            type="number"
+                                            min="0"
+                                            step="any"
+                                            placeholder="Auto"
+                                            value={config.override_bir_tax ?? ''}
+                                            onChange={(e) =>
+                                                updateConfig((prev) => ({
+                                                    ...prev,
+                                                    override_bir_tax: e.target.value === '' ? null : parseFloat(e.target.value),
+                                                }))
+                                            }
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                        )}
                     </div>
 
                     <div className="flex flex-col gap-1.5">
@@ -269,12 +419,14 @@ export default function CustomizeNetPayModal({ offer, userDefaults, open, onOpen
                             </span>
                             <Input
                                 type="number"
+                                min="0"
+                                step="any"
                                 placeholder="Leave empty for auto-calculation"
                                 value={config.manual_net_override ?? ''}
                                 onChange={(e) =>
                                     updateConfig((prev) => ({
                                         ...prev,
-                                        manual_net_override: e.target.value ? parseFloat(e.target.value) : null,
+                                        manual_net_override: e.target.value === '' ? null : parseFloat(e.target.value),
                                     }))
                                 }
                                 className="pl-7"

@@ -1,12 +1,13 @@
 import { Head, router, useForm } from '@inertiajs/react';
 import { Sun, Moon, Monitor, User, KeyRound, Palette, Check, Receipt, PlusIcon, TrashIcon } from 'lucide-react';
-import { useState, type ReactNode } from 'react';
+import { useState  } from 'react';
+import type {ReactNode} from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { PageHeader } from '@/components/ui/page-header';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useTheme, useColorTheme } from '@/hooks/use-theme';
 import AppLayout from '@/layouts/app-layout';
 import { cn } from '@/lib/utils';
@@ -293,6 +294,7 @@ function AppearanceSection() {
                         <legend className="sr-only">Theme mode selection</legend>
                         {THEME_OPTIONS.map(({ value, label, description, icon: Icon }) => {
                             const isSelected = mode === value;
+
                             return (
                                 <label
                                     key={value}
@@ -349,6 +351,7 @@ function AppearanceSection() {
                         <legend className="sr-only">Color theme selection</legend>
                         {COLOR_THEME_OPTIONS.map(({ value, label, colors }) => {
                             const isSelected = colorTheme === value;
+
                             return (
                                 <label
                                     key={value}
@@ -473,21 +476,23 @@ function TaxSettingsSection({ user }: { user: UserData }) {
                             onValueChange={(value) =>
                                 updateSettings((prev) => ({ ...prev, regime: value as TaxSettings['regime'] }))
                             }
-                    >
-                        <SelectTrigger className="w-full">
-                            <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                            {TAX_REGIMES.map((regime) => (
-                                <SelectItem key={regime.value} value={regime.value}>
-                                    <div className="flex flex-col">
-                                        <span>{regime.label}</span>
-                                        <span className="text-xs text-muted-foreground">{regime.description}</span>
-                                    </div>
-                                </SelectItem>
-                            ))}
-                        </SelectContent>
-                    </Select>
+                        >
+                            <SelectTrigger className="w-full">
+                                <SelectValue>
+                                    {TAX_REGIMES.find((r) => r.value === taxSettings.regime)?.label ?? 'Select Tax Regime'}
+                                </SelectValue>
+                            </SelectTrigger>
+                            <SelectContent alignItemWithTrigger={false} side="bottom" sideOffset={4}>
+                                {TAX_REGIMES.map((regime) => (
+                                    <SelectItem key={regime.value} value={regime.value}>
+                                        <div className="flex flex-col">
+                                            <span>{regime.label}</span>
+                                            <span className="text-xs text-muted-foreground">{regime.description}</span>
+                                        </div>
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
                 </div>
 
                 <div className="flex flex-col gap-2">
@@ -687,7 +692,7 @@ export default function SettingsIndex({ user }: SettingsPageProps) {
                 </div>
 
                 {/* Main Settings Content Panels */}
-                <div className="max-w-2xl">
+                <div className="w-full flex-1">
                     {activeTab === 'appearance' && <AppearanceSection />}
                     {activeTab === 'profile' && <ProfileSection user={user} />}
                     {activeTab === 'password' && <PasswordSection />}

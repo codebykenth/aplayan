@@ -1,6 +1,7 @@
 import { Head, Link, usePage } from '@inertiajs/react';
 import { BarChart3, Briefcase, CalendarIcon, ChevronLeft, ChevronRight, LayoutDashboard, LogOut, Menu, Settings, BookmarkIcon, GitCompareArrowsIcon, Target, FileText, Archive, Users } from 'lucide-react';
 import { useState, useEffect } from 'react';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import type { Auth } from '@/types/auth';
 
 const sidebarLinks = [
@@ -74,27 +75,49 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                 <div className="flex h-16 shrink-0 items-center border-b border-border px-4">
                     {sidebarOpen && (
                         <>
-<Link href="/dashboard" className="text-lg font-semibold text-foreground">
+                            <Link href="/dashboard" className="text-lg font-semibold text-foreground">
                                 Aplayan
                             </Link>
                             <div className="flex-1" />
-                            <button
-                                onClick={() => setSidebarOpen(false)}
-                                className="hidden rounded-sm p-1 text-muted-foreground hover:bg-muted md:block"
-                                aria-label="Collapse sidebar"
-                            >
-                                <ChevronLeft className="h-4 w-4" />
-                            </button>
+                            <TooltipProvider delay={100}>
+                                <Tooltip>
+                                    <TooltipTrigger
+                                        render={
+                                            <button
+                                                onClick={() => setSidebarOpen(false)}
+                                                className="hidden rounded-sm p-1 text-muted-foreground hover:bg-muted md:block"
+                                                aria-label="Collapse sidebar"
+                                            >
+                                                <ChevronLeft className="h-4 w-4" />
+                                            </button>
+                                        }
+                                    />
+                                    <TooltipContent side="right" sideOffset={8}>
+                                        Collapse sidebar
+                                    </TooltipContent>
+                                </Tooltip>
+                            </TooltipProvider>
                         </>
                     )}
                     {!sidebarOpen && (
-                        <button
-                            onClick={() => setSidebarOpen(true)}
-                            className="mx-auto rounded-sm p-1 text-muted-foreground hover:bg-muted"
-                            aria-label="Expand sidebar"
-                        >
-                            <ChevronRight className="h-4 w-4" />
-                        </button>
+                        <TooltipProvider delay={100}>
+                            <Tooltip>
+                                <TooltipTrigger
+                                    render={
+                                        <button
+                                            onClick={() => setSidebarOpen(true)}
+                                            className="mx-auto rounded-sm p-1 text-muted-foreground hover:bg-muted"
+                                            aria-label="Expand sidebar"
+                                        >
+                                            <ChevronRight className="h-4 w-4" />
+                                        </button>
+                                    }
+                                />
+                                <TooltipContent side="right" sideOffset={12}>
+                                    Expand sidebar
+                                </TooltipContent>
+                            </Tooltip>
+                        </TooltipProvider>
                     )}
                 </div>
 
@@ -107,6 +130,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                                     return link.href;
                                 }
                             }
+
                             return active;
                         }, '');
 
@@ -114,6 +138,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                             <>
                                 {sidebarLinks.map(({ href, label, icon: Icon }) => {
                                     const isActive = activeLink === href;
+
                                     return (
                                         <Link
                                             key={href}
@@ -131,25 +156,33 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                                 })}
                             </>
                         ) : (
-                            <>
+                            <TooltipProvider delay={100}>
                                 {sidebarLinks.map(({ href, label, icon: Icon }) => {
                                     const isActive = activeLink === href;
+
                                     return (
-                                        <Link
-                                            key={href}
-                                            href={href}
-                                            className={`flex items-center justify-center rounded-sm px-2 py-2 transition-colors ${
-                                                isActive
-                                                    ? 'bg-primary/10 text-primary'
-                                                    : 'text-muted-foreground hover:bg-muted hover:text-foreground'
-                                            }`}
-                                            title={label}
-                                        >
-                                            <Icon className="h-5 w-5 shrink-0" />
-                                        </Link>
+                                        <Tooltip key={href}>
+                                            <TooltipTrigger
+                                                render={
+                                                    <Link
+                                                        href={href}
+                                                        className={`flex items-center justify-center rounded-sm px-2 py-2 transition-colors ${
+                                                            isActive
+                                                                ? 'bg-primary/10 text-primary'
+                                                                : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+                                                        }`}
+                                                    >
+                                                        <Icon className="h-5 w-5 shrink-0" />
+                                                    </Link>
+                                                }
+                                            />
+                                            <TooltipContent side="right" sideOffset={12}>
+                                                {label}
+                                            </TooltipContent>
+                                        </Tooltip>
                                     );
                                 })}
-                            </>
+                            </TooltipProvider>
                         );
                     })()}
                 </nav>
@@ -183,7 +216,20 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                 {/* User avatar only when collapsed */}
                 {!sidebarOpen && (
                     <div className="shrink-0 border-t border-border p-2">
-                        <UserAvatar user={auth.user} compact />
+                        <TooltipProvider delay={100}>
+                            <Tooltip>
+                                <TooltipTrigger
+                                    render={
+                                        <div className="cursor-pointer">
+                                            <UserAvatar user={auth.user} compact />
+                                        </div>
+                                    }
+                                />
+                                <TooltipContent side="right" sideOffset={12}>
+                                    {auth.user?.name ?? 'User Account'}
+                                </TooltipContent>
+                            </Tooltip>
+                        </TooltipProvider>
                     </div>
                 )}
             </aside>

@@ -1,13 +1,12 @@
-import { Head, Link, useForm, router } from '@inertiajs/react';
-import { User, Briefcase, GraduationCap, Wrench, Award, FolderGit2, FileText, Download, Mail, Camera, Save, Sparkles, Eye, Edit3, FilePenLine, Wand2, Loader2, AlertCircle, BookText, ArrowUp, ArrowDown, GripVertical, BookmarkIcon, Trash2 } from 'lucide-react';
+import type {
+    DragEndEvent} from '@dnd-kit/core';
 import {
     DndContext,
     closestCenter,
     KeyboardSensor,
     PointerSensor,
     useSensor,
-    useSensors,
-    DragEndEvent,
+    useSensors
 } from '@dnd-kit/core';
 import {
     arrayMove,
@@ -17,6 +16,8 @@ import {
     useSortable,
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
+import { Head, Link, useForm, router } from '@inertiajs/react';
+import { User, Briefcase, GraduationCap, Wrench, Award, FolderGit2, FileText, Download, Mail, Camera, Save, Sparkles, Eye, Edit3, FilePenLine, Wand2, Loader2, AlertCircle, BookText, ArrowUp, ArrowDown, GripVertical, BookmarkIcon, Trash2 } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
@@ -25,8 +26,8 @@ import { ConfirmDestructiveDialog } from '@/components/ui/confirm-destructive-di
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogClose } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from '@/components/ui/select';
+import { Textarea } from '@/components/ui/textarea';
 import AppLayout from '@/layouts/app-layout';
 
 type WorkExperience = {
@@ -3317,7 +3318,11 @@ return;
                                             >
                                                 {(data.section_order || ['personal', 'work', 'education', 'skills', 'projects', 'certifications']).map((id, index) => {
                                                     const tab = TABS.find(t => t.id === id);
-                                                    if (!tab) return null;
+
+                                                    if (!tab) {
+return null;
+}
+
                                                     return (
                                                         <SortableTab
                                                             key={id}
@@ -3476,12 +3481,12 @@ return;
                             <div className="flex shrink-0 items-center justify-between">
                                 <Label>Template</Label>
                                 <Select value={template} onValueChange={(value: string | null) => value && setTemplate(value)}>
-                                    <SelectTrigger className="w-[180px]">
+                                    <SelectTrigger className="w-auto min-w-[260px]">
                                         <SelectValue placeholder="Select template">
                                             {TEMPLATES.find(t => t.id === template)?.name || "Select template"}
                                         </SelectValue>
                                     </SelectTrigger>
-                                    <SelectContent>
+                                    <SelectContent align="end">
                                         {TEMPLATES.map((t) => (
                                             <SelectItem key={t.id} value={t.id}>
                                                 {t.name}
@@ -3499,12 +3504,12 @@ return;
                             <div className="flex shrink-0 items-center justify-between">
                                 <Label>Cover Letter Style</Label>
                                 <Select value={clTemplate} onValueChange={(value: string | null) => value && setCLTemplate(value)}>
-                                    <SelectTrigger className="w-[200px]">
+                                    <SelectTrigger className="w-auto min-w-[260px]">
                                         <SelectValue placeholder="Select style">
                                             {COVER_LETTER_TEMPLATES.find(t => t.id === clTemplate)?.name || "Select style"}
                                         </SelectValue>
                                     </SelectTrigger>
-                                    <SelectContent>
+                                    <SelectContent align="end">
                                         {COVER_LETTER_TEMPLATES.map((t) => (
                                             <SelectItem key={t.id} value={t.id}>
                                                 {t.name}

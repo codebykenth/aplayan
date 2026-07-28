@@ -3,6 +3,7 @@ import { FileText, PlusIcon, Trash2Icon, PencilIcon, SaveIcon, XIcon, BookmarkIc
 import { useState } from 'react';
 import type { ReactNode } from 'react';
 import { Button } from '@/components/ui/button';
+import { ConfirmDestructiveDialog } from '@/components/ui/confirm-destructive-dialog';
 import {
     Dialog,
     DialogContent,
@@ -11,11 +12,10 @@ import {
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog';
-import { ConfirmDestructiveDialog } from '@/components/ui/confirm-destructive-dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
 import { PageHeader } from '@/components/ui/page-header';
+import { Textarea } from '@/components/ui/textarea';
 import AppLayout from '@/layouts/app-layout';
 import { store as saveTemplate, update as updateTemplate, destroy as deleteTemplate } from '@/routes/templates';
 import type { ApplicationTemplate } from '@/types/application-template';

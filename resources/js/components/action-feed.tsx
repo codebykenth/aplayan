@@ -114,7 +114,10 @@ export default function ActionFeed({ items }: { items: ActionItem[] }) {
 
     const updateScrollState = useCallback(() => {
         const el = scrollContainerRef.current;
-        if (!el) return;
+
+        if (!el) {
+return;
+}
 
         const left = el.scrollLeft;
         const maxScroll = el.scrollWidth - el.clientWidth;
@@ -126,6 +129,7 @@ export default function ActionFeed({ items }: { items: ActionItem[] }) {
     useEffect(() => {
         updateScrollState();
         window.addEventListener('resize', updateScrollState);
+
         return () => window.removeEventListener('resize', updateScrollState);
     }, [items, updateScrollState]);
 
@@ -137,13 +141,21 @@ export default function ActionFeed({ items }: { items: ActionItem[] }) {
 
     function scrollLeft() {
         const el = scrollContainerRef.current;
-        if (!el) return;
+
+        if (!el) {
+return;
+}
+
         el.scrollBy({ left: -el.clientWidth, behavior: 'smooth' });
     }
 
     function scrollRight() {
         const el = scrollContainerRef.current;
-        if (!el) return;
+
+        if (!el) {
+return;
+}
+
         el.scrollBy({ left: el.clientWidth, behavior: 'smooth' });
     }
 

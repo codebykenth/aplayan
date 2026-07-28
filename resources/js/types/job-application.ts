@@ -43,6 +43,10 @@ export interface TaxConfig {
     allowances: TaxAllowance[];
     custom_deductions: TaxCustomDeduction[];
     manual_net_override: number | null;
+    override_sss?: number | null;
+    override_philhealth?: number | null;
+    override_pagibig?: number | null;
+    override_bir_tax?: number | null;
 }
 
 export interface TaxSettings {

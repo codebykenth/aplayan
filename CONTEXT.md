@@ -74,10 +74,16 @@ A recruiter, hiring manager, or interviewer contact record (`name`, `email`, `ph
 A read-only calendar view displaying interview dates, follow-up deadlines, and application milestones pulled dynamically from `JobApplication` data without extra storage.
 
 ### Dynamic Document Builder
-A structured Resume & Cover Letter generator storing user experience, education, skills, and personal data as structured JSON/DB records. Renders ATS-friendly React templates with instant PDF generation without storing static PDF/Word files in cloud storage.
+A structured Resume & Cover Letter generator storing user experience, education, skills, certifications, projects, and additional information as structured JSON/DB records. Renders ATS-friendly React templates—including `ats_single_column` (ATS Standard Bulleted) and `ats_classic_serif` (ATS Executive Serif)—with free-form date ranges (`2025-PRESENT`), categorized skills (`Category: Skill 1, Skill 2`), Markdown bullet highlighting (`**bold text**`), and instant PDF generation without cloud storage overhead.
 
 ### Target Role
 An optional headline displayed prominently in the resume header indicating the specific position the resume is tailored for (e.g. "Senior Software Developer"). Allows a single resume profile to be customized per job application without duplicating data.
+
+### Additional Information
+A bulleted section storing key-value pairs or text items (e.g., `Languages: English, Filipino.`, `Certificates of Completion: ...`) displayed cleanly at the bottom of ATS resume templates.
+
+### Tax Configuration & Net Pay Engine
+A flexible, zero-cost salary evaluation engine for job offers. Supports multiple tax regimes (PH Regular Employee, PH Freelancer 8% Flat Tax, Tax-Exempt / Overseas, and Custom Net Override), itemized taxable and non-taxable allowances, itemized custom deductions (HMO dependent, insurance, loans), and global user-level tax defaults with per-offer overrides.
 
 ---
 
@@ -100,3 +106,6 @@ An optional headline displayed prominently in the resume header indicating the s
 - **2026-07-27 - Dashboard Recent Activity Sidebar Architecture**: Structured a responsive multi-column layout for the Dashboard featuring a right sidebar Recent Activity feed. Eager loads `jobApplication` relations to prevent N+1 queries and enables instant modal inspection upon clicking activity items.
 - **2026-07-27 - Zero-Cost Serverless AI Caching and Entity Normalization Architecture**: Established a global entity-normalized cache system (`ai_responses_cache`) with SHA-256 canonical keys, daily user rate-limiting allowance, 100% serverless synchronous execution, and fallback to local PHP `AiFallbackService` rules during Gemini outages. (See `docs/adr/0006-zero-cost-serverless-ai-caching-architecture.md`).
 - **2026-07-27 - Target Role Resume Header**: Added optional `target_role` field to Resume Profile, displayed as a headline under the name in all 6 resume templates. Enables per-application tailoring of a single resume profile without data duplication. Field is nullable — when empty, templates render normally without the role line.
+- **2026-07-28 - Automated & Customizable Offer Net Take-Home Pay Engine**: Implemented hybrid zero-cost tax engine architecture. Supports PH statutory employee tax auto-calc, 8% freelancer flat tax, tax-exempt/overseas, itemized allowances/deductions, manual statutory overrides (SSS, PhilHealth, Pag-IBIG, BIR tax), strict input validation error handling, global user tax defaults (`users.tax_settings`), per-offer JSON overrides (`job_applications.tax_config`), interactive "Customize Net Pay" card modal, and 1-click default resets. (See `docs/adr/0009-offer-net-take-home-pay-and-tax-calculator.md`).
+- **2026-07-28 - Tabbed Job Application Detail & Edit Modal Refactoring**: Designed 3-tab modal layout (`Details & Edit`, `AI Copilot`, `Contacts & Activity`). Introduces full inline editing for core application fields and Net Take-Home tax configurations (tax regime, allowances, deductions, manual net overrides), auto-expanding when status is `offer` or `offered_salary` is present, pristine form dirtiness tracking (`isDirty`), header-placed "Save as Template" action, and persistent footer "Delete Application" action using standard `AlertDialog` confirmation.
+- **2026-07-28 - ATS Single-Column Bulleted & Executive Serif Resume Templates Architecture**: Introduced `ats_single_column` (Modern Sans-Serif ATS Bulleted) and `ats_classic_serif` (Executive Serif ATS) templates matching Philippine tech & corporate standards. Supports free-form text date ranges (`2025-PRESENT`), categorized skills (`Category: Skill 1, Skill 2`), project dates, Markdown bold bullet highlighting (`**key terms**`), and a dedicated `additional_info` schema section for languages, certificates, and extra highlights.
