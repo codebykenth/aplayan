@@ -29,10 +29,12 @@ class UpdateResumeProfileRequest extends FormRequest
             'work_experience.*.position' => ['required_with:work_experience', 'string', 'max:255'],
             'work_experience.*.duration' => ['required_with:work_experience', 'string', 'max:100'],
             'work_experience.*.description' => ['nullable', 'string', 'max:2000'],
+            'work_experience.*.location' => ['nullable', 'string', 'max:255'],
             'education' => ['sometimes', 'array'],
             'education.*.institution' => ['required_with:education', 'string', 'max:255'],
             'education.*.degree' => ['required_with:education', 'string', 'max:255'],
             'education.*.year' => ['required_with:education', 'string', 'max:20'],
+            'education.*.location' => ['nullable', 'string', 'max:255'],
             'skills' => ['sometimes', 'array'],
             'skills.*' => ['string', 'max:100'],
             'certifications' => ['sometimes', 'array'],
@@ -43,6 +45,10 @@ class UpdateResumeProfileRequest extends FormRequest
             'projects.*.url' => ['nullable', 'string', 'max:500'],
             'projects.*.github_url' => ['nullable', 'string', 'max:500'],
             'projects.*.technologies' => ['nullable', 'string', 'max:500'],
+            'projects.*.duration' => ['nullable', 'string', 'max:100'],
+            'additional_info' => ['sometimes', 'array'],
+            'additional_info.*.label' => ['required_with:additional_info', 'string', 'max:255'],
+            'additional_info.*.value' => ['required_with:additional_info', 'string', 'max:1000'],
         ];
     }
 }

@@ -28,6 +28,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import AppLayout from '@/layouts/app-layout';
 
 type WorkExperience = {
@@ -35,12 +36,14 @@ type WorkExperience = {
     position: string;
     duration: string;
     description: string;
+    location?: string;
 };
 
 type Education = {
     institution: string;
     degree: string;
     year: string;
+    location?: string;
 };
 
 type Project = {
@@ -49,6 +52,7 @@ type Project = {
     url: string;
     github_url?: string;
     technologies: string;
+    duration?: string;
 };
 
 type ResumeProfile = {
@@ -68,7 +72,13 @@ type ResumeProfile = {
     skills: string[];
     certifications: string[];
     projects: Project[];
+    additional_info?: AdditionalInfo[];
     section_order?: string[];
+};
+
+type AdditionalInfo = {
+    label: string;
+    value: string;
 };
 
 type AiLimit = {
@@ -111,6 +121,8 @@ const TEMPLATES = [
     { id: 'ats_classic', name: 'ATS Classic (One-Line Contact)' },
     { id: 'ats_executive', name: 'ATS Executive (High Density)' },
     { id: 'ats_bullet', name: 'ATS Bulleted (High Scannability)' },
+    { id: 'ats_single_column', name: 'ATS Standard Bulleted (High Scannability)' },
+    { id: 'ats_classic_serif', name: 'ATS Executive Serif (Classic Corporate)' },
     { id: 'modern', name: 'Modern Professional' },
     { id: 'philippine', name: 'Philippine Standard (CV)' },
 ] as const;
@@ -211,6 +223,7 @@ const TABS = [
     { id: 'skills', label: 'Skills', icon: Wrench },
     { id: 'projects', label: 'Projects', icon: FolderGit2 },
     { id: 'certifications', label: 'Certifications', icon: Award },
+    { id: 'additional_info', label: 'Additional Info', icon: BookText },
 ] as const;
 
 const VIEWS = [
@@ -281,6 +294,36 @@ function getPrintStyles(template: string): string {
             .bullet-list { margin-top: 4px; padding-left: 20px; list-style-type: disc; }
             .bullet-list li { font-size: 13px; margin-bottom: 3px; line-height: 1.45; }
             .photo { width: 96px; height: 96px; border-radius: 8px; object-fit: cover; float: right; margin-left: 16px; }
+        `;
+    }
+
+    if (template === 'ats_single_column') {
+        return base + `
+            body { font-family: 'Instrument Sans', Inter, Arial, sans-serif; }
+            .section-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: #374151; margin-bottom: 6px; border-bottom: 1px solid #d1d5db; padding-bottom: 3px; }
+            .item-header { display: flex; justify-content: space-between; align-items: baseline; }
+            .item-title { font-size: 13px; font-weight: 600; }
+            .item-date { font-size: 11px; color: #6b7280; white-space: nowrap; }
+            .item-subtitle { font-size: 12px; color: #6b7280; }
+            .item-desc { font-size: 12px; margin-top: 4px; line-height: 1.45; }
+            .bullet-list { padding-left: 18px; list-style-type: disc; }
+            .bullet-list li { font-size: 12px; margin-bottom: 3px; line-height: 1.45; }
+            .photo { width: 80px; height: 80px; border-radius: 50%; object-fit: cover; margin: 0 auto 8px; display: block; }
+        `;
+    }
+
+    if (template === 'ats_classic_serif') {
+        return base + `
+            body { font-family: 'Times New Roman', Garamond, Georgia, serif; }
+            .section-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px; }
+            .item-header { display: flex; justify-content: space-between; align-items: baseline; }
+            .item-title { font-size: 13px; font-weight: 600; }
+            .item-date { font-size: 11px; color: #6b7280; white-space: nowrap; }
+            .item-subtitle { font-size: 12px; color: #6b7280; }
+            .item-desc { font-size: 12px; margin-top: 4px; line-height: 1.45; }
+            .bullet-list { padding-left: 18px; }
+            .bullet-list li { font-size: 12px; margin-bottom: 3px; line-height: 1.45; }
+            .photo { width: 80px; height: 80px; border-radius: 4px; object-fit: cover; float: right; margin-left: 16px; }
         `;
     }
 
@@ -417,6 +460,18 @@ function getScopedResumeStyles(template: string): string {
             .resume-paper-preview .bullet-list { margin-top: 4px; padding-left: 20px; list-style-type: disc; }
             .resume-paper-preview .bullet-list li { font-size: 13px; margin-bottom: 3px; line-height: 1.45; color: #1b1b18; }
             .resume-paper-preview .photo { width: 96px; height: 96px; border-radius: 8px; object-fit: cover; float: right; margin-left: 16px; }
+        `;
+    }
+
+    if (template === 'ats_single_column') {
+        return base + `
+            .resume-paper-preview { font-family: 'Instrument Sans', Inter, Arial, sans-serif; }
+        `;
+    }
+
+    if (template === 'ats_classic_serif') {
+        return base + `
+            .resume-paper-preview { font-family: 'Times New Roman', Garamond, Georgia, serif; }
         `;
     }
 
@@ -948,6 +1003,14 @@ updateExperience(index, 'duration', '');
                             />
                         </div>
                         <div className="flex flex-col gap-2">
+                            <Label>Location (optional)</Label>
+                            <Input
+                                value={exp.location || ''}
+                                onChange={(e) => updateExperience(index, 'location', e.target.value)}
+                                placeholder="Makati City, Metro Manila"
+                            />
+                        </div>
+                        <div className="flex flex-col gap-2">
                             <div className="flex items-center justify-between">
                                 <Label>Description</Label>
                                 <button
@@ -1080,6 +1143,14 @@ updateEducation(index, 'year', '');
 } 
 }}
                                 placeholder="2020"
+                            />
+                        </div>
+                        <div className="flex flex-col gap-2">
+                            <Label>Location (optional)</Label>
+                            <Input
+                                value={edu.location || ''}
+                                onChange={(e) => updateEducation(index, 'location', e.target.value)}
+                                placeholder="Quezon City"
                             />
                         </div>
                     </div>
@@ -1284,6 +1355,14 @@ updateProject(index, 'title', '');
                             />
                         </div>
                         <div className="flex flex-col gap-2">
+                            <Label>Date / Duration (optional)</Label>
+                            <Input
+                                value={project.duration || ''}
+                                onChange={(e) => updateProject(index, 'duration', e.target.value)}
+                                placeholder="February 2026 - Present"
+                            />
+                        </div>
+                        <div className="flex flex-col gap-2">
                             <div className="flex items-center justify-between">
                                 <Label>Description</Label>
                                 <button
@@ -1369,6 +1448,148 @@ updateProject(index, 'technologies', '');
             </Button>
         </div>
     );
+}
+
+function AdditionalInfoTab({ data, setData }: { data: ResumeProfile; setData: (key: string, value: AdditionalInfo[]) => void }) {
+    const items = data.additional_info ?? [];
+
+    function addItem() {
+        setData('additional_info', [
+            ...items,
+            { label: '', value: '' },
+        ]);
+    }
+
+    function updateItem(index: number, field: keyof AdditionalInfo, value: string) {
+        const updated = [...items];
+        updated[index] = { ...updated[index], [field]: value };
+        setData('additional_info', updated);
+    }
+
+    function removeItem(index: number) {
+        setData('additional_info', items.filter((_, i) => i !== index));
+    }
+
+    function moveItem(index: number, direction: 'up' | 'down') {
+        const target = direction === 'up' ? index - 1 : index + 1;
+
+        if (target < 0 || target >= items.length) {
+            return;
+        }
+
+        const updated = [...items];
+        [updated[index], updated[target]] = [updated[target], updated[index]];
+        setData('additional_info', updated);
+    }
+
+    return (
+        <div className="flex flex-col gap-6">
+            {items.map((item, index) => (
+                <div key={index} className="rounded-xl border border-border bg-card p-4">
+                    <div className="flex flex-col gap-4">
+                        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                            <div className="flex flex-col gap-2">
+                                <Label>Label</Label>
+                                <Input
+                                    value={item.label}
+                                    onChange={(e) => updateItem(index, 'label', e.target.value)}
+                                    placeholder="Languages"
+                                />
+                            </div>
+                            <div className="flex flex-col gap-2">
+                                <Label>Value</Label>
+                                <Input
+                                    value={item.value}
+                                    onChange={(e) => updateItem(index, 'value', e.target.value)}
+                                    placeholder="English, Filipino, Japanese"
+                                />
+                            </div>
+                        </div>
+                    </div>
+                    <div className="mt-3 flex items-center justify-between">
+                        <div className="flex items-center gap-1">
+                            <button
+                                type="button"
+                                onClick={() => moveItem(index, 'up')}
+                                disabled={index === 0}
+                                className="rounded-sm p-1 text-[#706f6c] hover:bg-[#f5f5f4] hover:text-[#1b1b18] dark:text-[#A1A09A] dark:hover:bg-[#1C1C1A] dark:hover:text-[#EDEDEC] transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                            >
+                                <ArrowUp className="size-4" />
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => moveItem(index, 'down')}
+                                disabled={index === items.length - 1}
+                                className="rounded-sm p-1 text-[#706f6c] hover:bg-[#f5f5f4] hover:text-[#1b1b18] dark:text-[#A1A09A] dark:hover:bg-[#1C1C1A] dark:hover:text-[#EDEDEC] transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                            >
+                                <ArrowDown className="size-4" />
+                            </button>
+                        </div>
+                        <Button variant="ghost" size="sm" onClick={() => removeItem(index)}>
+                            Remove
+                        </Button>
+                    </div>
+                </div>
+            ))}
+            <Button variant="outline" onClick={addItem}>
+                Add Additional Info
+            </Button>
+            {items.length === 0 && (
+                <p className="text-sm text-muted-foreground">
+                    Add items like Languages, Certificates, Volunteer Work, etc.
+                </p>
+            )}
+        </div>
+    );
+}
+
+function renderFormattedBullet(text: string): React.ReactNode {
+    if (!text || !text.trim()) {
+        return null;
+    }
+
+    const parts: React.ReactNode[] = [];
+    const regex = /\*\*(.+?)\*\*/g;
+    let lastIndex = 0;
+    let match;
+
+    while ((match = regex.exec(text)) !== null) {
+        if (match.index > lastIndex) {
+            parts.push(text.slice(lastIndex, match.index));
+        }
+
+        parts.push(<strong key={match.index}>{match[1]}</strong>);
+        lastIndex = match.index + match[0].length;
+    }
+
+    if (lastIndex < text.length) {
+        parts.push(text.slice(lastIndex));
+    }
+
+    return parts.length > 0 ? parts : text;
+}
+
+function renderSkillsWithCategoryBold(skills: string[], separator: string = ', '): React.ReactNode {
+    return skills.map((skill, i) => {
+        const colonIndex = skill.indexOf(':');
+
+        if (colonIndex > 0 && colonIndex < 30) {
+            const prefix = skill.substring(0, colonIndex);
+            const rest = skill.substring(colonIndex + 1);
+
+            return <span key={i}><strong>{prefix}:</strong>{rest}</span>;
+        }
+
+        return <span key={i}>{skill}</span>;
+    }).reduce<React.ReactNode[]>((acc, curr, i, arr) => {
+        acc.push(curr);
+
+        if (i < arr.length - 1) {
+            acc.push(separator);
+        }
+
+        return acc;
+    }, []);
 }
 
 function getDirectImageUrl(url: string | null): string | null {
@@ -1608,7 +1829,7 @@ return null;
         return (
             <ul className="bullet-list">
                 {lines.map((line, idx) => (
-                    <li key={idx}>{line}</li>
+                    <li key={idx}>{renderFormattedBullet(line)}</li>
                 ))}
             </ul>
         );
@@ -1616,7 +1837,7 @@ return null;
     const photoSrc = getDirectImageUrl(photoDataUrl || data.photo_url) || '';
     const hasPhoto = !!photoSrc;
 
-    const sectionOrder = data.section_order || ['personal', 'work', 'education', 'skills', 'projects', 'certifications'];
+    const sectionOrder = data.section_order || ['personal', 'work', 'education', 'skills', 'projects', 'certifications', 'additional_info'];
     const getOrder = (id: string) => sectionOrder.indexOf(id);
 
     const SectionWrapper = ({ id, children, className }: { id: string; children: React.ReactNode; className?: string }) => (
@@ -1707,7 +1928,7 @@ return null;
                             {(data.skills?.length ?? 0) > 0 && (
                                 <>
                                     <div className="ats-section-title">Skills & Technologies</div>
-                                    <div className="ats-desc">{data.skills?.join(', ')}</div>
+                                    <div className="ats-desc">{renderSkillsWithCategoryBold(data.skills || [])}</div>
                                 </>
                             )}
                         </SectionWrapper>
@@ -1732,6 +1953,20 @@ return null;
                                                 {project.technologies && <span className="ats-date">{project.technologies}</span>}
                                             </div>
                                             {project.description && <p className="ats-desc">{project.description}</p>}
+                                        </div>
+                                    ))}
+                                </>
+                            )}
+                        </SectionWrapper>
+
+                        <SectionWrapper id="additional_info">
+                            {(data.additional_info?.length ?? 0) > 0 && (
+                                <>
+                                    <div className="ats-section-title">Additional Information</div>
+                                    {data.additional_info?.map((item, i) => (
+                                        <div key={i} className="ats-desc" style={{ marginBottom: '4px' }}>
+                                            <strong>{renderFormattedBullet(item.label)}:</strong>{' '}
+                                            {renderFormattedBullet(item.value)}
                                         </div>
                                     ))}
                                 </>
@@ -1816,7 +2051,7 @@ return null;
                             {(data.skills?.length ?? 0) > 0 && (
                                 <>
                                     <div className="exec-section-title">Core Competencies</div>
-                                    <div className="skills">{data.skills?.join(', ')}</div>
+                                    <div className="skills">{renderSkillsWithCategoryBold(data.skills || [])}</div>
                                 </>
                             )}
                         </SectionWrapper>
@@ -1839,6 +2074,20 @@ return null;
                                             <div className="project-title">{project.title}</div>
                                             {project.technologies && <div className="project-tech">{project.technologies}</div>}
                                             {project.description && <p className="project-desc">{project.description}</p>}
+                                        </div>
+                                    ))}
+                                </>
+                            )}
+                        </SectionWrapper>
+
+                        <SectionWrapper id="additional_info">
+                            {(data.additional_info?.length ?? 0) > 0 && (
+                                <>
+                                    <div className="exec-section-title">Additional Information</div>
+                                    {data.additional_info?.map((item, i) => (
+                                        <div key={i} className="job-desc" style={{ marginBottom: '4px' }}>
+                                            <strong>{renderFormattedBullet(item.label)}:</strong>{' '}
+                                            {renderFormattedBullet(item.value)}
                                         </div>
                                     ))}
                                 </>
@@ -1967,6 +2216,20 @@ return null;
                                 </>
                             )}
                         </SectionWrapper>
+
+                        <SectionWrapper id="additional_info">
+                            {(data.additional_info?.length ?? 0) > 0 && (
+                                <>
+                                    <div className="bullet-section-title">Additional Information</div>
+                                    {data.additional_info?.map((item, i) => (
+                                        <div key={i} className="bullet-item" style={{ marginBottom: '4px' }}>
+                                            <span style={{ fontWeight: 600 }}>{renderFormattedBullet(item.label)}:</span>{' '}
+                                            <span>{renderFormattedBullet(item.value)}</span>
+                                        </div>
+                                    ))}
+                                </>
+                            )}
+                        </SectionWrapper>
                     </>
                 )}
 
@@ -2036,7 +2299,7 @@ return null;
                             {(data.skills?.length ?? 0) > 0 && (
                                 <>
                                     <h2>Skills</h2>
-                                    <div className="skills">{data.skills?.join(', ')}</div>
+                                    <div className="skills">{renderSkillsWithCategoryBold(data.skills || [])}</div>
                                 </>
                             )}
                         </SectionWrapper>
@@ -2075,6 +2338,20 @@ return null;
                                                 </div>
                                             )}
                                             {project.description && <p className="project-desc">{project.description}</p>}
+                                        </div>
+                                    ))}
+                                </>
+                            )}
+                        </SectionWrapper>
+
+                        <SectionWrapper id="additional_info">
+                            {(data.additional_info?.length ?? 0) > 0 && (
+                                <>
+                                    <h2>Additional Information</h2>
+                                    {data.additional_info?.map((item, i) => (
+                                        <div key={i} style={{ marginBottom: '4px', fontSize: '13px' }}>
+                                            <strong>{renderFormattedBullet(item.label)}:</strong>{' '}
+                                            {renderFormattedBullet(item.value)}
                                         </div>
                                     ))}
                                 </>
@@ -2156,7 +2433,7 @@ return null;
                                 {(data.skills?.length ?? 0) > 0 && (
                                     <>
                                         <h2>Skills</h2>
-                                        <div className="skills">{data.skills?.join(', ')}</div>
+                                        <div className="skills">{renderSkillsWithCategoryBold(data.skills || [])}</div>
                                     </>
                                 )}
                             </SectionWrapper>
@@ -2199,6 +2476,20 @@ acc.push(<span key={`psep-${i}`}>  •  </span>);
                                     ))}
                                 </>
                             )}
+                            </SectionWrapper>
+
+                            <SectionWrapper id="additional_info">
+                                {(data.additional_info?.length ?? 0) > 0 && (
+                                    <>
+                                        <h2>Additional Information</h2>
+                                        {data.additional_info?.map((item, i) => (
+                                            <div key={i} style={{ marginBottom: '4px', fontSize: '13px' }}>
+                                                <strong>{renderFormattedBullet(item.label)}:</strong>{' '}
+                                                {renderFormattedBullet(item.value)}
+                                            </div>
+                                        ))}
+                                    </>
+                                )}
                             </SectionWrapper>
                         </div>
                     </>
@@ -2280,7 +2571,7 @@ acc.push(<span key={`psep-${i}`}>  •  </span>);
                                 <>
                                     <h2>IV. SKILLS & COMPETENCIES</h2>
                                     <div className="section-line" />
-                                    <div className="skills-text">{data.skills?.join(' / ')}</div>
+                                    <div className="skills-text">{renderSkillsWithCategoryBold(data.skills || [], ' / ')}</div>
                                 </>
                             )}
                         </SectionWrapper>
@@ -2319,6 +2610,21 @@ acc.push(<span key={`psep-${i}`}>  •  </span>);
                             )}
                         </SectionWrapper>
 
+                        <SectionWrapper id="additional_info">
+                            {(data.additional_info?.length ?? 0) > 0 && (
+                                <>
+                                    <h2>VII. ADDITIONAL INFORMATION</h2>
+                                    <div className="section-line" />
+                                    {data.additional_info?.map((item, i) => (
+                                        <div key={i} style={{ marginBottom: '4px', fontSize: '13px' }}>
+                                            <strong>{renderFormattedBullet(item.label)}:</strong>{' '}
+                                            {renderFormattedBullet(item.value)}
+                                        </div>
+                                    ))}
+                                </>
+                            )}
+                        </SectionWrapper>
+
                         <div className="ph-certification-block" style={{ marginTop: '24px', paddingTop: '16px', borderTop: '1px solid #e3e3e0' }}>
                             <p style={{ fontSize: '11px', fontStyle: 'italic', color: '#706f6c' }}>
                                 I hereby declare that the information contained herein is true and correct to the best of my knowledge and ability.
@@ -2332,6 +2638,314 @@ acc.push(<span key={`psep-${i}`}>  •  </span>);
                                 </div>
                             </div>
                         </div>
+                    </>
+                )}
+
+                {template === 'ats_single_column' && (
+                    <>
+                        <SectionWrapper id="personal">
+                            <div style={{ textAlign: 'center', marginBottom: '16px', borderBottom: '1px solid #d1d5db', paddingBottom: '12px' }}>
+                                {hasPhoto && <img src={photoSrc} alt="" className="photo" referrerPolicy="no-referrer" style={{ width: '80px', height: '80px', borderRadius: '50%', objectFit: 'cover', margin: '0 auto 8px', display: 'block' }} />}
+                                <div style={{ fontFamily: "'Instrument Sans', Inter, Arial, sans-serif", fontSize: '22px', fontWeight: 700, letterSpacing: '-0.01em', color: '#111827' }}>{data.full_name || 'Your Name'}</div>
+                                {data.target_role && <div style={{ fontSize: '12px', fontWeight: 500, color: '#6b7280', marginTop: '2px' }}>{data.target_role}</div>}
+                                <div style={{ fontSize: '11px', color: '#6b7280', marginTop: '6px' }}>
+                                    {[
+                                        data.phone ? <span key="phone">{data.phone}</span> : null,
+                                        data.email ? <a key="email" href={`mailto:${data.email}`} style={{ color: 'inherit', textDecoration: 'underline' }}>{data.email}</a> : null,
+                                        data.location ? <span key="loc">{data.location}</span> : null,
+                                        data.linkedin_url ? <span key="li">{renderLink(data.linkedin_url)}</span> : null,
+                                        data.github_url ? <span key="gh">{renderLink(data.github_url)}</span> : null,
+                                        data.website_url ? <span key="web">{renderLink(data.website_url)}</span> : null,
+                                    ].filter(Boolean).reduce((acc: React.ReactNode[], curr, i, arr) => {
+                                        acc.push(curr);
+
+                                        if (i < arr.length - 1) {
+                                            acc.push(<span key={`sep-${i}`}> | </span>);
+                                        }
+
+                                        return acc;
+                                    }, [])}
+                                </div>
+                            </div>
+
+                            {data.summary && (
+                                <>
+                                    <div style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#374151', marginBottom: '6px', borderBottom: '1px solid #d1d5db', paddingBottom: '3px' }}>Summary</div>
+                                    <p style={{ fontSize: '12px', lineHeight: 1.5, color: '#111827', marginBottom: '12px' }}>{data.summary}</p>
+                                </>
+                            )}
+                        </SectionWrapper>
+
+                        <SectionWrapper id="work">
+                            {(data.work_experience?.length ?? 0) > 0 && (
+                                <>
+                                    <div style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#374151', marginBottom: '6px', borderBottom: '1px solid #d1d5db', paddingBottom: '3px' }}>Work Experience</div>
+                                    {data.work_experience?.map((job, i) => (
+                                        <div key={i} style={{ marginBottom: '10px' }}>
+                                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
+                                                <span style={{ fontSize: '13px', fontWeight: 600, color: '#111827' }}>{job.position || 'Position'}</span>
+                                                <span style={{ fontSize: '11px', color: '#6b7280', whiteSpace: 'nowrap' }}>{job.duration}</span>
+                                            </div>
+                                            <div style={{ fontSize: '12px', color: '#6b7280' }}>
+                                                {job.company}{job.location ? `, ${job.location}` : ''}
+                                            </div>
+                                            {job.description && (
+                                                <ul style={{ marginTop: '4px', paddingLeft: '18px', listStyleType: 'disc', fontSize: '12px', lineHeight: 1.45, color: '#111827' }}>
+                                                    {job.description.split(/\n|(?<=[\.\?!])\s+(?=[A-Z0-9])|•|▪|\*/).map(l => l.trim().replace(/^[-•*▪]\s*/, '')).filter(l => l.length > 0).map((line, li) => (
+                                                        <li key={li}>{renderFormattedBullet(line)}</li>
+                                                    ))}
+                                                </ul>
+                                            )}
+                                        </div>
+                                    ))}
+                                </>
+                            )}
+                        </SectionWrapper>
+
+                        <SectionWrapper id="education">
+                            {(data.education?.length ?? 0) > 0 && (
+                                <>
+                                    <div style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#374151', marginBottom: '6px', borderBottom: '1px solid #d1d5db', paddingBottom: '3px' }}>Education</div>
+                                    {data.education?.map((edu, i) => (
+                                        <div key={i} style={{ marginBottom: '8px' }}>
+                                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
+                                                <span style={{ fontSize: '13px', fontWeight: 600, color: '#111827' }}>{edu.degree || 'Degree'}</span>
+                                                <span style={{ fontSize: '11px', color: '#6b7280', whiteSpace: 'nowrap' }}>{edu.year}</span>
+                                            </div>
+                                            <div style={{ fontSize: '12px', color: '#6b7280' }}>
+                                                {edu.institution}{edu.location ? `, ${edu.location}` : ''}
+                                            </div>
+                                        </div>
+                                    ))}
+                                </>
+                            )}
+                        </SectionWrapper>
+
+                        <SectionWrapper id="skills">
+                            {(data.skills?.length ?? 0) > 0 && (
+                                <>
+                                    <div style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#374151', marginBottom: '6px', borderBottom: '1px solid #d1d5db', paddingBottom: '3px' }}>Skills</div>
+                                    <div style={{ fontSize: '12px', lineHeight: 1.5, color: '#111827' }}>
+                                        {data.skills?.map((skill, i) => {
+                                            const colonIndex = skill.indexOf(':');
+
+                                            if (colonIndex > 0 && colonIndex < 30) {
+                                                const prefix = skill.substring(0, colonIndex);
+                                                const rest = skill.substring(colonIndex + 1);
+
+                                                return <div key={i}><strong>{prefix}:</strong>{rest}</div>;
+                                            }
+
+                                            return <div key={i}>{skill}</div>;
+                                        })}
+                                    </div>
+                                </>
+                            )}
+                        </SectionWrapper>
+
+                        <SectionWrapper id="projects">
+                            {(data.projects?.length ?? 0) > 0 && (
+                                <>
+                                    <div style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#374151', marginBottom: '6px', borderBottom: '1px solid #d1d5db', paddingBottom: '3px' }}>Projects</div>
+                                    {data.projects?.map((project, i) => (
+                                        <div key={i} style={{ marginBottom: '10px' }}>
+                                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
+                                                <span style={{ fontSize: '13px', fontWeight: 600, color: '#111827' }}>{project.title}</span>
+                                                {project.duration && <span style={{ fontSize: '11px', color: '#6b7280', whiteSpace: 'nowrap' }}>{project.duration}</span>}
+                                            </div>
+                                            {project.technologies && <div style={{ fontSize: '11px', color: '#6b7280' }}>{project.technologies}</div>}
+                                            {project.description && (
+                                                <ul style={{ marginTop: '4px', paddingLeft: '18px', listStyleType: 'disc', fontSize: '12px', lineHeight: 1.45, color: '#111827' }}>
+                                                    {project.description.split(/\n|(?<=[\.\?!])\s+(?=[A-Z0-9])|•|▪|\*/).map(l => l.trim().replace(/^[-•*▪]\s*/, '')).filter(l => l.length > 0).map((line, li) => (
+                                                        <li key={li}>{renderFormattedBullet(line)}</li>
+                                                    ))}
+                                                </ul>
+                                            )}
+                                        </div>
+                                    ))}
+                                </>
+                            )}
+                        </SectionWrapper>
+
+                        <SectionWrapper id="certifications">
+                            {(data.certifications?.length ?? 0) > 0 && (
+                                <>
+                                    <div style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#374151', marginBottom: '6px', borderBottom: '1px solid #d1d5db', paddingBottom: '3px' }}>Certifications</div>
+                                    <ul style={{ paddingLeft: '18px', listStyleType: 'disc', fontSize: '12px', lineHeight: 1.5, color: '#111827' }}>
+                                        {data.certifications?.map((cert, i) => (
+                                            <li key={i}>{cert}</li>
+                                        ))}
+                                    </ul>
+                                </>
+                            )}
+                        </SectionWrapper>
+
+                        <SectionWrapper id="additional_info">
+                            {(data.additional_info?.length ?? 0) > 0 && (
+                                <>
+                                    <div style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#374151', marginBottom: '6px', borderBottom: '1px solid #d1d5db', paddingBottom: '3px' }}>Additional Information</div>
+                                    {data.additional_info?.map((item, i) => (
+                                        <div key={i} style={{ fontSize: '12px', lineHeight: 1.5, color: '#111827', marginBottom: '4px' }}>
+                                            <strong>{renderFormattedBullet(item.label)}:</strong>{' '}
+                                            {renderFormattedBullet(item.value)}
+                                        </div>
+                                    ))}
+                                </>
+                            )}
+                        </SectionWrapper>
+                    </>
+                )}
+
+                {template === 'ats_classic_serif' && (
+                    <>
+                        <SectionWrapper id="personal">
+                            <div style={{ marginBottom: '16px', paddingBottom: '12px', borderBottom: '1px solid #d1d5db' }}>
+                                {hasPhoto && <img src={photoSrc} alt="" className="photo" referrerPolicy="no-referrer" style={{ width: '80px', height: '80px', borderRadius: '4px', objectFit: 'cover', float: 'right', marginLeft: '16px' }} />}
+                                <div style={{ fontFamily: "'Times New Roman', Garamond, Georgia, serif", fontSize: '24px', fontWeight: 700, color: '#111827', marginBottom: '4px' }}>{data.full_name || 'Your Name'}</div>
+                                {data.target_role && <div style={{ fontFamily: "'Times New Roman', Garamond, Georgia, serif", fontSize: '13px', fontWeight: 500, color: '#374151', marginBottom: '4px' }}>{data.target_role}</div>}
+                                <div style={{ fontFamily: "'Times New Roman', Garamond, Georgia, serif", fontSize: '11px', color: '#6b7280' }}>
+                                    {[
+                                        data.phone ? <span key="phone">{data.phone}</span> : null,
+                                        data.email ? <a key="email" href={`mailto:${data.email}`} style={{ color: 'inherit', textDecoration: 'underline' }}>{data.email}</a> : null,
+                                        data.location ? <span key="loc">{data.location}</span> : null,
+                                        data.linkedin_url ? <span key="li">{renderLink(data.linkedin_url)}</span> : null,
+                                        data.github_url ? <span key="gh">{renderLink(data.github_url)}</span> : null,
+                                        data.website_url ? <span key="web">{renderLink(data.website_url)}</span> : null,
+                                    ].filter(Boolean).reduce((acc: React.ReactNode[], curr, i, arr) => {
+                                        acc.push(curr);
+
+                                        if (i < arr.length - 1) {
+                                            acc.push(<span key={`sep-${i}`}> | </span>);
+                                        }
+
+                                        return acc;
+                                    }, [])}
+                                </div>
+                            </div>
+
+                            {data.summary && (
+                                <>
+                                    <div style={{ fontFamily: "'Times New Roman', Garamond, Georgia, serif", fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: '#111827', marginBottom: '6px' }}>SUMMARY</div>
+                                    <p style={{ fontFamily: "'Times New Roman', Garamond, Georgia, serif", fontSize: '12px', lineHeight: 1.5, color: '#111827', marginBottom: '12px' }}>{data.summary}</p>
+                                </>
+                            )}
+                        </SectionWrapper>
+
+                        <SectionWrapper id="work">
+                            {(data.work_experience?.length ?? 0) > 0 && (
+                                <>
+                                    <div style={{ fontFamily: "'Times New Roman', Garamond, Georgia, serif", fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: '#111827', marginBottom: '6px' }}>EXPERIENCE</div>
+                                    {data.work_experience?.map((job, i) => (
+                                        <div key={i} style={{ marginBottom: '10px' }}>
+                                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
+                                                <span style={{ fontFamily: "'Times New Roman', Garamond, Georgia, serif", fontSize: '13px', fontWeight: 600, color: '#111827' }}>{job.position || 'Position'}</span>
+                                                <span style={{ fontFamily: "'Times New Roman', Garamond, Georgia, serif", fontSize: '11px', color: '#6b7280', whiteSpace: 'nowrap' }}>{job.duration}</span>
+                                            </div>
+                                            <div style={{ fontFamily: "'Times New Roman', Garamond, Georgia, serif", fontSize: '12px', color: '#6b7280' }}>
+                                                {job.company}{job.location ? `, ${job.location}` : ''}
+                                            </div>
+                                            {job.description && (
+                                                <ul style={{ marginTop: '4px', paddingLeft: '18px', fontSize: '12px', lineHeight: 1.45, color: '#111827', fontFamily: "'Times New Roman', Garamond, Georgia, serif" }}>
+                                                    {job.description.split(/\n|(?<=[\.\?!])\s+(?=[A-Z0-9])|•|▪|\*/).map(l => l.trim().replace(/^[-•*▪]\s*/, '')).filter(l => l.length > 0).map((line, li) => (
+                                                        <li key={li} style={{ marginBottom: '3px' }}>{renderFormattedBullet(line)}</li>
+                                                    ))}
+                                                </ul>
+                                            )}
+                                        </div>
+                                    ))}
+                                </>
+                            )}
+                        </SectionWrapper>
+
+                        <SectionWrapper id="education">
+                            {(data.education?.length ?? 0) > 0 && (
+                                <>
+                                    <div style={{ fontFamily: "'Times New Roman', Garamond, Georgia, serif", fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: '#111827', marginBottom: '6px' }}>EDUCATION</div>
+                                    {data.education?.map((edu, i) => (
+                                        <div key={i} style={{ marginBottom: '8px' }}>
+                                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
+                                                <span style={{ fontFamily: "'Times New Roman', Garamond, Georgia, serif", fontSize: '13px', fontWeight: 600, color: '#111827' }}>{edu.degree || 'Degree'}</span>
+                                                <span style={{ fontFamily: "'Times New Roman', Garamond, Georgia, serif", fontSize: '11px', color: '#6b7280', whiteSpace: 'nowrap' }}>{edu.year}</span>
+                                            </div>
+                                            <div style={{ fontFamily: "'Times New Roman', Garamond, Georgia, serif", fontSize: '12px', color: '#6b7280' }}>
+                                                {edu.institution}{edu.location ? `, ${edu.location}` : ''}
+                                            </div>
+                                        </div>
+                                    ))}
+                                </>
+                            )}
+                        </SectionWrapper>
+
+                        <SectionWrapper id="skills">
+                            {(data.skills?.length ?? 0) > 0 && (
+                                <>
+                                    <div style={{ fontFamily: "'Times New Roman', Garamond, Georgia, serif", fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: '#111827', marginBottom: '6px' }}>SKILLS</div>
+                                    <div style={{ fontFamily: "'Times New Roman', Garamond, Georgia, serif", fontSize: '12px', lineHeight: 1.5, color: '#111827' }}>
+                                        {data.skills?.map((skill, i) => {
+                                            const colonIndex = skill.indexOf(':');
+
+                                            if (colonIndex > 0 && colonIndex < 30) {
+                                                const prefix = skill.substring(0, colonIndex);
+                                                const rest = skill.substring(colonIndex + 1);
+
+                                                return <div key={i}><strong>{prefix}:</strong>{rest}</div>;
+                                            }
+
+                                            return <div key={i}>{skill}</div>;
+                                        })}
+                                    </div>
+                                </>
+                            )}
+                        </SectionWrapper>
+
+                        <SectionWrapper id="projects">
+                            {(data.projects?.length ?? 0) > 0 && (
+                                <>
+                                    <div style={{ fontFamily: "'Times New Roman', Garamond, Georgia, serif", fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: '#111827', marginBottom: '6px' }}>PROJECTS</div>
+                                    {data.projects?.map((project, i) => (
+                                        <div key={i} style={{ marginBottom: '10px' }}>
+                                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
+                                                <span style={{ fontFamily: "'Times New Roman', Garamond, Georgia, serif", fontSize: '13px', fontWeight: 600, color: '#111827' }}>{project.title}</span>
+                                                {project.duration && <span style={{ fontFamily: "'Times New Roman', Garamond, Georgia, serif", fontSize: '11px', color: '#6b7280', whiteSpace: 'nowrap' }}>{project.duration}</span>}
+                                            </div>
+                                            {project.technologies && <div style={{ fontFamily: "'Times New Roman', Garamond, Georgia, serif", fontSize: '11px', color: '#6b7280' }}>{project.technologies}</div>}
+                                            {project.description && (
+                                                <ul style={{ marginTop: '4px', paddingLeft: '18px', fontSize: '12px', lineHeight: 1.45, color: '#111827', fontFamily: "'Times New Roman', Garamond, Georgia, serif" }}>
+                                                    {project.description.split(/\n|(?<=[\.\?!])\s+(?=[A-Z0-9])|•|▪|\*/).map(l => l.trim().replace(/^[-•*▪]\s*/, '')).filter(l => l.length > 0).map((line, li) => (
+                                                        <li key={li} style={{ marginBottom: '3px' }}>{renderFormattedBullet(line)}</li>
+                                                    ))}
+                                                </ul>
+                                            )}
+                                        </div>
+                                    ))}
+                                </>
+                            )}
+                        </SectionWrapper>
+
+                        <SectionWrapper id="certifications">
+                            {(data.certifications?.length ?? 0) > 0 && (
+                                <>
+                                    <div style={{ fontFamily: "'Times New Roman', Garamond, Georgia, serif", fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: '#111827', marginBottom: '6px' }}>CERTIFICATIONS</div>
+                                    <div style={{ fontFamily: "'Times New Roman', Garamond, Georgia, serif", fontSize: '12px', lineHeight: 1.5, color: '#111827' }}>
+                                        {data.certifications?.join(' | ')}
+                                    </div>
+                                </>
+                            )}
+                        </SectionWrapper>
+
+                        <SectionWrapper id="additional_info">
+                            {(data.additional_info?.length ?? 0) > 0 && (
+                                <>
+                                    <div style={{ fontFamily: "'Times New Roman', Garamond, Georgia, serif", fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: '#111827', marginBottom: '6px' }}>ADDITIONAL INFORMATION</div>
+                                    {data.additional_info?.map((item, i) => (
+                                        <div key={i} style={{ fontFamily: "'Times New Roman', Garamond, Georgia, serif", fontSize: '12px', lineHeight: 1.5, color: '#111827', marginBottom: '4px' }}>
+                                            <strong>{renderFormattedBullet(item.label)}:</strong>{' '}
+                                            {renderFormattedBullet(item.value)}
+                                        </div>
+                                    ))}
+                                </>
+                            )}
+                        </SectionWrapper>
                     </>
                 )}
             </div>
@@ -3080,7 +3694,8 @@ export default function DocumentsIndex({ profile, aiLimit, loadedResume, loadedC
                 technologies: 'Laravel, React, PostgreSQL'
             }
         ],
-        section_order: activeProfileData?.section_order ?? ['personal', 'work', 'education', 'skills', 'projects', 'certifications'],
+        additional_info: (activeProfileData?.additional_info?.length ?? 0) > 0 ? (activeProfileData?.additional_info || []) : [],
+        section_order: activeProfileData?.section_order ?? ['personal', 'work', 'education', 'skills', 'projects', 'certifications', 'additional_info'],
     });
 
     function handleSubmit(e: React.FormEvent) {
@@ -3131,7 +3746,8 @@ export default function DocumentsIndex({ profile, aiLimit, loadedResume, loadedC
             skills: resume.profile_data.skills || [],
             certifications: resume.profile_data.certifications || [],
             projects: resume.profile_data.projects || [],
-            section_order: resume.profile_data.section_order || ['personal', 'work', 'education', 'skills', 'projects', 'certifications']
+            additional_info: resume.profile_data.additional_info || [],
+            section_order: resume.profile_data.section_order || ['personal', 'work', 'education', 'skills', 'projects', 'certifications', 'additional_info']
         });
         setLoadResumeDialogOpen(false);
     }
@@ -3151,7 +3767,7 @@ export default function DocumentsIndex({ profile, aiLimit, loadedResume, loadedC
         const { active, over } = event;
 
         if (over && active.id !== over.id) {
-            const currentOrder = data.section_order || ['personal', 'work', 'education', 'skills', 'projects', 'certifications'];
+            const currentOrder = data.section_order || ['personal', 'work', 'education', 'skills', 'projects', 'certifications', 'additional_info'];
             const oldIndex = currentOrder.indexOf(active.id as string);
             const newIndex = currentOrder.indexOf(over.id as string);
 
@@ -3237,10 +3853,19 @@ return;
                         </p>
                     </div>
                     <div className="flex items-center gap-2">
-                        <span className="inline-flex items-center gap-1 rounded-full border border-border bg-card px-3 py-1 text-xs text-muted-foreground">
-                            <Sparkles className="size-3" />
-                            {aiLimit.remaining}/{aiLimit.total} AI uses today
-                        </span>
+                        <TooltipProvider>
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <span className="inline-flex cursor-help items-center gap-1.5 rounded-full border border-border bg-card px-3 py-1 text-xs text-muted-foreground transition-colors hover:text-foreground">
+                                        <Sparkles className="size-3 text-amber-500" />
+                                        {aiLimit.remaining}/{aiLimit.total} AI uses today
+                                    </span>
+                                </TooltipTrigger>
+                                <TooltipContent side="bottom" className="max-w-xs text-xs">
+                                    Shared daily limit (10 uncached requests/day) across AI Assist and Document Generator. Cached requests are unlimited and free.
+                                </TooltipContent>
+                            </Tooltip>
+                        </TooltipProvider>
                         <Link href="/documents/saved">
                             <Button variant="outline" size="sm">
                                 <FolderGit2 className="mr-2 size-4" />
@@ -3313,10 +3938,10 @@ return;
                                     <div className="flex flex-wrap gap-1 rounded-lg bg-[#f5f5f4] p-1 dark:bg-[#1C1C1A]">
                                         <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
                                             <SortableContext
-                                                items={data.section_order || ['personal', 'work', 'education', 'skills', 'projects', 'certifications']}
+                                                items={data.section_order || ['personal', 'work', 'education', 'skills', 'projects', 'certifications', 'additional_info']}
                                                 strategy={horizontalListSortingStrategy}
                                             >
-                                                {(data.section_order || ['personal', 'work', 'education', 'skills', 'projects', 'certifications']).map((id, index) => {
+                                                {(data.section_order || ['personal', 'work', 'education', 'skills', 'projects', 'certifications', 'additional_info']).map((id, index) => {
                                                     const tab = TABS.find(t => t.id === id);
 
                                                     if (!tab) {
@@ -3372,6 +3997,9 @@ return null;
                                         )}
                                         {activeEditorTab === 'certifications' && (
                                             <CertificationsTab data={data} setData={setData} />
+                                        )}
+                                        {activeEditorTab === 'additional_info' && (
+                                            <AdditionalInfoTab data={data} setData={setData} />
                                         )}
                                     </div>
                                 </CardContent>
@@ -3442,7 +4070,8 @@ return null;
                                                             technologies: 'Laravel, React, PostgreSQL'
                                                         }
                                                     ],
-                                                    section_order: ['personal', 'work', 'education', 'skills', 'projects', 'certifications']
+                                                    additional_info: [],
+                                                    section_order: ['personal', 'work', 'education', 'skills', 'projects', 'certifications', 'additional_info']
                                                 });
                                             }}
                                         />
@@ -3481,7 +4110,7 @@ return null;
                             <div className="flex shrink-0 items-center justify-between">
                                 <Label>Template</Label>
                                 <Select value={template} onValueChange={(value: string | null) => value && setTemplate(value)}>
-                                    <SelectTrigger className="w-auto min-w-[260px]">
+                                    <SelectTrigger className="w-auto min-w-[260px] bg-background text-foreground">
                                         <SelectValue placeholder="Select template">
                                             {TEMPLATES.find(t => t.id === template)?.name || "Select template"}
                                         </SelectValue>
@@ -3504,7 +4133,7 @@ return null;
                             <div className="flex shrink-0 items-center justify-between">
                                 <Label>Cover Letter Style</Label>
                                 <Select value={clTemplate} onValueChange={(value: string | null) => value && setCLTemplate(value)}>
-                                    <SelectTrigger className="w-auto min-w-[260px]">
+                                    <SelectTrigger className="w-auto min-w-[260px] bg-background text-foreground">
                                         <SelectValue placeholder="Select style">
                                             {COVER_LETTER_TEMPLATES.find(t => t.id === clTemplate)?.name || "Select style"}
                                         </SelectValue>

@@ -122,7 +122,7 @@ class DocumentController extends Controller
     {
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
-            'template' => ['required', 'string', 'in:clean,modern,philippine,ats_classic,ats_executive,ats_bullet'],
+            'template' => ['required', 'string', 'in:clean,modern,philippine,ats_classic,ats_executive,ats_bullet,ats_single_column,ats_classic_serif'],
             'profile_data' => ['required', 'array'],
             'photo_url' => ['nullable', 'string', 'max:500'],
         ]);

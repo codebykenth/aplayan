@@ -25,6 +25,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property array $skills
  * @property array $certifications
  * @property array $projects
+ * @property array $additional_info
  * @property Carbon $created_at
  * @property Carbon $updated_at
  */
@@ -50,6 +51,7 @@ class ResumeProfile extends Model
         'skills',
         'certifications',
         'projects',
+        'additional_info',
     ];
 
     protected function casts(): array
@@ -60,6 +62,7 @@ class ResumeProfile extends Model
             'skills' => 'array',
             'certifications' => 'array',
             'projects' => 'array',
+            'additional_info' => 'array',
         ];
     }
 
