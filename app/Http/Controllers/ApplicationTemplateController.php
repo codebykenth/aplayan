@@ -23,6 +23,8 @@ class ApplicationTemplateController extends Controller
 
         return Inertia::render('templates/index', [
             'templates' => $templates,
+            'coverLetterTemplates' => $request->user()->coverLetterTemplates()->latest()->get(),
+            'activeTab' => 'application',
         ]);
     }
 

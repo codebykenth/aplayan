@@ -1,5 +1,5 @@
 import { Head, Link, useForm, router } from '@inertiajs/react';
-import { User, Briefcase, GraduationCap, Wrench, Award, FolderGit2, FileText, Download, Mail, Camera, Save, Sparkles, Eye, Edit3, FilePenLine, Wand2, Loader2, AlertCircle, BookText, ArrowUp, ArrowDown, GripVertical } from 'lucide-react';
+import { User, Briefcase, GraduationCap, Wrench, Award, FolderGit2, FileText, Download, Mail, Camera, Save, Sparkles, Eye, Edit3, FilePenLine, Wand2, Loader2, AlertCircle, BookText, ArrowUp, ArrowDown, GripVertical, BookmarkIcon } from 'lucide-react';
 import {
     DndContext,
     closestCenter,
@@ -218,8 +218,9 @@ const VIEWS = [
 
 function getPrintStyles(template: string): string {
     const base = `
+        @page { margin: 0; }
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Instrument Sans', Arial, sans-serif; color: #1b1b18; font-size: 13px; line-height: 1.5; padding: 40px; }
+        body { font-family: 'Instrument Sans', Arial, sans-serif; color: #1b1b18; font-size: 13px; line-height: 1.5; padding: 32px; }
     `;
 
     if (template === 'ats_classic') {
@@ -490,37 +491,38 @@ function getScopedResumeStyles(template: string): string {
 
 function getCoverLetterPrintStyles(template: string): string {
     const base = `
+        @page { margin: 0; }
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Instrument Sans', Arial, sans-serif; color: #1b1b18; font-size: 13px; line-height: 1.6; padding: 40px; }
+        body { font-family: 'Instrument Sans', Arial, sans-serif; color: #1b1b18; font-size: 13px; line-height: 1.6; padding: 32px; }
     `;
 
     if (template === 'cl_formal' || template === 'ats_classic') {
         return base + `
             .letter-header { text-align: center; border-bottom: 2px solid #1b1b18; padding-bottom: 12px; margin-bottom: 20px; }
-            .letter-name { font-size: 24px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px; }
+            .letter-name { font-size: 24px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #1b1b18; margin-bottom: 6px; }
             .letter-contact-line { font-size: 12px; color: #4a4a46; font-weight: 500; }
             .letter-date { color: #4a4a46; font-size: 12px; margin-bottom: 16px; text-align: right; font-weight: 500; }
-            .letter-recipient { font-size: 13px; line-height: 1.5; margin-bottom: 20px; }
-            .letter-salutation { font-size: 14px; font-weight: 600; margin-bottom: 16px; }
-            .letter-body { font-size: 13px; line-height: 1.7; }
+            .letter-recipient { font-size: 13px; line-height: 1.5; margin-bottom: 20px; color: #1b1b18; }
+            .letter-salutation { font-size: 14px; font-weight: 600; margin-bottom: 16px; color: #1b1b18; }
+            .letter-body { font-size: 13px; line-height: 1.7; color: #1b1b18; }
             .letter-body p { margin-bottom: 14px; text-align: justify; }
-            .letter-closing { margin-top: 28px; }
-            .letter-signature { margin-top: 6px; font-weight: 700; font-size: 14px; }
+            .letter-closing { margin-top: 28px; color: #1b1b18; }
+            .letter-signature { margin-top: 6px; font-weight: 700; font-size: 14px; color: #1b1b18; }
         `;
     }
 
     if (template === 'cl_executive' || template === 'ats_executive') {
         return base + `
             .letter-header { border-left: 4px solid #1b1b18; padding-left: 12px; margin-bottom: 20px; }
-            .letter-name { font-size: 24px; font-weight: 700; margin-bottom: 4px; }
+            .letter-name { font-size: 24px; font-weight: 700; color: #1b1b18; margin-bottom: 4px; }
             .letter-contact-line { font-size: 12px; color: #555450; font-weight: 500; }
             .letter-date { color: #706f6c; font-size: 12px; margin-bottom: 16px; }
-            .letter-recipient { font-size: 13px; line-height: 1.5; margin-bottom: 20px; }
-            .letter-salutation { font-size: 14px; font-weight: 600; margin-bottom: 16px; }
-            .letter-body { font-size: 13px; line-height: 1.7; }
+            .letter-recipient { font-size: 13px; line-height: 1.5; margin-bottom: 20px; color: #1b1b18; }
+            .letter-salutation { font-size: 14px; font-weight: 600; margin-bottom: 16px; color: #1b1b18; }
+            .letter-body { font-size: 13px; line-height: 1.7; color: #1b1b18; }
             .letter-body p { margin-bottom: 14px; }
-            .letter-closing { margin-top: 28px; }
-            .letter-signature { margin-top: 6px; font-weight: 700; }
+            .letter-closing { margin-top: 28px; color: #1b1b18; }
+            .letter-signature { margin-top: 6px; font-weight: 700; color: #1b1b18; }
         `;
     }
 
@@ -530,11 +532,12 @@ function getCoverLetterPrintStyles(template: string): string {
             .letter-header .letter-name { font-size: 24px; font-weight: 700; color: white; margin-bottom: 4px; }
             .letter-header .letter-contact-line { font-size: 12px; color: rgba(255,255,255,0.85); }
             .letter-header .letter-date { color: rgba(255,255,255,0.75); font-size: 12px; margin-top: 8px; }
-            .letter-salutation { font-size: 14px; font-weight: 600; margin-bottom: 16px; }
-            .letter-body { font-size: 13px; line-height: 1.7; }
+            .letter-body-wrapper { padding: 0; }
+            .letter-salutation { font-size: 14px; font-weight: 600; margin-bottom: 16px; color: #1b1b18; }
+            .letter-body { font-size: 13px; line-height: 1.7; color: #1b1b18; }
             .letter-body p { margin-bottom: 14px; }
-            .letter-closing { margin-top: 28px; }
-            .letter-signature { margin-top: 6px; font-weight: 700; }
+            .letter-closing { margin-top: 28px; color: #1b1b18; }
+            .letter-signature { margin-top: 6px; font-weight: 700; color: #1b1b18; }
         `;
     }
 
@@ -545,23 +548,23 @@ function getCoverLetterPrintStyles(template: string): string {
             .letter-contact-line { font-size: 12px; color: #6366f1; margin-top: 4px; font-weight: 500; }
             .letter-date { color: #6b7280; font-size: 12px; margin-bottom: 16px; }
             .letter-salutation { font-size: 15px; font-weight: 700; color: #3730a3; margin-bottom: 16px; }
-            .letter-body { font-size: 13.5px; line-height: 1.75; }
+            .letter-body { font-size: 13.5px; line-height: 1.75; color: #1f2937; }
             .letter-body p { margin-bottom: 16px; }
             .letter-closing { margin-top: 32px; font-weight: 600; color: #3730a3; }
-            .letter-signature { margin-top: 8px; font-weight: 800; font-size: 15px; }
+            .letter-signature { margin-top: 8px; font-weight: 800; font-size: 15px; color: #3730a3; }
         `;
     }
 
     return base + `
         .letter-header { margin-bottom: 24px; border-bottom: 1px solid #e5e7eb; padding-bottom: 12px; }
-        .letter-name { font-size: 22px; font-weight: 600; letter-spacing: -0.01em; }
+        .letter-name { font-size: 22px; font-weight: 600; letter-spacing: -0.01em; color: #111827; }
         .letter-contact-line { font-size: 12px; color: #6b7280; margin-top: 2px; }
         .letter-date { color: #6b7280; font-size: 12px; margin-bottom: 16px; }
-        .letter-salutation { font-size: 14px; font-weight: 600; margin-bottom: 16px; }
-        .letter-body { font-size: 13px; line-height: 1.7; }
+        .letter-salutation { font-size: 14px; font-weight: 600; margin-bottom: 16px; color: #111827; }
+        .letter-body { font-size: 13px; line-height: 1.7; color: #1f2937; }
         .letter-body p { margin-bottom: 14px; }
         .letter-closing { margin-top: 24px; }
-        .letter-signature { margin-top: 4px; font-weight: 600; }
+        .letter-signature { margin-top: 4px; font-weight: 600; color: #111827; }
     `;
 }
 
@@ -2490,6 +2493,13 @@ function CoverLetterBuilder({ profile, template, onTemplateChange, aiLimit, cove
     const [loadDialogOpen, setLoadDialogOpen] = useState(false);
     const [savedLetters, setSavedLetters] = useState<Array<{ id: number; content: string; target_company: string | null; target_job_title: string | null; created_at: string }>>([]);
     const [loadingLetters, setLoadingLetters] = useState(false);
+    const [loadTemplateDialogOpen, setLoadTemplateDialogOpen] = useState(false);
+    const [savedTemplates, setSavedTemplates] = useState<Array<{ id: number; title: string; recipient: string | null; content: string }>>([]);
+    const [loadingTemplates, setLoadingTemplates] = useState(false);
+    const [saveAsTemplateDialogOpen, setSaveAsTemplateDialogOpen] = useState(false);
+    const [templateTitle, setTemplateTitle] = useState('');
+    const [templateRecipient, setTemplateRecipient] = useState('');
+    const [savingAsTemplate, setSavingAsTemplate] = useState(false);
 
     useEffect(() => {
         onCoverLetterMetaChange(companyName, jobTitle);
@@ -2644,14 +2654,100 @@ return;
         onCoverLetterContentChange(letter.content);
 
         if (letter.target_company) {
-setCompanyName(letter.target_company);
-}
+            setCompanyName(letter.target_company);
+        }
 
         if (letter.target_job_title) {
-setJobTitle(letter.target_job_title);
-}
+            setJobTitle(letter.target_job_title);
+        }
 
         setLoadDialogOpen(false);
+    }
+
+    async function handleOpenLoadTemplate() {
+        setLoadTemplateDialogOpen(true);
+        setLoadingTemplates(true);
+        setError(null);
+
+        try {
+            const token = (document.querySelector('meta[name="csrf-token"]') as HTMLMetaElement)?.content ?? '';
+            const response = await fetch('/cover-letter-templates/json', {
+                headers: {
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': token,
+                },
+            });
+            const isJson = response.headers.get('content-type')?.includes('application/json');
+            const data = isJson ? await response.json() : null;
+            setSavedTemplates(data?.templates ?? []);
+        } catch {
+            setError('Failed to load cover letter templates.');
+        } finally {
+            setLoadingTemplates(false);
+        }
+    }
+
+    function handleLoadTemplate(template: { id: number; title: string; recipient: string | null; content: string }) {
+        let content = template.content;
+
+        if (template.recipient) {
+            content = content.replaceAll('[Recipient]', template.recipient);
+        }
+
+        content = content
+            .replaceAll('[Company Name]', companyName || 'Target Company')
+            .replaceAll('[Job Title]', jobTitle || 'Software Developer')
+            .replaceAll('[Your Name]', profile?.full_name || 'Applicant')
+            .replaceAll('[Date]', new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }));
+
+        onCoverLetterContentChange(content);
+        setLoadTemplateDialogOpen(false);
+    }
+
+    function handleOpenSaveAsTemplate() {
+        setTemplateTitle('');
+        setTemplateRecipient('');
+        setSaveAsTemplateDialogOpen(true);
+    }
+
+    async function handleSaveAsTemplate() {
+        if (!coverLetterContent.trim() || !templateTitle.trim()) {
+            return;
+        }
+
+        setSavingAsTemplate(true);
+        setError(null);
+
+        try {
+            const token = (document.querySelector('meta[name="csrf-token"]') as HTMLMetaElement)?.content ?? '';
+            const response = await fetch('/cover-letter-templates', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': token,
+                },
+                body: JSON.stringify({
+                    title: templateTitle,
+                    recipient: templateRecipient || null,
+                    content: coverLetterContent,
+                }),
+            });
+
+            if (!response.ok) {
+                const isJson = response.headers.get('content-type')?.includes('application/json');
+                const data = isJson ? await response.json() : null;
+                throw new Error(data?.message || `Save failed (HTTP ${response.status})`);
+            }
+
+            setSaveAsTemplateDialogOpen(false);
+            setSaveSuccess(true);
+            setTimeout(() => setSaveSuccess(false), 5000);
+        } catch (err) {
+            setError(err instanceof Error ? err.message : 'Failed to save as template');
+        } finally {
+            setSavingAsTemplate(false);
+        }
     }
 
     const polishPresets = [
@@ -2755,6 +2851,16 @@ setJobTitle(letter.target_job_title);
                     type="button"
                     variant="outline"
                     size="sm"
+                    onClick={handleOpenLoadTemplate}
+                >
+                    <FileText className="mr-2 size-4" />
+                    Load Template
+                </Button>
+
+                <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
                     onClick={handleSave}
                     disabled={saving || !coverLetterContent.trim()}
                 >
@@ -2764,6 +2870,17 @@ setJobTitle(letter.target_job_title);
                         <Save className="mr-2 size-4" />
                     )}
                     {saving ? 'Saving...' : 'Save'}
+                </Button>
+
+                <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={handleOpenSaveAsTemplate}
+                    disabled={!coverLetterContent.trim()}
+                >
+                    <BookmarkIcon className="mr-2 size-4" />
+                    Save as Template
                 </Button>
 
                 <div className="ml-auto flex items-center gap-1 text-xs text-muted-foreground">
@@ -2866,6 +2983,117 @@ setJobTitle(letter.target_job_title);
                     </div>
                     <DialogFooter>
                         <DialogClose render={<Button variant="outline">Cancel</Button>} />
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+
+            <Dialog open={loadTemplateDialogOpen} onOpenChange={setLoadTemplateDialogOpen}>
+                <DialogContent className="max-w-lg max-h-[70vh] flex flex-col">
+                    <DialogHeader>
+                        <DialogTitle className="flex items-center gap-2">
+                            <FileText className="size-4" />
+                            Load Cover Letter Template
+                        </DialogTitle>
+                        <DialogDescription>
+                            Select a saved template to insert into your cover letter with placeholders replaced.
+                        </DialogDescription>
+                    </DialogHeader>
+                    <div className="flex-1 overflow-y-auto min-h-0">
+                        {loadingTemplates ? (
+                            <div className="flex items-center justify-center py-8">
+                                <Loader2 className="size-6 animate-spin text-muted-foreground" />
+                            </div>
+                        ) : savedTemplates.length === 0 ? (
+                            <div className="flex flex-col items-center justify-center py-8 text-center">
+                                <FileText className="h-8 w-8 text-muted-foreground mb-2" />
+                                <p className="text-sm text-muted-foreground">No cover letter templates yet.</p>
+                                <p className="text-xs text-muted-foreground mt-1">
+                                    Create templates on the Templates page or use "Save as Template" here.
+                                </p>
+                            </div>
+                        ) : (
+                            <div className="flex flex-col gap-2">
+                                {savedTemplates.map((tmpl) => (
+                                    <button
+                                        key={tmpl.id}
+                                        type="button"
+                                        onClick={() => handleLoadTemplate(tmpl)}
+                                        className="flex flex-col gap-1 rounded-lg border border-border bg-card p-3 text-left text-sm hover:bg-[#f5f5f4] dark:hover:bg-[#1C1C1A] transition-colors"
+                                    >
+                                        <div className="flex items-center justify-between">
+                                            <span className="font-medium text-foreground">
+                                                {tmpl.title}
+                                            </span>
+                                            {tmpl.recipient && (
+                                                <span className="text-xs text-muted-foreground">
+                                                    To: {tmpl.recipient}
+                                                </span>
+                                            )}
+                                        </div>
+                                        <p className="text-xs text-muted-foreground line-clamp-2">
+                                            {tmpl.content}
+                                        </p>
+                                    </button>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+                    <DialogFooter>
+                        <DialogClose render={<Button variant="outline">Cancel</Button>} />
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+
+            <Dialog open={saveAsTemplateDialogOpen} onOpenChange={setSaveAsTemplateDialogOpen}>
+                <DialogContent className="sm:max-w-lg">
+                    <DialogHeader>
+                        <DialogTitle className="flex items-center gap-2">
+                            <BookmarkIcon className="size-4" />
+                            Save as Cover Letter Template
+                        </DialogTitle>
+                        <DialogDescription>
+                            Save your current cover letter as a reusable template for future applications.
+                        </DialogDescription>
+                    </DialogHeader>
+                    <div className="flex flex-col gap-4">
+                        <div className="flex flex-col gap-2">
+                            <Label htmlFor="save_template_title">Template Title</Label>
+                            <Input
+                                id="save_template_title"
+                                value={templateTitle}
+                                onChange={(e) => setTemplateTitle(e.target.value)}
+                                placeholder="e.g. General Cover Letter, Tech Role Application"
+                            />
+                        </div>
+                        <div className="flex flex-col gap-2">
+                            <Label htmlFor="save_template_recipient">Recipient (optional)</Label>
+                            <Input
+                                id="save_template_recipient"
+                                value={templateRecipient}
+                                onChange={(e) => setTemplateRecipient(e.target.value)}
+                                placeholder="e.g. Hiring Manager, HR Team"
+                            />
+                        </div>
+                        <div className="flex flex-col gap-2">
+                            <Label>Preview</Label>
+                            <div className="max-h-32 overflow-y-auto rounded-lg border border-border bg-muted p-3 text-xs text-muted-foreground font-mono">
+                                {coverLetterContent.slice(0, 300)}{coverLetterContent.length > 300 ? '...' : ''}
+                            </div>
+                        </div>
+                    </div>
+                    <DialogFooter>
+                        <DialogClose render={<Button variant="outline">Cancel</Button>} />
+                        <Button
+                            onClick={handleSaveAsTemplate}
+                            disabled={savingAsTemplate || !templateTitle.trim() || !coverLetterContent.trim()}
+                        >
+                            {savingAsTemplate ? (
+                                <Loader2 className="mr-2 size-4 animate-spin" />
+                            ) : (
+                                <BookmarkIcon className="mr-2 size-4" />
+                            )}
+                            {savingAsTemplate ? 'Saving...' : 'Save Template'}
+                        </Button>
                     </DialogFooter>
                 </DialogContent>
             </Dialog>

@@ -62,6 +62,11 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->hasMany(SavedCoverLetter::class);
     }
 
+    public function coverLetterTemplates(): HasMany
+    {
+        return $this->hasMany(CoverLetterTemplate::class);
+    }
+
     public function contacts(): HasMany
     {
         return $this->hasMany(Contact::class);

@@ -7,6 +7,7 @@ use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\SocialiteController;
 use App\Http\Controllers\CalendarController;
 use App\Http\Controllers\ContactController;
+use App\Http\Controllers\CoverLetterTemplateController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DocumentController;
 use App\Http\Controllers\FollowUpEmailController;
@@ -96,6 +97,12 @@ Route::middleware('auth')->group(function () {
     Route::post('templates', [ApplicationTemplateController::class, 'store'])->name('templates.store');
     Route::match(['put', 'patch'], 'templates/{applicationTemplate}', [ApplicationTemplateController::class, 'update'])->name('templates.update');
     Route::delete('templates/{applicationTemplate}', [ApplicationTemplateController::class, 'destroy'])->name('templates.destroy');
+
+    Route::get('cover-letter-templates', [CoverLetterTemplateController::class, 'index'])->name('cover-letter-templates.index');
+    Route::post('cover-letter-templates', [CoverLetterTemplateController::class, 'store'])->name('cover-letter-templates.store');
+    Route::match(['put', 'patch'], 'cover-letter-templates/{coverLetterTemplate}', [CoverLetterTemplateController::class, 'update'])->name('cover-letter-templates.update');
+    Route::delete('cover-letter-templates/{coverLetterTemplate}', [CoverLetterTemplateController::class, 'destroy'])->name('cover-letter-templates.destroy');
+    Route::get('cover-letter-templates/json', [CoverLetterTemplateController::class, 'json'])->name('cover-letter-templates.json');
 
     Route::get('contacts', [ContactController::class, 'index'])->name('contacts.index');
     Route::post('contacts', [ContactController::class, 'store'])->name('contacts.store');
