@@ -17,8 +17,6 @@ export const CURRENCIES: Currency[] = [
     { code: 'NZD', symbol: 'NZ$', name: 'New Zealand Dollar' },
 ];
 
-export const CURRENCY_CODES = CURRENCIES.map((c) => c.code);
-
 export function getCurrencySymbol(code: string): string {
     return CURRENCIES.find((c) => c.code === code)?.symbol ?? code;
 }

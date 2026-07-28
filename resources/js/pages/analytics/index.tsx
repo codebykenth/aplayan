@@ -18,9 +18,9 @@ import {
     ChartTooltipContent,
     ChartLegend,
     ChartLegendContent
-    
+
 } from '@/components/ui/chart';
-import type {ChartConfig} from '@/components/ui/chart';
+import type { ChartConfig } from '@/components/ui/chart';
 import { PageHeader } from '@/components/ui/page-header';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import AppLayout from '@/layouts/app-layout';
@@ -81,20 +81,20 @@ function statusLabel(value: string): string {
 
 function responseColor(days: number): string {
     if (days <= 7) {
-return RESPONSE_COLORS[0];
-}
+        return RESPONSE_COLORS[0];
+    }
 
     if (days <= 14) {
-return RESPONSE_COLORS[1];
-}
+        return RESPONSE_COLORS[1];
+    }
 
     if (days <= 30) {
-return RESPONSE_COLORS[2];
-}
+        return RESPONSE_COLORS[2];
+    }
 
     if (days <= 60) {
-return RESPONSE_COLORS[3];
-}
+        return RESPONSE_COLORS[3];
+    }
 
     return RESPONSE_COLORS[4];
 }

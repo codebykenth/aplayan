@@ -159,12 +159,6 @@ class FxExchangeService
             return round($amount * $rates[$toCurrency], 2);
         }
 
-        $fallbackRates = self::FALLBACK_RATES[$fromCurrency] ?? [];
-
-        if (isset($fallbackRates[$toCurrency])) {
-            return round($amount * $fallbackRates[$toCurrency], 2);
-        }
-
         return $amount;
     }
 

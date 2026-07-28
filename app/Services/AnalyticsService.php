@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\DB;
 class AnalyticsService
 {
     public function __construct(
-        private readonly FxExchangeService $fxService = new FxExchangeService,
+        private readonly FxExchangeService $fxService,
     ) {}
 
     public function funnel(User $user): Collection
