@@ -1,19 +1,51 @@
 import { Head, router, useForm } from '@inertiajs/react';
-import { Sun, Moon, Monitor, User, KeyRound, Palette, Check, Receipt, PlusIcon, TrashIcon } from 'lucide-react';
-import { useState  } from 'react';
-import type {ReactNode} from 'react';
+import {
+    Sun,
+    Moon,
+    Monitor,
+    User,
+    KeyRound,
+    Palette,
+    Check,
+    Receipt,
+    PlusIcon,
+    TrashIcon,
+} from 'lucide-react';
+import { useState } from 'react';
+import type { ReactNode } from 'react';
 import { Button } from '@/components/ui/button';
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
+import {
+    Card,
+    CardHeader,
+    CardTitle,
+    CardDescription,
+    CardContent,
+} from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
+import { PasswordInput } from '@/components/ui/password-input';
 import { Label } from '@/components/ui/label';
 import { PageHeader } from '@/components/ui/page-header';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select';
 import { useTheme, useColorTheme } from '@/hooks/use-theme';
 import AppLayout from '@/layouts/app-layout';
 import { cn } from '@/lib/utils';
-import { profileSchema, passwordSchema as passwordSchemaZod, validateWithZod } from '@/lib/validations';
+import {
+    profileSchema,
+    passwordSchema as passwordSchemaZod,
+    validateWithZod,
+} from '@/lib/validations';
 import settings from '@/routes/settings';
-import type { TaxSettings, TaxAllowance, TaxCustomDeduction } from '@/types/job-application';
+import type {
+    TaxSettings,
+    TaxAllowance,
+    TaxCustomDeduction,
+} from '@/types/job-application';
 import { TAX_REGIMES } from '@/types/job-application';
 import { CURRENCIES, getCurrencySymbol } from '@/utils/currency';
 
@@ -39,11 +71,31 @@ const THEME_OPTIONS = [
 ] as const;
 
 const COLOR_THEME_OPTIONS = [
-    { value: 'zinc', label: 'Zinc', colors: ['oklch(0.205 0 0)', 'oklch(0.922 0 0)'] },
-    { value: 'emerald', label: 'Emerald', colors: ['oklch(0.448 0.154 164.978)', 'oklch(0.696 0.17 162.48)'] },
-    { value: 'ocean', label: 'Ocean', colors: ['oklch(0.375 0.143 259.433)', 'oklch(0.594 0.184 254.624)'] },
-    { value: 'indigo', label: 'Indigo', colors: ['oklch(0.398 0.154 286.027)', 'oklch(0.612 0.214 282.755)'] },
-    { value: 'sunset', label: 'Sunset', colors: ['oklch(0.544 0.185 22.555)', 'oklch(0.715 0.194 22.555)'] },
+    {
+        value: 'zinc',
+        label: 'Zinc',
+        colors: ['oklch(0.205 0 0)', 'oklch(0.922 0 0)'],
+    },
+    {
+        value: 'emerald',
+        label: 'Emerald',
+        colors: ['oklch(0.448 0.154 164.978)', 'oklch(0.696 0.17 162.48)'],
+    },
+    {
+        value: 'ocean',
+        label: 'Ocean',
+        colors: ['oklch(0.375 0.143 259.433)', 'oklch(0.594 0.184 254.624)'],
+    },
+    {
+        value: 'indigo',
+        label: 'Indigo',
+        colors: ['oklch(0.398 0.154 286.027)', 'oklch(0.612 0.214 282.755)'],
+    },
+    {
+        value: 'sunset',
+        label: 'Sunset',
+        colors: ['oklch(0.544 0.185 22.555)', 'oklch(0.715 0.194 22.555)'],
+    },
 ] as const;
 
 type UserData = {
@@ -64,10 +116,20 @@ interface SettingsPageProps {
 }
 
 function ProfileSection({ user }: { user: UserData }) {
-    const { data, setData, patch, processing, errors, transform, setError, clearErrors } = useForm({
+    const {
+        data,
+        setData,
+        patch,
+        processing,
+        errors,
+        transform,
+        setError,
+        clearErrors,
+    } = useForm({
         name: user.name,
         email: user.email,
-        expected_salary: user.expected_salary != null ? String(user.expected_salary) : '',
+        expected_salary:
+            user.expected_salary != null ? String(user.expected_salary) : '',
         base_currency: user.base_currency || 'PHP',
         theme: user.theme,
         color_theme: user.color_theme,
@@ -76,7 +138,12 @@ function ProfileSection({ user }: { user: UserData }) {
     function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
 
-        const result = validateWithZod(profileSchema, { name: data.name, email: data.email, expected_salary: Number(data.expected_salary), base_currency: data.base_currency });
+        const result = validateWithZod(profileSchema, {
+            name: data.name,
+            email: data.email,
+            expected_salary: Number(data.expected_salary),
+            base_currency: data.base_currency,
+        });
 
         if (!result.success) {
             clearErrors();
@@ -88,7 +155,9 @@ function ProfileSection({ user }: { user: UserData }) {
 
         transform((formData) => ({
             ...formData,
-            expected_salary: formData.expected_salary ? Number(formData.expected_salary) : null,
+            expected_salary: formData.expected_salary
+                ? Number(formData.expected_salary)
+                : null,
         }));
 
         patch(settings.profile.update.url());
@@ -103,7 +172,8 @@ function ProfileSection({ user }: { user: UserData }) {
                         Profile Preferences
                     </CardTitle>
                     <CardDescription>
-                        Update your public name, email address, default currency, and target compensation.
+                        Update your public name, email address, default
+                        currency, and target compensation.
                     </CardDescription>
                 </CardHeader>
                 <CardContent className="flex flex-col gap-4">
@@ -116,7 +186,9 @@ function ProfileSection({ user }: { user: UserData }) {
                             aria-invalid={!!errors.name}
                         />
                         {errors.name && (
-                            <p className="text-xs text-destructive">{errors.name}</p>
+                            <p className="text-xs text-destructive">
+                                {errors.name}
+                            </p>
                         )}
                     </div>
 
@@ -130,7 +202,9 @@ function ProfileSection({ user }: { user: UserData }) {
                             aria-invalid={!!errors.email}
                         />
                         {errors.email && (
-                            <p className="text-xs text-destructive">{errors.email}</p>
+                            <p className="text-xs text-destructive">
+                                {errors.email}
+                            </p>
                         )}
                     </div>
 
@@ -138,9 +212,14 @@ function ProfileSection({ user }: { user: UserData }) {
                         <Label htmlFor="base_currency">Base Currency</Label>
                         <Select
                             value={data.base_currency || 'PHP'}
-                            onValueChange={(val) => setData('base_currency', val ?? 'PHP')}
+                            onValueChange={(val) =>
+                                setData('base_currency', val ?? 'PHP')
+                            }
                         >
-                            <SelectTrigger id="base_currency" aria-invalid={!!errors.base_currency}>
+                            <SelectTrigger
+                                id="base_currency"
+                                aria-invalid={!!errors.base_currency}
+                            >
                                 <SelectValue placeholder="Select currency" />
                             </SelectTrigger>
                             <SelectContent side="bottom">
@@ -152,16 +231,19 @@ function ProfileSection({ user }: { user: UserData }) {
                             </SelectContent>
                         </Select>
                         {errors.base_currency && (
-                            <p className="text-xs text-destructive">{errors.base_currency}</p>
+                            <p className="text-xs text-destructive">
+                                {errors.base_currency}
+                            </p>
                         )}
                     </div>
 
                     <div className="flex flex-col gap-2">
                         <Label htmlFor="expected_salary">
-                            Expected Target Salary ({getCurrencySymbol(data.base_currency || 'PHP')})
+                            Expected Target Salary (
+                            {getCurrencySymbol(data.base_currency || 'PHP')})
                         </Label>
                         <div className="relative">
-                            <span className="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
+                            <span className="pointer-events-none absolute top-1/2 left-2.5 -translate-y-1/2 text-sm text-muted-foreground">
                                 {getCurrencySymbol(data.base_currency || 'PHP')}
                             </span>
                             <Input
@@ -194,7 +276,16 @@ function ProfileSection({ user }: { user: UserData }) {
 }
 
 function PasswordSection() {
-    const { data, setData, patch, processing, errors, reset, setError, clearErrors } = useForm({
+    const {
+        data,
+        setData,
+        patch,
+        processing,
+        errors,
+        reset,
+        setError,
+        clearErrors,
+    } = useForm({
         current_password: '',
         password: '',
         password_confirmation: '',
@@ -235,9 +326,8 @@ function PasswordSection() {
                         <Label htmlFor="current_password">
                             Current Password
                         </Label>
-                        <Input
+                        <PasswordInput
                             id="current_password"
-                            type="password"
                             value={data.current_password}
                             onChange={(e) =>
                                 setData('current_password', e.target.value)
@@ -254,9 +344,8 @@ function PasswordSection() {
 
                     <div className="flex flex-col gap-2">
                         <Label htmlFor="password">New Password</Label>
-                        <Input
+                        <PasswordInput
                             id="password"
-                            type="password"
                             value={data.password}
                             onChange={(e) =>
                                 setData('password', e.target.value)
@@ -275,9 +364,8 @@ function PasswordSection() {
                         <Label htmlFor="password_confirmation">
                             Confirm New Password
                         </Label>
-                        <Input
+                        <PasswordInput
                             id="password_confirmation"
-                            type="password"
                             value={data.password_confirmation}
                             onChange={(e) =>
                                 setData('password_confirmation', e.target.value)
@@ -314,7 +402,9 @@ function AppearanceSection() {
     }
 
     function handleColorThemeChange(value: string) {
-        setColorTheme(value as 'zinc' | 'emerald' | 'ocean' | 'indigo' | 'sunset');
+        setColorTheme(
+            value as 'zinc' | 'emerald' | 'ocean' | 'indigo' | 'sunset',
+        );
         router.patch(settings.colorTheme.update.url(), {
             color_theme: value,
         });
@@ -328,75 +418,96 @@ function AppearanceSection() {
                     Theme & Appearance
                 </CardTitle>
                 <CardDescription>
-                    Customize your interface theme mode and primary color scheme.
+                    Customize your interface theme mode and primary color
+                    scheme.
                 </CardDescription>
             </CardHeader>
             <CardContent className="flex flex-col gap-6">
                 {/* Mode Selector */}
                 <div className="flex flex-col gap-3">
                     <div className="flex items-center justify-between">
-                        <Label className="text-sm font-semibold">Theme Mode</Label>
-                        <span className="text-xs text-muted-foreground">Select interface style</span>
+                        <Label className="text-sm font-semibold">
+                            Theme Mode
+                        </Label>
+                        <span className="text-xs text-muted-foreground">
+                            Select interface style
+                        </span>
                     </div>
                     <fieldset className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-                        <legend className="sr-only">Theme mode selection</legend>
-                        {THEME_OPTIONS.map(({ value, label, description, icon: Icon }) => {
-                            const isSelected = mode === value;
+                        <legend className="sr-only">
+                            Theme mode selection
+                        </legend>
+                        {THEME_OPTIONS.map(
+                            ({ value, label, description, icon: Icon }) => {
+                                const isSelected = mode === value;
 
-                            return (
-                                <label
-                                    key={value}
-                                    className={cn(
-                                        'group relative flex cursor-pointer flex-col gap-3 rounded-xl border p-4 transition-all',
-                                        isSelected
-                                            ? 'border-primary bg-primary/5 ring-2 ring-primary/20'
-                                            : 'border-border bg-card hover:border-foreground/20 hover:bg-muted/50',
-                                    )}
-                                >
-                                    <input
-                                        type="radio"
-                                        name="theme"
-                                        value={value}
-                                        checked={isSelected}
-                                        onChange={() => handleModeChange(value)}
-                                        className="sr-only"
-                                    />
-                                    <div className="flex items-center justify-between">
-                                        <div
-                                            className={cn(
-                                                'flex size-9 items-center justify-center rounded-lg border transition-colors',
-                                                isSelected
-                                                    ? 'border-primary/30 bg-primary/10 text-primary'
-                                                    : 'border-border bg-muted text-muted-foreground group-hover:text-foreground',
-                                            )}
-                                        >
-                                            <Icon className="size-4" />
-                                        </div>
-                                        {isSelected && (
-                                            <span className="flex size-5 items-center justify-center rounded-full bg-primary text-primary-foreground">
-                                                <Check className="size-3 stroke-[3]" />
-                                            </span>
+                                return (
+                                    <label
+                                        key={value}
+                                        className={cn(
+                                            'group relative flex cursor-pointer flex-col gap-3 rounded-xl border p-4 transition-all',
+                                            isSelected
+                                                ? 'border-primary bg-primary/5 ring-2 ring-primary/20'
+                                                : 'border-border bg-card hover:border-foreground/20 hover:bg-muted/50',
                                         )}
-                                    </div>
+                                    >
+                                        <input
+                                            type="radio"
+                                            name="theme"
+                                            value={value}
+                                            checked={isSelected}
+                                            onChange={() =>
+                                                handleModeChange(value)
+                                            }
+                                            className="sr-only"
+                                        />
+                                        <div className="flex items-center justify-between">
+                                            <div
+                                                className={cn(
+                                                    'flex size-9 items-center justify-center rounded-lg border transition-colors',
+                                                    isSelected
+                                                        ? 'border-primary/30 bg-primary/10 text-primary'
+                                                        : 'border-border bg-muted text-muted-foreground group-hover:text-foreground',
+                                                )}
+                                            >
+                                                <Icon className="size-4" />
+                                            </div>
+                                            {isSelected && (
+                                                <span className="flex size-5 items-center justify-center rounded-full bg-primary text-primary-foreground">
+                                                    <Check className="size-3 stroke-[3]" />
+                                                </span>
+                                            )}
+                                        </div>
 
-                                    <div>
-                                        <p className="text-sm font-medium text-foreground">{label}</p>
-                                        <p className="text-xs text-muted-foreground">{description}</p>
-                                    </div>
-                                </label>
-                            );
-                        })}
+                                        <div>
+                                            <p className="text-sm font-medium text-foreground">
+                                                {label}
+                                            </p>
+                                            <p className="text-xs text-muted-foreground">
+                                                {description}
+                                            </p>
+                                        </div>
+                                    </label>
+                                );
+                            },
+                        )}
                     </fieldset>
                 </div>
 
                 {/* Accent Color Selector */}
                 <div className="flex flex-col gap-3 border-t pt-5">
                     <div className="flex items-center justify-between">
-                        <Label className="text-sm font-semibold">Accent Color</Label>
-                        <span className="text-xs text-muted-foreground">Personalize highlight colors</span>
+                        <Label className="text-sm font-semibold">
+                            Accent Color
+                        </Label>
+                        <span className="text-xs text-muted-foreground">
+                            Personalize highlight colors
+                        </span>
                     </div>
                     <fieldset className="grid grid-cols-2 gap-3 sm:grid-cols-5">
-                        <legend className="sr-only">Color theme selection</legend>
+                        <legend className="sr-only">
+                            Color theme selection
+                        </legend>
                         {COLOR_THEME_OPTIONS.map(({ value, label, colors }) => {
                             const isSelected = colorTheme === value;
 
@@ -404,7 +515,7 @@ function AppearanceSection() {
                                 <label
                                     key={value}
                                     className={cn(
-                                        'group relative flex cursor-pointer flex-col items-center gap-2.5 rounded-xl border p-3.5 transition-all text-center',
+                                        'group relative flex cursor-pointer flex-col items-center gap-2.5 rounded-xl border p-3.5 text-center transition-all',
                                         isSelected
                                             ? 'border-primary bg-primary/5 ring-2 ring-primary/20'
                                             : 'border-border bg-card hover:border-foreground/20 hover:bg-muted/50',
@@ -415,19 +526,25 @@ function AppearanceSection() {
                                         name="color_theme"
                                         value={value}
                                         checked={isSelected}
-                                        onChange={() => handleColorThemeChange(value)}
+                                        onChange={() =>
+                                            handleColorThemeChange(value)
+                                        }
                                         className="sr-only"
                                     />
                                     <div className="flex items-center gap-1.5">
                                         {colors.map((color, i) => (
                                             <div
                                                 key={i}
-                                                className="size-5 rounded-full ring-1 ring-black/10 dark:ring-white/20 shadow-xs"
-                                                style={{ backgroundColor: color }}
+                                                className="size-5 rounded-full shadow-xs ring-1 ring-black/10 dark:ring-white/20"
+                                                style={{
+                                                    backgroundColor: color,
+                                                }}
                                             />
                                         ))}
                                     </div>
-                                    <span className="text-xs font-medium text-foreground">{label}</span>
+                                    <span className="text-xs font-medium text-foreground">
+                                        {label}
+                                    </span>
                                     {isSelected && (
                                         <span className="absolute -top-1 -right-1 flex size-5 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-xs">
                                             <Check className="size-3 stroke-[3]" />
@@ -457,7 +574,9 @@ function TaxSettingsSection({ user }: { user: UserData }) {
     });
     const taxSettings = data.tax_settings;
 
-    function updateSettings(updater: (prev: typeof taxSettings) => typeof taxSettings) {
+    function updateSettings(
+        updater: (prev: typeof taxSettings) => typeof taxSettings,
+    ) {
         setData('tax_settings', updater(taxSettings));
     }
 
@@ -481,31 +600,48 @@ function TaxSettingsSection({ user }: { user: UserData }) {
         }));
     }
 
-    function updateAllowance(index: number, field: keyof TaxAllowance, value: string | number | boolean) {
+    function updateAllowance(
+        index: number,
+        field: keyof TaxAllowance,
+        value: string | number | boolean,
+    ) {
         updateSettings((prev) => ({
             ...prev,
-            allowances: prev.allowances.map((a, i) => (i === index ? { ...a, [field]: value } : a)),
+            allowances: prev.allowances.map((a, i) =>
+                i === index ? { ...a, [field]: value } : a,
+            ),
         }));
     }
 
     function addCustomDeduction() {
         updateSettings((prev) => ({
             ...prev,
-            custom_deductions: [...prev.custom_deductions, { name: '', amount: 0 }],
+            custom_deductions: [
+                ...prev.custom_deductions,
+                { name: '', amount: 0 },
+            ],
         }));
     }
 
     function removeCustomDeduction(index: number) {
         updateSettings((prev) => ({
             ...prev,
-            custom_deductions: prev.custom_deductions.filter((_, i) => i !== index),
+            custom_deductions: prev.custom_deductions.filter(
+                (_, i) => i !== index,
+            ),
         }));
     }
 
-    function updateCustomDeduction(index: number, field: keyof TaxCustomDeduction, value: string | number) {
+    function updateCustomDeduction(
+        index: number,
+        field: keyof TaxCustomDeduction,
+        value: string | number,
+    ) {
         updateSettings((prev) => ({
             ...prev,
-            custom_deductions: prev.custom_deductions.map((d, i) => (i === index ? { ...d, [field]: value } : d)),
+            custom_deductions: prev.custom_deductions.map((d, i) =>
+                i === index ? { ...d, [field]: value } : d,
+            ),
         }));
     }
 
@@ -517,46 +653,68 @@ function TaxSettingsSection({ user }: { user: UserData }) {
                     Global Tax Preferences
                 </CardTitle>
                 <CardDescription>
-                    Set default tax regime, standard allowances, and statutory contribution overrides. These apply to all offer comparisons unless customized per-offer.
+                    Set default tax regime, standard allowances, and statutory
+                    contribution overrides. These apply to all offer comparisons
+                    unless customized per-offer.
                 </CardDescription>
             </CardHeader>
             <CardContent className="flex flex-col gap-4">
                 <div className="flex flex-col gap-1.5">
                     <Label>Default Tax Regime</Label>
-                        <Select
-                            value={taxSettings.regime}
-                            onValueChange={(value) =>
-                                updateSettings((prev) => ({ ...prev, regime: value as TaxSettings['regime'] }))
-                            }
+                    <Select
+                        value={taxSettings.regime}
+                        onValueChange={(value) =>
+                            updateSettings((prev) => ({
+                                ...prev,
+                                regime: value as TaxSettings['regime'],
+                            }))
+                        }
+                    >
+                        <SelectTrigger className="w-full">
+                            <SelectValue>
+                                {TAX_REGIMES.find(
+                                    (r) => r.value === taxSettings.regime,
+                                )?.label ?? 'Select Tax Regime'}
+                            </SelectValue>
+                        </SelectTrigger>
+                        <SelectContent
+                            alignItemWithTrigger={false}
+                            side="bottom"
+                            sideOffset={4}
                         >
-                            <SelectTrigger className="w-full">
-                                <SelectValue>
-                                    {TAX_REGIMES.find((r) => r.value === taxSettings.regime)?.label ?? 'Select Tax Regime'}
-                                </SelectValue>
-                            </SelectTrigger>
-                            <SelectContent alignItemWithTrigger={false} side="bottom" sideOffset={4}>
-                                {TAX_REGIMES.map((regime) => (
-                                    <SelectItem key={regime.value} value={regime.value}>
-                                        <div className="flex flex-col">
-                                            <span>{regime.label}</span>
-                                            <span className="text-xs text-muted-foreground">{regime.description}</span>
-                                        </div>
-                                    </SelectItem>
-                                ))}
-                            </SelectContent>
-                        </Select>
+                            {TAX_REGIMES.map((regime) => (
+                                <SelectItem
+                                    key={regime.value}
+                                    value={regime.value}
+                                >
+                                    <div className="flex flex-col">
+                                        <span>{regime.label}</span>
+                                        <span className="text-xs text-muted-foreground">
+                                            {regime.description}
+                                        </span>
+                                    </div>
+                                </SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
                 </div>
 
                 <div className="flex flex-col gap-3 border-t border-border pt-4">
                     <div>
-                        <Label className="text-sm font-semibold">Statutory Contribution Overrides (Optional)</Label>
+                        <Label className="text-sm font-semibold">
+                            Statutory Contribution Overrides (Optional)
+                        </Label>
                         <p className="text-xs text-muted-foreground">
-                            Leave empty to automatically calculate deductions using official 2026 Philippine government statutory rates.
+                            Leave empty to automatically calculate deductions
+                            using official 2026 Philippine government statutory
+                            rates.
                         </p>
                     </div>
                     <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                         <div className="flex flex-col gap-1.5">
-                            <Label htmlFor="override_sss" className="text-xs">SSS Monthly (₱)</Label>
+                            <Label htmlFor="override_sss" className="text-xs">
+                                SSS Monthly (₱)
+                            </Label>
                             <Input
                                 id="override_sss"
                                 type="number"
@@ -566,13 +724,21 @@ function TaxSettingsSection({ user }: { user: UserData }) {
                                 onChange={(e) =>
                                     updateSettings((prev) => ({
                                         ...prev,
-                                        override_sss: e.target.value !== '' ? parseFloat(e.target.value) : null,
+                                        override_sss:
+                                            e.target.value !== ''
+                                                ? parseFloat(e.target.value)
+                                                : null,
                                     }))
                                 }
                             />
                         </div>
                         <div className="flex flex-col gap-1.5">
-                            <Label htmlFor="override_philhealth" className="text-xs">PhilHealth Monthly (₱)</Label>
+                            <Label
+                                htmlFor="override_philhealth"
+                                className="text-xs"
+                            >
+                                PhilHealth Monthly (₱)
+                            </Label>
                             <Input
                                 id="override_philhealth"
                                 type="number"
@@ -582,13 +748,21 @@ function TaxSettingsSection({ user }: { user: UserData }) {
                                 onChange={(e) =>
                                     updateSettings((prev) => ({
                                         ...prev,
-                                        override_philhealth: e.target.value !== '' ? parseFloat(e.target.value) : null,
+                                        override_philhealth:
+                                            e.target.value !== ''
+                                                ? parseFloat(e.target.value)
+                                                : null,
                                     }))
                                 }
                             />
                         </div>
                         <div className="flex flex-col gap-1.5">
-                            <Label htmlFor="override_pagibig" className="text-xs">Pag-IBIG Monthly (₱)</Label>
+                            <Label
+                                htmlFor="override_pagibig"
+                                className="text-xs"
+                            >
+                                Pag-IBIG Monthly (₱)
+                            </Label>
                             <Input
                                 id="override_pagibig"
                                 type="number"
@@ -598,13 +772,21 @@ function TaxSettingsSection({ user }: { user: UserData }) {
                                 onChange={(e) =>
                                     updateSettings((prev) => ({
                                         ...prev,
-                                        override_pagibig: e.target.value !== '' ? parseFloat(e.target.value) : null,
+                                        override_pagibig:
+                                            e.target.value !== ''
+                                                ? parseFloat(e.target.value)
+                                                : null,
                                     }))
                                 }
                             />
                         </div>
                         <div className="flex flex-col gap-1.5">
-                            <Label htmlFor="override_bir_tax" className="text-xs">BIR Income Tax Monthly (₱)</Label>
+                            <Label
+                                htmlFor="override_bir_tax"
+                                className="text-xs"
+                            >
+                                BIR Income Tax Monthly (₱)
+                            </Label>
                             <Input
                                 id="override_bir_tax"
                                 type="number"
@@ -614,7 +796,10 @@ function TaxSettingsSection({ user }: { user: UserData }) {
                                 onChange={(e) =>
                                     updateSettings((prev) => ({
                                         ...prev,
-                                        override_bir_tax: e.target.value !== '' ? parseFloat(e.target.value) : null,
+                                        override_bir_tax:
+                                            e.target.value !== ''
+                                                ? parseFloat(e.target.value)
+                                                : null,
                                     }))
                                 }
                             />
@@ -625,23 +810,40 @@ function TaxSettingsSection({ user }: { user: UserData }) {
                 <div className="flex flex-col gap-2">
                     <div className="flex items-center justify-between">
                         <Label>Non-Taxable Allowances</Label>
-                        <Button type="button" variant="ghost" size="sm" onClick={() => addAllowance(false)}>
+                        <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => addAllowance(false)}
+                        >
                             <PlusIcon className="size-3.5" />
                             Add
                         </Button>
                     </div>
-                    {taxSettings.allowances.filter((a) => !a.taxable).length === 0 && (
-                        <p className="text-xs text-muted-foreground">No non-taxable allowances configured.</p>
+                    {taxSettings.allowances.filter((a) => !a.taxable).length ===
+                        0 && (
+                        <p className="text-xs text-muted-foreground">
+                            No non-taxable allowances configured.
+                        </p>
                     )}
                     {taxSettings.allowances
                         .map((a, i) => ({ ...a, originalIndex: i }))
                         .filter((a) => !a.taxable)
                         .map((a) => (
-                            <div key={a.originalIndex} className="flex items-center gap-2">
+                            <div
+                                key={a.originalIndex}
+                                className="flex items-center gap-2"
+                            >
                                 <Input
                                     placeholder="Name (e.g. Rice Allowance)"
                                     value={a.name}
-                                    onChange={(e) => updateAllowance(a.originalIndex, 'name', e.target.value)}
+                                    onChange={(e) =>
+                                        updateAllowance(
+                                            a.originalIndex,
+                                            'name',
+                                            e.target.value,
+                                        )
+                                    }
                                     className="flex-1"
                                 />
                                 <Input
@@ -649,7 +851,11 @@ function TaxSettingsSection({ user }: { user: UserData }) {
                                     placeholder="Amount"
                                     value={a.amount || ''}
                                     onChange={(e) =>
-                                        updateAllowance(a.originalIndex, 'amount', parseFloat(e.target.value) || 0)
+                                        updateAllowance(
+                                            a.originalIndex,
+                                            'amount',
+                                            parseFloat(e.target.value) || 0,
+                                        )
                                     }
                                     className="w-28"
                                 />
@@ -657,7 +863,9 @@ function TaxSettingsSection({ user }: { user: UserData }) {
                                     type="button"
                                     variant="ghost"
                                     size="icon-sm"
-                                    onClick={() => removeAllowance(a.originalIndex)}
+                                    onClick={() =>
+                                        removeAllowance(a.originalIndex)
+                                    }
                                 >
                                     <TrashIcon className="size-3.5" />
                                 </Button>
@@ -668,23 +876,40 @@ function TaxSettingsSection({ user }: { user: UserData }) {
                 <div className="flex flex-col gap-2">
                     <div className="flex items-center justify-between">
                         <Label>Taxable Allowances</Label>
-                        <Button type="button" variant="ghost" size="sm" onClick={() => addAllowance(true)}>
+                        <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => addAllowance(true)}
+                        >
                             <PlusIcon className="size-3.5" />
                             Add
                         </Button>
                     </div>
-                    {taxSettings.allowances.filter((a) => a.taxable).length === 0 && (
-                        <p className="text-xs text-muted-foreground">No taxable allowances configured.</p>
+                    {taxSettings.allowances.filter((a) => a.taxable).length ===
+                        0 && (
+                        <p className="text-xs text-muted-foreground">
+                            No taxable allowances configured.
+                        </p>
                     )}
                     {taxSettings.allowances
                         .map((a, i) => ({ ...a, originalIndex: i }))
                         .filter((a) => a.taxable)
                         .map((a) => (
-                            <div key={a.originalIndex} className="flex items-center gap-2">
+                            <div
+                                key={a.originalIndex}
+                                className="flex items-center gap-2"
+                            >
                                 <Input
                                     placeholder="Name (e.g. Monthly Bonus)"
                                     value={a.name}
-                                    onChange={(e) => updateAllowance(a.originalIndex, 'name', e.target.value)}
+                                    onChange={(e) =>
+                                        updateAllowance(
+                                            a.originalIndex,
+                                            'name',
+                                            e.target.value,
+                                        )
+                                    }
                                     className="flex-1"
                                 />
                                 <Input
@@ -692,7 +917,11 @@ function TaxSettingsSection({ user }: { user: UserData }) {
                                     placeholder="Amount"
                                     value={a.amount || ''}
                                     onChange={(e) =>
-                                        updateAllowance(a.originalIndex, 'amount', parseFloat(e.target.value) || 0)
+                                        updateAllowance(
+                                            a.originalIndex,
+                                            'amount',
+                                            parseFloat(e.target.value) || 0,
+                                        )
                                     }
                                     className="w-28"
                                 />
@@ -700,7 +929,9 @@ function TaxSettingsSection({ user }: { user: UserData }) {
                                     type="button"
                                     variant="ghost"
                                     size="icon-sm"
-                                    onClick={() => removeAllowance(a.originalIndex)}
+                                    onClick={() =>
+                                        removeAllowance(a.originalIndex)
+                                    }
                                 >
                                     <TrashIcon className="size-3.5" />
                                 </Button>
@@ -711,20 +942,33 @@ function TaxSettingsSection({ user }: { user: UserData }) {
                 <div className="flex flex-col gap-2">
                     <div className="flex items-center justify-between">
                         <Label>Custom Deductions</Label>
-                        <Button type="button" variant="ghost" size="sm" onClick={addCustomDeduction}>
+                        <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            onClick={addCustomDeduction}
+                        >
                             <PlusIcon className="size-3.5" />
                             Add
                         </Button>
                     </div>
                     {taxSettings.custom_deductions.length === 0 && (
-                        <p className="text-xs text-muted-foreground">No custom deductions configured.</p>
+                        <p className="text-xs text-muted-foreground">
+                            No custom deductions configured.
+                        </p>
                     )}
                     {taxSettings.custom_deductions.map((d, i) => (
                         <div key={i} className="flex items-center gap-2">
                             <Input
                                 placeholder="Name (e.g. HMO Dependent)"
                                 value={d.name}
-                                onChange={(e) => updateCustomDeduction(i, 'name', e.target.value)}
+                                onChange={(e) =>
+                                    updateCustomDeduction(
+                                        i,
+                                        'name',
+                                        e.target.value,
+                                    )
+                                }
                                 className="flex-1"
                             />
                             <Input
@@ -732,11 +976,20 @@ function TaxSettingsSection({ user }: { user: UserData }) {
                                 placeholder="Amount"
                                 value={d.amount || ''}
                                 onChange={(e) =>
-                                    updateCustomDeduction(i, 'amount', parseFloat(e.target.value) || 0)
+                                    updateCustomDeduction(
+                                        i,
+                                        'amount',
+                                        parseFloat(e.target.value) || 0,
+                                    )
                                 }
                                 className="w-28"
                             />
-                            <Button type="button" variant="ghost" size="icon-sm" onClick={() => removeCustomDeduction(i)}>
+                            <Button
+                                type="button"
+                                variant="ghost"
+                                size="icon-sm"
+                                onClick={() => removeCustomDeduction(i)}
+                            >
                                 <TrashIcon className="size-3.5" />
                             </Button>
                         </div>
@@ -744,7 +997,11 @@ function TaxSettingsSection({ user }: { user: UserData }) {
                 </div>
             </CardContent>
             <div className="flex items-center justify-end border-t px-(--card-spacing) py-(--card-spacing)">
-                <Button type="button" onClick={handleSave} disabled={processing}>
+                <Button
+                    type="button"
+                    onClick={handleSave}
+                    disabled={processing}
+                >
                     {processing ? 'Saving...' : 'Save Tax Settings'}
                 </Button>
             </div>
@@ -753,7 +1010,7 @@ function TaxSettingsSection({ user }: { user: UserData }) {
 }
 
 const VALID_TABS = ['appearance', 'profile', 'password', 'tax'] as const;
-type SettingsTab = typeof VALID_TABS[number];
+type SettingsTab = (typeof VALID_TABS)[number];
 
 function getInitialSettingsTab(): SettingsTab {
     if (typeof window !== 'undefined') {
@@ -762,7 +1019,9 @@ function getInitialSettingsTab(): SettingsTab {
         if (urlTab && VALID_TABS.includes(urlTab)) {
             return urlTab;
         }
-        const savedTab = localStorage.getItem('settings_active_tab') as SettingsTab | null;
+        const savedTab = localStorage.getItem(
+            'settings_active_tab',
+        ) as SettingsTab | null;
         if (savedTab && VALID_TABS.includes(savedTab)) {
             return savedTab;
         }
@@ -771,7 +1030,9 @@ function getInitialSettingsTab(): SettingsTab {
 }
 
 export default function SettingsIndex({ user }: SettingsPageProps) {
-    const [activeTab, setActiveTabState] = useState<SettingsTab>(getInitialSettingsTab);
+    const [activeTab, setActiveTabState] = useState<SettingsTab>(
+        getInitialSettingsTab,
+    );
 
     const handleTabChange = (tab: SettingsTab) => {
         setActiveTabState(tab);
@@ -788,7 +1049,10 @@ export default function SettingsIndex({ user }: SettingsPageProps) {
             <Head title="Settings" />
 
             <div className="flex min-h-0 flex-1 flex-col gap-6 overflow-y-auto pr-2 pb-8">
-                <PageHeader title="Settings" description="Manage your account settings, password, and theme preferences." />
+                <PageHeader
+                    title="Settings"
+                    description="Manage your account settings, password, and theme preferences."
+                />
 
                 {/* Tab Navigation Controls */}
                 <div className="flex items-center gap-1 border-b border-border pb-1">

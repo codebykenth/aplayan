@@ -1,5 +1,13 @@
 import { Head, Link } from '@inertiajs/react';
-import { MapPinIcon, ExternalLinkIcon, TrendingUp, CalendarDays, Briefcase, PhilippinePesoIcon, SettingsIcon } from 'lucide-react';
+import {
+    MapPinIcon,
+    ExternalLinkIcon,
+    TrendingUp,
+    CalendarDays,
+    Briefcase,
+    PhilippinePesoIcon,
+    SettingsIcon,
+} from 'lucide-react';
 import { useState } from 'react';
 import type { ReactNode } from 'react';
 import ApplicationDetailModal from '@/components/job-applications/application-detail-modal';
@@ -67,16 +75,19 @@ function OfferCard({
                 <CardContent className="flex flex-1 flex-col gap-3">
                     {offer.offered_salary !== null && (
                         <div className="flex items-center justify-between rounded-lg bg-muted/50 px-3 py-2">
-                            <span className="text-sm text-muted-foreground">Offered Salary</span>
-                            <span className="text-lg font-bold tabular-nums text-foreground">
-                                {formatSalary(offer.offered_salary, offer.currency ?? baseCurrency)}
+                            <span className="text-sm text-muted-foreground">
+                                Offered Salary
+                            </span>
+                            <span className="text-lg font-bold text-foreground tabular-nums">
+                                {formatSalary(
+                                    offer.offered_salary,
+                                    offer.currency ?? baseCurrency,
+                                )}
                             </span>
                         </div>
                     )}
 
-                    {tb && (
-                        <TaxBreakdownCard taxBreakdown={tb} />
-                    )}
+                    {tb && <TaxBreakdownCard taxBreakdown={tb} />}
 
                     <Button
                         type="button"
@@ -98,8 +109,8 @@ function OfferCard({
                                     offer.ai_match_percentage >= 70
                                         ? 'text-green-600 dark:text-green-400'
                                         : offer.ai_match_percentage >= 40
-                                            ? 'text-amber-600 dark:text-amber-400'
-                                            : 'text-red-600 dark:text-red-400'
+                                          ? 'text-amber-600 dark:text-amber-400'
+                                          : 'text-red-600 dark:text-red-400'
                                 }`}
                             >
                                 {offer.ai_match_percentage}%
@@ -109,7 +120,11 @@ function OfferCard({
 
                     <div className="flex items-center gap-2 text-xs text-muted-foreground">
                         <CalendarDays className="size-3.5" />
-                        <span>Received: {formatDate(offer.date_applied) ?? formatDate(offer.created_at)}</span>
+                        <span>
+                            Received:{' '}
+                            {formatDate(offer.date_applied) ??
+                                formatDate(offer.created_at)}
+                        </span>
                     </div>
 
                     <div className="mt-auto flex flex-col gap-2 pt-2">
@@ -160,7 +175,9 @@ export default function OfferComparisonIndex({
     contacts?: Contact[];
 }) {
     const offerList = Array.isArray(offers) ? offers : (offers?.data ?? []);
-    const [selectedOffer, setSelectedOffer] = useState<JobApplication | null>(null);
+    const [selectedOffer, setSelectedOffer] = useState<JobApplication | null>(
+        null,
+    );
     const [detailModalOpen, setDetailModalOpen] = useState(false);
 
     const handleViewDetails = (offer: JobApplication) => {
@@ -173,13 +190,17 @@ export default function OfferComparisonIndex({
             <Head title="Offer Comparison" />
 
             <div className="flex flex-col gap-6">
-                <PageHeader title="Offer Comparison" description="Compare your job offers side by side" />
+                <PageHeader
+                    title="Offer Comparison"
+                    description="Compare your job offers side by side"
+                />
 
                 {offerList.length === 0 ? (
                     <div className="flex flex-col items-center justify-center gap-2 py-16 text-center">
                         <PhilippinePesoIcon className="size-12 text-muted-foreground/40" />
                         <p className="text-sm text-muted-foreground">
-                            No offers yet. Move an application to "Offer" status to see it here.
+                            No offers yet. Move an application to "Offer" status
+                            to see it here.
                         </p>
                         <Link
                             href="/job-applications"
@@ -216,4 +237,6 @@ export default function OfferComparisonIndex({
     );
 }
 
-OfferComparisonIndex.layout = (page: ReactNode) => <AppLayout>{page}</AppLayout>;
+OfferComparisonIndex.layout = (page: ReactNode) => (
+    <AppLayout>{page}</AppLayout>
+);

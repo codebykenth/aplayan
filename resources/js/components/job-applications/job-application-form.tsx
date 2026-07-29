@@ -1,5 +1,5 @@
-import { useForm, usePage } from '@inertiajs/react';
-import { useCallback, useEffect, useState } from 'react';
+import { usePage } from '@inertiajs/react';
+import { useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import {
     Dialog,
@@ -18,10 +18,18 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
-import { store as jobAppStore, update as jobAppUpdate } from '@/routes/job-applications';
-import { CURRENCIES, getCurrencySymbol, convertCurrency } from '@/utils/currency';
+import {
+    store as jobAppStore,
+    update as jobAppUpdate,
+} from '@/routes/job-applications';
+import {
+    CURRENCIES,
+    getCurrencySymbol,
+    convertCurrency,
+} from '@/utils/currency';
 import { JOB_APPLICATION_STATUSES } from '@/types/job-application';
 import type { JobApplication } from '@/types/job-application';
+import { useFormSubmit } from '@/hooks/use-form-submit';
 
 interface FormData {
     company_name: string;
@@ -47,29 +55,38 @@ export default function JobApplicationForm({
     application?: JobApplication | null;
 }) {
     const isEditing = !!application;
-    const { auth } = usePage<{ auth?: { user?: { base_currency?: string } } }>().props;
+    const { auth } = usePage<{ auth?: { user?: { base_currency?: string } } }>()
+        .props;
     const userBaseCurrency = auth?.user?.base_currency || 'PHP';
 
-    const { data, setData, post, put, processing, errors, reset, transform, clearErrors } =
-        useForm<FormData>({
-            company_name: application?.company_name ?? '',
-            job_title: application?.job_title ?? '',
-            job_url: application?.job_url ?? '',
-            job_description: application?.job_description ?? '',
-            location: application?.location ?? '',
-            status: application?.status ?? 'wishlist',
-            date_applied: application?.date_applied ?? '',
-            expected_salary:
-                application?.expected_salary != null
-                    ? String(application.expected_salary)
-                    : '',
-            offered_salary:
-                application?.offered_salary != null
-                    ? String(application.offered_salary)
-                    : '',
-            currency: application?.currency ?? userBaseCurrency,
-            notes: application?.notes ?? '',
-        });
+    const {
+        data,
+        setData,
+        handleSubmit,
+        processing,
+        errors,
+        reset,
+        transform,
+        clearErrors,
+    } = useFormSubmit<FormData>({
+        company_name: application?.company_name ?? '',
+        job_title: application?.job_title ?? '',
+        job_url: application?.job_url ?? '',
+        job_description: application?.job_description ?? '',
+        location: application?.location ?? '',
+        status: application?.status ?? 'wishlist',
+        date_applied: application?.date_applied ?? '',
+        expected_salary:
+            application?.expected_salary != null
+                ? String(application.expected_salary)
+                : '',
+        offered_salary:
+            application?.offered_salary != null
+                ? String(application.offered_salary)
+                : '',
+        currency: application?.currency ?? userBaseCurrency,
+        notes: application?.notes ?? '',
+    });
 
     useEffect(() => {
         if (open && application) {
@@ -119,11 +136,11 @@ export default function JobApplicationForm({
         }));
 
         if (isEditing) {
-            put(jobAppUpdate.url(application!.id), {
+            handleSubmit('put', jobAppUpdate.url(application!.id), {
                 onSuccess: () => handleClose(),
             });
         } else {
-            post(jobAppStore.url(), {
+            handleSubmit('post', jobAppStore.url(), {
                 onSuccess: () => handleClose(),
             });
         }
@@ -210,11 +227,13 @@ export default function JobApplicationForm({
                                     value={data.status}
                                     onValueChange={(value: string | null) => {
                                         if (value) {
-setData('status', value);
-}
+                                            setData('status', value);
+                                        }
                                     }}
                                 >
-                                    <SelectTrigger aria-invalid={!!errors.status}>
+                                    <SelectTrigger
+                                        aria-invalid={!!errors.status}
+                                    >
                                         <SelectValue placeholder="Select status" />
                                     </SelectTrigger>
                                     <SelectContent>
@@ -250,17 +269,37 @@ setData('status', value);
                                     let newExpected = data.expected_salary;
                                     let newOffered = data.offered_salary;
 
-                                    if (data.expected_salary && !isNaN(Number(data.expected_salary))) {
-                                        const val = Number(data.expected_salary);
+                                    if (
+                                        data.expected_salary &&
+                                        !isNaN(Number(data.expected_salary))
+                                    ) {
+                                        const val = Number(
+                                            data.expected_salary,
+                                        );
                                         if (val > 0) {
-                                            newExpected = String(convertCurrency(val, oldCurrency, newCurrency));
+                                            newExpected = String(
+                                                convertCurrency(
+                                                    val,
+                                                    oldCurrency,
+                                                    newCurrency,
+                                                ),
+                                            );
                                         }
                                     }
 
-                                    if (data.offered_salary && !isNaN(Number(data.offered_salary))) {
+                                    if (
+                                        data.offered_salary &&
+                                        !isNaN(Number(data.offered_salary))
+                                    ) {
                                         const val = Number(data.offered_salary);
                                         if (val > 0) {
-                                            newOffered = String(convertCurrency(val, oldCurrency, newCurrency));
+                                            newOffered = String(
+                                                convertCurrency(
+                                                    val,
+                                                    oldCurrency,
+                                                    newCurrency,
+                                                ),
+                                            );
                                         }
                                     }
 
@@ -296,10 +335,11 @@ setData('status', value);
                         <div className="grid grid-cols-2 gap-4">
                             <div className="flex flex-col gap-2">
                                 <Label htmlFor="expected_salary">
-                                    Expected Salary ({getCurrencySymbol(data.currency)})
+                                    Expected Salary (
+                                    {getCurrencySymbol(data.currency)})
                                 </Label>
                                 <div className="relative">
-                                    <span className="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
+                                    <span className="pointer-events-none absolute top-1/2 left-2.5 -translate-y-1/2 text-sm text-muted-foreground">
                                         {getCurrencySymbol(data.currency)}
                                     </span>
                                     <Input
@@ -309,7 +349,10 @@ setData('status', value);
                                         className="pl-6"
                                         value={data.expected_salary}
                                         onChange={(e) =>
-                                            setData('expected_salary', e.target.value)
+                                            setData(
+                                                'expected_salary',
+                                                e.target.value,
+                                            )
                                         }
                                         placeholder="50000"
                                     />
@@ -323,10 +366,11 @@ setData('status', value);
 
                             <div className="flex flex-col gap-2">
                                 <Label htmlFor="offered_salary">
-                                    Offered Salary ({getCurrencySymbol(data.currency)})
+                                    Offered Salary (
+                                    {getCurrencySymbol(data.currency)})
                                 </Label>
                                 <div className="relative">
-                                    <span className="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
+                                    <span className="pointer-events-none absolute top-1/2 left-2.5 -translate-y-1/2 text-sm text-muted-foreground">
                                         {getCurrencySymbol(data.currency)}
                                     </span>
                                     <Input
@@ -336,7 +380,10 @@ setData('status', value);
                                         className="pl-6"
                                         value={data.offered_salary}
                                         onChange={(e) =>
-                                            setData('offered_salary', e.target.value)
+                                            setData(
+                                                'offered_salary',
+                                                e.target.value,
+                                            )
                                         }
                                         placeholder="60000"
                                     />
@@ -350,23 +397,23 @@ setData('status', value);
                         </div>
 
                         <div className="grid grid-cols-2 gap-4">
-<div className="flex flex-col gap-2">
-                                 <Label htmlFor="job_url">Job URL</Label>
-                                 <Input
-                                     id="job_url"
-                                     type="url"
-                                     value={data.job_url}
-                                     onChange={(e) =>
-                                         setData('job_url', e.target.value)
-                                     }
-                                     placeholder="https://example.com/job"
-                                 />
-                                 {errors.job_url && (
-                                     <p className="text-xs text-destructive">
-                                         {errors.job_url}
-                                     </p>
-                                 )}
-                             </div>
+                            <div className="flex flex-col gap-2">
+                                <Label htmlFor="job_url">Job URL</Label>
+                                <Input
+                                    id="job_url"
+                                    type="url"
+                                    value={data.job_url}
+                                    onChange={(e) =>
+                                        setData('job_url', e.target.value)
+                                    }
+                                    placeholder="https://example.com/job"
+                                />
+                                {errors.job_url && (
+                                    <p className="text-xs text-destructive">
+                                        {errors.job_url}
+                                    </p>
+                                )}
+                            </div>
 
                             <div className="flex flex-col gap-2">
                                 <Label htmlFor="date_applied">
@@ -430,7 +477,11 @@ setData('status', value);
                     </div>
 
                     <DialogFooter>
-                        <Button type="button" variant="outline" onClick={handleClose}>
+                        <Button
+                            type="button"
+                            variant="outline"
+                            onClick={handleClose}
+                        >
                             Cancel
                         </Button>
                         <Button type="submit" disabled={processing}>

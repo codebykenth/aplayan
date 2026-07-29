@@ -1,5 +1,10 @@
 import { Head, router } from '@inertiajs/react';
-import { ChevronLeftIcon, ChevronRightIcon, GridIcon, ListIcon } from 'lucide-react';
+import {
+    ChevronLeftIcon,
+    ChevronRightIcon,
+    GridIcon,
+    ListIcon,
+} from 'lucide-react';
 import { useState, useMemo } from 'react';
 import type { ReactNode } from 'react';
 import ApplicationDetailModal from '@/components/job-applications/application-detail-modal';
@@ -68,7 +73,11 @@ function getWeeksInMonth(year: number, month: number): number[][] {
     return weeks;
 }
 
-function getWeekDays(year: number, month: number, day: number): { date: string; label: string }[] {
+function getWeekDays(
+    year: number,
+    month: number,
+    day: number,
+): { date: string; label: string }[] {
     const date = new Date(year, month - 1, day);
     const days: { date: string; label: string }[] = [];
     const startOfWeek = new Date(date);
@@ -79,7 +88,11 @@ function getWeekDays(year: number, month: number, day: number): { date: string; 
         d.setDate(startOfWeek.getDate() + i);
         days.push({
             date: d.toISOString().split('T')[0],
-            label: d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }),
+            label: d.toLocaleDateString('en-US', {
+                weekday: 'short',
+                month: 'short',
+                day: 'numeric',
+            }),
         });
     }
 
@@ -98,7 +111,8 @@ export default function Calendar({
     year: number;
 }) {
     const [view, setView] = useState<'month' | 'week'>('month');
-    const [viewingApplication, setViewingApplication] = useState<JobApplication | null>(null);
+    const [viewingApplication, setViewingApplication] =
+        useState<JobApplication | null>(null);
     const [currentMonth, setCurrentMonth] = useState(month);
     const [currentYear, setCurrentYear] = useState(year);
     const [currentDay, setCurrentDay] = useState(1);
@@ -129,7 +143,11 @@ export default function Calendar({
             }
             setCurrentDay(1);
         } else {
-            const date = new Date(currentYear, currentMonth - 1, currentDay - 7);
+            const date = new Date(
+                currentYear,
+                currentMonth - 1,
+                currentDay - 7,
+            );
             setCurrentYear(date.getFullYear());
             setCurrentMonth(date.getMonth() + 1);
             setCurrentDay(date.getDate());
@@ -146,7 +164,11 @@ export default function Calendar({
             }
             setCurrentDay(1);
         } else {
-            const date = new Date(currentYear, currentMonth - 1, currentDay + 7);
+            const date = new Date(
+                currentYear,
+                currentMonth - 1,
+                currentDay + 7,
+            );
             setCurrentYear(date.getFullYear());
             setCurrentMonth(date.getMonth() + 1);
             setCurrentDay(date.getDate());
@@ -161,7 +183,7 @@ export default function Calendar({
         try {
             const response = await fetch(`/job-applications/${applicationId}`, {
                 headers: {
-                    'Accept': 'application/json',
+                    Accept: 'application/json',
                     'X-Requested-With': 'XMLHttpRequest',
                 },
             });
@@ -192,13 +214,13 @@ export default function Calendar({
         return Math.ceil((currentDay + firstDay) / 7);
     }, [currentYear, currentMonth, currentDay]);
 
-    const weeks = view === 'month' ? getWeeksInMonth(currentYear, currentMonth) : [];
-
+    const weeks =
+        view === 'month' ? getWeeksInMonth(currentYear, currentMonth) : [];
 
     const selectedDayEvents = useMemo(() => {
         if (!selectedDate) {
-return [];
-}
+            return [];
+        }
 
         return eventsByDate.get(selectedDate) ?? [];
     }, [selectedDate, eventsByDate]);
@@ -207,18 +229,29 @@ return [];
         <>
             <Head title="Calendar" />
 
-            <div className="flex flex-1 min-h-0 flex-col gap-6 overflow-y-auto">
-                <PageHeader title="Calendar" description="Track upcoming interviews, follow-ups, and application dates">
+            <div className="flex min-h-0 flex-1 flex-col gap-6 overflow-y-auto">
+                <PageHeader
+                    title="Calendar"
+                    description="Track upcoming interviews, follow-ups, and application dates"
+                >
                     <div className="flex items-center gap-2">
-                        <Button variant="outline" size="sm" onClick={handlePrev}>
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={handlePrev}
+                        >
                             <ChevronLeftIcon className="size-4" />
                         </Button>
-                        <span className="min-w-[140px] text-center text-sm sm:text-base font-semibold text-foreground">
-                            {view === 'week' 
+                        <span className="min-w-[140px] text-center text-sm font-semibold text-foreground sm:text-base">
+                            {view === 'week'
                                 ? `Week ${activeWeekNumber} - ${formatMonthYear(currentYear, currentMonth)}`
                                 : formatMonthYear(currentYear, currentMonth)}
                         </span>
-                        <Button variant="outline" size="sm" onClick={handleNext}>
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={handleNext}
+                        >
                             <ChevronRightIcon className="size-4" />
                         </Button>
                     </div>
@@ -250,34 +283,44 @@ return [];
                                 {DAY_NAMES.map((day) => (
                                     <div
                                         key={day}
-                                        className="text-center text-[11px] sm:text-xs font-semibold text-muted-foreground py-1"
+                                        className="py-1 text-center text-[11px] font-semibold text-muted-foreground sm:text-xs"
                                     >
-                                        <span className="sm:hidden">{day[0]}</span>
-                                        <span className="hidden sm:inline">{day}</span>
+                                        <span className="sm:hidden">
+                                            {day[0]}
+                                        </span>
+                                        <span className="hidden sm:inline">
+                                            {day}
+                                        </span>
                                     </div>
                                 ))}
-                                {weeks.map((week, weekIndex) => (
+                                {weeks.map((week, weekIndex) =>
                                     week.map((day, dayIndex) => {
                                         const dateStr = day
                                             ? `${currentYear}-${String(currentMonth).padStart(2, '0')}-${String(day).padStart(2, '0')}`
                                             : '';
-                                        const dayEvents = day ? eventsByDate.get(dateStr) : [];
-                                        const isSelected = selectedDate === dateStr;
-                                        const hasEvents = dayEvents && dayEvents.length > 0;
+                                        const dayEvents = day
+                                            ? eventsByDate.get(dateStr)
+                                            : [];
+                                        const isSelected =
+                                            selectedDate === dateStr;
+                                        const hasEvents =
+                                            dayEvents && dayEvents.length > 0;
 
                                         return (
                                             <div
                                                 key={`${weekIndex}-${dayIndex}`}
-                                                className={`min-h-[50px] sm:min-h-[85px] rounded-lg border p-1 sm:p-2 transition-all flex flex-col justify-between ${
+                                                className={`flex min-h-[50px] flex-col justify-between rounded-lg border p-1 transition-all sm:min-h-[85px] sm:p-2 ${
                                                     day
                                                         ? isSelected
                                                             ? 'border-primary bg-primary/10 ring-1 ring-primary'
-                                                            : 'bg-card hover:bg-muted/50 cursor-pointer'
-                                                        : 'bg-transparent border-transparent opacity-0 pointer-events-none'
+                                                            : 'cursor-pointer bg-card hover:bg-muted/50'
+                                                        : 'pointer-events-none border-transparent bg-transparent opacity-0'
                                                 }`}
                                                 onClick={() => {
                                                     if (day) {
-                                                        setSelectedDate(dateStr);
+                                                        setSelectedDate(
+                                                            dateStr,
+                                                        );
                                                         setCurrentDay(day);
                                                     }
                                                 }}
@@ -285,58 +328,78 @@ return [];
                                                 {day ? (
                                                     <>
                                                         <div className="flex items-center justify-between">
-                                                            <span className={`text-xs sm:text-sm font-medium ${isSelected ? 'text-primary font-bold' : 'text-foreground'}`}>
+                                                            <span
+                                                                className={`text-xs font-medium sm:text-sm ${isSelected ? 'font-bold text-primary' : 'text-foreground'}`}
+                                                            >
                                                                 {day}
                                                             </span>
                                                             {hasEvents && (
-                                                                <span className="sm:hidden flex size-2 rounded-full bg-primary" />
+                                                                <span className="flex size-2 rounded-full bg-primary sm:hidden" />
                                                             )}
                                                         </div>
 
                                                         {/* Mobile Dots */}
                                                         {hasEvents && (
-                                                            <div className="mt-1 flex flex-wrap gap-0.5 sm:hidden justify-center">
-                                                                {dayEvents.map((event, idx) => (
-                                                                    <span
-                                                                        key={idx}
-                                                                        className={`size-1.5 rounded-full ${
-                                                                            event.status === 'interviewing'
-                                                                                ? 'bg-amber-500'
-                                                                                : event.status === 'offer'
-                                                                                  ? 'bg-green-500'
-                                                                                  : event.status === 'applied'
-                                                                                    ? 'bg-blue-500'
-                                                                                    : 'bg-slate-400'
-                                                                        }`}
-                                                                    />
-                                                                ))}
+                                                            <div className="mt-1 flex flex-wrap justify-center gap-0.5 sm:hidden">
+                                                                {dayEvents.map(
+                                                                    (
+                                                                        event,
+                                                                        idx,
+                                                                    ) => (
+                                                                        <span
+                                                                            key={
+                                                                                idx
+                                                                            }
+                                                                            className={`size-1.5 rounded-full ${
+                                                                                event.status ===
+                                                                                'interviewing'
+                                                                                    ? 'bg-amber-500'
+                                                                                    : event.status ===
+                                                                                        'offer'
+                                                                                      ? 'bg-green-500'
+                                                                                      : event.status ===
+                                                                                          'applied'
+                                                                                        ? 'bg-blue-500'
+                                                                                        : 'bg-slate-400'
+                                                                            }`}
+                                                                        />
+                                                                    ),
+                                                                )}
                                                             </div>
                                                         )}
 
                                                         {/* Desktop Badges */}
-                                                        <div className="mt-1 hidden sm:flex flex-col gap-1">
-                                                            {dayEvents?.map((event) => (
-                                                                <div
-                                                                    key={`${event.id}-${event.type}`}
-                                                                    className="cursor-pointer"
-                                                                    onClick={(e) => {
-                                                                        e.stopPropagation();
-                                                                        openApplicationDetailById(event.id);
-                                                                    }}
-                                                                >
-                                                                    <StatusBadge
-                                                                        status={event.status as JobApplicationStatus}
-                                                                        className="cursor-pointer text-[10px] truncate max-w-full"
-                                                                    />
-                                                                </div>
-                                                            ))}
+                                                        <div className="mt-1 hidden flex-col gap-1 sm:flex">
+                                                            {dayEvents?.map(
+                                                                (event) => (
+                                                                    <div
+                                                                        key={`${event.id}-${event.type}`}
+                                                                        className="cursor-pointer"
+                                                                        onClick={(
+                                                                            e,
+                                                                        ) => {
+                                                                            e.stopPropagation();
+                                                                            openApplicationDetailById(
+                                                                                event.id,
+                                                                            );
+                                                                        }}
+                                                                    >
+                                                                        <StatusBadge
+                                                                            status={
+                                                                                event.status as JobApplicationStatus
+                                                                            }
+                                                                            className="max-w-full cursor-pointer truncate text-[10px]"
+                                                                        />
+                                                                    </div>
+                                                                ),
+                                                            )}
                                                         </div>
                                                     </>
                                                 ) : null}
                                             </div>
                                         );
-                                    })
-                                ))}
+                                    }),
+                                )}
                             </div>
                         ) : (
                             <div className="flex flex-col gap-2">
@@ -346,34 +409,47 @@ return [];
                                     return (
                                         <div
                                             key={date}
-                                            className={`flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 rounded-lg border p-3 hover:bg-muted/50 transition-colors cursor-pointer ${
+                                            className={`flex cursor-pointer flex-col gap-2 rounded-lg border p-3 transition-colors hover:bg-muted/50 sm:flex-row sm:items-center sm:gap-4 ${
                                                 selectedDate === date
                                                     ? 'border-primary bg-primary/10 ring-1 ring-primary'
                                                     : 'bg-card'
                                             }`}
                                             onClick={() => {
                                                 setSelectedDate(date);
-                                                setCurrentDay(parseInt(date.split('-')[2]));
+                                                setCurrentDay(
+                                                    parseInt(
+                                                        date.split('-')[2],
+                                                    ),
+                                                );
                                             }}
                                         >
-                                            <span className={`w-full sm:w-24 text-xs sm:text-sm font-semibold shrink-0 ${selectedDate === date ? 'text-primary' : 'text-foreground'}`}>
+                                            <span
+                                                className={`w-full shrink-0 text-xs font-semibold sm:w-24 sm:text-sm ${selectedDate === date ? 'text-primary' : 'text-foreground'}`}
+                                            >
                                                 {label}
                                             </span>
                                             <div className="flex flex-wrap gap-1.5">
-                                                {dayEvents && dayEvents.length > 0 ? (
+                                                {dayEvents &&
+                                                dayEvents.length > 0 ? (
                                                     dayEvents.map((event) => (
                                                         <StatusBadge
                                                             key={`${event.id}-${event.type}`}
-                                                            status={event.status as JobApplicationStatus}
+                                                            status={
+                                                                event.status as JobApplicationStatus
+                                                            }
                                                             className="cursor-pointer text-xs"
                                                             onClick={(e) => {
                                                                 e.stopPropagation();
-                                                                openApplicationDetailById(event.id);
+                                                                openApplicationDetailById(
+                                                                    event.id,
+                                                                );
                                                             }}
                                                         />
                                                     ))
                                                 ) : (
-                                                    <span className="text-xs text-muted-foreground">No events</span>
+                                                    <span className="text-xs text-muted-foreground">
+                                                        No events
+                                                    </span>
                                                 )}
                                             </div>
                                         </div>
@@ -387,12 +463,25 @@ return [];
                 {/* Selected Date Agenda (Mobile & Quick Detail) */}
                 {selectedDate && (
                     <Card className="shrink-0">
-                        <CardContent className="p-4 flex flex-col gap-3">
+                        <CardContent className="flex flex-col gap-3 p-4">
                             <div className="flex items-center justify-between">
                                 <h3 className="text-sm font-semibold text-foreground">
-                                    Events for {new Date(selectedDate).toLocaleDateString('en-PH', { month: 'short', day: 'numeric', year: 'numeric' })}
+                                    Events for{' '}
+                                    {new Date(selectedDate).toLocaleDateString(
+                                        'en-PH',
+                                        {
+                                            month: 'short',
+                                            day: 'numeric',
+                                            year: 'numeric',
+                                        },
+                                    )}
                                 </h3>
-                                <Button variant="ghost" size="sm" className="h-6 px-2 text-xs" onClick={() => setSelectedDate(null)}>
+                                <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    className="h-6 px-2 text-xs"
+                                    onClick={() => setSelectedDate(null)}
+                                >
                                     Clear
                                 </Button>
                             </div>
@@ -402,18 +491,27 @@ return [];
                                     {selectedDayEvents.map((event) => (
                                         <div
                                             key={`${event.id}-${event.type}`}
-                                            onClick={() => openApplicationDetailById(event.id)}
+                                            onClick={() =>
+                                                openApplicationDetailById(
+                                                    event.id,
+                                                )
+                                            }
                                             className="flex cursor-pointer items-center justify-between rounded-lg border border-border bg-card p-3 transition-colors hover:bg-accent"
                                         >
-                                            <div className="flex flex-col gap-0.5 min-w-0 flex-1 mr-4">
-                                                <span className="text-sm font-semibold text-foreground truncate">
+                                            <div className="mr-4 flex min-w-0 flex-1 flex-col gap-0.5">
+                                                <span className="truncate text-sm font-semibold text-foreground">
                                                     {event.job_title}
                                                 </span>
-                                                <span className="text-xs text-muted-foreground truncate">
+                                                <span className="truncate text-xs text-muted-foreground">
                                                     {event.company_name}
                                                 </span>
                                             </div>
-                                            <StatusBadge status={event.status as JobApplicationStatus} className="text-xs" />
+                                            <StatusBadge
+                                                status={
+                                                    event.status as JobApplicationStatus
+                                                }
+                                                className="text-xs"
+                                            />
                                         </div>
                                     ))}
                                 </div>

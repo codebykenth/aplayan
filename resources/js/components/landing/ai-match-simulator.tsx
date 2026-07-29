@@ -45,7 +45,13 @@ const rolePresets: RolePreset[] = [
     },
 ];
 
-function AnimatedCounter({ value, duration = 1000 }: { value: number; duration?: number }) {
+function AnimatedCounter({
+    value,
+    duration = 1000,
+}: {
+    value: number;
+    duration?: number;
+}) {
     const [display, setDisplay] = useState(0);
     const startRef = useRef<number | null>(null);
     const rafRef = useRef<number | null>(null);
@@ -73,7 +79,9 @@ function AnimatedCounter({ value, duration = 1000 }: { value: number; duration?:
 }
 
 export default function AiMatchSimulator() {
-    const [selectedRole, setSelectedRole] = useState<RolePreset>(rolePresets[0]);
+    const [selectedRole, setSelectedRole] = useState<RolePreset>(
+        rolePresets[0],
+    );
     const [animate, setAnimate] = useState(false);
 
     useEffect(() => {
@@ -87,7 +95,9 @@ export default function AiMatchSimulator() {
         <div className="rounded-xl border border-border bg-card/60 p-6 backdrop-blur-sm sm:p-8">
             <div className="flex items-center gap-2 text-sm text-zinc-600 dark:text-zinc-300">
                 <Target className="h-4 w-4 text-primary" />
-                <span className="font-medium">Select a target role to simulate AI match analysis</span>
+                <span className="font-medium">
+                    Select a target role to simulate AI match analysis
+                </span>
             </div>
 
             <div className="mt-4 flex flex-wrap gap-2">
@@ -96,10 +106,10 @@ export default function AiMatchSimulator() {
                         key={role.title}
                         onClick={() => setSelectedRole(role)}
                         className={cn(
-                            'rounded-lg border px-3.5 py-1.5 text-sm font-semibold transition-all cursor-pointer',
+                            'cursor-pointer rounded-lg border px-3.5 py-1.5 text-sm font-semibold transition-all',
                             selectedRole.title === role.title
                                 ? 'border-primary bg-primary/15 text-primary shadow-xs'
-                                : 'border-border bg-background/50 text-zinc-700 dark:text-zinc-300 hover:border-foreground/40 hover:text-foreground',
+                                : 'border-border bg-background/50 text-zinc-700 hover:border-foreground/40 hover:text-foreground dark:text-zinc-300',
                         )}
                     >
                         {role.title}
@@ -110,15 +120,25 @@ export default function AiMatchSimulator() {
             <div className="mt-6 grid gap-6 sm:grid-cols-[1fr_1fr]">
                 <div className="flex flex-col items-center justify-center rounded-xl border border-border bg-background/60 p-6">
                     <span className="text-5xl font-bold tracking-tight text-foreground">
-                        {animate ? <AnimatedCounter value={selectedRole.matchScore} /> : '0%'}
+                        {animate ? (
+                            <AnimatedCounter value={selectedRole.matchScore} />
+                        ) : (
+                            '0%'
+                        )}
                     </span>
-                    <span className="mt-1.5 text-xs font-semibold uppercase tracking-wider text-zinc-600 dark:text-zinc-400">Match Score</span>
+                    <span className="mt-1.5 text-xs font-semibold tracking-wider text-zinc-600 uppercase dark:text-zinc-400">
+                        Match Score
+                    </span>
                     <div className="mt-3 h-2.5 w-full max-w-40 overflow-hidden rounded-full bg-muted">
                         <div
                             className={cn(
                                 'h-full rounded-full bg-primary transition-all duration-1000 ease-out',
                             )}
-                            style={{ width: animate ? `${selectedRole.matchScore}%` : '0%' }}
+                            style={{
+                                width: animate
+                                    ? `${selectedRole.matchScore}%`
+                                    : '0%',
+                            }}
                         />
                     </div>
                 </div>
@@ -131,7 +151,10 @@ export default function AiMatchSimulator() {
                         </h4>
                         <ul className="mt-1.5 space-y-1.5">
                             {selectedRole.strengths.map((s) => (
-                                <li key={s} className="flex items-start gap-2 text-sm font-medium text-foreground">
+                                <li
+                                    key={s}
+                                    className="flex items-start gap-2 text-sm font-medium text-foreground"
+                                >
                                     <ChevronRight className="mt-0.5 h-3.5 w-3.5 shrink-0 text-emerald-500" />
                                     {s}
                                 </li>
@@ -145,7 +168,10 @@ export default function AiMatchSimulator() {
                         </h4>
                         <ul className="mt-1.5 space-y-1.5">
                             {selectedRole.gaps.map((g) => (
-                                <li key={g} className="flex items-start gap-2 text-sm font-medium text-foreground">
+                                <li
+                                    key={g}
+                                    className="flex items-start gap-2 text-sm font-medium text-foreground"
+                                >
                                     <ChevronRight className="mt-0.5 h-3.5 w-3.5 shrink-0 text-rose-500" />
                                     {g}
                                 </li>

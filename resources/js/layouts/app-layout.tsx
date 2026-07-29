@@ -1,14 +1,42 @@
 import { Head, Link, usePage } from '@inertiajs/react';
-import { BarChart3, Briefcase, CalendarIcon, ChevronLeft, ChevronRight, LayoutDashboard, LogOut, Menu, Settings, BookmarkIcon, GitCompareArrowsIcon, Target, FileText, Archive, Users, Sun, Moon, Monitor } from 'lucide-react';
+import {
+    BarChart3,
+    Briefcase,
+    CalendarIcon,
+    ChevronLeft,
+    ChevronRight,
+    LayoutDashboard,
+    LogOut,
+    Menu,
+    Settings,
+    BookmarkIcon,
+    GitCompareArrowsIcon,
+    Target,
+    FileText,
+    Archive,
+    Users,
+    Sun,
+    Moon,
+    Monitor,
+} from 'lucide-react';
 import { useState, useEffect } from 'react';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger,
+} from '@/components/ui/tooltip';
 import { useTheme } from '@/hooks/use-theme';
 import type { Auth } from '@/types/auth';
 
 const sidebarLinks = [
     { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
     { href: '/job-applications', label: 'Applications', icon: Briefcase },
-    { href: '/job-applications/offers', label: 'Offer Comparison', icon: GitCompareArrowsIcon },
+    {
+        href: '/job-applications/offers',
+        label: 'Offer Comparison',
+        icon: GitCompareArrowsIcon,
+    },
     { href: '/calendar', label: 'Calendar', icon: CalendarIcon },
     { href: '/contacts', label: 'Contacts', icon: Users },
     { href: '/analytics', label: 'Analytics', icon: BarChart3 },
@@ -18,7 +46,13 @@ const sidebarLinks = [
     { href: '/templates', label: 'Templates', icon: BookmarkIcon },
 ];
 
-function UserAvatar({ user, compact }: { user: Auth['user']; compact?: boolean }) {
+function UserAvatar({
+    user,
+    compact,
+}: {
+    user: Auth['user'];
+    compact?: boolean;
+}) {
     const avatarClass = compact
         ? 'mx-auto h-8 w-8 rounded-full'
         : 'h-8 w-8 shrink-0 rounded-full';
@@ -37,14 +71,22 @@ function UserAvatar({ user, compact }: { user: Auth['user']; compact?: boolean }
     );
 }
 
-function UserProfileMenu({ user, isExpanded }: { user: Auth['user']; isExpanded: boolean }) {
+function UserProfileMenu({
+    user,
+    isExpanded,
+}: {
+    user: Auth['user'];
+    isExpanded: boolean;
+}) {
     const [open, setOpen] = useState(false);
     const { mode, setMode } = useTheme();
 
     useEffect(() => {
         if (!open) return;
         const close = (e: MouseEvent) => {
-            if (!(e.target as Element).closest('.user-profile-menu-container')) {
+            if (
+                !(e.target as Element).closest('.user-profile-menu-container')
+            ) {
                 setOpen(false);
             }
         };
@@ -55,10 +97,10 @@ function UserProfileMenu({ user, isExpanded }: { user: Auth['user']; isExpanded:
     return (
         <div className="user-profile-menu-container relative w-full">
             {/* The Trigger */}
-            <button 
+            <button
                 type="button"
                 onClick={() => setOpen(!open)}
-                className={`flex w-full items-center gap-3 rounded-md transition-colors hover:bg-muted ${isExpanded ? 'p-2' : 'p-2 justify-center'}`}
+                className={`flex w-full items-center gap-3 rounded-md transition-colors hover:bg-muted ${isExpanded ? 'p-2' : 'justify-center p-2'}`}
             >
                 <UserAvatar user={user} compact={!isExpanded} />
                 {isExpanded && (
@@ -75,16 +117,22 @@ function UserProfileMenu({ user, isExpanded }: { user: Auth['user']; isExpanded:
 
             {/* The Dropdown */}
             {open && (
-                <div className={`absolute z-50 w-64 rounded-xl border border-border bg-popover text-popover-foreground shadow-md p-1 overflow-hidden ${
-                    isExpanded 
-                        ? 'bottom-full left-0 mb-2' 
-                        : 'bottom-0 left-full ml-4'
-                }`}>
-                    <div className="px-3 py-2 border-b border-border mb-1">
-                        <p className="truncate text-sm font-medium">{user?.name}</p>
-                        <p className="truncate text-xs text-muted-foreground">{user?.email}</p>
+                <div
+                    className={`absolute z-50 w-64 overflow-hidden rounded-xl border border-border bg-popover p-1 text-popover-foreground shadow-md ${
+                        isExpanded
+                            ? 'bottom-full left-0 mb-2'
+                            : 'bottom-0 left-full ml-4'
+                    }`}
+                >
+                    <div className="mb-1 border-b border-border px-3 py-2">
+                        <p className="truncate text-sm font-medium">
+                            {user?.name}
+                        </p>
+                        <p className="truncate text-xs text-muted-foreground">
+                            {user?.email}
+                        </p>
                     </div>
-                    
+
                     <Link
                         href="/settings"
                         className="flex w-full items-center gap-2 rounded-sm px-3 py-2 text-sm transition-colors hover:bg-muted"
@@ -95,28 +143,39 @@ function UserProfileMenu({ user, isExpanded }: { user: Auth['user']; isExpanded:
                     </Link>
 
                     <div className="px-3 py-2">
-                        <p className="text-xs font-medium text-muted-foreground mb-2">Theme Mode</p>
-                        <div className="flex bg-muted/50 rounded-lg p-0.5">
+                        <p className="mb-2 text-xs font-medium text-muted-foreground">
+                            Theme Mode
+                        </p>
+                        <div className="flex rounded-lg bg-muted/50 p-0.5">
                             <button
                                 type="button"
-                                onClick={() => { setMode('light'); setOpen(false); }}
-                                className={`flex-1 flex justify-center py-1.5 rounded-md transition-all text-xs ${mode === 'light' ? 'bg-background shadow-xs text-foreground' : 'text-muted-foreground hover:text-foreground'}`}
+                                onClick={() => {
+                                    setMode('light');
+                                    setOpen(false);
+                                }}
+                                className={`flex flex-1 justify-center rounded-md py-1.5 text-xs transition-all ${mode === 'light' ? 'bg-background text-foreground shadow-xs' : 'text-muted-foreground hover:text-foreground'}`}
                                 aria-label="Light mode"
                             >
                                 <Sun className="h-3.5 w-3.5" />
                             </button>
                             <button
                                 type="button"
-                                onClick={() => { setMode('dark'); setOpen(false); }}
-                                className={`flex-1 flex justify-center py-1.5 rounded-md transition-all text-xs ${mode === 'dark' ? 'bg-background shadow-xs text-foreground' : 'text-muted-foreground hover:text-foreground'}`}
+                                onClick={() => {
+                                    setMode('dark');
+                                    setOpen(false);
+                                }}
+                                className={`flex flex-1 justify-center rounded-md py-1.5 text-xs transition-all ${mode === 'dark' ? 'bg-background text-foreground shadow-xs' : 'text-muted-foreground hover:text-foreground'}`}
                                 aria-label="Dark mode"
                             >
                                 <Moon className="h-3.5 w-3.5" />
                             </button>
                             <button
                                 type="button"
-                                onClick={() => { setMode('system'); setOpen(false); }}
-                                className={`flex-1 flex justify-center py-1.5 rounded-md transition-all text-xs ${mode === 'system' ? 'bg-background shadow-xs text-foreground' : 'text-muted-foreground hover:text-foreground'}`}
+                                onClick={() => {
+                                    setMode('system');
+                                    setOpen(false);
+                                }}
+                                className={`flex flex-1 justify-center rounded-md py-1.5 text-xs transition-all ${mode === 'system' ? 'bg-background text-foreground shadow-xs' : 'text-muted-foreground hover:text-foreground'}`}
                                 aria-label="System mode"
                             >
                                 <Monitor className="h-3.5 w-3.5" />
@@ -124,13 +183,13 @@ function UserProfileMenu({ user, isExpanded }: { user: Auth['user']; isExpanded:
                         </div>
                     </div>
 
-                    <div className="border-t border-border mt-1 pt-1">
+                    <div className="mt-1 border-t border-border pt-1">
                         <Link
                             href="/logout"
                             method="post"
                             as="button"
                             onClick={() => setOpen(false)}
-                            className="flex w-full items-center gap-2 rounded-sm px-3 py-2 text-sm text-destructive hover:bg-destructive/10 transition-colors"
+                            className="flex w-full items-center gap-2 rounded-sm px-3 py-2 text-sm text-destructive transition-colors hover:bg-destructive/10"
                         >
                             <LogOut className="h-4 w-4" />
                             Logout
@@ -182,7 +241,10 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                 <div className="flex h-16 shrink-0 items-center border-b border-border px-4">
                     {isExpanded && (
                         <>
-                            <Link href="/dashboard" className="text-lg font-semibold text-foreground">
+                            <Link
+                                href="/dashboard"
+                                className="text-lg font-semibold text-foreground"
+                            >
                                 Aplayan
                             </Link>
                             <div className="flex-1" />
@@ -191,7 +253,9 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                                     <TooltipTrigger
                                         render={
                                             <button
-                                                onClick={() => setSidebarOpen(false)}
+                                                onClick={() =>
+                                                    setSidebarOpen(false)
+                                                }
                                                 className="hidden rounded-sm p-1 text-muted-foreground hover:bg-muted md:block"
                                                 aria-label="Collapse sidebar"
                                             >
@@ -229,73 +293,91 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                 </div>
 
                 {/* Navigation links */}
-                <nav className="flex-1 flex flex-col gap-1 overflow-y-auto p-3">
+                <nav className="flex flex-1 flex-col gap-1 overflow-y-auto p-3">
                     {(() => {
-                        const activeLink = sidebarLinks.reduce((active, link) => {
-                            if (url === link.href || url.startsWith(`${link.href}/`)) {
-                                if (!active || link.href.length > active.length) {
-                                    return link.href;
+                        const activeLink = sidebarLinks.reduce(
+                            (active, link) => {
+                                if (
+                                    url === link.href ||
+                                    url.startsWith(`${link.href}/`)
+                                ) {
+                                    if (
+                                        !active ||
+                                        link.href.length > active.length
+                                    ) {
+                                        return link.href;
+                                    }
                                 }
-                            }
 
-                            return active;
-                        }, '');
+                                return active;
+                            },
+                            '',
+                        );
 
                         return isExpanded ? (
                             <>
-                                {sidebarLinks.map(({ href, label, icon: Icon }) => {
-                                    const isActive = activeLink === href;
+                                {sidebarLinks.map(
+                                    ({ href, label, icon: Icon }) => {
+                                        const isActive = activeLink === href;
 
-                                    return (
-                                        <Link
-                                            key={href}
-                                            href={href}
-                                            className={`flex items-center gap-3 rounded-sm px-3 py-2 text-sm transition-colors ${
-                                                isActive
-                                                    ? 'bg-primary/10 text-primary font-medium'
-                                                    : 'text-muted-foreground hover:bg-muted hover:text-foreground'
-                                            }`}
-                                        >
-                                            <Icon className="h-4 w-4 shrink-0" />
-                                            {label}
-                                        </Link>
-                                    );
-                                })}
+                                        return (
+                                            <Link
+                                                key={href}
+                                                href={href}
+                                                className={`flex items-center gap-3 rounded-sm px-3 py-2 text-sm transition-colors ${
+                                                    isActive
+                                                        ? 'bg-primary/10 font-medium text-primary'
+                                                        : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+                                                }`}
+                                            >
+                                                <Icon className="h-4 w-4 shrink-0" />
+                                                {label}
+                                            </Link>
+                                        );
+                                    },
+                                )}
                             </>
                         ) : (
                             <TooltipProvider delay={100}>
-                                {sidebarLinks.map(({ href, label, icon: Icon }) => {
-                                    const isActive = activeLink === href;
+                                {sidebarLinks.map(
+                                    ({ href, label, icon: Icon }) => {
+                                        const isActive = activeLink === href;
 
-                                    return (
-                                        <Tooltip key={href}>
-                                            <TooltipTrigger
-                                                render={
-                                                    <Link
-                                                        href={href}
-                                                        className={`flex items-center justify-center rounded-sm px-2 py-2 transition-colors ${
-                                                            isActive
-                                                                ? 'bg-primary/10 text-primary'
-                                                                : 'text-muted-foreground hover:bg-muted hover:text-foreground'
-                                                        }`}
-                                                    >
-                                                        <Icon className="h-5 w-5 shrink-0" />
-                                                    </Link>
-                                                }
-                                            />
-                                            <TooltipContent side="right" sideOffset={12}>
-                                                {label}
-                                            </TooltipContent>
-                                        </Tooltip>
-                                    );
-                                })}
+                                        return (
+                                            <Tooltip key={href}>
+                                                <TooltipTrigger
+                                                    render={
+                                                        <Link
+                                                            href={href}
+                                                            className={`flex items-center justify-center rounded-sm px-2 py-2 transition-colors ${
+                                                                isActive
+                                                                    ? 'bg-primary/10 text-primary'
+                                                                    : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+                                                            }`}
+                                                        >
+                                                            <Icon className="h-5 w-5 shrink-0" />
+                                                        </Link>
+                                                    }
+                                                />
+                                                <TooltipContent
+                                                    side="right"
+                                                    sideOffset={12}
+                                                >
+                                                    {label}
+                                                </TooltipContent>
+                                            </Tooltip>
+                                        );
+                                    },
+                                )}
                             </TooltipProvider>
                         );
                     })()}
                 </nav>
 
                 {/* User profile footer */}
-                <div className={`shrink-0 border-t border-border ${isExpanded ? 'p-2' : 'p-2 flex justify-center'}`}>
+                <div
+                    className={`shrink-0 border-t border-border ${isExpanded ? 'p-2' : 'flex justify-center p-2'}`}
+                >
                     <UserProfileMenu user={auth.user} isExpanded={isExpanded} />
                 </div>
             </aside>
@@ -314,12 +396,17 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                     >
                         <Menu className="h-5 w-5 text-foreground" />
                     </button>
-                    <Link href="/" className="text-lg font-semibold text-foreground">
+                    <Link
+                        href="/"
+                        className="text-lg font-semibold text-foreground"
+                    >
                         Aplayan
                     </Link>
                 </header>
 
-                <main className="flex flex-1 min-h-0 flex-col overflow-hidden p-4 sm:p-6 lg:p-8">{children}</main>
+                <main className="flex min-h-0 flex-1 flex-col overflow-hidden p-4 sm:p-6 lg:p-8">
+                    {children}
+                </main>
             </div>
         </div>
     );

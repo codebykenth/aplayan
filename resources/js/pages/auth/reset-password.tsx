@@ -1,9 +1,17 @@
 import { Head, Link, usePage } from '@inertiajs/react';
-import {  useState } from 'react';
-import type {FormEvent} from 'react';
+import { useState } from 'react';
+import type { FormEvent } from 'react';
+import { PasswordInput } from '@/components/ui/password-input';
 
-export default function ResetPassword({ token, email }: { token: string; email: string }) {
-    const { errors: pageErrors } = usePage<{ errors: Record<string, string> }>().props;
+export default function ResetPassword({
+    token,
+    email,
+}: {
+    token: string;
+    email: string;
+}) {
+    const { errors: pageErrors } = usePage<{ errors: Record<string, string> }>()
+        .props;
 
     const [password, setPassword] = useState('');
     const [passwordConfirmation, setPasswordConfirmation] = useState('');
@@ -22,12 +30,24 @@ export default function ResetPassword({ token, email }: { token: string; email: 
                     Reset your password
                 </h1>
 
-                <form action="/reset-password" method="POST" onSubmit={submit} className="space-y-4">
-                    <input type="hidden" name="_token" value={usePage().props.csrf_token as string} />
+                <form
+                    action="/reset-password"
+                    method="POST"
+                    onSubmit={submit}
+                    className="space-y-4"
+                >
+                    <input
+                        type="hidden"
+                        name="_token"
+                        value={usePage().props.csrf_token as string}
+                    />
                     <input type="hidden" name="token" value={token} />
 
                     <div>
-                        <label htmlFor="email" className="block text-sm font-medium text-foreground">
+                        <label
+                            htmlFor="email"
+                            className="block text-sm font-medium text-foreground"
+                        >
                             Email
                         </label>
                         <input
@@ -42,38 +62,44 @@ export default function ResetPassword({ token, email }: { token: string; email: 
                     </div>
 
                     <div>
-                        <label htmlFor="password" className="block text-sm font-medium text-foreground">
+                        <label
+                            htmlFor="password"
+                            className="mb-1 block text-sm font-medium text-foreground"
+                        >
                             Password
                         </label>
-                        <input
+                        <PasswordInput
                             id="password"
                             name="password"
-                            type="password"
                             required
                             autoFocus
                             autoComplete="new-password"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
-                            className="mt-1 block w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground placeholder-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
                             placeholder="New password"
                         />
                         {pageErrors?.password && (
-                            <p className="mt-1 text-sm text-destructive">{pageErrors.password}</p>
+                            <p className="mt-1 text-sm text-destructive">
+                                {pageErrors.password}
+                            </p>
                         )}
                     </div>
 
                     <div>
-                        <label htmlFor="password_confirmation" className="block text-sm font-medium text-foreground">
+                        <label
+                            htmlFor="password_confirmation"
+                            className="mb-1 block text-sm font-medium text-foreground"
+                        >
                             Confirm Password
                         </label>
-                        <input
+                        <PasswordInput
                             id="password_confirmation"
                             name="password_confirmation"
-                            type="password"
                             required
                             value={passwordConfirmation}
-                            onChange={(e) => setPasswordConfirmation(e.target.value)}
-                            className="mt-1 block w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground placeholder-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
+                            onChange={(e) =>
+                                setPasswordConfirmation(e.target.value)
+                            }
                             placeholder="Confirm new password"
                         />
                     </div>

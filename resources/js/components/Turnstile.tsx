@@ -7,10 +7,13 @@ export interface TurnstileInstance {
 declare global {
     interface Window {
         turnstile?: {
-            render: (container: HTMLElement, params: {
-                sitekey: string;
-                callback: (token: string) => void;
-            }) => string;
+            render: (
+                container: HTMLElement,
+                params: {
+                    sitekey: string;
+                    callback: (token: string) => void;
+                },
+            ) => string;
             execute: (widgetId: string) => void;
             reset: (widgetId: string) => void;
             remove: (widgetId: string) => void;
@@ -18,13 +21,16 @@ declare global {
     }
 }
 
-const SCRIPT_SRC = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit';
+const SCRIPT_SRC =
+    'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit';
 
 const Turnstile = forwardRef<TurnstileInstance, { siteKey: string }>(
     function Turnstile({ siteKey }, ref) {
         const containerRef = useRef<HTMLDivElement>(null);
         const widgetIdRef = useRef<string | null>(null);
-        const resolveRef = useRef<((token: string | null) => void) | null>(null);
+        const resolveRef = useRef<((token: string | null) => void) | null>(
+            null,
+        );
 
         useImperativeHandle(ref, () => ({
             execute: () => {
@@ -47,18 +53,23 @@ const Turnstile = forwardRef<TurnstileInstance, { siteKey: string }>(
             function initWidget() {
                 if (!containerRef.current || !window.turnstile) return;
 
-                widgetIdRef.current = window.turnstile.render(containerRef.current, {
-                    sitekey: siteKey,
-                    callback: (token: string) => {
-                        if (resolveRef.current) {
-                            resolveRef.current(token);
-                            resolveRef.current = null;
-                        }
+                widgetIdRef.current = window.turnstile.render(
+                    containerRef.current,
+                    {
+                        sitekey: siteKey,
+                        callback: (token: string) => {
+                            if (resolveRef.current) {
+                                resolveRef.current(token);
+                                resolveRef.current = null;
+                            }
+                        },
                     },
-                });
+                );
             }
 
-            const existing = document.querySelector(`script[src="${SCRIPT_SRC}"]`);
+            const existing = document.querySelector(
+                `script[src="${SCRIPT_SRC}"]`,
+            );
             if (existing) {
                 if (window.turnstile) {
                     initWidget();

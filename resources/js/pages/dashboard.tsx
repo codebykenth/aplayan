@@ -1,7 +1,7 @@
 import { Head } from '@inertiajs/react';
 import { Briefcase, TrendingUp, CalendarDays, InfoIcon } from 'lucide-react';
-import { useState, useCallback  } from 'react';
-import type {ReactNode} from 'react';
+import { useState, useCallback } from 'react';
+import type { ReactNode } from 'react';
 import {
     BarChart,
     Bar,
@@ -27,7 +27,12 @@ import {
 } from '@/components/ui/chart';
 import type { ChartConfig } from '@/components/ui/chart';
 import { PageHeader } from '@/components/ui/page-header';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger,
+} from '@/components/ui/tooltip';
 import AppLayout from '@/layouts/app-layout';
 import { show as showRoute } from '@/routes/job-applications';
 import { JOB_APPLICATION_STATUSES } from '@/types/job-application';
@@ -51,14 +56,17 @@ function ChartInfoTooltip({ description }: { description: string }) {
                     render={
                         <button
                             type="button"
-                            className="text-muted-foreground/70 hover:text-foreground transition-colors p-0.5 rounded-sm focus:outline-hidden focus:ring-1 focus:ring-ring"
+                            className="rounded-sm p-0.5 text-muted-foreground/70 transition-colors hover:text-foreground focus:ring-1 focus:ring-ring focus:outline-hidden"
                             aria-label="Card information"
                         >
                             <InfoIcon className="size-4" />
                         </button>
                     }
                 />
-                <TooltipContent side="top" className="max-w-64 text-xs font-normal">
+                <TooltipContent
+                    side="top"
+                    className="max-w-64 text-xs font-normal"
+                >
                     {description}
                 </TooltipContent>
             </Tooltip>
@@ -105,8 +113,8 @@ export default function Dashboard({
                 });
 
                 if (!response.ok) {
-throw new Error('Failed to fetch application');
-}
+                    throw new Error('Failed to fetch application');
+                }
 
                 const json = await response.json();
                 setSelectedApplication(json.data as JobApplication);
@@ -145,10 +153,16 @@ throw new Error('Failed to fetch application');
             <Head title="Dashboard" />
 
             <div className="flex min-h-0 flex-1 flex-col gap-6 overflow-y-auto pr-2 pb-4">
-                <PageHeader title="Dashboard" description="Overview of your job search activity" />
+                <PageHeader
+                    title="Dashboard"
+                    description="Overview of your job search activity"
+                />
 
                 {/* Action Feed */}
-                <ActionFeed items={action_items} onSelectApplication={handleSelectApplication} />
+                <ActionFeed
+                    items={action_items}
+                    onSelectApplication={handleSelectApplication}
+                />
 
                 <div className="grid gap-6 lg:grid-cols-[1fr_320px]">
                     <div className="flex min-w-0 flex-col gap-6">

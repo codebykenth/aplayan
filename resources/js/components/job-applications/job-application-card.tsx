@@ -13,8 +13,8 @@ import type { JobApplication } from '@/types/job-application';
 
 function formatDate(date: string | null): string | null {
     if (!date) {
-return null;
-}
+        return null;
+    }
 
     const d = new Date(date);
 
@@ -25,11 +25,7 @@ return null;
     });
 }
 
-function InterviewCountdownBadge({
-    interviewDate,
-}: {
-    interviewDate: string;
-}) {
+function InterviewCountdownBadge({ interviewDate }: { interviewDate: string }) {
     const [daysRemaining, setDaysRemaining] = useState<number | null>(null);
 
     useEffect(() => {
@@ -41,14 +37,15 @@ function InterviewCountdownBadge({
     }, [interviewDate]);
 
     if (daysRemaining === null || daysRemaining < 0) {
-return null;
-}
+        return null;
+    }
 
-    const label = daysRemaining === 0
-        ? 'Interview today'
-        : daysRemaining === 1
-          ? 'Interview in 1 day'
-          : `Interview in ${daysRemaining} days`;
+    const label =
+        daysRemaining === 0
+            ? 'Interview today'
+            : daysRemaining === 1
+              ? 'Interview in 1 day'
+              : `Interview in ${daysRemaining} days`;
 
     return (
         <span className="inline-flex items-center gap-1 rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-medium text-amber-700 dark:bg-amber-900/30 dark:text-amber-300">
@@ -66,8 +63,8 @@ function StalenessBadge({
     daysSinceUpdate: number;
 }) {
     if (level === null) {
-return null;
-}
+        return null;
+    }
 
     return (
         <span
@@ -77,7 +74,8 @@ return null;
                     : 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300'
             }`}
         >
-            {level === 'alert' ? 'Needs attention' : 'Follow up'} {daysSinceUpdate}d
+            {level === 'alert' ? 'Needs attention' : 'Follow up'}{' '}
+            {daysSinceUpdate}d
         </span>
     );
 }
@@ -94,8 +92,8 @@ function ActionsDropdown({
 
     useEffect(() => {
         if (!open) {
-return;
-}
+            return;
+        }
 
         function handleKeyDown(event: KeyboardEvent) {
             if (event.key === 'Escape') {
@@ -132,14 +130,14 @@ return;
                         setOpen((prev) => !prev);
                     }
                 }}
-                className="flex size-6 items-center justify-center rounded-md text-muted-foreground opacity-0 transition-opacity hover:bg-accent hover:text-accent-foreground group-hover/card:opacity-100 focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                className="flex size-6 items-center justify-center rounded-md text-muted-foreground opacity-0 transition-opacity group-hover/card:opacity-100 hover:bg-accent hover:text-accent-foreground focus-visible:opacity-100 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
                 aria-label="Actions"
             >
                 <MoreVerticalIcon className="size-4" />
             </button>
 
             {open && (
-                <div className="absolute right-0 top-full z-20 mt-1 w-36 overflow-hidden rounded-lg border border-border bg-popover p-1 shadow-lg">
+                <div className="absolute top-full right-0 z-20 mt-1 w-36 overflow-hidden rounded-lg border border-border bg-popover p-1 shadow-lg">
                     <button
                         type="button"
                         onClick={(e) => {
@@ -201,7 +199,7 @@ export default function JobApplicationCard({
                     type="button"
                     {...dragHandleProps}
                     onClick={(e) => e.stopPropagation()}
-                    className="mt-0.5 flex shrink-0 cursor-grab touch-none items-center justify-center rounded-md p-0.5 text-muted-foreground/50 transition-colors hover:text-muted-foreground active:cursor-grabbing focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                    className="mt-0.5 flex shrink-0 cursor-grab touch-none items-center justify-center rounded-md p-0.5 text-muted-foreground/50 transition-colors hover:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none active:cursor-grabbing"
                     aria-label="Drag to reorder"
                 >
                     <GripVerticalIcon className="size-4" />
@@ -214,23 +212,34 @@ export default function JobApplicationCard({
                     <p className="truncate text-xs text-muted-foreground">
                         {application.company_name}
                         {application.location && (
-                            <> {'\u00B7'} {application.location}</>
+                            <>
+                                {' '}
+                                {'\u00B7'} {application.location}
+                            </>
                         )}
                     </p>
                 </div>
 
                 <div className="flex shrink-0 items-center gap-1.5">
-                    <StatusBadge status={application.status} className="text-[10px] px-2 py-0 leading-normal" />
+                    <StatusBadge
+                        status={application.status}
+                        className="px-2 py-0 text-[10px] leading-normal"
+                    />
 
                     <ActionsDropdown onEdit={onEdit} onDelete={onDelete} />
                 </div>
             </div>
 
-            {(application.status === 'interviewing' && application.interview_date || application.staleness_level !== null) && (
+            {((application.status === 'interviewing' &&
+                application.interview_date) ||
+                application.staleness_level !== null) && (
                 <div className="flex flex-wrap items-center gap-1.5">
-                    {application.status === 'interviewing' && application.interview_date && (
-                        <InterviewCountdownBadge interviewDate={application.interview_date} />
-                    )}
+                    {application.status === 'interviewing' &&
+                        application.interview_date && (
+                            <InterviewCountdownBadge
+                                interviewDate={application.interview_date}
+                            />
+                        )}
 
                     <StalenessBadge
                         level={application.staleness_level}
@@ -244,7 +253,13 @@ export default function JobApplicationCard({
                     <span>{formatDate(application.date_applied)}</span>
                 )}
                 {application.expected_salary !== null && (
-                    <span>Expected {formatSalary(application.expected_salary, application.currency)}</span>
+                    <span>
+                        Expected{' '}
+                        {formatSalary(
+                            application.expected_salary,
+                            application.currency,
+                        )}
+                    </span>
                 )}
                 {application.ai_match_percentage !== null && (
                     <span

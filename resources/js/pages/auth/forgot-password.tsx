@@ -4,8 +4,13 @@ import type { FormEvent } from 'react';
 import Turnstile from '@/components/Turnstile';
 
 export default function ForgotPassword() {
-    const { status, errors: pageErrors } = usePage<{ status?: string; errors: Record<string, string> }>().props;
-    const turnstileRef = useRef<{ execute: () => Promise<string | null> }>(null);
+    const { status, errors: pageErrors } = usePage<{
+        status?: string;
+        errors: Record<string, string>;
+    }>().props;
+    const turnstileRef = useRef<{ execute: () => Promise<string | null> }>(
+        null,
+    );
 
     const [email, setEmail] = useState('');
     function submit(e: FormEvent) {
@@ -15,10 +20,14 @@ export default function ForgotPassword() {
 
     async function submitForm() {
         const token = await turnstileRef.current?.execute();
-        const form = document.querySelector('form[action="/forgot-password"]') as HTMLFormElement | null;
+        const form = document.querySelector(
+            'form[action="/forgot-password"]',
+        ) as HTMLFormElement | null;
         if (!form) return;
 
-        let input = form.querySelector('input[name="turnstile"]') as HTMLInputElement | null;
+        let input = form.querySelector(
+            'input[name="turnstile"]',
+        ) as HTMLInputElement | null;
         if (!input) {
             input = document.createElement('input');
             input.type = 'hidden';
@@ -34,12 +43,12 @@ export default function ForgotPassword() {
             <Head title="Forgot Password" />
 
             <div className="mx-auto mt-16 w-full max-w-sm">
-<h1 className="mb-2 text-2xl font-semibold text-foreground">
-                            Reset your password
-                        </h1>
-                        <p className="mb-6 text-sm text-muted-foreground">
-                            Enter your email and we'll send you a reset link.
-                        </p>
+                <h1 className="mb-2 text-2xl font-semibold text-foreground">
+                    Reset your password
+                </h1>
+                <p className="mb-6 text-sm text-muted-foreground">
+                    Enter your email and we'll send you a reset link.
+                </p>
 
                 {status && (
                     <div className="mb-4 rounded-sm border border-green-300 bg-green-50 px-4 py-3 text-sm text-green-800 dark:border-green-800 dark:bg-green-950 dark:text-green-200">
@@ -47,11 +56,23 @@ export default function ForgotPassword() {
                     </div>
                 )}
 
-                <form action="/forgot-password" method="POST" onSubmit={submit} className="space-y-4">
-                    <input type="hidden" name="_token" value={usePage().props.csrf_token as string} />
+                <form
+                    action="/forgot-password"
+                    method="POST"
+                    onSubmit={submit}
+                    className="space-y-4"
+                >
+                    <input
+                        type="hidden"
+                        name="_token"
+                        value={usePage().props.csrf_token as string}
+                    />
 
                     <div>
-                        <label htmlFor="email" className="block text-sm font-medium text-foreground">
+                        <label
+                            htmlFor="email"
+                            className="block text-sm font-medium text-foreground"
+                        >
                             Email
                         </label>
                         <input
@@ -66,13 +87,17 @@ export default function ForgotPassword() {
                             placeholder="you@example.com"
                         />
                         {pageErrors?.email && (
-                            <p className="mt-1 text-sm text-destructive">{pageErrors.email}</p>
+                            <p className="mt-1 text-sm text-destructive">
+                                {pageErrors.email}
+                            </p>
                         )}
                     </div>
 
                     <div className="mt-4">
                         <Turnstile
-                            siteKey={usePage().props.turnstile_site_key as string}
+                            siteKey={
+                                usePage().props.turnstile_site_key as string
+                            }
                             ref={turnstileRef}
                         />
                     </div>

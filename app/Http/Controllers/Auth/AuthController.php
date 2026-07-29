@@ -35,7 +35,7 @@ class AuthController extends Controller
             'turnstile' => ['required', 'string'],
         ]);
 
-        if (!$this->turnstile->verify($data['turnstile'])) {
+        if (! $this->turnstile->verify($data['turnstile'])) {
             return back()->withErrors([
                 'security_check_failed' => 'Please complete the security check, then try again.',
             ]);
@@ -51,7 +51,7 @@ class AuthController extends Controller
 
         Auth::login($user);
 
-        return redirect()->intended(route('job-applications.index', absolute: false));
+        return redirect()->intended(route('dashboard', absolute: false));
     }
 
     public function login(): Response
@@ -69,7 +69,7 @@ class AuthController extends Controller
             'turnstile' => ['required', 'string'],
         ]);
 
-        if (!$this->turnstile->verify($data['turnstile'])) {
+        if (! $this->turnstile->verify($data['turnstile'])) {
             return back()->withErrors([
                 'security_check_failed' => 'Please complete the security check, then try again.',
             ]);

@@ -64,9 +64,21 @@ export interface TaxSettings {
 }
 
 export const TAX_REGIMES = [
-    { value: 'ph_regular', label: 'PH Regular Employee', description: 'SSS + PhilHealth + Pag-IBIG + BIR TRAIN' },
-    { value: 'ph_freelance_8', label: 'PH Freelancer (8% Flat Tax)', description: '8% flat tax above ₱250k, no statutory contributions' },
-    { value: 'tax_exempt', label: 'Tax-Exempt / Overseas', description: 'No local statutory taxes applied' },
+    {
+        value: 'ph_regular',
+        label: 'PH Regular Employee',
+        description: 'SSS + PhilHealth + Pag-IBIG + BIR TRAIN',
+    },
+    {
+        value: 'ph_freelance_8',
+        label: 'PH Freelancer (8% Flat Tax)',
+        description: '8% flat tax above ₱250k, no statutory contributions',
+    },
+    {
+        value: 'tax_exempt',
+        label: 'Tax-Exempt / Overseas',
+        description: 'No local statutory taxes applied',
+    },
 ] as const;
 
 export interface JobApplication {
@@ -109,7 +121,10 @@ export interface JobApplication {
     created_at: string;
     updated_at: string;
     activities: JobApplicationActivity[];
-    contacts?: Pick<Contact, 'id' | 'name' | 'email' | 'phone' | 'company_name' | 'role'>[];
+    contacts?: Pick<
+        Contact,
+        'id' | 'name' | 'email' | 'phone' | 'company_name' | 'role'
+    >[];
 }
 
 export type JobApplicationStatus =
@@ -133,8 +148,10 @@ export const JOB_APPLICATION_STATUSES: {
 ];
 
 export const STATUS_COLORS: Record<JobApplicationStatus, string> = {
-    wishlist: 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-200',
-    applied: 'bg-blue-100 text-blue-700 dark:bg-blue-950/80 dark:text-blue-200 dark:border dark:border-blue-800/50',
+    wishlist:
+        'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-200',
+    applied:
+        'bg-blue-100 text-blue-700 dark:bg-blue-950/80 dark:text-blue-200 dark:border dark:border-blue-800/50',
     interviewing:
         'bg-amber-100 text-amber-800 dark:bg-amber-950/80 dark:text-amber-200 dark:border dark:border-amber-800/50',
     offer: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/80 dark:text-emerald-200 dark:border dark:border-emerald-800/50',

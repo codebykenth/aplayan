@@ -64,16 +64,36 @@ const BIR_BRACKETS = [
     { min: 0, max: 250_000, base: 0, rate: 0, excessMin: 0 },
     { min: 250_000, max: 400_000, base: 0, rate: 0.15, excessMin: 250_000 },
     { min: 400_000, max: 800_000, base: 22_500, rate: 0.2, excessMin: 400_000 },
-    { min: 800_000, max: 2_000_000, base: 102_500, rate: 0.25, excessMin: 800_000 },
-    { min: 2_000_000, max: 8_000_000, base: 402_500, rate: 0.3, excessMin: 2_000_000 },
-    { min: 8_000_000, max: Infinity, base: 2_202_500, rate: 0.35, excessMin: 8_000_000 },
+    {
+        min: 800_000,
+        max: 2_000_000,
+        base: 102_500,
+        rate: 0.25,
+        excessMin: 800_000,
+    },
+    {
+        min: 2_000_000,
+        max: 8_000_000,
+        base: 402_500,
+        rate: 0.3,
+        excessMin: 2_000_000,
+    },
+    {
+        min: 8_000_000,
+        max: Infinity,
+        base: 2_202_500,
+        rate: 0.35,
+        excessMin: 8_000_000,
+    },
 ];
 
 const THIRTEENTH_MONTH_EXEMPTION = 90_000;
 const FREELANCE_EXEMPTION = 250_000;
 
 function computeMonthlySss(salary: number): number {
-    const bracket = SSS_BRACKETS.find((b) => salary >= b.min && salary <= b.max);
+    const bracket = SSS_BRACKETS.find(
+        (b) => salary >= b.min && salary <= b.max,
+    );
     return bracket?.employee ?? 1350;
 }
 
@@ -96,7 +116,9 @@ function computeAnnualTaxableIncome(salary: number): number {
 
 function computeAnnualBirTax(annualIncome: number): number {
     if (annualIncome <= 250_000) return 0;
-    const bracket = BIR_BRACKETS.find((b) => annualIncome > b.min && annualIncome <= b.max);
+    const bracket = BIR_BRACKETS.find(
+        (b) => annualIncome > b.min && annualIncome <= b.max,
+    );
     if (!bracket) {
         const last = BIR_BRACKETS[BIR_BRACKETS.length - 1];
         return last.base + (annualIncome - last.excessMin) * last.rate;
@@ -117,8 +139,16 @@ interface DeductionRowProps {
 function DeductionRow({ label, amount }: DeductionRowProps) {
     return (
         <div className="flex items-center justify-between text-sm">
-            <span className="font-medium text-zinc-600 dark:text-zinc-400">{label}</span>
-            <span className="font-mono font-semibold text-foreground">₱{amount.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+            <span className="font-medium text-zinc-600 dark:text-zinc-400">
+                {label}
+            </span>
+            <span className="font-mono font-semibold text-foreground">
+                ₱
+                {amount.toLocaleString('en-PH', {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                })}
+            </span>
         </div>
     );
 }
@@ -146,7 +176,10 @@ export default function PhPayCalculatorWidget() {
                 break;
             case 'ph_freelance_8': {
                 const annualGross = salary * 12;
-                const annualTax = annualGross <= FREELANCE_EXEMPTION ? 0 : (annualGross - FREELANCE_EXEMPTION) * 0.08;
+                const annualTax =
+                    annualGross <= FREELANCE_EXEMPTION
+                        ? 0
+                        : (annualGross - FREELANCE_EXEMPTION) * 0.08;
                 birTax = Math.round((annualTax / 12) * 100) / 100;
                 break;
             }
@@ -160,27 +193,48 @@ export default function PhPayCalculatorWidget() {
         return { sss, philHealth, pagIbig, birTax, totalDeductions, netPay };
     }, [salary, regime]);
 
-    const regimeOptions: { value: TaxRegime; label: string; description: string }[] = [
-        { value: 'ph_regular', label: 'Regular Employee', description: 'SSS, PhilHealth, Pag-IBIG, BIR TRAIN Law' },
-        { value: 'ph_freelance_8', label: '8% Freelancer', description: 'Simplified 8% income tax' },
-        { value: 'tax_exempt', label: 'Tax-Exempt / Overseas', description: 'Zero statutory deductions' },
+    const regimeOptions: {
+        value: TaxRegime;
+        label: string;
+        description: string;
+    }[] = [
+        {
+            value: 'ph_regular',
+            label: 'Regular Employee',
+            description: 'SSS, PhilHealth, Pag-IBIG, BIR TRAIN Law',
+        },
+        {
+            value: 'ph_freelance_8',
+            label: '8% Freelancer',
+            description: 'Simplified 8% income tax',
+        },
+        {
+            value: 'tax_exempt',
+            label: 'Tax-Exempt / Overseas',
+            description: 'Zero statutory deductions',
+        },
     ];
 
     return (
         <div className="rounded-xl border border-border bg-card/60 p-6 backdrop-blur-sm sm:p-8">
             <div className="flex items-center gap-2">
                 <Calculator className="h-5 w-5 text-primary" />
-                <h3 className="text-xl font-bold text-foreground">Philippine Net Pay Calculator</h3>
+                <h3 className="text-xl font-bold text-foreground">
+                    Philippine Net Pay Calculator
+                </h3>
             </div>
 
             <div className="mt-6 grid gap-6 sm:grid-cols-[1fr_1fr]">
                 <div className="space-y-4">
                     <div>
-                        <label htmlFor="monthly-salary" className="text-sm font-semibold text-foreground">
+                        <label
+                            htmlFor="monthly-salary"
+                            className="text-sm font-semibold text-foreground"
+                        >
                             Monthly Gross Salary (₱)
                         </label>
-                        <div className="mt-1.5 relative">
-                            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500 dark:text-zinc-400">
+                        <div className="relative mt-1.5">
+                            <span className="absolute top-1/2 left-3 -translate-y-1/2 text-zinc-500 dark:text-zinc-400">
                                 <PhilippinePeso className="h-4 w-4" />
                             </span>
                             <input
@@ -188,24 +242,29 @@ export default function PhPayCalculatorWidget() {
                                 type="text"
                                 value={salaryInput}
                                 onChange={(e) => {
-                                    const cleaned = e.target.value.replace(/[^0-9,]/g, '');
+                                    const cleaned = e.target.value.replace(
+                                        /[^0-9,]/g,
+                                        '',
+                                    );
                                     setSalaryInput(cleaned);
                                 }}
-                                className="h-10 w-full rounded-lg border border-input bg-background/50 pl-9 pr-3 text-sm font-semibold text-foreground transition-colors focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
+                                className="h-10 w-full rounded-lg border border-input bg-background/50 pr-3 pl-9 text-sm font-semibold text-foreground transition-colors focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
                                 placeholder="85,000"
                             />
                         </div>
                     </div>
 
                     <div>
-                        <label className="text-sm font-semibold text-foreground">Tax Regime</label>
+                        <label className="text-sm font-semibold text-foreground">
+                            Tax Regime
+                        </label>
                         <div className="mt-1.5 flex flex-col gap-2">
                             {regimeOptions.map((opt) => (
                                 <button
                                     key={opt.value}
                                     onClick={() => setRegime(opt.value)}
                                     className={cn(
-                                        'flex items-center gap-2.5 rounded-lg border px-3.5 py-2.5 text-left text-sm transition-all cursor-pointer',
+                                        'flex cursor-pointer items-center gap-2.5 rounded-lg border px-3.5 py-2.5 text-left text-sm transition-all',
                                         regime === opt.value
                                             ? 'border-primary bg-primary/15 text-foreground'
                                             : 'border-border bg-background/50 hover:border-foreground/40',
@@ -224,8 +283,12 @@ export default function PhPayCalculatorWidget() {
                                         )}
                                     </span>
                                     <div>
-                                        <span className="font-semibold text-foreground">{opt.label}</span>
-                                        <span className="ml-1.5 text-xs text-zinc-600 dark:text-zinc-400">— {opt.description}</span>
+                                        <span className="font-semibold text-foreground">
+                                            {opt.label}
+                                        </span>
+                                        <span className="ml-1.5 text-xs text-zinc-600 dark:text-zinc-400">
+                                            — {opt.description}
+                                        </span>
                                     </div>
                                 </button>
                             ))}
@@ -236,25 +299,51 @@ export default function PhPayCalculatorWidget() {
                 <div className="rounded-xl border border-border bg-background/70 p-5">
                     {breakdown ? (
                         <div className="space-y-3.5">
-                            <div className="pb-3 border-b border-border">
-                                <div className="text-xs font-semibold uppercase tracking-wider text-zinc-600 dark:text-zinc-400">Net Take-Home Pay</div>
+                            <div className="border-b border-border pb-3">
+                                <div className="text-xs font-semibold tracking-wider text-zinc-600 uppercase dark:text-zinc-400">
+                                    Net Take-Home Pay
+                                </div>
                                 <div className="mt-1 text-3xl font-bold tracking-tight text-foreground">
-                                    ₱{breakdown.netPay.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                    ₱
+                                    {breakdown.netPay.toLocaleString('en-PH', {
+                                        minimumFractionDigits: 2,
+                                        maximumFractionDigits: 2,
+                                    })}
                                 </div>
                                 <div className="mt-1 text-xs text-zinc-600 dark:text-zinc-400">
-                                    from ₱{salary.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} gross
+                                    from ₱
+                                    {salary.toLocaleString('en-PH', {
+                                        minimumFractionDigits: 2,
+                                        maximumFractionDigits: 2,
+                                    })}{' '}
+                                    gross
                                 </div>
                             </div>
 
                             <div className="space-y-2">
-                                <DeductionRow label="SSS Contribution" amount={breakdown.sss} />
-                                <DeductionRow label="PhilHealth" amount={breakdown.philHealth} />
-                                <DeductionRow label="Pag-IBIG" amount={breakdown.pagIbig} />
-                                <DeductionRow label="BIR Income Tax" amount={breakdown.birTax} />
+                                <DeductionRow
+                                    label="SSS Contribution"
+                                    amount={breakdown.sss}
+                                />
+                                <DeductionRow
+                                    label="PhilHealth"
+                                    amount={breakdown.philHealth}
+                                />
+                                <DeductionRow
+                                    label="Pag-IBIG"
+                                    amount={breakdown.pagIbig}
+                                />
+                                <DeductionRow
+                                    label="BIR Income Tax"
+                                    amount={breakdown.birTax}
+                                />
                             </div>
 
-                            <div className="pt-3 border-t border-border">
-                                <DeductionRow label="Total Deductions" amount={breakdown.totalDeductions} />
+                            <div className="border-t border-border pt-3">
+                                <DeductionRow
+                                    label="Total Deductions"
+                                    amount={breakdown.totalDeductions}
+                                />
                             </div>
                         </div>
                     ) : (

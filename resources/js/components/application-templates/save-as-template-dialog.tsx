@@ -26,7 +26,16 @@ export default function SaveAsTemplateDialog({
         job_description: string | null;
     } | null;
 }) {
-    const { data, setData, post, processing, errors, reset, clearErrors, transform } = useForm<{
+    const {
+        data,
+        setData,
+        post,
+        processing,
+        errors,
+        reset,
+        clearErrors,
+        transform,
+    } = useForm<{
         name: string;
         category: string;
         default_location: string | undefined;
@@ -39,11 +48,12 @@ export default function SaveAsTemplateDialog({
         default_location: application?.location ?? undefined,
         default_expected_salary: application?.expected_salary ?? undefined,
         default_notes: application?.notes ?? undefined,
-        default_job_description_keywords: application?.job_description
-            ?.split(/\s+/)
-            .filter((w) => w.length > 3)
-            .slice(0, 20)
-            .join(', ') || undefined,
+        default_job_description_keywords:
+            application?.job_description
+                ?.split(/\s+/)
+                .filter((w) => w.length > 3)
+                .slice(0, 20)
+                .join(', ') || undefined,
     });
 
     function handleClose() {
@@ -60,7 +70,8 @@ export default function SaveAsTemplateDialog({
             category: formData.category || undefined,
             default_location: formData.default_location || undefined,
             default_notes: formData.default_notes || undefined,
-            default_job_description_keywords: formData.default_job_description_keywords || undefined,
+            default_job_description_keywords:
+                formData.default_job_description_keywords || undefined,
         }));
 
         post(saveTemplate.url(), {
@@ -90,7 +101,9 @@ export default function SaveAsTemplateDialog({
                             autoFocus
                         />
                         {errors.name && (
-                            <p className="text-xs text-destructive">{errors.name}</p>
+                            <p className="text-xs text-destructive">
+                                {errors.name}
+                            </p>
                         )}
                     </div>
 
@@ -99,13 +112,19 @@ export default function SaveAsTemplateDialog({
                         <Input
                             id="template_category"
                             value={data.category}
-                            onChange={(e) => setData('category', e.target.value)}
+                            onChange={(e) =>
+                                setData('category', e.target.value)
+                            }
                             placeholder="e.g. Remote Frontend, BPO Cebu"
                         />
                     </div>
 
                     <DialogFooter>
-                        <Button type="button" variant="outline" onClick={handleClose}>
+                        <Button
+                            type="button"
+                            variant="outline"
+                            onClick={handleClose}
+                        >
                             Cancel
                         </Button>
                         <Button type="submit" disabled={processing}>

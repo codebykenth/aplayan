@@ -3,9 +3,9 @@ import {
     DragOverlay,
     useDroppable,
     useDraggable,
-    pointerWithin
+    pointerWithin,
 } from '@dnd-kit/core';
-import type {DragEndEvent, DragStartEvent} from '@dnd-kit/core';
+import type { DragEndEvent, DragStartEvent } from '@dnd-kit/core';
 import { router } from '@inertiajs/react';
 import { useMemo, useState, useCallback, useEffect } from 'react';
 import JobApplicationCard from '@/components/job-applications/job-application-card';
@@ -14,7 +14,10 @@ import {
     JOB_APPLICATION_STATUSES,
     STATUS_COLORS,
 } from '@/types/job-application';
-import type { JobApplication, JobApplicationStatus } from '@/types/job-application';
+import type {
+    JobApplication,
+    JobApplicationStatus,
+} from '@/types/job-application';
 
 type FilterOption = 'all' | 'needs-attention';
 
@@ -40,7 +43,7 @@ function Column({
     return (
         <div
             ref={setNodeRef}
-            className={`flex h-full max-h-full w-72 shrink-0 flex-col gap-3 rounded-xl border bg-card/70 p-3 backdrop-blur-md transition-shadow max-md:w-full max-md:h-full ${
+            className={`flex h-full max-h-full w-72 shrink-0 flex-col gap-3 rounded-xl border bg-card/70 p-3 backdrop-blur-md transition-shadow max-md:h-full max-md:w-full ${
                 isOver
                     ? 'border-primary shadow-lg shadow-primary/10'
                     : 'border-border'
@@ -57,7 +60,7 @@ function Column({
                 </span>
             </div>
 
-            <div className="flex flex-1 min-h-0 flex-col gap-2 overflow-y-auto pr-1">
+            <div className="flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto pr-1">
                 {applications.map((app) => (
                     <DraggableCard
                         key={app.id}
@@ -149,8 +152,10 @@ function MobileTabDroppable({
             ref={setNodeRef}
             type="button"
             onClick={onClick}
-            className={`flex items-center gap-2 whitespace-nowrap rounded-full px-4 py-2 text-sm font-medium transition-all duration-200 ${
-                isOver ? 'ring-2 ring-primary ring-offset-2 ring-offset-background bg-primary/10' : ''
+            className={`flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium whitespace-nowrap transition-all duration-200 ${
+                isOver
+                    ? 'bg-primary/10 ring-2 ring-primary ring-offset-2 ring-offset-background'
+                    : ''
             } ${
                 activeTab === status
                     ? 'bg-primary text-primary-foreground'
@@ -197,7 +202,8 @@ export default function KanbanBoard({
     const needsAttention = (app: JobApplication): boolean => {
         return (
             (app.status === 'applied' || app.status === 'interviewing') &&
-            (app.staleness_level === 'warning' || app.staleness_level === 'alert')
+            (app.staleness_level === 'warning' ||
+                app.staleness_level === 'alert')
         );
     };
 
@@ -211,7 +217,10 @@ export default function KanbanBoard({
 
     const grouped = useMemo(() => {
         const map = Object.fromEntries(
-            JOB_APPLICATION_STATUSES.map((s) => [s.value, [] as JobApplication[]]),
+            JOB_APPLICATION_STATUSES.map((s) => [
+                s.value,
+                [] as JobApplication[],
+            ]),
         ) as Record<JobApplicationStatus, JobApplication[]>;
 
         for (const app of filteredApplications) {
@@ -220,63 +229,63 @@ export default function KanbanBoard({
             }
         }
 
-            return map;
+        return map;
     }, [filteredApplications]);
 
     const handleDragStart = useCallback((event: DragStartEvent) => {
         setActiveApplication(event.active.data.current as JobApplication);
     }, []);
 
-    const handleDragEnd = useCallback(
-        (event: DragEndEvent) => {
-            setActiveApplication(null);
+    const handleDragEnd = useCallback((event: DragEndEvent) => {
+        setActiveApplication(null);
 
-            const { active, over } = event;
+        const { active, over } = event;
 
-            if (!over) {
-                return;
-            }
+        if (!over) {
+            return;
+        }
 
-            const app = active.data.current as JobApplication;
-            let newStatus = over.id as JobApplicationStatus | string;
+        const app = active.data.current as JobApplication;
+        let newStatus = over.id as JobApplicationStatus | string;
 
-            if (newStatus.startsWith('mobile-')) {
-                newStatus = newStatus.replace('mobile-', '') as JobApplicationStatus;
-            }
+        if (newStatus.startsWith('mobile-')) {
+            newStatus = newStatus.replace(
+                'mobile-',
+                '',
+            ) as JobApplicationStatus;
+        }
 
-            if (app.status === newStatus) {
-                return;
-            }
+        if (app.status === newStatus) {
+            return;
+        }
 
-            if (!COLUMN_IDS.includes(newStatus as JobApplicationStatus)) {
-                return;
-            }
+        if (!COLUMN_IDS.includes(newStatus as JobApplicationStatus)) {
+            return;
+        }
 
-            setLocalApplications((prev) =>
-                prev.map((a) =>
-                    a.id === app.id ? { ...a, status: newStatus as JobApplicationStatus } : a,
-                ),
-            );
+        setLocalApplications((prev) =>
+            prev.map((a) =>
+                a.id === app.id
+                    ? { ...a, status: newStatus as JobApplicationStatus }
+                    : a,
+            ),
+        );
 
-            router.patch(
-                updateStatus.url(app.id),
-                { status: newStatus },
-                {
-                    preserveState: true,
-                    onError: () => {
-                        setLocalApplications((prev) =>
-                            prev.map((a) =>
-                                a.id === app.id
-                                    ? { ...a, status: app.status }
-                                    : a,
-                            ),
-                        );
-                    },
+        router.patch(
+            updateStatus.url(app.id),
+            { status: newStatus },
+            {
+                preserveState: true,
+                onError: () => {
+                    setLocalApplications((prev) =>
+                        prev.map((a) =>
+                            a.id === app.id ? { ...a, status: app.status } : a,
+                        ),
+                    );
                 },
-            );
-        },
-        [],
-    );
+            },
+        );
+    }, []);
 
     return (
         <DndContext
@@ -285,7 +294,7 @@ export default function KanbanBoard({
             collisionDetection={pointerWithin}
         >
             {/* Mobile Tab Navigation */}
-            <div className="mb-4 flex shrink-0 gap-2 overflow-x-auto pb-2 md:hidden [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+            <div className="mb-4 flex shrink-0 [scrollbar-width:none] gap-2 overflow-x-auto pb-2 [-ms-overflow-style:none] md:hidden [&::-webkit-scrollbar]:hidden">
                 {JOB_APPLICATION_STATUSES.map(({ value, label }) => (
                     <MobileTabDroppable
                         key={value}
@@ -298,10 +307,14 @@ export default function KanbanBoard({
                 ))}
                 <button
                     type="button"
-                    onClick={() => setActiveFilter(
-                        activeFilter === 'needs-attention' ? 'all' : 'needs-attention',
-                    )}
-                    className={`flex items-center gap-2 whitespace-nowrap rounded-full px-4 py-2 text-sm font-medium transition-colors ${
+                    onClick={() =>
+                        setActiveFilter(
+                            activeFilter === 'needs-attention'
+                                ? 'all'
+                                : 'needs-attention',
+                        )
+                    }
+                    className={`flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium whitespace-nowrap transition-colors ${
                         activeFilter === 'needs-attention'
                             ? 'bg-primary text-primary-foreground'
                             : 'bg-muted text-muted-foreground hover:bg-muted/80'
@@ -311,13 +324,13 @@ export default function KanbanBoard({
                 </button>
             </div>
 
-            <div className="flex flex-1 min-h-0 gap-4 overflow-x-auto pb-6 max-md:flex-col max-md:overflow-x-hidden">
+            <div className="flex min-h-0 flex-1 gap-4 overflow-x-auto pb-6 max-md:flex-col max-md:overflow-x-hidden">
                 {JOB_APPLICATION_STATUSES.map(({ value, label }) => (
                     <div
                         key={value}
                         className={`h-full max-md:w-full ${
                             activeTab === value
-                                ? 'flex flex-1 min-h-0 flex-col max-md:h-full'
+                                ? 'flex min-h-0 flex-1 flex-col max-md:h-full'
                                 : 'hidden max-md:hidden'
                         } md:flex md:flex-col`}
                     >

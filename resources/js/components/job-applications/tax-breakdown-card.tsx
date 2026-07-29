@@ -16,7 +16,11 @@ const REGIME_LABELS: Record<string, string> = {
     custom: 'Custom',
 };
 
-export default function TaxBreakdownCard({ taxBreakdown }: { taxBreakdown: TaxBreakdown }) {
+export default function TaxBreakdownCard({
+    taxBreakdown,
+}: {
+    taxBreakdown: TaxBreakdown;
+}) {
     const [expanded, setExpanded] = useState(false);
     const tb = taxBreakdown;
 
@@ -31,7 +35,7 @@ export default function TaxBreakdownCard({ taxBreakdown }: { taxBreakdown: TaxBr
                     <PhilippinePesoIcon className="size-3.5 text-emerald-600 dark:text-emerald-400" />
                     Net Take-Home Pay
                 </span>
-                <span className="text-sm tabular-nums font-bold text-emerald-600 dark:text-emerald-400">
+                <span className="text-sm font-bold text-emerald-600 tabular-nums dark:text-emerald-400">
                     {formatSalary(tb.monthly_net)} / mo
                 </span>
             </button>
@@ -39,53 +43,71 @@ export default function TaxBreakdownCard({ taxBreakdown }: { taxBreakdown: TaxBr
                 <div className="flex flex-col gap-2 text-sm">
                     <div className="flex items-center justify-between text-muted-foreground">
                         <span>Regime</span>
-                        <span className="text-xs font-medium">{REGIME_LABELS[tb.regime] ?? tb.regime}</span>
+                        <span className="text-xs font-medium">
+                            {REGIME_LABELS[tb.regime] ?? tb.regime}
+                        </span>
                     </div>
                     <hr className="border-border" />
                     <div className="flex items-center justify-between text-muted-foreground">
                         <span>Monthly Gross</span>
-                        <span className="tabular-nums">{formatSalary(tb.monthly_gross)}</span>
+                        <span className="tabular-nums">
+                            {formatSalary(tb.monthly_gross)}
+                        </span>
                     </div>
                     {tb.sss > 0 && (
                         <div className="flex items-center justify-between text-destructive">
                             <span>SSS</span>
-                            <span className="tabular-nums">-{formatSalary(tb.sss)}</span>
+                            <span className="tabular-nums">
+                                -{formatSalary(tb.sss)}
+                            </span>
                         </div>
                     )}
                     {tb.philhealth > 0 && (
                         <div className="flex items-center justify-between text-destructive">
                             <span>PhilHealth</span>
-                            <span className="tabular-nums">-{formatSalary(tb.philhealth)}</span>
+                            <span className="tabular-nums">
+                                -{formatSalary(tb.philhealth)}
+                            </span>
                         </div>
                     )}
                     {tb.pagibig > 0 && (
                         <div className="flex items-center justify-between text-destructive">
                             <span>Pag-IBIG</span>
-                            <span className="tabular-nums">-{formatSalary(tb.pagibig)}</span>
+                            <span className="tabular-nums">
+                                -{formatSalary(tb.pagibig)}
+                            </span>
                         </div>
                     )}
                     {tb.bir_tax > 0 && (
                         <div className="flex items-center justify-between text-destructive">
                             <span>BIR Tax</span>
-                            <span className="tabular-nums">-{formatSalary(tb.bir_tax)}</span>
+                            <span className="tabular-nums">
+                                -{formatSalary(tb.bir_tax)}
+                            </span>
                         </div>
                     )}
                     {tb.taxable_allowances > 0 && (
                         <div className="flex items-center justify-between text-muted-foreground">
                             <span>Taxable Allowances</span>
-                            <span className="tabular-nums text-foreground">+{formatSalary(tb.taxable_allowances)}</span>
+                            <span className="text-foreground tabular-nums">
+                                +{formatSalary(tb.taxable_allowances)}
+                            </span>
                         </div>
                     )}
                     {tb.non_taxable_allowances > 0 && (
                         <div className="flex items-center justify-between text-muted-foreground">
                             <span>Non-Taxable Allowances</span>
-                            <span className="tabular-nums text-foreground">+{formatSalary(tb.non_taxable_allowances)}</span>
+                            <span className="text-foreground tabular-nums">
+                                +{formatSalary(tb.non_taxable_allowances)}
+                            </span>
                         </div>
                     )}
                     {tb.custom_deductions > 0 && (
                         <div className="flex items-center justify-between text-destructive">
                             <span>Custom Deductions</span>
-                            <span className="tabular-nums">-{formatSalary(tb.custom_deductions)}</span>
+                            <span className="tabular-nums">
+                                -{formatSalary(tb.custom_deductions)}
+                            </span>
                         </div>
                     )}
                     <hr className="border-border" />
@@ -93,7 +115,9 @@ export default function TaxBreakdownCard({ taxBreakdown }: { taxBreakdown: TaxBr
                         <span>Monthly Net Pay</span>
                         <span className="tabular-nums">
                             {tb.manual_net_override !== null ? (
-                                <span className="text-primary">{formatSalary(tb.monthly_net)} (manual)</span>
+                                <span className="text-primary">
+                                    {formatSalary(tb.monthly_net)} (manual)
+                                </span>
                             ) : (
                                 formatSalary(tb.monthly_net)
                             )}
@@ -102,15 +126,21 @@ export default function TaxBreakdownCard({ taxBreakdown }: { taxBreakdown: TaxBr
                     <hr className="border-border" />
                     <div className="flex items-center justify-between text-muted-foreground">
                         <span>13th Month Pay</span>
-                        <span className="tabular-nums">{formatSalary(tb.thirteenth_month)}</span>
+                        <span className="tabular-nums">
+                            {formatSalary(tb.thirteenth_month)}
+                        </span>
                     </div>
                     <div className="flex items-center justify-between text-muted-foreground">
                         <span>Annual Gross</span>
-                        <span className="tabular-nums">{formatSalary(tb.annual_gross)}</span>
+                        <span className="tabular-nums">
+                            {formatSalary(tb.annual_gross)}
+                        </span>
                     </div>
                     <div className="flex items-center justify-between font-semibold text-foreground">
                         <span>Annual Net</span>
-                        <span className="tabular-nums">{formatSalary(tb.annual_net)}</span>
+                        <span className="tabular-nums">
+                            {formatSalary(tb.annual_net)}
+                        </span>
                     </div>
                 </div>
             )}

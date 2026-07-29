@@ -25,10 +25,10 @@ const features: FeatureRow[] = [
         highlight: true,
     },
     {
-        category: 'Zero-Storage Resume Privacy',
+        category: 'Zero File-Storage Privacy',
         excel: 'Stored on your device',
-        generic: 'Cloud stored',
-        aplayan: 'Ephemeral in-memory only',
+        generic: 'Cloud file stored',
+        aplayan: 'In-memory parsing + Private DB',
         highlight: true,
     },
     {
@@ -73,7 +73,13 @@ const features: FeatureRow[] = [
     },
 ];
 
-function CellValue({ value, isAplayan = false }: { value: boolean | string; isAplayan?: boolean }) {
+function CellValue({
+    value,
+    isAplayan = false,
+}: {
+    value: boolean | string;
+    isAplayan?: boolean;
+}) {
     if (value === true) {
         return <Check className="h-4.5 w-4.5 text-emerald-500" />;
     }
@@ -101,17 +107,24 @@ export default function ComparisonMatrix() {
                 Why teams switch to Aplayan
             </h3>
             <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
-                See how Aplayan compares to spreadsheets and generic application trackers.
+                See how Aplayan compares to spreadsheets and generic application
+                trackers.
             </p>
 
             <div className="mt-6 overflow-x-auto">
                 <table className="w-full min-w-[500px] border-collapse text-sm">
                     <thead>
                         <tr className="border-b border-border">
-                            <th className="py-2.5 pr-4 text-left text-xs font-bold text-zinc-700 dark:text-zinc-200 uppercase tracking-wider">Feature</th>
-                            <th className="py-2.5 px-3 text-center text-xs font-semibold text-zinc-600 dark:text-zinc-300">Excel / Sheets</th>
-                            <th className="py-2.5 px-3 text-center text-xs font-semibold text-zinc-600 dark:text-zinc-300">Generic Trackers</th>
-                            <th className="py-2.5 px-3 text-center text-xs font-bold text-foreground">
+                            <th className="py-2.5 pr-4 text-left text-xs font-bold tracking-wider text-zinc-700 uppercase dark:text-zinc-200">
+                                Feature
+                            </th>
+                            <th className="px-3 py-2.5 text-center text-xs font-semibold text-zinc-600 dark:text-zinc-300">
+                                Excel / Sheets
+                            </th>
+                            <th className="px-3 py-2.5 text-center text-xs font-semibold text-zinc-600 dark:text-zinc-300">
+                                Generic Trackers
+                            </th>
+                            <th className="px-3 py-2.5 text-center text-xs font-bold text-foreground">
                                 <span className="rounded-full bg-emerald-500/15 px-2.5 py-1 text-xs font-bold text-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-300">
                                     Aplayan
                                 </span>
@@ -130,19 +143,22 @@ export default function ComparisonMatrix() {
                                 <td className="py-3.5 pr-4 text-sm font-semibold text-foreground">
                                     {row.category}
                                 </td>
-                                <td className="py-3.5 px-3 text-center">
+                                <td className="px-3 py-3.5 text-center">
                                     <div className="flex justify-center">
                                         <CellValue value={row.excel} />
                                     </div>
                                 </td>
-                                <td className="py-3.5 px-3 text-center">
+                                <td className="px-3 py-3.5 text-center">
                                     <div className="flex justify-center">
                                         <CellValue value={row.generic} />
                                     </div>
                                 </td>
-                                <td className="py-3.5 px-3 text-center">
+                                <td className="px-3 py-3.5 text-center">
                                     <div className="flex justify-center">
-                                        <CellValue value={row.aplayan} isAplayan />
+                                        <CellValue
+                                            value={row.aplayan}
+                                            isAplayan
+                                        />
                                     </div>
                                 </td>
                             </tr>

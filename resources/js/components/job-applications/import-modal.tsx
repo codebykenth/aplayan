@@ -1,5 +1,11 @@
 import { useForm } from '@inertiajs/react';
-import { UploadIcon, FileTextIcon, FileJsonIcon, DownloadIcon, XIcon } from 'lucide-react';
+import {
+    UploadIcon,
+    FileTextIcon,
+    FileJsonIcon,
+    DownloadIcon,
+    XIcon,
+} from 'lucide-react';
 import { useState, useRef, useCallback } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -22,24 +28,98 @@ const REQUIRED_FIELDS = [
 ];
 
 const OPTIONAL_FIELDS = [
-    { name: 'status', description: 'Application status', required: false, default: 'wishlist' },
-    { name: 'location', description: 'Job location', required: false, default: 'Remote' },
-    { name: 'expected_salary', description: 'Expected salary', required: false, default: null },
-    { name: 'date_applied', description: 'Date applied (YYYY-MM-DD)', required: false, default: null },
-    { name: 'job_url', description: 'Job posting URL', required: false, default: null },
-    { name: 'job_description', description: 'Job description', required: false, default: null },
-    { name: 'notes', description: 'Additional notes', required: false, default: null },
+    {
+        name: 'status',
+        description: 'Application status',
+        required: false,
+        default: 'wishlist',
+    },
+    {
+        name: 'location',
+        description: 'Job location',
+        required: false,
+        default: 'Remote',
+    },
+    {
+        name: 'expected_salary',
+        description: 'Expected salary',
+        required: false,
+        default: null,
+    },
+    {
+        name: 'date_applied',
+        description: 'Date applied (YYYY-MM-DD)',
+        required: false,
+        default: null,
+    },
+    {
+        name: 'job_url',
+        description: 'Job posting URL',
+        required: false,
+        default: null,
+    },
+    {
+        name: 'job_description',
+        description: 'Job description',
+        required: false,
+        default: null,
+    },
+    {
+        name: 'notes',
+        description: 'Additional notes',
+        required: false,
+        default: null,
+    },
 ];
 
-const STATUS_OPTIONS = ['wishlist', 'applied', 'interviewing', 'offer', 'rejected', 'withdrawn'];
+const STATUS_OPTIONS = [
+    'wishlist',
+    'applied',
+    'interviewing',
+    'offer',
+    'rejected',
+    'withdrawn',
+];
 
 function generateSampleCsv(): string {
-    const headers = ['company_name', 'job_title', 'status', 'location', 'expected_salary', 'date_applied', 'job_url', 'job_description', 'notes'];
-    const rows = [
-        ['Acme Corp', 'Software Engineer', 'applied', 'Remote', '50000', '2024-01-15', 'https://example.com/job1', 'Senior role', 'Applied via referral'],
-        ['Globex', 'Product Manager', 'interviewing', 'Metro Manila', '80000', '2024-02-20', '', '', ''],
+    const headers = [
+        'company_name',
+        'job_title',
+        'status',
+        'location',
+        'expected_salary',
+        'date_applied',
+        'job_url',
+        'job_description',
+        'notes',
     ];
-    const csvRows = rows.map(row => row.map(field => `"${field}"`).join(',')).join('\n');
+    const rows = [
+        [
+            'Acme Corp',
+            'Software Engineer',
+            'applied',
+            'Remote',
+            '50000',
+            '2024-01-15',
+            'https://example.com/job1',
+            'Senior role',
+            'Applied via referral',
+        ],
+        [
+            'Globex',
+            'Product Manager',
+            'interviewing',
+            'Metro Manila',
+            '80000',
+            '2024-02-20',
+            '',
+            '',
+            '',
+        ],
+    ];
+    const csvRows = rows
+        .map((row) => row.map((field) => `"${field}"`).join(','))
+        .join('\n');
 
     return `${headers.join(',')}\n${csvRows}`;
 }
@@ -142,17 +222,25 @@ export default function ImportModal({
     }
 
     function isValidFileType(file: File): boolean {
-        const validTypes = ['text/csv', 'text/plain', 'application/json', 'text/json'];
+        const validTypes = [
+            'text/csv',
+            'text/plain',
+            'application/json',
+            'text/json',
+        ];
         const validExtensions = ['.csv', '.txt', '.json'];
         const extension = '.' + file.name.split('.').pop()?.toLowerCase();
 
-        return validTypes.includes(file.type) || validExtensions.includes(extension);
+        return (
+            validTypes.includes(file.type) ||
+            validExtensions.includes(extension)
+        );
     }
 
     function handleSubmit() {
         if (!selectedFile) {
-return;
-}
+            return;
+        }
 
         importForm.setData('file', selectedFile);
         importForm.post(importMethod.url(), {
@@ -165,40 +253,67 @@ return;
 
     function handleDownloadSample(format: ImportFormat) {
         if (format === 'csv') {
-            downloadFile(generateSampleCsv(), 'sample_applications.csv', 'text/csv');
+            downloadFile(
+                generateSampleCsv(),
+                'sample_applications.csv',
+                'text/csv',
+            );
         } else {
-            downloadFile(generateSampleJson(), 'sample_applications.json', 'application/json');
+            downloadFile(
+                generateSampleJson(),
+                'sample_applications.json',
+                'application/json',
+            );
         }
     }
 
     return (
         <Dialog open={open} onOpenChange={(open) => !open && handleClose()}>
-            <DialogContent className="sm:max-w-2xl max-h-[85vh] flex flex-col p-0 overflow-hidden">
-                <DialogHeader className="px-6 py-4 border-b shrink-0">
+            <DialogContent className="flex max-h-[85vh] flex-col overflow-hidden p-0 sm:max-w-2xl">
+                <DialogHeader className="shrink-0 border-b px-6 py-4">
                     <DialogTitle>Import Job Applications</DialogTitle>
                     <DialogDescription>
-                        Upload a CSV or JSON file to import your job applications. Download a sample template to check formatting.
+                        Upload a CSV or JSON file to import your job
+                        applications. Download a sample template to check
+                        formatting.
                     </DialogDescription>
                 </DialogHeader>
 
-                <div className="flex-1 overflow-y-auto p-6 flex flex-col gap-5">
-                    <Tabs defaultValue="csv" className="flex flex-col gap-4 w-full">
-                        <TabsList className="grid grid-cols-2 w-full h-9 p-1 bg-muted rounded-lg shrink-0">
-                            <TabsTrigger value="csv" className="flex items-center justify-center gap-1.5 text-xs sm:text-sm font-medium">
+                <div className="flex flex-1 flex-col gap-5 overflow-y-auto p-6">
+                    <Tabs
+                        defaultValue="csv"
+                        className="flex w-full flex-col gap-4"
+                    >
+                        <TabsList className="grid h-9 w-full shrink-0 grid-cols-2 rounded-lg bg-muted p-1">
+                            <TabsTrigger
+                                value="csv"
+                                className="flex items-center justify-center gap-1.5 text-xs font-medium sm:text-sm"
+                            >
                                 <FileTextIcon />
                                 CSV Format
                             </TabsTrigger>
-                            <TabsTrigger value="json" className="flex items-center justify-center gap-1.5 text-xs sm:text-sm font-medium">
+                            <TabsTrigger
+                                value="json"
+                                className="flex items-center justify-center gap-1.5 text-xs font-medium sm:text-sm"
+                            >
                                 <FileJsonIcon />
                                 JSON Format
                             </TabsTrigger>
                         </TabsList>
 
-                        <TabsContent value="csv" className="mt-0 flex flex-col gap-4">
-                            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 rounded-lg border bg-card p-3">
+                        <TabsContent
+                            value="csv"
+                            className="mt-0 flex flex-col gap-4"
+                        >
+                            <div className="flex flex-col justify-between gap-2 rounded-lg border bg-card p-3 sm:flex-row sm:items-center">
                                 <div>
-                                    <h4 className="font-medium text-sm">CSV Format Guide</h4>
-                                    <p className="text-xs text-muted-foreground">Standard comma-separated value spreadsheet format.</p>
+                                    <h4 className="text-sm font-medium">
+                                        CSV Format Guide
+                                    </h4>
+                                    <p className="text-xs text-muted-foreground">
+                                        Standard comma-separated value
+                                        spreadsheet format.
+                                    </p>
                                 </div>
                                 <Button
                                     variant="outline"
@@ -211,22 +326,45 @@ return;
                                 </Button>
                             </div>
 
-                            <div className="rounded-lg border bg-card p-3.5 flex flex-col gap-3 text-xs">
+                            <div className="flex flex-col gap-3 rounded-lg border bg-card p-3.5 text-xs">
                                 <div>
-                                    <span className="font-semibold text-foreground">How to import:</span>
-                                    <ol className="list-decimal list-inside mt-1 text-muted-foreground space-y-1">
-                                        <li>Download the sample CSV template</li>
-                                        <li>Fill in your job application data (keep the header row)</li>
-                                        <li>Ensure <code className="font-mono text-foreground">company_name</code> and <code className="font-mono text-foreground">job_title</code> are present</li>
+                                    <span className="font-semibold text-foreground">
+                                        How to import:
+                                    </span>
+                                    <ol className="mt-1 list-inside list-decimal space-y-1 text-muted-foreground">
+                                        <li>
+                                            Download the sample CSV template
+                                        </li>
+                                        <li>
+                                            Fill in your job application data
+                                            (keep the header row)
+                                        </li>
+                                        <li>
+                                            Ensure{' '}
+                                            <code className="font-mono text-foreground">
+                                                company_name
+                                            </code>{' '}
+                                            and{' '}
+                                            <code className="font-mono text-foreground">
+                                                job_title
+                                            </code>{' '}
+                                            are present
+                                        </li>
                                         <li>Save as CSV and upload the file</li>
                                     </ol>
                                 </div>
 
                                 <div>
-                                    <span className="font-semibold text-foreground mr-2">Required Headers:</span>
-                                    <div className="inline-flex flex-wrap gap-1.5 mt-1 sm:mt-0">
-                                        {REQUIRED_FIELDS.map(field => (
-                                            <Badge key={field.name} variant="outline" className="font-mono bg-red-500/10 text-red-600 border-red-500/20 dark:text-red-400">
+                                    <span className="mr-2 font-semibold text-foreground">
+                                        Required Headers:
+                                    </span>
+                                    <div className="mt-1 inline-flex flex-wrap gap-1.5 sm:mt-0">
+                                        {REQUIRED_FIELDS.map((field) => (
+                                            <Badge
+                                                key={field.name}
+                                                variant="outline"
+                                                className="border-red-500/20 bg-red-500/10 font-mono text-red-600 dark:text-red-400"
+                                            >
                                                 {field.name}
                                             </Badge>
                                         ))}
@@ -234,22 +372,37 @@ return;
                                 </div>
 
                                 <div>
-                                    <span className="font-semibold text-foreground mr-2">Optional Headers:</span>
-                                    <div className="inline-flex flex-wrap gap-1.5 mt-1">
-                                        {OPTIONAL_FIELDS.map(field => (
-                                            <Badge key={field.name} variant="outline" className="font-mono bg-blue-500/10 text-blue-600 border-blue-500/20 dark:text-blue-400">
+                                    <span className="mr-2 font-semibold text-foreground">
+                                        Optional Headers:
+                                    </span>
+                                    <div className="mt-1 inline-flex flex-wrap gap-1.5">
+                                        {OPTIONAL_FIELDS.map((field) => (
+                                            <Badge
+                                                key={field.name}
+                                                variant="outline"
+                                                className="border-blue-500/20 bg-blue-500/10 font-mono text-blue-600 dark:text-blue-400"
+                                            >
                                                 {field.name}
-                                                {field.default && <span className="ml-1 opacity-70">({field.default})</span>}
+                                                {field.default && (
+                                                    <span className="ml-1 opacity-70">
+                                                        ({field.default})
+                                                    </span>
+                                                )}
                                             </Badge>
                                         ))}
                                     </div>
                                 </div>
 
                                 <div>
-                                    <span className="font-semibold text-foreground mr-2">Valid Status Values:</span>
-                                    <div className="inline-flex flex-wrap gap-1.5 mt-1">
-                                        {STATUS_OPTIONS.map(status => (
-                                            <span key={status} className="inline-flex items-center rounded-md bg-muted px-2 py-0.5 font-mono text-muted-foreground border border-border">
+                                    <span className="mr-2 font-semibold text-foreground">
+                                        Valid Status Values:
+                                    </span>
+                                    <div className="mt-1 inline-flex flex-wrap gap-1.5">
+                                        {STATUS_OPTIONS.map((status) => (
+                                            <span
+                                                key={status}
+                                                className="inline-flex items-center rounded-md border border-border bg-muted px-2 py-0.5 font-mono text-muted-foreground"
+                                            >
                                                 {status}
                                             </span>
                                         ))}
@@ -258,11 +411,19 @@ return;
                             </div>
                         </TabsContent>
 
-                        <TabsContent value="json" className="mt-0 flex flex-col gap-4">
-                            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 rounded-lg border bg-card p-3">
+                        <TabsContent
+                            value="json"
+                            className="mt-0 flex flex-col gap-4"
+                        >
+                            <div className="flex flex-col justify-between gap-2 rounded-lg border bg-card p-3 sm:flex-row sm:items-center">
                                 <div>
-                                    <h4 className="font-medium text-sm">JSON Format Guide</h4>
-                                    <p className="text-xs text-muted-foreground">Array of job application objects in standard JSON format.</p>
+                                    <h4 className="text-sm font-medium">
+                                        JSON Format Guide
+                                    </h4>
+                                    <p className="text-xs text-muted-foreground">
+                                        Array of job application objects in
+                                        standard JSON format.
+                                    </p>
                                 </div>
                                 <Button
                                     variant="outline"
@@ -275,12 +436,18 @@ return;
                                 </Button>
                             </div>
 
-                            <div className="rounded-lg border bg-card p-3.5 flex flex-col gap-3 text-xs">
+                            <div className="flex flex-col gap-3 rounded-lg border bg-card p-3.5 text-xs">
                                 <div>
-                                    <span className="font-semibold text-foreground mr-2">Required Fields:</span>
-                                    <div className="inline-flex flex-wrap gap-1.5 mt-1 sm:mt-0">
-                                        {REQUIRED_FIELDS.map(field => (
-                                            <Badge key={field.name} variant="outline" className="font-mono bg-red-500/10 text-red-600 border-red-500/20 dark:text-red-400">
+                                    <span className="mr-2 font-semibold text-foreground">
+                                        Required Fields:
+                                    </span>
+                                    <div className="mt-1 inline-flex flex-wrap gap-1.5 sm:mt-0">
+                                        {REQUIRED_FIELDS.map((field) => (
+                                            <Badge
+                                                key={field.name}
+                                                variant="outline"
+                                                className="border-red-500/20 bg-red-500/10 font-mono text-red-600 dark:text-red-400"
+                                            >
                                                 {field.name}
                                             </Badge>
                                         ))}
@@ -288,22 +455,37 @@ return;
                                 </div>
 
                                 <div>
-                                    <span className="font-semibold text-foreground mr-2">Optional Fields:</span>
-                                    <div className="inline-flex flex-wrap gap-1.5 mt-1">
-                                        {OPTIONAL_FIELDS.map(field => (
-                                            <Badge key={field.name} variant="outline" className="font-mono bg-blue-500/10 text-blue-600 border-blue-500/20 dark:text-blue-400">
+                                    <span className="mr-2 font-semibold text-foreground">
+                                        Optional Fields:
+                                    </span>
+                                    <div className="mt-1 inline-flex flex-wrap gap-1.5">
+                                        {OPTIONAL_FIELDS.map((field) => (
+                                            <Badge
+                                                key={field.name}
+                                                variant="outline"
+                                                className="border-blue-500/20 bg-blue-500/10 font-mono text-blue-600 dark:text-blue-400"
+                                            >
                                                 {field.name}
-                                                {field.default && <span className="ml-1 opacity-70">({field.default})</span>}
+                                                {field.default && (
+                                                    <span className="ml-1 opacity-70">
+                                                        ({field.default})
+                                                    </span>
+                                                )}
                                             </Badge>
                                         ))}
                                     </div>
                                 </div>
 
                                 <div>
-                                    <span className="font-semibold text-foreground mr-2">Valid Status Values:</span>
-                                    <div className="inline-flex flex-wrap gap-1.5 mt-1">
-                                        {STATUS_OPTIONS.map(status => (
-                                            <span key={status} className="inline-flex items-center rounded-md bg-muted px-2 py-0.5 font-mono text-muted-foreground border border-border">
+                                    <span className="mr-2 font-semibold text-foreground">
+                                        Valid Status Values:
+                                    </span>
+                                    <div className="mt-1 inline-flex flex-wrap gap-1.5">
+                                        {STATUS_OPTIONS.map((status) => (
+                                            <span
+                                                key={status}
+                                                className="inline-flex items-center rounded-md border border-border bg-muted px-2 py-0.5 font-mono text-muted-foreground"
+                                            >
                                                 {status}
                                             </span>
                                         ))}
@@ -311,9 +493,11 @@ return;
                                 </div>
 
                                 <div>
-                                    <span className="font-semibold text-foreground block mb-1">Example Structure:</span>
-                                    <pre className="text-[11px] bg-muted/80 p-2 rounded border border-border overflow-x-auto max-h-36">
-{`[
+                                    <span className="mb-1 block font-semibold text-foreground">
+                                        Example Structure:
+                                    </span>
+                                    <pre className="max-h-36 overflow-x-auto rounded border border-border bg-muted/80 p-2 text-[11px]">
+                                        {`[
   {
     "company_name": "Acme Corp",
     "job_title": "Software Engineer",
@@ -333,14 +517,16 @@ return;
                     </Tabs>
 
                     <div className="flex flex-col gap-2">
-                        <label className="text-xs font-semibold text-foreground">Select or Drop File</label>
+                        <label className="text-xs font-semibold text-foreground">
+                            Select or Drop File
+                        </label>
                         <div
-                            className={`relative border-2 border-dashed rounded-lg p-6 text-center cursor-pointer transition-colors ${
+                            className={`relative cursor-pointer rounded-lg border-2 border-dashed p-6 text-center transition-colors ${
                                 isDragActive
                                     ? 'border-primary bg-primary/5'
                                     : selectedFile
-                                        ? 'border-green-500 bg-green-500/10'
-                                        : 'border-border hover:border-muted-foreground/50 bg-card'
+                                      ? 'border-green-500 bg-green-500/10'
+                                      : 'border-border bg-card hover:border-muted-foreground/50'
                             }`}
                             onDragEnter={handleDragEnter}
                             onDragLeave={handleDragLeave}
@@ -359,16 +545,19 @@ return;
                             {selectedFile ? (
                                 <div className="flex items-center justify-center gap-3">
                                     {selectedFile.name.endsWith('.json') ? (
-                                        <FileJsonIcon className="text-green-500 shrink-0" />
+                                        <FileJsonIcon className="shrink-0 text-green-500" />
                                     ) : (
-                                        <FileTextIcon className="text-green-500 shrink-0" />
+                                        <FileTextIcon className="shrink-0 text-green-500" />
                                     )}
-                                    <div className="text-left min-w-0 flex-1">
-                                        <p className="font-medium text-sm text-foreground truncate">
+                                    <div className="min-w-0 flex-1 text-left">
+                                        <p className="truncate text-sm font-medium text-foreground">
                                             {selectedFile.name}
                                         </p>
                                         <p className="text-xs text-muted-foreground">
-                                            {(selectedFile.size / 1024).toFixed(1)} KB
+                                            {(selectedFile.size / 1024).toFixed(
+                                                1,
+                                            )}{' '}
+                                            KB
                                         </p>
                                     </div>
                                     <Button
@@ -385,8 +574,10 @@ return;
                             ) : (
                                 <div className="flex flex-col gap-1.5">
                                     <UploadIcon className="mx-auto text-muted-foreground" />
-                                    <p className="text-xs sm:text-sm font-medium text-foreground">
-                                        {isDragActive ? 'Drop your file here' : 'Drag & drop file here, or click to browse'}
+                                    <p className="text-xs font-medium text-foreground sm:text-sm">
+                                        {isDragActive
+                                            ? 'Drop your file here'
+                                            : 'Drag & drop file here, or click to browse'}
                                     </p>
                                     <p className="text-[11px] text-muted-foreground">
                                         Supports .csv, .txt, or .json
@@ -403,7 +594,7 @@ return;
                     )}
                 </div>
 
-                <DialogFooter className="m-0 rounded-b-xl px-6 py-3.5 border-t bg-muted/40 shrink-0 flex flex-row justify-end gap-2">
+                <DialogFooter className="m-0 flex shrink-0 flex-row justify-end gap-2 rounded-b-xl border-t bg-muted/40 px-6 py-3.5">
                     <Button variant="outline" onClick={handleClose}>
                         Cancel
                     </Button>
@@ -411,7 +602,9 @@ return;
                         onClick={handleSubmit}
                         disabled={!selectedFile || importForm.processing}
                     >
-                        {importForm.processing ? 'Importing...' : 'Import Applications'}
+                        {importForm.processing
+                            ? 'Importing...'
+                            : 'Import Applications'}
                     </Button>
                 </DialogFooter>
             </DialogContent>

@@ -51,7 +51,8 @@ function getSystemPrefersDark(): boolean {
 }
 
 function applyMode(mode: Mode): void {
-    const isDark = mode === 'dark' || (mode === 'system' && getSystemPrefersDark());
+    const isDark =
+        mode === 'dark' || (mode === 'system' && getSystemPrefersDark());
     document.documentElement.classList.toggle('dark', isDark);
 }
 

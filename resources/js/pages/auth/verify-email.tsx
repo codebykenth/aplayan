@@ -14,8 +14,10 @@ export default function VerifyEmail() {
                     Verify your email address
                 </h1>
                 <p className="mb-6 text-sm text-muted-foreground">
-                    Thanks for signing up! Before getting started, could you verify your email address by clicking the
-                    link we just emailed to you? If you didn't receive the email, we will gladly send you another.
+                    Thanks for signing up! Before getting started, could you
+                    verify your email address by clicking the link we just
+                    emailed to you? If you didn't receive the email, we will
+                    gladly send you another.
                 </p>
 
                 {status && (
@@ -25,7 +27,11 @@ export default function VerifyEmail() {
                 )}
 
                 <form action="/email/verification-notification" method="POST">
-                    <input type="hidden" name="_token" value={usePage().props.csrf_token as string} />
+                    <input
+                        type="hidden"
+                        name="_token"
+                        value={usePage().props.csrf_token as string}
+                    />
 
                     <button
                         type="submit"
@@ -36,7 +42,11 @@ export default function VerifyEmail() {
                 </form>
 
                 <form action="/logout" method="POST" className="mt-4">
-                    <input type="hidden" name="_token" value={usePage().props.csrf_token as string} />
+                    <input
+                        type="hidden"
+                        name="_token"
+                        value={usePage().props.csrf_token as string}
+                    />
 
                     <button
                         type="submit"

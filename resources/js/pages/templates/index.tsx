@@ -1,5 +1,14 @@
 import { Head, router, useForm } from '@inertiajs/react';
-import { FileText, PlusIcon, Trash2Icon, PencilIcon, SaveIcon, XIcon, BookmarkIcon, Mail } from 'lucide-react';
+import {
+    FileText,
+    PlusIcon,
+    Trash2Icon,
+    PencilIcon,
+    SaveIcon,
+    XIcon,
+    BookmarkIcon,
+    Mail,
+} from 'lucide-react';
 import { useState } from 'react';
 import type { ReactNode } from 'react';
 import { Button } from '@/components/ui/button';
@@ -17,7 +26,11 @@ import { Label } from '@/components/ui/label';
 import { PageHeader } from '@/components/ui/page-header';
 import { Textarea } from '@/components/ui/textarea';
 import AppLayout from '@/layouts/app-layout';
-import { store as saveTemplate, update as updateTemplate, destroy as deleteTemplate } from '@/routes/templates';
+import {
+    store as saveTemplate,
+    update as updateTemplate,
+    destroy as deleteTemplate,
+} from '@/routes/templates';
 import type { ApplicationTemplate } from '@/types/application-template';
 
 interface ApplicationFormData {
@@ -29,20 +42,20 @@ interface ApplicationFormData {
     default_notes: string;
 }
 
-
-
 export default function TemplatesIndex({
     templates,
 }: {
     templates: ApplicationTemplate[];
 }) {
-
     return (
         <>
             <Head title="Templates" />
 
-            <div className="flex flex-1 min-h-0 flex-col gap-6">
-                <PageHeader title="Templates" description="Manage reusable application presets and defaults for fast job entries" />
+            <div className="flex min-h-0 flex-1 flex-col gap-6">
+                <PageHeader
+                    title="Templates"
+                    description="Manage reusable application presets and defaults for fast job entries"
+                />
 
                 <ApplicationTemplatesTab templates={templates} />
             </div>
@@ -50,12 +63,28 @@ export default function TemplatesIndex({
     );
 }
 
-function ApplicationTemplatesTab({ templates }: { templates: ApplicationTemplate[] }) {
+function ApplicationTemplatesTab({
+    templates,
+}: {
+    templates: ApplicationTemplate[];
+}) {
     const [formOpen, setFormOpen] = useState(false);
-    const [editingTemplate, setEditingTemplate] = useState<ApplicationTemplate | null>(null);
-    const [deletingTemplate, setDeletingTemplate] = useState<ApplicationTemplate | null>(null);
+    const [editingTemplate, setEditingTemplate] =
+        useState<ApplicationTemplate | null>(null);
+    const [deletingTemplate, setDeletingTemplate] =
+        useState<ApplicationTemplate | null>(null);
 
-    const { data, setData, post, put, processing, errors, reset, clearErrors, transform } = useForm<ApplicationFormData>({
+    const {
+        data,
+        setData,
+        post,
+        put,
+        processing,
+        errors,
+        reset,
+        clearErrors,
+        transform,
+    } = useForm<ApplicationFormData>({
         name: '',
         category: '',
         default_location: '',
@@ -77,8 +106,10 @@ function ApplicationTemplatesTab({ templates }: { templates: ApplicationTemplate
             name: template.name,
             category: template.category ?? '',
             default_location: template.default_location ?? '',
-            default_expected_salary: template.default_expected_salary?.toString() ?? '',
-            default_job_description_keywords: template.default_job_description_keywords ?? '',
+            default_expected_salary:
+                template.default_expected_salary?.toString() ?? '',
+            default_job_description_keywords:
+                template.default_job_description_keywords ?? '',
             default_notes: template.default_notes ?? '',
         });
         clearErrors();
@@ -101,7 +132,8 @@ function ApplicationTemplatesTab({ templates }: { templates: ApplicationTemplate
                 ? Number(formData.default_expected_salary)
                 : undefined,
             default_location: formData.default_location || undefined,
-            default_job_description_keywords: formData.default_job_description_keywords || undefined,
+            default_job_description_keywords:
+                formData.default_job_description_keywords || undefined,
             default_notes: formData.default_notes || undefined,
             category: formData.category || undefined,
         }));
@@ -121,17 +153,20 @@ function ApplicationTemplatesTab({ templates }: { templates: ApplicationTemplate
         setDeletingTemplate(template);
     }
 
-    const grouped = templates.reduce<Record<string, ApplicationTemplate[]>>((acc, t) => {
-        const key = t.category || 'Uncategorized';
+    const grouped = templates.reduce<Record<string, ApplicationTemplate[]>>(
+        (acc, t) => {
+            const key = t.category || 'Uncategorized';
 
-        if (!acc[key]) {
-            acc[key] = [];
-        }
+            if (!acc[key]) {
+                acc[key] = [];
+            }
 
-        acc[key].push(t);
+            acc[key].push(t);
 
-        return acc;
-    }, {});
+            return acc;
+        },
+        {},
+    );
 
     const sortedCategories = Object.keys(grouped).sort((a, b) => {
         if (a === 'Uncategorized') {
@@ -147,7 +182,7 @@ function ApplicationTemplatesTab({ templates }: { templates: ApplicationTemplate
 
     return (
         <>
-            <div className="flex flex-1 min-h-0 flex-col gap-6">
+            <div className="flex min-h-0 flex-1 flex-col gap-6">
                 <div className="flex justify-end">
                     <Button onClick={openCreate}>
                         <PlusIcon data-icon="inline-start" />
@@ -156,10 +191,11 @@ function ApplicationTemplatesTab({ templates }: { templates: ApplicationTemplate
                 </div>
 
                 {templates.length === 0 ? (
-                    <div className="flex flex-1 min-h-0 flex-col items-center justify-center gap-2 py-16 text-center">
+                    <div className="flex min-h-0 flex-1 flex-col items-center justify-center gap-2 py-16 text-center">
                         <BookmarkIcon className="size-12 text-muted-foreground/40" />
                         <p className="text-sm text-muted-foreground">
-                            No templates yet. Save an application pattern as a template to quickly apply later.
+                            No templates yet. Save an application pattern as a
+                            template to quickly apply later.
                         </p>
                         <Button variant="outline" onClick={openCreate}>
                             <PlusIcon data-icon="inline-start" />
@@ -170,7 +206,7 @@ function ApplicationTemplatesTab({ templates }: { templates: ApplicationTemplate
                     <div className="flex flex-col gap-8">
                         {sortedCategories.map((category) => (
                             <div key={category} className="flex flex-col gap-3">
-                                <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
+                                <h2 className="text-sm font-semibold tracking-wider text-muted-foreground uppercase">
                                     {category}
                                 </h2>
                                 <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -186,7 +222,9 @@ function ApplicationTemplatesTab({ templates }: { templates: ApplicationTemplate
                                                     </h3>
                                                     {template.default_location && (
                                                         <p className="text-xs text-muted-foreground">
-                                                            {template.default_location}
+                                                            {
+                                                                template.default_location
+                                                            }
                                                         </p>
                                                     )}
                                                 </div>
@@ -194,7 +232,9 @@ function ApplicationTemplatesTab({ templates }: { templates: ApplicationTemplate
                                                     <Button
                                                         variant="ghost"
                                                         size="icon"
-                                                        onClick={() => openEdit(template)}
+                                                        onClick={() =>
+                                                            openEdit(template)
+                                                        }
                                                         aria-label="Edit template"
                                                     >
                                                         <PencilIcon className="size-3.5" />
@@ -202,7 +242,11 @@ function ApplicationTemplatesTab({ templates }: { templates: ApplicationTemplate
                                                     <Button
                                                         variant="ghost"
                                                         size="icon"
-                                                        onClick={() => handleDelete(template)}
+                                                        onClick={() =>
+                                                            handleDelete(
+                                                                template,
+                                                            )
+                                                        }
                                                         aria-label="Delete template"
                                                     >
                                                         <Trash2Icon className="size-3.5 text-destructive" />
@@ -211,19 +255,27 @@ function ApplicationTemplatesTab({ templates }: { templates: ApplicationTemplate
                                             </div>
 
                                             <div className="flex flex-col gap-1 text-xs text-muted-foreground">
-                                                {template.default_expected_salary !== null && (
+                                                {template.default_expected_salary !==
+                                                    null && (
                                                     <p>
-                                                        Expected Salary: ₱{template.default_expected_salary.toLocaleString('en-PH')}
+                                                        Expected Salary: ₱
+                                                        {template.default_expected_salary.toLocaleString(
+                                                            'en-PH',
+                                                        )}
                                                     </p>
                                                 )}
                                                 {template.default_job_description_keywords && (
                                                     <p className="line-clamp-2">
-                                                        Keywords: {template.default_job_description_keywords}
+                                                        Keywords:{' '}
+                                                        {
+                                                            template.default_job_description_keywords
+                                                        }
                                                     </p>
                                                 )}
                                                 {template.default_notes && (
                                                     <p className="line-clamp-2">
-                                                        Notes: {template.default_notes}
+                                                        Notes:{' '}
+                                                        {template.default_notes}
                                                     </p>
                                                 )}
                                             </div>
@@ -236,7 +288,10 @@ function ApplicationTemplatesTab({ templates }: { templates: ApplicationTemplate
                 )}
             </div>
 
-            <Dialog open={formOpen} onOpenChange={(open) => !open && handleClose()}>
+            <Dialog
+                open={formOpen}
+                onOpenChange={(open) => !open && handleClose()}
+            >
                 <DialogContent className="sm:max-w-lg">
                     <DialogHeader>
                         <DialogTitle>
@@ -256,12 +311,16 @@ function ApplicationTemplatesTab({ templates }: { templates: ApplicationTemplate
                                 <Input
                                     id="name"
                                     value={data.name}
-                                    onChange={(e) => setData('name', e.target.value)}
+                                    onChange={(e) =>
+                                        setData('name', e.target.value)
+                                    }
                                     aria-invalid={!!errors.name}
                                     placeholder="Remote Frontend Template"
                                 />
                                 {errors.name && (
-                                    <p className="text-xs text-destructive">{errors.name}</p>
+                                    <p className="text-xs text-destructive">
+                                        {errors.name}
+                                    </p>
                                 )}
                             </div>
 
@@ -270,21 +329,32 @@ function ApplicationTemplatesTab({ templates }: { templates: ApplicationTemplate
                                 <Input
                                     id="category"
                                     value={data.category}
-                                    onChange={(e) => setData('category', e.target.value)}
+                                    onChange={(e) =>
+                                        setData('category', e.target.value)
+                                    }
                                     placeholder="e.g. Remote Frontend, BPO Cebu, Government PH"
                                 />
                                 {errors.category && (
-                                    <p className="text-xs text-destructive">{errors.category}</p>
+                                    <p className="text-xs text-destructive">
+                                        {errors.category}
+                                    </p>
                                 )}
                             </div>
 
                             <div className="grid grid-cols-2 gap-4">
                                 <div className="flex flex-col gap-2">
-                                    <Label htmlFor="default_location">Default Location</Label>
+                                    <Label htmlFor="default_location">
+                                        Default Location
+                                    </Label>
                                     <Input
                                         id="default_location"
                                         value={data.default_location}
-                                        onChange={(e) => setData('default_location', e.target.value)}
+                                        onChange={(e) =>
+                                            setData(
+                                                'default_location',
+                                                e.target.value,
+                                            )
+                                        }
                                         placeholder="Remote"
                                     />
                                 </div>
@@ -293,7 +363,7 @@ function ApplicationTemplatesTab({ templates }: { templates: ApplicationTemplate
                                         Expected Salary (₱)
                                     </Label>
                                     <div className="relative">
-                                        <span className="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
+                                        <span className="pointer-events-none absolute top-1/2 left-2.5 -translate-y-1/2 text-sm text-muted-foreground">
                                             ₱
                                         </span>
                                         <Input
@@ -302,7 +372,12 @@ function ApplicationTemplatesTab({ templates }: { templates: ApplicationTemplate
                                             min={0}
                                             className="pl-6"
                                             value={data.default_expected_salary}
-                                            onChange={(e) => setData('default_expected_salary', e.target.value)}
+                                            onChange={(e) =>
+                                                setData(
+                                                    'default_expected_salary',
+                                                    e.target.value,
+                                                )
+                                            }
                                             placeholder="50000"
                                         />
                                     </div>
@@ -316,34 +391,49 @@ function ApplicationTemplatesTab({ templates }: { templates: ApplicationTemplate
                                 <Textarea
                                     id="default_job_description_keywords"
                                     rows={2}
-                                    value={data.default_job_description_keywords}
-                                    onChange={(e) => setData('default_job_description_keywords', e.target.value)}
+                                    value={
+                                        data.default_job_description_keywords
+                                    }
+                                    onChange={(e) =>
+                                        setData(
+                                            'default_job_description_keywords',
+                                            e.target.value,
+                                        )
+                                    }
                                     placeholder="React, TypeScript, Laravel, Remote"
                                 />
                             </div>
 
                             <div className="flex flex-col gap-2">
-                                <Label htmlFor="default_notes">Default Notes</Label>
+                                <Label htmlFor="default_notes">
+                                    Default Notes
+                                </Label>
                                 <Textarea
                                     id="default_notes"
                                     rows={2}
                                     value={data.default_notes}
-                                    onChange={(e) => setData('default_notes', e.target.value)}
+                                    onChange={(e) =>
+                                        setData('default_notes', e.target.value)
+                                    }
                                     placeholder="Any default notes for this type of application"
                                 />
                             </div>
                         </div>
 
                         <DialogFooter>
-                            <Button type="button" variant="outline" onClick={handleClose}>
+                            <Button
+                                type="button"
+                                variant="outline"
+                                onClick={handleClose}
+                            >
                                 Cancel
                             </Button>
                             <Button type="submit" disabled={processing}>
                                 {processing
                                     ? 'Saving...'
                                     : editingTemplate
-                                        ? 'Update'
-                                        : 'Create'}
+                                      ? 'Update'
+                                      : 'Create'}
                             </Button>
                         </DialogFooter>
                     </form>
@@ -354,7 +444,10 @@ function ApplicationTemplatesTab({ templates }: { templates: ApplicationTemplate
                 open={deletingTemplate !== null}
                 onOpenChange={(open) => !open && setDeletingTemplate(null)}
                 title="Delete Template?"
-                description={deletingTemplate && `Are you sure you want to delete "${deletingTemplate.name}"? This action cannot be undone.`}
+                description={
+                    deletingTemplate &&
+                    `Are you sure you want to delete "${deletingTemplate.name}"? This action cannot be undone.`
+                }
                 onConfirm={() => {
                     if (deletingTemplate) {
                         router.delete(deleteTemplate.url(deletingTemplate.id));

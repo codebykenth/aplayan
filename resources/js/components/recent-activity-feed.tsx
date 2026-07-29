@@ -22,7 +22,10 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 import { index as jobAppsIndex } from '@/routes/job-applications';
 import { STATUS_COLORS } from '@/types/job-application';
-import type { JobApplicationActivity, JobApplicationStatus } from '@/types/job-application';
+import type {
+    JobApplicationActivity,
+    JobApplicationStatus,
+} from '@/types/job-application';
 
 export interface RecentActivityItem extends Omit<
     JobApplicationActivity,
@@ -51,8 +54,12 @@ const STATUS_ICONS: Record<JobApplicationStatus, typeof Clock> = {
     withdrawn: X,
 };
 
-function getStatusFromDescription(description: string): JobApplicationStatus | null {
-    const match = description.match(/Status changed to (Wishlist|Applied|Interviewing|Offer|Rejected|Withdrawn)/i);
+function getStatusFromDescription(
+    description: string,
+): JobApplicationStatus | null {
+    const match = description.match(
+        /Status changed to (Wishlist|Applied|Interviewing|Offer|Rejected|Withdrawn)/i,
+    );
     if (match) {
         return match[1].toLowerCase() as JobApplicationStatus;
     }
@@ -99,20 +106,20 @@ function formatRelativeTime(date: string): string {
     const diffDays = Math.floor(diffMs / 86400000);
 
     if (diffMins < 1) {
-return 'Just now';
-}
+        return 'Just now';
+    }
 
     if (diffMins < 60) {
-return `${diffMins} minute${diffMins === 1 ? '' : 's'} ago`;
-}
+        return `${diffMins} minute${diffMins === 1 ? '' : 's'} ago`;
+    }
 
     if (diffHours < 24) {
-return `${diffHours} hour${diffHours === 1 ? '' : 's'} ago`;
-}
+        return `${diffHours} hour${diffHours === 1 ? '' : 's'} ago`;
+    }
 
     if (diffDays < 7) {
-return `${diffDays} day${diffDays === 1 ? '' : 's'} ago`;
-}
+        return `${diffDays} day${diffDays === 1 ? '' : 's'} ago`;
+    }
 
     return d.toLocaleDateString('en-PH', {
         month: 'short',
@@ -128,7 +135,8 @@ function ActivityCard({
     onSelect: (applicationId: number) => void;
 }) {
     let Icon = ACTIVITY_ICONS[item.type] ?? Clock;
-    let iconColor = ACTIVITY_COLORS[item.type] ?? 'bg-muted text-muted-foreground';
+    let iconColor =
+        ACTIVITY_COLORS[item.type] ?? 'bg-muted text-muted-foreground';
     let customBadgeClass = '';
 
     if (item.type === 'status_update') {
@@ -161,12 +169,19 @@ function ActivityCard({
                         {item.company_name}
                     </span>
                     {customBadgeClass ? (
-                        <div className={cn("inline-flex items-center rounded-full border px-2.5 py-0.5 text-[10px] font-semibold transition-colors focus:outline-hidden focus:ring-2 focus:ring-ring focus:ring-offset-2 shrink-0 leading-none", customBadgeClass)}>
+                        <div
+                            className={cn(
+                                'inline-flex shrink-0 items-center rounded-full border px-2.5 py-0.5 text-[10px] leading-none font-semibold transition-colors focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:outline-hidden',
+                                customBadgeClass,
+                            )}
+                        >
                             {ACTIVITY_LABELS[item.type] ?? item.type}
                         </div>
                     ) : (
                         <Badge
-                            variant={ACTIVITY_BADGE_VARIANTS[item.type] ?? 'outline'}
+                            variant={
+                                ACTIVITY_BADGE_VARIANTS[item.type] ?? 'outline'
+                            }
                             className="shrink-0 text-[10px] leading-none"
                         >
                             {ACTIVITY_LABELS[item.type] ?? item.type}
@@ -196,7 +211,13 @@ export default function RecentActivityFeed({
     className?: string;
 }) {
     return (
-        <Card size="sm" className={cn("flex flex-col h-full max-h-[520px] min-h-0", className)}>
+        <Card
+            size="sm"
+            className={cn(
+                'flex h-full max-h-[520px] min-h-0 flex-col',
+                className,
+            )}
+        >
             <CardHeader className="shrink-0">
                 <CardTitle className="flex items-center gap-2">
                     <div className="flex size-5 items-center justify-center rounded-md bg-foreground/5">
@@ -205,7 +226,7 @@ export default function RecentActivityFeed({
                     Recent Activity
                 </CardTitle>
             </CardHeader>
-            <CardContent className="flex-1 min-h-0 max-h-[460px] overflow-y-auto px-0">
+            <CardContent className="max-h-[460px] min-h-0 flex-1 overflow-y-auto px-0">
                 {items.length === 0 ? (
                     <div className="flex flex-col items-center gap-3 px-(--card-spacing) py-8 text-center">
                         <div className="flex size-10 items-center justify-center rounded-full bg-muted">

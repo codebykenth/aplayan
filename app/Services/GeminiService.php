@@ -72,8 +72,8 @@ PROMPT;
         $prompt = <<<PROMPT
 You are a salary estimation expert. Based on the following job details, estimate the salary range.
 Return ONLY a raw valid JSON object (no markdown code fences or backticks) with these exact keys:
-- min_salary_php (integer, annual PHP salary)
-- max_salary_php (integer, annual PHP salary)
+- min_salary_php (integer, monthly PHP salary)
+- max_salary_php (integer, monthly PHP salary)
 - market_context (string, brief explanation of the market context)
 
 Job Title: {$jobTitle}

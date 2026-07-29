@@ -2,7 +2,13 @@ import { Head, useForm } from '@inertiajs/react';
 import { Flame, Target, TrendingUp, Save } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { Button } from '@/components/ui/button';
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
+import {
+    Card,
+    CardHeader,
+    CardTitle,
+    CardDescription,
+    CardContent,
+} from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { PageHeader } from '@/components/ui/page-header';
@@ -45,7 +51,8 @@ function StreakBadge({ streak }: { streak: number }) {
 }
 
 function ProgressRing({ progress, goal }: { progress: number; goal: number }) {
-    const percentage = goal > 0 ? Math.min(Math.round((progress / goal) * 100), 100) : 0;
+    const percentage =
+        goal > 0 ? Math.min(Math.round((progress / goal) * 100), 100) : 0;
     const circumference = 2 * Math.PI * 54;
     const offset = circumference - (percentage / 100) * circumference;
     const isComplete = progress >= goal;
@@ -53,11 +60,24 @@ function ProgressRing({ progress, goal }: { progress: number; goal: number }) {
     return (
         <div className="relative flex items-center justify-center">
             <svg width="140" height="140" className="-rotate-90">
-                <circle cx="70" cy="70" r="54" fill="none" stroke="hsl(var(--muted))" strokeWidth="8" />
                 <circle
-                    cx="70" cy="70" r="54"
+                    cx="70"
+                    cy="70"
+                    r="54"
                     fill="none"
-                    stroke={isComplete ? 'hsl(142, 76%, 36%)' : 'hsl(var(--primary))'}
+                    stroke="hsl(var(--muted))"
+                    strokeWidth="8"
+                />
+                <circle
+                    cx="70"
+                    cy="70"
+                    r="54"
+                    fill="none"
+                    stroke={
+                        isComplete
+                            ? 'hsl(142, 76%, 36%)'
+                            : 'hsl(var(--primary))'
+                    }
                     strokeWidth="8"
                     strokeLinecap="round"
                     strokeDasharray={circumference}
@@ -66,7 +86,9 @@ function ProgressRing({ progress, goal }: { progress: number; goal: number }) {
                 />
             </svg>
             <div className="absolute flex flex-col items-center">
-                <span className="text-3xl font-bold text-foreground">{progress}</span>
+                <span className="text-3xl font-bold text-foreground">
+                    {progress}
+                </span>
                 <span className="text-xs text-muted-foreground">of {goal}</span>
             </div>
         </div>
@@ -74,14 +96,17 @@ function ProgressRing({ progress, goal }: { progress: number; goal: number }) {
 }
 
 function GoalUpdateForm({ currentGoal }: { currentGoal: number }) {
-    const { data, setData, patch, processing, errors, setError, clearErrors } = useForm({
-        weekly_goal: String(currentGoal),
-    });
+    const { data, setData, patch, processing, errors, setError, clearErrors } =
+        useForm({
+            weekly_goal: String(currentGoal),
+        });
 
     function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
 
-        const result = validateWithZod(goalSchema, { weekly_goal: data.weekly_goal });
+        const result = validateWithZod(goalSchema, {
+            weekly_goal: data.weekly_goal,
+        });
 
         if (!result.success) {
             clearErrors();
@@ -102,11 +127,15 @@ function GoalUpdateForm({ currentGoal }: { currentGoal: number }) {
                         <Target className="size-4" />
                         Weekly Target
                     </CardTitle>
-                    <CardDescription>Set your weekly application goal.</CardDescription>
+                    <CardDescription>
+                        Set your weekly application goal.
+                    </CardDescription>
                 </CardHeader>
                 <CardContent className="flex flex-col gap-4">
                     <div className="flex flex-col gap-2">
-                        <Label htmlFor="weekly_goal">Applications per week</Label>
+                        <Label htmlFor="weekly_goal">
+                            Applications per week
+                        </Label>
                         <div className="flex gap-2">
                             <Input
                                 id="weekly_goal"
@@ -114,17 +143,27 @@ function GoalUpdateForm({ currentGoal }: { currentGoal: number }) {
                                 min={1}
                                 max={100}
                                 value={data.weekly_goal}
-                                onChange={(e) => setData('weekly_goal', e.target.value)}
+                                onChange={(e) =>
+                                    setData('weekly_goal', e.target.value)
+                                }
                                 aria-invalid={!!errors.weekly_goal}
                                 className="max-w-28"
                             />
-                            <Button type="submit" disabled={processing || data.weekly_goal === String(currentGoal)}>
+                            <Button
+                                type="submit"
+                                disabled={
+                                    processing ||
+                                    data.weekly_goal === String(currentGoal)
+                                }
+                            >
                                 <Save className="size-4" />
                                 {processing ? 'Saving...' : 'Save'}
                             </Button>
                         </div>
                         {errors.weekly_goal && (
-                            <p className="text-xs text-destructive">{errors.weekly_goal}</p>
+                            <p className="text-xs text-destructive">
+                                {errors.weekly_goal}
+                            </p>
                         )}
                     </div>
                 </CardContent>
@@ -133,7 +172,13 @@ function GoalUpdateForm({ currentGoal }: { currentGoal: number }) {
     );
 }
 
-function BenchmarkTip({ fourWeekAverage, weeklyGoal }: { fourWeekAverage: number; weeklyGoal: number }) {
+function BenchmarkTip({
+    fourWeekAverage,
+    weeklyGoal,
+}: {
+    fourWeekAverage: number;
+    weeklyGoal: number;
+}) {
     let tip: string;
 
     if (fourWeekAverage === 0) {
@@ -141,9 +186,11 @@ function BenchmarkTip({ fourWeekAverage, weeklyGoal }: { fourWeekAverage: number
     } else if (fourWeekAverage >= weeklyGoal) {
         tip = 'Great momentum! Your 4-week average exceeds your goal.';
     } else if (fourWeekAverage >= weeklyGoal * 0.75) {
-        tip = 'Nearly there! A couple more applications per week will get you to your goal.';
+        tip =
+            'Nearly there! A couple more applications per week will get you to your goal.';
     } else {
-        tip = 'Consider adjusting your goal or increasing your application pace.';
+        tip =
+            'Consider adjusting your goal or increasing your application pace.';
     }
 
     return (
@@ -155,8 +202,12 @@ function BenchmarkTip({ fourWeekAverage, weeklyGoal }: { fourWeekAverage: number
                 </CardTitle>
             </CardHeader>
             <CardContent>
-                <p className="text-2xl font-bold text-foreground">{fourWeekAverage}</p>
-                <p className="text-xs text-muted-foreground">Avg Applications Per Week</p>
+                <p className="text-2xl font-bold text-foreground">
+                    {fourWeekAverage}
+                </p>
+                <p className="text-xs text-muted-foreground">
+                    Avg Applications Per Week
+                </p>
                 <p className="mt-2 text-sm text-muted-foreground">{tip}</p>
             </CardContent>
         </Card>
@@ -173,24 +224,36 @@ function WeeklyHistory({ history }: { history: WeeklyHistoryItem[] }) {
                     <TrendingUp className="size-4" />
                     Weekly Breakdown
                 </CardTitle>
-                <CardDescription>Your application activity over the last 4 weeks.</CardDescription>
+                <CardDescription>
+                    Your application activity over the last 4 weeks.
+                </CardDescription>
             </CardHeader>
             <CardContent>
                 <div className="flex items-end gap-3">
                     {history.map((week) => (
-                        <div key={week.start_date} className="flex flex-1 flex-col items-center gap-1.5">
-                            <span className="text-xs font-medium text-foreground">{week.count}</span>
+                        <div
+                            key={week.start_date}
+                            className="flex flex-1 flex-col items-center gap-1.5"
+                        >
+                            <span className="text-xs font-medium text-foreground">
+                                {week.count}
+                            </span>
                             <div
                                 className={`w-full rounded-sm transition-all duration-500 ${
-                                    week.is_current ? 'bg-primary' : 'bg-primary/40'
+                                    week.is_current
+                                        ? 'bg-primary'
+                                        : 'bg-primary/40'
                                 }`}
                                 style={{
-                                    height: week.count > 0
-                                        ? `${Math.max((week.count / maxCount) * 80, 8)}px`
-                                        : '8px',
+                                    height:
+                                        week.count > 0
+                                            ? `${Math.max((week.count / maxCount) * 80, 8)}px`
+                                            : '8px',
                                 }}
                             />
-                            <span className="text-[10px] text-muted-foreground">{week.label}</span>
+                            <span className="text-[10px] text-muted-foreground">
+                                {week.label}
+                            </span>
                         </div>
                     ))}
                 </div>
@@ -210,8 +273,11 @@ export default function GoalsIndex({
         <>
             <Head title="Goals" />
 
-            <div className="flex flex-1 min-h-0 flex-col gap-6 overflow-y-auto pr-2 pb-4">
-                <PageHeader title="Weekly Goals" description="Track your application consistency and keep your momentum going." />
+            <div className="flex min-h-0 flex-1 flex-col gap-6 overflow-y-auto pr-2 pb-4">
+                <PageHeader
+                    title="Weekly Goals"
+                    description="Track your application consistency and keep your momentum going."
+                />
 
                 <div className="grid gap-6 lg:grid-cols-3">
                     <Card className="lg:col-span-2">
@@ -230,7 +296,10 @@ export default function GoalsIndex({
                             </CardDescription>
                         </CardHeader>
                         <CardContent className="flex items-center justify-center sm:justify-around">
-                            <ProgressRing progress={weekly_progress} goal={weekly_goal} />
+                            <ProgressRing
+                                progress={weekly_progress}
+                                goal={weekly_goal}
+                            />
                         </CardContent>
                     </Card>
 
@@ -241,7 +310,10 @@ export default function GoalsIndex({
                     <div className="lg:col-span-2">
                         <WeeklyHistory history={weekly_history} />
                     </div>
-                    <BenchmarkTip fourWeekAverage={four_week_average} weeklyGoal={weekly_goal} />
+                    <BenchmarkTip
+                        fourWeekAverage={four_week_average}
+                        weeklyGoal={weekly_goal}
+                    />
                 </div>
             </div>
         </>

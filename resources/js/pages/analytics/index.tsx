@@ -17,12 +17,16 @@ import {
     ChartTooltip,
     ChartTooltipContent,
     ChartLegend,
-    ChartLegendContent
-
+    ChartLegendContent,
 } from '@/components/ui/chart';
 import type { ChartConfig } from '@/components/ui/chart';
 import { PageHeader } from '@/components/ui/page-header';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger,
+} from '@/components/ui/tooltip';
 import AppLayout from '@/layouts/app-layout';
 import { JOB_APPLICATION_STATUSES } from '@/types/job-application';
 import type { JobApplicationStatus } from '@/types/job-application';
@@ -37,21 +41,9 @@ const STATUS_CHART_COLORS: Record<JobApplicationStatus, string> = {
     withdrawn: '#64748b',
 };
 
-const FUNNEL_COLORS = [
-    '#94a3b8',
-    '#3b82f6',
-    '#f59e0b',
-    '#10b981',
-    '#ef4444',
-];
+const FUNNEL_COLORS = ['#94a3b8', '#3b82f6', '#f59e0b', '#10b981', '#ef4444'];
 
-const RESPONSE_COLORS = [
-    '#15803d',
-    '#22c55e',
-    '#eab308',
-    '#f97316',
-    '#ef4444',
-];
+const RESPONSE_COLORS = ['#15803d', '#22c55e', '#eab308', '#f97316', '#ef4444'];
 
 function ChartInfoTooltip({ description }: { description: string }) {
     return (
@@ -61,14 +53,17 @@ function ChartInfoTooltip({ description }: { description: string }) {
                     render={
                         <button
                             type="button"
-                            className="text-muted-foreground/70 hover:text-foreground transition-colors p-0.5 rounded-sm focus:outline-hidden focus:ring-1 focus:ring-ring"
+                            className="rounded-sm p-0.5 text-muted-foreground/70 transition-colors hover:text-foreground focus:ring-1 focus:ring-ring focus:outline-hidden"
                             aria-label="Chart information"
                         >
                             <InfoIcon className="size-4" />
                         </button>
                     }
                 />
-                <TooltipContent side="top" className="max-w-64 text-xs font-normal">
+                <TooltipContent
+                    side="top"
+                    className="max-w-64 text-xs font-normal"
+                >
                     {description}
                 </TooltipContent>
             </Tooltip>
@@ -77,7 +72,9 @@ function ChartInfoTooltip({ description }: { description: string }) {
 }
 
 function statusLabel(value: string): string {
-    return JOB_APPLICATION_STATUSES.find((s) => s.value === value)?.label ?? value;
+    return (
+        JOB_APPLICATION_STATUSES.find((s) => s.value === value)?.label ?? value
+    );
 }
 
 function responseColor(days: number): string {
@@ -200,21 +197,29 @@ export default function Analytics({
         responseConfig[item.company] = { label: item.company, color };
     }
 
-    const hasWeeklyData = weekly_volume.length > 0 && weekly_volume.some((w) => w.count > 0);
-    const hasStatusOverTime = status_over_time.length > 0 && status_over_time.some((w) =>
-        JOB_APPLICATION_STATUSES.some((s) => Number(w[s.value]) > 0)
-    );
-    const hasSalaryBands = salary_bands.length > 0 && salary_bands.some((b) => b.expected > 0 || b.offered > 0);
+    const hasWeeklyData =
+        weekly_volume.length > 0 && weekly_volume.some((w) => w.count > 0);
+    const hasStatusOverTime =
+        status_over_time.length > 0 &&
+        status_over_time.some((w) =>
+            JOB_APPLICATION_STATUSES.some((s) => Number(w[s.value]) > 0),
+        );
+    const hasSalaryBands =
+        salary_bands.length > 0 &&
+        salary_bands.some((b) => b.expected > 0 || b.offered > 0);
 
     return (
         <>
             <Head title="Analytics" />
 
-            <div className="flex flex-1 min-h-0 flex-col gap-6 overflow-y-auto pr-2 pb-4">
-                <PageHeader title="Analytics" description="Deep-dive metrics on your job search pipeline" />
+            <div className="flex min-h-0 flex-1 flex-col gap-6 overflow-y-auto pr-2 pb-4">
+                <PageHeader
+                    title="Analytics"
+                    description="Deep-dive metrics on your job search pipeline"
+                />
 
                 {/* Salary Insights Summary */}
-                <div className="grid gap-4 sm:grid-cols-2 shrink-0">
+                <div className="grid shrink-0 gap-4 sm:grid-cols-2">
                     <Card>
                         <CardHeader className="flex flex-row items-center justify-between pb-2">
                             <CardTitle className="text-sm font-medium text-muted-foreground">
@@ -225,7 +230,10 @@ export default function Analytics({
                         <CardContent>
                             <p className="text-3xl font-bold text-foreground">
                                 {salary_insights.avg_expected !== null
-                                    ? formatSalary(salary_insights.avg_expected, baseCurrency)
+                                    ? formatSalary(
+                                          salary_insights.avg_expected,
+                                          baseCurrency,
+                                      )
                                     : '—'}
                             </p>
                         </CardContent>
@@ -240,7 +248,10 @@ export default function Analytics({
                         <CardContent>
                             <p className="text-3xl font-bold text-foreground">
                                 {salary_insights.avg_offered !== null
-                                    ? formatSalary(salary_insights.avg_offered, baseCurrency)
+                                    ? formatSalary(
+                                          salary_insights.avg_offered,
+                                          baseCurrency,
+                                      )
                                     : '—'}
                             </p>
                         </CardContent>
@@ -248,7 +259,7 @@ export default function Analytics({
                 </div>
 
                 {/* Main Chart Grid */}
-                <div className="grid gap-6 md:grid-cols-2 shrink-0">
+                <div className="grid shrink-0 gap-6 md:grid-cols-2">
                     {/* 1. Application Funnel */}
                     <Card>
                         <CardHeader className="flex flex-row items-center justify-between">
@@ -256,13 +267,17 @@ export default function Analytics({
                             <ChartInfoTooltip description="Shows total applications grouped by stage (Wishlist, Applied, Interviewing, Offer). Excludes rejected applications." />
                         </CardHeader>
                         <CardContent>
-                            {funnel.length === 0 || funnel.every((f) => f.value === 0) ? (
+                            {funnel.length === 0 ||
+                            funnel.every((f) => f.value === 0) ? (
                                 <div className="flex items-center justify-center py-12 text-sm text-muted-foreground">
                                     No applications yet
                                 </div>
                             ) : (
                                 <>
-                                    <ChartContainer config={funnelConfig} className="h-75 w-full">
+                                    <ChartContainer
+                                        config={funnelConfig}
+                                        className="min-h-[300px] w-full"
+                                    >
                                         <BarChart
                                             data={funnel.map((item, index) => ({
                                                 ...item,
@@ -292,25 +307,45 @@ export default function Analytics({
                                                 width={80}
                                             />
                                             <ChartTooltip
-                                                cursor={{ fill: 'var(--muted)', opacity: 0.2 }}
+                                                cursor={{
+                                                    fill: 'var(--muted)',
+                                                    opacity: 0.2,
+                                                }}
                                                 content={
                                                     <ChartTooltipContent
                                                         hideLabel
-                                                        formatter={(value, name, item, index, payload) => {
-                                                            const p = payload as Record<string, any>;
+                                                        formatter={(
+                                                            value,
+                                                            name,
+                                                            item,
+                                                            index,
+                                                            payload,
+                                                        ) => {
+                                                            const p =
+                                                                payload as Record<
+                                                                    string,
+                                                                    any
+                                                                >;
 
                                                             return (
                                                                 <>
                                                                     <div
                                                                         className="h-2.5 w-2.5 shrink-0 rounded-xs"
-                                                                        style={{ backgroundColor: p.fill }}
+                                                                        style={{
+                                                                            backgroundColor:
+                                                                                p.fill,
+                                                                        }}
                                                                     />
-                                                                    <div className="flex flex-1 justify-between leading-none items-center gap-4">
+                                                                    <div className="flex flex-1 items-center justify-between gap-4 leading-none">
                                                                         <span className="text-muted-foreground">
-                                                                            {p.name}
+                                                                            {
+                                                                                p.name
+                                                                            }
                                                                         </span>
                                                                         <span className="font-mono font-medium text-foreground tabular-nums">
-                                                                            {value as React.ReactNode}
+                                                                            {
+                                                                                value as React.ReactNode
+                                                                            }
                                                                         </span>
                                                                     </div>
                                                                 </>
@@ -322,12 +357,18 @@ export default function Analytics({
                                             <ChartLegend
                                                 content={() => (
                                                     <ChartLegendContent
-                                                        payload={funnel.map((item, index) => ({
-                                                            dataKey: item.name,
-                                                            value: item.name,
-                                                            type: 'square',
-                                                            color: FUNNEL_COLORS[index],
-                                                        }) as any)}
+                                                        payload={funnel.map(
+                                                            (item, index) =>
+                                                                ({
+                                                                    dataKey:
+                                                                        item.name,
+                                                                    value: item.name,
+                                                                    type: 'square',
+                                                                    color: FUNNEL_COLORS[
+                                                                        index
+                                                                    ],
+                                                                }) as any,
+                                                        )}
                                                     />
                                                 )}
                                             />
@@ -339,7 +380,9 @@ export default function Analytics({
                                                 {funnel.map((_, index) => (
                                                     <Cell
                                                         key={index}
-                                                        fill={FUNNEL_COLORS[index]}
+                                                        fill={
+                                                            FUNNEL_COLORS[index]
+                                                        }
                                                     />
                                                 ))}
                                             </Bar>
@@ -362,8 +405,14 @@ export default function Analytics({
                                     No data yet
                                 </div>
                             ) : (
-                                <ChartContainer config={weeklyConfig} className="h-75 w-full">
-                                    <BarChart data={weekly_volume} margin={{ left: 0, right: 0 }}>
+                                <ChartContainer
+                                    config={weeklyConfig}
+                                    className="min-h-[300px] w-full"
+                                >
+                                    <BarChart
+                                        data={weekly_volume}
+                                        margin={{ left: 0, right: 0 }}
+                                    >
                                         <CartesianGrid
                                             vertical={false}
                                             strokeDasharray="3 3"
@@ -386,11 +435,17 @@ export default function Analytics({
                                         <ChartTooltip
                                             content={
                                                 <ChartTooltipContent
-                                                    labelFormatter={(label) => weekTooltipLabel(String(label))}
+                                                    labelFormatter={(label) =>
+                                                        weekTooltipLabel(
+                                                            String(label),
+                                                        )
+                                                    }
                                                 />
                                             }
                                         />
-                                        <ChartLegend content={<ChartLegendContent />} />
+                                        <ChartLegend
+                                            content={<ChartLegendContent />}
+                                        />
                                         <Bar
                                             dataKey="count"
                                             fill="#6366f1"
@@ -414,8 +469,14 @@ export default function Analytics({
                                     No data yet
                                 </div>
                             ) : (
-                                <ChartContainer config={statusOverTimeConfig} className="h-75 w-full">
-                                    <AreaChart data={status_over_time} margin={{ left: 0, right: 0 }}>
+                                <ChartContainer
+                                    config={statusOverTimeConfig}
+                                    className="min-h-[300px] w-full"
+                                >
+                                    <AreaChart
+                                        data={status_over_time}
+                                        margin={{ left: 0, right: 0 }}
+                                    >
                                         <CartesianGrid
                                             strokeDasharray="3 3"
                                             stroke="hsl(var(--border))"
@@ -437,22 +498,38 @@ export default function Analytics({
                                         <ChartTooltip
                                             content={
                                                 <ChartTooltipContent
-                                                    labelFormatter={(label) => weekTooltipLabel(String(label))}
+                                                    labelFormatter={(label) =>
+                                                        weekTooltipLabel(
+                                                            String(label),
+                                                        )
+                                                    }
                                                 />
                                             }
                                         />
-                                        <ChartLegend content={<ChartLegendContent />} />
-                                        {JOB_APPLICATION_STATUSES.map(({ value }) => (
-                                            <Area
-                                                key={value}
-                                                type="monotone"
-                                                dataKey={value}
-                                                stackId="1"
-                                                stroke={STATUS_CHART_COLORS[value]}
-                                                fill={STATUS_CHART_COLORS[value]}
-                                                fillOpacity={0.6}
-                                            />
-                                        ))}
+                                        <ChartLegend
+                                            content={<ChartLegendContent />}
+                                        />
+                                        {JOB_APPLICATION_STATUSES.map(
+                                            ({ value }) => (
+                                                <Area
+                                                    key={value}
+                                                    type="monotone"
+                                                    dataKey={value}
+                                                    stackId="1"
+                                                    stroke={
+                                                        STATUS_CHART_COLORS[
+                                                            value
+                                                        ]
+                                                    }
+                                                    fill={
+                                                        STATUS_CHART_COLORS[
+                                                            value
+                                                        ]
+                                                    }
+                                                    fillOpacity={0.6}
+                                                />
+                                            ),
+                                        )}
                                     </AreaChart>
                                 </ChartContainer>
                             )}
@@ -471,8 +548,14 @@ export default function Analytics({
                                     No salary data yet
                                 </div>
                             ) : (
-                                <ChartContainer config={salaryBandsConfig} className="h-75 w-full">
-                                    <BarChart data={salary_bands} margin={{ left: 0, right: 0 }}>
+                                <ChartContainer
+                                    config={salaryBandsConfig}
+                                    className="min-h-[300px] w-full"
+                                >
+                                    <BarChart
+                                        data={salary_bands}
+                                        margin={{ left: 0, right: 0 }}
+                                    >
                                         <CartesianGrid
                                             vertical={false}
                                             strokeDasharray="3 3"
@@ -491,8 +574,12 @@ export default function Analytics({
                                             fontSize={10}
                                             width={30}
                                         />
-                                        <ChartTooltip content={<ChartTooltipContent />} />
-                                        <ChartLegend content={<ChartLegendContent />} />
+                                        <ChartTooltip
+                                            content={<ChartTooltipContent />}
+                                        />
+                                        <ChartLegend
+                                            content={<ChartLegendContent />}
+                                        />
                                         <Bar
                                             dataKey="expected"
                                             fill="#f59e0b"
@@ -524,14 +611,23 @@ export default function Analytics({
                                 No response data yet
                             </div>
                         ) : (
-                            <ChartContainer config={responseConfig} className="h-87.5 w-full">
+                            <ChartContainer
+                                config={responseConfig}
+                                className="min-h-[350px] w-full"
+                            >
                                 <BarChart
-                                    data={time_to_response.slice(0, 15).map((item) => ({
-                                        ...item,
-                                        fill: responseColor(item.days),
-                                    }))}
+                                    data={time_to_response
+                                        .slice(0, 15)
+                                        .map((item) => ({
+                                            ...item,
+                                            fill: responseColor(item.days),
+                                        }))}
                                     layout="vertical"
-                                    margin={{ left: -10, right: 30, bottom: 20 }}
+                                    margin={{
+                                        left: -10,
+                                        right: 30,
+                                        bottom: 20,
+                                    }}
                                 >
                                     <CartesianGrid
                                         horizontal={false}
@@ -566,43 +662,87 @@ export default function Analytics({
                                                 return null;
                                             }
 
-                                            const item = payload[0].payload as TimeToResponseItem;
-                                            const dotColor = responseColor(item.days);
+                                            const item = payload[0]
+                                                .payload as TimeToResponseItem;
+                                            const dotColor = responseColor(
+                                                item.days,
+                                            );
 
                                             return (
                                                 <div className="grid min-w-48 items-start gap-1.5 rounded-lg border border-border/50 bg-background px-3 py-2 text-xs shadow-xl">
-                                                    <div className="font-semibold text-foreground border-b border-border/40 pb-1">
-                                                        {item.company} <span className="text-muted-foreground font-normal">— {item.job_title}</span>
+                                                    <div className="border-b border-border/40 pb-1 font-semibold text-foreground">
+                                                        {item.company}{' '}
+                                                        <span className="font-normal text-muted-foreground">
+                                                            — {item.job_title}
+                                                        </span>
                                                     </div>
                                                     <div className="flex items-center justify-between gap-4 pt-0.5">
-                                                        <div className="flex items-center gap-1.5 text-muted-foreground font-medium">
+                                                        <div className="flex items-center gap-1.5 font-medium text-muted-foreground">
                                                             <div
                                                                 className="h-2 w-2 rounded-[2px]"
-                                                                style={{ backgroundColor: dotColor }}
+                                                                style={{
+                                                                    backgroundColor:
+                                                                        dotColor,
+                                                                }}
                                                             />
                                                             First Response:
                                                         </div>
                                                         <span className="font-mono font-medium text-foreground">
-                                                            {item.days} {item.days === 1 ? 'day' : 'days'}
+                                                            {item.days}{' '}
+                                                            {item.days === 1
+                                                                ? 'day'
+                                                                : 'days'}
                                                         </span>
                                                     </div>
-                                                    <div className="text-[11px] text-muted-foreground space-y-0.5 pt-1 border-t border-border/20">
-                                                        <div>• Applied: {item.applied_date}</div>
-                                                        <div>• Responded: {item.first_response_date}</div>
-                                                        {item.last_contact_date && item.last_contact_days !== null && (
-                                                            <div className="text-primary font-medium pt-0.5">
-                                                                • Last Contact: {item.last_contact_date} ({item.last_contact_days}d total)
-                                                            </div>
-                                                        )}
+                                                    <div className="space-y-0.5 border-t border-border/20 pt-1 text-[11px] text-muted-foreground">
+                                                        <div>
+                                                            • Applied:{' '}
+                                                            {item.applied_date}
+                                                        </div>
+                                                        <div>
+                                                            • Responded:{' '}
+                                                            {
+                                                                item.first_response_date
+                                                            }
+                                                        </div>
+                                                        {item.last_contact_date &&
+                                                            item.last_contact_days !==
+                                                                null && (
+                                                                <div className="pt-0.5 font-medium text-primary">
+                                                                    • Last
+                                                                    Contact:{' '}
+                                                                    {
+                                                                        item.last_contact_date
+                                                                    }{' '}
+                                                                    (
+                                                                    {
+                                                                        item.last_contact_days
+                                                                    }
+                                                                    d total)
+                                                                </div>
+                                                            )}
                                                     </div>
                                                 </div>
                                             );
                                         }}
                                     />
-                                    <Bar dataKey="days" name="Days" radius={[0, 4, 4, 0]} barSize={22} minPointSize={2}>
-                                        {time_to_response.slice(0, 15).map((item, index) => (
-                                            <Cell key={index} fill={responseColor(item.days)} />
-                                        ))}
+                                    <Bar
+                                        dataKey="days"
+                                        name="Days"
+                                        radius={[0, 4, 4, 0]}
+                                        barSize={22}
+                                        minPointSize={2}
+                                    >
+                                        {time_to_response
+                                            .slice(0, 15)
+                                            .map((item, index) => (
+                                                <Cell
+                                                    key={index}
+                                                    fill={responseColor(
+                                                        item.days,
+                                                    )}
+                                                />
+                                            ))}
                                     </Bar>
                                 </BarChart>
                             </ChartContainer>

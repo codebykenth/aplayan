@@ -13,8 +13,8 @@ import {
     LinkIcon,
     UnlinkIcon,
 } from 'lucide-react';
-import { useState, useMemo  } from 'react';
-import type {ReactNode} from 'react';
+import { useState, useMemo } from 'react';
+import type { ReactNode } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { ConfirmDestructiveDialog } from '@/components/ui/confirm-destructive-dialog';
@@ -54,8 +54,8 @@ interface ContactFormData {
 
 function formatLastContacted(date: string | null): string | null {
     if (!date) {
-return null;
-}
+        return null;
+    }
 
     const d = new Date(date);
 
@@ -81,8 +81,8 @@ function ContactCard({
     const [unlinking, setUnlinking] = useState<number | null>(null);
     const [linkDialogOpen, setLinkDialogOpen] = useState(false);
 
-    const linkedApps = applications.filter(
-        (app) => contact.job_application_ids?.includes(app.id),
+    const linkedApps = applications.filter((app) =>
+        contact.job_application_ids?.includes(app.id),
     );
 
     const availableApps = applications.filter(
@@ -167,7 +167,8 @@ function ContactCard({
                 {contact.last_contacted_at && (
                     <p className="flex items-center gap-1">
                         <ClockIcon className="size-3 shrink-0" />
-                        Last contact: {formatLastContacted(contact.last_contacted_at)}
+                        Last contact:{' '}
+                        {formatLastContacted(contact.last_contacted_at)}
                     </p>
                 )}
             </div>
@@ -227,10 +228,11 @@ function ContactCard({
                     <DialogHeader>
                         <DialogTitle>Link to Application</DialogTitle>
                         <DialogDescription>
-                            Select a job application to link with {contact.name}.
+                            Select a job application to link with {contact.name}
+                            .
                         </DialogDescription>
                     </DialogHeader>
-                    <div className="flex flex-col gap-2 max-h-60 overflow-y-auto">
+                    <div className="flex max-h-60 flex-col gap-2 overflow-y-auto">
                         {availableApps.map((app) => (
                             <button
                                 key={app.id}
@@ -240,7 +242,9 @@ function ContactCard({
                                 className="flex items-center justify-between rounded-lg border border-border p-3 text-left text-sm hover:bg-accent hover:text-accent-foreground"
                             >
                                 <div className="flex flex-col gap-0.5">
-                                    <span className="font-medium">{app.job_title}</span>
+                                    <span className="font-medium">
+                                        {app.job_title}
+                                    </span>
                                     <span className="text-xs text-muted-foreground">
                                         {app.company_name}
                                     </span>
@@ -250,7 +254,10 @@ function ContactCard({
                         ))}
                     </div>
                     <DialogFooter>
-                        <Button variant="outline" onClick={() => setLinkDialogOpen(false)}>
+                        <Button
+                            variant="outline"
+                            onClick={() => setLinkDialogOpen(false)}
+                        >
                             Cancel
                         </Button>
                     </DialogFooter>
@@ -271,23 +278,34 @@ export default function ContactsIndex({
     const [search, setSearch] = useState('');
     const [formOpen, setFormOpen] = useState(false);
     const [editingContact, setEditingContact] = useState<Contact | null>(null);
-    const [deletingContact, setDeletingContact] = useState<Contact | null>(null);
+    const [deletingContact, setDeletingContact] = useState<Contact | null>(
+        null,
+    );
 
-    const { data, setData, post, put, processing, errors, reset, clearErrors, setError } =
-        useForm<ContactFormData>({
-            name: '',
-            email: '',
-            phone: '',
-            company_name: '',
-            role: '',
-            notes: '',
-            last_contacted_at: '',
-        });
+    const {
+        data,
+        setData,
+        post,
+        put,
+        processing,
+        errors,
+        reset,
+        clearErrors,
+        setError,
+    } = useForm<ContactFormData>({
+        name: '',
+        email: '',
+        phone: '',
+        company_name: '',
+        role: '',
+        notes: '',
+        last_contacted_at: '',
+    });
 
     const filtered = useMemo(() => {
         if (!search) {
-return contacts;
-}
+            return contacts;
+        }
 
         const q = search.toLowerCase();
 
@@ -317,7 +335,9 @@ return contacts;
             role: contact.role ?? '',
             notes: contact.notes ?? '',
             last_contacted_at: contact.last_contacted_at
-                ? new Date(contact.last_contacted_at).toISOString().split('T')[0]
+                ? new Date(contact.last_contacted_at)
+                      .toISOString()
+                      .split('T')[0]
                 : '',
         });
         clearErrors();
@@ -373,8 +393,11 @@ return contacts;
         <>
             <Head title="Contacts" />
 
-            <div className="flex flex-1 min-h-0 flex-col gap-6">
-                <PageHeader title="Contacts" description="Manage your professional network, recruiters, and hiring managers">
+            <div className="flex min-h-0 flex-1 flex-col gap-6">
+                <PageHeader
+                    title="Contacts"
+                    description="Manage your professional network, recruiters, and hiring managers"
+                >
                     <Button onClick={openCreate}>
                         <PlusIcon data-icon="inline-start" />
                         New Contact
@@ -382,7 +405,7 @@ return contacts;
                 </PageHeader>
 
                 <div className="relative w-full max-w-xs shrink-0">
-                    <SearchIcon className="pointer-events-none absolute left-2.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+                    <SearchIcon className="pointer-events-none absolute top-1/2 left-2.5 size-4 -translate-y-1/2 text-muted-foreground" />
                     <Input
                         className="pl-8"
                         placeholder="Search contacts..."
@@ -392,11 +415,12 @@ return contacts;
                 </div>
 
                 {contacts.length === 0 ? (
-                    <div className="flex flex-1 min-h-0 flex-col items-center justify-center gap-2 py-16 text-center">
+                    <div className="flex min-h-0 flex-1 flex-col items-center justify-center gap-2 py-16 text-center">
                         <UsersIcon className="size-12 text-muted-foreground/40" />
                         <p className="text-sm text-muted-foreground">
-                            No contacts yet. Add recruiters, HR managers, or interviewers
-                            to keep track of your professional network.
+                            No contacts yet. Add recruiters, HR managers, or
+                            interviewers to keep track of your professional
+                            network.
                         </p>
                         <Button variant="outline" onClick={openCreate}>
                             <PlusIcon data-icon="inline-start" />
@@ -404,7 +428,7 @@ return contacts;
                         </Button>
                     </div>
                 ) : filtered.length === 0 ? (
-                    <div className="flex flex-1 min-h-0 flex-col items-center justify-center gap-2 py-16 text-center">
+                    <div className="flex min-h-0 flex-1 flex-col items-center justify-center gap-2 py-16 text-center">
                         <p className="text-sm text-muted-foreground">
                             No contacts match your search.
                         </p>
@@ -424,7 +448,10 @@ return contacts;
                 )}
             </div>
 
-            <Dialog open={formOpen} onOpenChange={(open) => !open && handleClose()}>
+            <Dialog
+                open={formOpen}
+                onOpenChange={(open) => !open && handleClose()}
+            >
                 <DialogContent className="sm:max-w-lg">
                     <DialogHeader>
                         <DialogTitle>
@@ -444,12 +471,16 @@ return contacts;
                                 <Input
                                     id="contact-name"
                                     value={data.name}
-                                    onChange={(e) => setData('name', e.target.value)}
+                                    onChange={(e) =>
+                                        setData('name', e.target.value)
+                                    }
                                     aria-invalid={!!errors.name}
                                     placeholder="Juan dela Cruz"
                                 />
                                 {errors.name && (
-                                    <p className="text-xs text-destructive">{errors.name}</p>
+                                    <p className="text-xs text-destructive">
+                                        {errors.name}
+                                    </p>
                                 )}
                             </div>
 
@@ -460,12 +491,16 @@ return contacts;
                                         id="contact-email"
                                         type="email"
                                         value={data.email}
-                                        onChange={(e) => setData('email', e.target.value)}
+                                        onChange={(e) =>
+                                            setData('email', e.target.value)
+                                        }
                                         aria-invalid={!!errors.email}
                                         placeholder="juan@company.com"
                                     />
                                     {errors.email && (
-                                        <p className="text-xs text-destructive">{errors.email}</p>
+                                        <p className="text-xs text-destructive">
+                                            {errors.email}
+                                        </p>
                                     )}
                                 </div>
                                 <div className="flex flex-col gap-2">
@@ -473,7 +508,9 @@ return contacts;
                                     <Input
                                         id="contact-phone"
                                         value={data.phone}
-                                        onChange={(e) => setData('phone', e.target.value)}
+                                        onChange={(e) =>
+                                            setData('phone', e.target.value)
+                                        }
                                         placeholder="+63 917 123 4567"
                                     />
                                 </div>
@@ -481,12 +518,17 @@ return contacts;
 
                             <div className="grid grid-cols-2 gap-4">
                                 <div className="flex flex-col gap-2">
-                                    <Label htmlFor="contact-company">Company</Label>
+                                    <Label htmlFor="contact-company">
+                                        Company
+                                    </Label>
                                     <Input
                                         id="contact-company"
                                         value={data.company_name}
                                         onChange={(e) =>
-                                            setData('company_name', e.target.value)
+                                            setData(
+                                                'company_name',
+                                                e.target.value,
+                                            )
                                         }
                                         placeholder="Acme Corp"
                                     />
@@ -496,7 +538,9 @@ return contacts;
                                     <Input
                                         id="contact-role"
                                         value={data.role}
-                                        onChange={(e) => setData('role', e.target.value)}
+                                        onChange={(e) =>
+                                            setData('role', e.target.value)
+                                        }
                                         placeholder="HR Manager"
                                     />
                                 </div>
@@ -511,7 +555,10 @@ return contacts;
                                     type="date"
                                     value={data.last_contacted_at}
                                     onChange={(e) =>
-                                        setData('last_contacted_at', e.target.value)
+                                        setData(
+                                            'last_contacted_at',
+                                            e.target.value,
+                                        )
                                     }
                                 />
                             </div>
@@ -522,14 +569,20 @@ return contacts;
                                     id="contact-notes"
                                     rows={3}
                                     value={data.notes}
-                                    onChange={(e) => setData('notes', e.target.value)}
+                                    onChange={(e) =>
+                                        setData('notes', e.target.value)
+                                    }
                                     placeholder="Met at job fair, referred by..."
                                 />
                             </div>
                         </div>
 
                         <DialogFooter>
-                            <Button type="button" variant="outline" onClick={handleClose}>
+                            <Button
+                                type="button"
+                                variant="outline"
+                                onClick={handleClose}
+                            >
                                 Cancel
                             </Button>
                             <Button type="submit" disabled={processing}>
@@ -548,7 +601,10 @@ return contacts;
                 open={deletingContact !== null}
                 onOpenChange={(open) => !open && setDeletingContact(null)}
                 title="Delete Contact?"
-                description={deletingContact && `Are you sure you want to delete "${deletingContact.name}"? This action cannot be undone.`}
+                description={
+                    deletingContact &&
+                    `Are you sure you want to delete "${deletingContact.name}"? This action cannot be undone.`
+                }
                 onConfirm={() => {
                     if (deletingContact) {
                         router.delete(deleteContact.url(deletingContact.id));

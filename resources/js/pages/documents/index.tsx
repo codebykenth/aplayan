@@ -1,12 +1,11 @@
-import type {
-    DragEndEvent} from '@dnd-kit/core';
+import type { DragEndEvent } from '@dnd-kit/core';
 import {
     DndContext,
     closestCenter,
     KeyboardSensor,
     PointerSensor,
     useSensor,
-    useSensors
+    useSensors,
 } from '@dnd-kit/core';
 import {
     arrayMove,
@@ -17,18 +16,68 @@ import {
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { Head, Link, useForm, router } from '@inertiajs/react';
-import { User, Briefcase, GraduationCap, Wrench, Award, FolderGit2, FileText, Download, Mail, Camera, Save, Sparkles, Eye, Edit3, FilePenLine, Wand2, Loader2, AlertCircle, BookText, ArrowUp, ArrowDown, GripVertical, BookmarkIcon, Trash2 } from 'lucide-react';
+import {
+    User,
+    Briefcase,
+    GraduationCap,
+    Wrench,
+    Award,
+    FolderGit2,
+    FileText,
+    Download,
+    Mail,
+    Camera,
+    Save,
+    Sparkles,
+    Eye,
+    Edit3,
+    FilePenLine,
+    Wand2,
+    Loader2,
+    AlertCircle,
+    BookText,
+    ArrowUp,
+    ArrowDown,
+    GripVertical,
+    BookmarkIcon,
+    Trash2,
+} from 'lucide-react';
 import type { ReactNode } from 'react';
 import { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
+import {
+    Card,
+    CardHeader,
+    CardTitle,
+    CardDescription,
+    CardContent,
+} from '@/components/ui/card';
 import { ConfirmDestructiveDialog } from '@/components/ui/confirm-destructive-dialog';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogClose } from '@/components/ui/dialog';
+import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+    DialogDescription,
+    DialogFooter,
+    DialogClose,
+} from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from '@/components/ui/select';
+import {
+    Select,
+    SelectTrigger,
+    SelectContent,
+    SelectItem,
+    SelectValue,
+} from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger,
+} from '@/components/ui/tooltip';
 import AppLayout from '@/layouts/app-layout';
 
 type WorkExperience = {
@@ -121,8 +170,14 @@ const TEMPLATES = [
     { id: 'ats_classic', name: 'ATS Classic (One-Line Contact)' },
     { id: 'ats_executive', name: 'ATS Executive (High Density)' },
     { id: 'ats_bullet', name: 'ATS Bulleted (High Scannability)' },
-    { id: 'ats_single_column', name: 'ATS Standard Bulleted (High Scannability)' },
-    { id: 'ats_classic_serif', name: 'ATS Executive Serif (Classic Corporate)' },
+    {
+        id: 'ats_single_column',
+        name: 'ATS Standard Bulleted (High Scannability)',
+    },
+    {
+        id: 'ats_classic_serif',
+        name: 'ATS Executive Serif (Classic Corporate)',
+    },
     { id: 'modern', name: 'Modern Professional' },
     { id: 'philippine', name: 'Philippine Standard (CV)' },
 ] as const;
@@ -207,8 +262,15 @@ Best regards,
 [Your Name]`,
 };
 
-function getPredefinedCoverLetter(templateId: string, jobTitle: string, companyName: string, fullName: string): string {
-    const raw = COVER_LETTER_PREDEFINED_TEXTS[templateId] || COVER_LETTER_PREDEFINED_TEXTS.cl_modern;
+function getPredefinedCoverLetter(
+    templateId: string,
+    jobTitle: string,
+    companyName: string,
+    fullName: string,
+): string {
+    const raw =
+        COVER_LETTER_PREDEFINED_TEXTS[templateId] ||
+        COVER_LETTER_PREDEFINED_TEXTS.cl_modern;
 
     return raw
         .replaceAll('[Target Job Title]', jobTitle || 'Software Developer')
@@ -228,9 +290,17 @@ const TABS = [
 
 const VIEWS = [
     { id: 'resume-edit', label: 'Resume Builder', icon: Edit3 },
-    { id: 'cover-letter-edit', label: 'Cover Letter Builder', icon: FilePenLine },
+    {
+        id: 'cover-letter-edit',
+        label: 'Cover Letter Builder',
+        icon: FilePenLine,
+    },
     { id: 'resume-preview', label: 'Resume Preview', icon: Eye },
-    { id: 'cover-letter-preview', label: 'Cover Letter Preview', icon: BookText },
+    {
+        id: 'cover-letter-preview',
+        label: 'Cover Letter Preview',
+        icon: BookText,
+    },
 ] as const;
 
 function getPrintStyles(template: string): string {
@@ -238,10 +308,14 @@ function getPrintStyles(template: string): string {
         @page { margin: 0; }
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Instrument Sans', Arial, sans-serif; color: #1b1b18; font-size: 13px; line-height: 1.5; padding: 32px; }
+        .bullet-list { margin-top: 4px; padding-left: 20px; list-style-type: disc; }
+        .bullet-list li { margin-bottom: 3px; line-height: 1.45; }
     `;
 
     if (template === 'ats_classic') {
-        return base + `
+        return (
+            base +
+            `
             .ats-header { text-align: center; margin-bottom: 16px; border-bottom: 2px solid #1b1b18; padding-bottom: 12px; }
             .ats-name { font-size: 24px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px; }
             .target-role { font-size: 13px; font-weight: 500; margin-bottom: 6px; }
@@ -254,11 +328,14 @@ function getPrintStyles(template: string): string {
             .ats-company { font-size: 13px; font-weight: 600; color: #4a4a46; font-style: italic; }
             .ats-desc { font-size: 13px; margin-top: 4px; line-height: 1.45; }
             .photo { width: 96px; height: 96px; border-radius: 8px; object-fit: cover; float: right; margin-left: 16px; }
-        `;
+        `
+        );
     }
 
     if (template === 'ats_executive') {
-        return base + `
+        return (
+            base +
+            `
             .exec-header { margin-bottom: 16px; border-bottom: 1px solid #dcdcd8; padding-bottom: 12px; }
             .exec-name { font-size: 24px; font-weight: 700; margin-bottom: 4px; }
             .target-role { font-size: 13px; font-weight: 500; margin-bottom: 4px; }
@@ -276,11 +353,14 @@ function getPrintStyles(template: string): string {
             .project-title { font-size: 14px; font-weight: 600; }
             .project-tech { font-size: 12px; color: #706f6c; }
             .project-desc { font-size: 13px; margin-top: 4px; line-height: 1.4; }
-        `;
+        `
+        );
     }
 
     if (template === 'ats_bullet') {
-        return base + `
+        return (
+            base +
+            `
             .bullet-header { text-align: center; margin-bottom: 16px; border-bottom: 2px solid #1b1b18; padding-bottom: 12px; }
             .bullet-name { font-size: 24px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px; }
             .target-role { font-size: 13px; font-weight: 500; margin-bottom: 6px; }
@@ -294,11 +374,14 @@ function getPrintStyles(template: string): string {
             .bullet-list { margin-top: 4px; padding-left: 20px; list-style-type: disc; }
             .bullet-list li { font-size: 13px; margin-bottom: 3px; line-height: 1.45; }
             .photo { width: 96px; height: 96px; border-radius: 8px; object-fit: cover; float: right; margin-left: 16px; }
-        `;
+        `
+        );
     }
 
     if (template === 'ats_single_column') {
-        return base + `
+        return (
+            base +
+            `
             body { font-family: 'Instrument Sans', Inter, Arial, sans-serif; }
             .section-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: #374151; margin-bottom: 6px; border-bottom: 1px solid #d1d5db; padding-bottom: 3px; }
             .item-header { display: flex; justify-content: space-between; align-items: baseline; }
@@ -309,11 +392,14 @@ function getPrintStyles(template: string): string {
             .bullet-list { padding-left: 18px; list-style-type: disc; }
             .bullet-list li { font-size: 12px; margin-bottom: 3px; line-height: 1.45; }
             .photo { width: 80px; height: 80px; border-radius: 50%; object-fit: cover; margin: 0 auto 8px; display: block; }
-        `;
+        `
+        );
     }
 
     if (template === 'ats_classic_serif') {
-        return base + `
+        return (
+            base +
+            `
             body { font-family: 'Times New Roman', Garamond, Georgia, serif; }
             .section-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px; }
             .item-header { display: flex; justify-content: space-between; align-items: baseline; }
@@ -321,14 +407,17 @@ function getPrintStyles(template: string): string {
             .item-date { font-size: 11px; color: #6b7280; white-space: nowrap; }
             .item-subtitle { font-size: 12px; color: #6b7280; }
             .item-desc { font-size: 12px; margin-top: 4px; line-height: 1.45; }
-            .bullet-list { padding-left: 18px; }
+            .bullet-list { padding-left: 18px; list-style-type: disc; }
             .bullet-list li { font-size: 12px; margin-bottom: 3px; line-height: 1.45; }
             .photo { width: 80px; height: 80px; border-radius: 4px; object-fit: cover; float: right; margin-left: 16px; }
-        `;
+        `
+        );
     }
 
     if (template === 'clean') {
-        return base + `
+        return (
+            base +
+            `
             .header { margin-bottom: 16px; }
             .name { font-size: 24px; font-weight: 600; margin-bottom: 4px; }
             .target-role { font-size: 14px; font-style: italic; color: #706f6c; margin-bottom: 6px; }
@@ -347,11 +436,14 @@ function getPrintStyles(template: string): string {
             .project-title { font-size: 14px; font-weight: 500; }
             .project-tech { font-size: 12px; color: #706f6c; }
             .project-desc { font-size: 13px; margin-top: 4px; line-height: 1.4; }
-        `;
+        `
+        );
     }
 
     if (template === 'modern') {
-        return base + `
+        return (
+            base +
+            `
             .header { background: #1b1b18; color: white; padding: 24px; }
             .name { font-size: 24px; font-weight: 700; color: white; }
             .target-role { font-size: 14px; color: white; opacity: 0.9; margin-top: 2px; }
@@ -371,10 +463,13 @@ function getPrintStyles(template: string): string {
             .project-title { font-size: 14px; font-weight: 500; }
             .project-tech { font-size: 12px; color: #706f6c; }
             .project-desc { font-size: 13px; margin-top: 4px; line-height: 1.4; }
-        `;
+        `
+        );
     }
 
-    return base + `
+    return (
+        base +
+        `
         .header { text-align: center; border-bottom: 2px solid #1b1b18; padding-bottom: 16px; margin-bottom: 16px; }
         .cv-title { font-size: 11px; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; color: #706f6c; margin-bottom: 4px; }
         .name { font-size: 24px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; }
@@ -398,16 +493,21 @@ function getPrintStyles(template: string): string {
         .project-title { font-size: 14px; font-weight: 600; }
         .project-tech { font-size: 12px; color: #706f6c; }
         .project-desc { font-size: 13px; margin-top: 4px; line-height: 1.4; }
-    `;
+    `
+    );
 }
 
 function getScopedResumeStyles(template: string): string {
     const base = `
         .resume-paper-preview { font-family: 'Instrument Sans', Arial, sans-serif; color: #1b1b18; font-size: 13px; line-height: 1.5; }
+        .resume-paper-preview .bullet-list { margin-top: 4px; padding-left: 20px; list-style-type: disc; }
+        .resume-paper-preview .bullet-list li { margin-bottom: 3px; line-height: 1.45; }
     `;
 
     if (template === 'ats_classic') {
-        return base + `
+        return (
+            base +
+            `
             .resume-paper-preview .ats-header { text-align: center; margin-bottom: 16px; border-bottom: 2px solid #1b1b18; padding-bottom: 12px; }
             .resume-paper-preview .ats-name { font-size: 24px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #1b1b18; margin-bottom: 6px; }
             .resume-paper-preview .target-role { font-size: 13px; font-weight: 500; margin-bottom: 6px; color: #1b1b18; }
@@ -420,11 +520,14 @@ function getScopedResumeStyles(template: string): string {
             .resume-paper-preview .ats-company { font-size: 13px; font-weight: 600; color: #4a4a46; font-style: italic; }
             .resume-paper-preview .ats-desc { font-size: 13px; margin-top: 4px; line-height: 1.45; color: #1b1b18; }
             .resume-paper-preview .photo { width: 96px; height: 96px; border-radius: 8px; object-fit: cover; float: right; margin-left: 16px; }
-        `;
+        `
+        );
     }
 
     if (template === 'ats_executive') {
-        return base + `
+        return (
+            base +
+            `
             .resume-paper-preview .exec-header { margin-bottom: 16px; border-bottom: 1px solid #dcdcd8; padding-bottom: 12px; }
             .resume-paper-preview .exec-name { font-size: 24px; font-weight: 700; color: #1b1b18; margin-bottom: 4px; }
             .resume-paper-preview .target-role { font-size: 13px; font-weight: 500; margin-bottom: 4px; color: #1b1b18; }
@@ -442,11 +545,14 @@ function getScopedResumeStyles(template: string): string {
             .resume-paper-preview .project-title { font-size: 14px; font-weight: 600; color: #1b1b18; }
             .resume-paper-preview .project-tech { font-size: 12px; color: #706f6c; }
             .resume-paper-preview .project-desc { font-size: 13px; margin-top: 4px; line-height: 1.4; color: #1b1b18; }
-        `;
+        `
+        );
     }
 
     if (template === 'ats_bullet') {
-        return base + `
+        return (
+            base +
+            `
             .resume-paper-preview .bullet-header { text-align: center; margin-bottom: 16px; border-bottom: 2px solid #1b1b18; padding-bottom: 12px; }
             .resume-paper-preview .bullet-name { font-size: 24px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #1b1b18; margin-bottom: 6px; }
             .resume-paper-preview .target-role { font-size: 13px; font-weight: 500; margin-bottom: 6px; color: #1b1b18; }
@@ -460,23 +566,36 @@ function getScopedResumeStyles(template: string): string {
             .resume-paper-preview .bullet-list { margin-top: 4px; padding-left: 20px; list-style-type: disc; }
             .resume-paper-preview .bullet-list li { font-size: 13px; margin-bottom: 3px; line-height: 1.45; color: #1b1b18; }
             .resume-paper-preview .photo { width: 96px; height: 96px; border-radius: 8px; object-fit: cover; float: right; margin-left: 16px; }
-        `;
+        `
+        );
     }
 
     if (template === 'ats_single_column') {
-        return base + `
+        return (
+            base +
+            `
             .resume-paper-preview { font-family: 'Instrument Sans', Inter, Arial, sans-serif; }
-        `;
+            .resume-paper-preview .bullet-list { padding-left: 18px; list-style-type: disc; }
+            .resume-paper-preview .bullet-list li { font-size: 12px; margin-bottom: 3px; line-height: 1.45; }
+        `
+        );
     }
 
     if (template === 'ats_classic_serif') {
-        return base + `
+        return (
+            base +
+            `
             .resume-paper-preview { font-family: 'Times New Roman', Garamond, Georgia, serif; }
-        `;
+            .resume-paper-preview .bullet-list { padding-left: 18px; list-style-type: disc; }
+            .resume-paper-preview .bullet-list li { font-size: 12px; margin-bottom: 3px; line-height: 1.45; }
+        `
+        );
     }
 
     if (template === 'clean') {
-        return base + `
+        return (
+            base +
+            `
             .resume-paper-preview .header { margin-bottom: 16px; }
             .resume-paper-preview .name { font-size: 24px; font-weight: 600; margin-bottom: 4px; color: #1b1b18; }
             .resume-paper-preview .target-role { font-size: 14px; font-style: italic; color: #706f6c; margin-bottom: 6px; }
@@ -495,11 +614,14 @@ function getScopedResumeStyles(template: string): string {
             .resume-paper-preview .project-title { font-size: 14px; font-weight: 500; color: #1b1b18; }
             .resume-paper-preview .project-tech { font-size: 12px; color: #706f6c; }
             .resume-paper-preview .project-desc { font-size: 13px; margin-top: 4px; line-height: 1.4; color: #1b1b18; }
-        `;
+        `
+        );
     }
 
     if (template === 'modern') {
-        return base + `
+        return (
+            base +
+            `
             .resume-paper-preview .header { background: #1b1b18; color: white; padding: 24px; border-radius: 6px 6px 0 0; margin: -32px -32px 24px -32px; }
             .resume-paper-preview .name { font-size: 24px; font-weight: 700; color: white; }
             .resume-paper-preview .target-role { font-size: 14px; color: white; opacity: 0.9; margin-top: 2px; }
@@ -519,10 +641,13 @@ function getScopedResumeStyles(template: string): string {
             .resume-paper-preview .project-title { font-size: 14px; font-weight: 500; color: #1b1b18; }
             .resume-paper-preview .project-tech { font-size: 12px; color: #706f6c; }
             .resume-paper-preview .project-desc { font-size: 13px; margin-top: 4px; line-height: 1.4; color: #1b1b18; }
-        `;
+        `
+        );
     }
 
-    return base + `
+    return (
+        base +
+        `
         .resume-paper-preview .header { text-align: center; border-bottom: 2px solid #1b1b18; padding-bottom: 16px; margin-bottom: 16px; }
         .resume-paper-preview .name { font-size: 24px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #1b1b18; }
         .resume-paper-preview .target-role { font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: #706f6c; margin-top: 4px; }
@@ -545,7 +670,8 @@ function getScopedResumeStyles(template: string): string {
         .resume-paper-preview .project-title { font-size: 14px; font-weight: 600; color: #1b1b18; }
         .resume-paper-preview .project-tech { font-size: 12px; color: #706f6c; }
         .resume-paper-preview .project-desc { font-size: 13px; margin-top: 4px; line-height: 1.4; color: #1b1b18; }
-    `;
+    `
+    );
 }
 
 function getCoverLetterPrintStyles(template: string): string {
@@ -556,7 +682,9 @@ function getCoverLetterPrintStyles(template: string): string {
     `;
 
     if (template === 'cl_formal' || template === 'ats_classic') {
-        return base + `
+        return (
+            base +
+            `
             .letter-header { text-align: center; border-bottom: 2px solid #1b1b18; padding-bottom: 12px; margin-bottom: 20px; }
             .letter-name { font-size: 24px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #1b1b18; margin-bottom: 6px; }
             .letter-contact-line { font-size: 12px; color: #4a4a46; font-weight: 500; }
@@ -567,11 +695,14 @@ function getCoverLetterPrintStyles(template: string): string {
             .letter-body p { margin-bottom: 14px; text-align: justify; }
             .letter-closing { margin-top: 28px; color: #1b1b18; }
             .letter-signature { margin-top: 6px; font-weight: 700; font-size: 14px; color: #1b1b18; }
-        `;
+        `
+        );
     }
 
     if (template === 'cl_executive' || template === 'ats_executive') {
-        return base + `
+        return (
+            base +
+            `
             .letter-header { border-left: 4px solid #1b1b18; padding-left: 12px; margin-bottom: 20px; }
             .letter-name { font-size: 24px; font-weight: 700; color: #1b1b18; margin-bottom: 4px; }
             .letter-contact-line { font-size: 12px; color: #555450; font-weight: 500; }
@@ -582,11 +713,14 @@ function getCoverLetterPrintStyles(template: string): string {
             .letter-body p { margin-bottom: 14px; }
             .letter-closing { margin-top: 28px; color: #1b1b18; }
             .letter-signature { margin-top: 6px; font-weight: 700; color: #1b1b18; }
-        `;
+        `
+        );
     }
 
     if (template === 'cl_modern' || template === 'modern') {
-        return base + `
+        return (
+            base +
+            `
             .letter-header { background: #1b1b18; color: white; padding: 24px; margin-bottom: 24px; border-radius: 6px; }
             .letter-header .letter-name { font-size: 24px; font-weight: 700; color: white; margin-bottom: 4px; }
             .letter-header .letter-contact-line { font-size: 12px; color: rgba(255,255,255,0.85); }
@@ -597,11 +731,14 @@ function getCoverLetterPrintStyles(template: string): string {
             .letter-body p { margin-bottom: 14px; }
             .letter-closing { margin-top: 28px; color: #1b1b18; }
             .letter-signature { margin-top: 6px; font-weight: 700; color: #1b1b18; }
-        `;
+        `
+        );
     }
 
     if (template === 'cl_creative' || template === 'philippine') {
-        return base + `
+        return (
+            base +
+            `
             .letter-header { text-align: left; border-bottom: 2px solid #6366f1; padding-bottom: 12px; margin-bottom: 20px; }
             .letter-name { font-size: 26px; font-weight: 800; color: #4338ca; letter-spacing: -0.02em; }
             .letter-contact-line { font-size: 12px; color: #6366f1; margin-top: 4px; font-weight: 500; }
@@ -611,10 +748,13 @@ function getCoverLetterPrintStyles(template: string): string {
             .letter-body p { margin-bottom: 16px; }
             .letter-closing { margin-top: 32px; font-weight: 600; color: #3730a3; }
             .letter-signature { margin-top: 8px; font-weight: 800; font-size: 15px; color: #3730a3; }
-        `;
+        `
+        );
     }
 
-    return base + `
+    return (
+        base +
+        `
         .letter-header { margin-bottom: 24px; border-bottom: 1px solid #e5e7eb; padding-bottom: 12px; }
         .letter-name { font-size: 22px; font-weight: 600; letter-spacing: -0.01em; color: #111827; }
         .letter-contact-line { font-size: 12px; color: #6b7280; margin-top: 2px; }
@@ -624,7 +764,8 @@ function getCoverLetterPrintStyles(template: string): string {
         .letter-body p { margin-bottom: 14px; }
         .letter-closing { margin-top: 24px; }
         .letter-signature { margin-top: 4px; font-weight: 600; color: #111827; }
-    `;
+    `
+    );
 }
 
 function getScopedCoverLetterStyles(template: string): string {
@@ -633,7 +774,9 @@ function getScopedCoverLetterStyles(template: string): string {
     `;
 
     if (template === 'cl_formal' || template === 'ats_classic') {
-        return base + `
+        return (
+            base +
+            `
             .cover-letter-paper-preview .letter-header { text-align: center; border-bottom: 2px solid #1b1b18; padding-bottom: 12px; margin-bottom: 20px; }
             .cover-letter-paper-preview .letter-name { font-size: 24px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #1b1b18; margin-bottom: 6px; }
             .cover-letter-paper-preview .letter-contact-line { font-size: 12px; color: #4a4a46; font-weight: 500; }
@@ -644,11 +787,14 @@ function getScopedCoverLetterStyles(template: string): string {
             .cover-letter-paper-preview .letter-body p { margin-bottom: 14px; text-align: justify; }
             .cover-letter-paper-preview .letter-closing { margin-top: 28px; color: #1b1b18; }
             .cover-letter-paper-preview .letter-signature { margin-top: 6px; font-weight: 700; font-size: 14px; color: #1b1b18; }
-        `;
+        `
+        );
     }
 
     if (template === 'cl_executive' || template === 'ats_executive') {
-        return base + `
+        return (
+            base +
+            `
             .cover-letter-paper-preview .letter-header { border-left: 4px solid #1b1b18; padding-left: 12px; margin-bottom: 20px; }
             .cover-letter-paper-preview .letter-name { font-size: 24px; font-weight: 700; color: #1b1b18; margin-bottom: 4px; }
             .cover-letter-paper-preview .letter-contact-line { font-size: 12px; color: #555450; font-weight: 500; }
@@ -659,11 +805,14 @@ function getScopedCoverLetterStyles(template: string): string {
             .cover-letter-paper-preview .letter-body p { margin-bottom: 14px; }
             .cover-letter-paper-preview .letter-closing { margin-top: 28px; }
             .cover-letter-paper-preview .letter-signature { margin-top: 6px; font-weight: 700; color: #1b1b18; }
-        `;
+        `
+        );
     }
 
     if (template === 'cl_modern' || template === 'modern') {
-        return base + `
+        return (
+            base +
+            `
             .cover-letter-paper-preview .letter-header { background: #1b1b18; color: white; padding: 24px; margin-bottom: 24px; border-radius: 6px; }
             .cover-letter-paper-preview .letter-header .letter-name { font-size: 24px; font-weight: 700; color: white; margin-bottom: 4px; }
             .cover-letter-paper-preview .letter-header .letter-contact-line { font-size: 12px; color: rgba(255,255,255,0.85); }
@@ -674,11 +823,14 @@ function getScopedCoverLetterStyles(template: string): string {
             .cover-letter-paper-preview .letter-body p { margin-bottom: 14px; }
             .cover-letter-paper-preview .letter-closing { margin-top: 28px; color: #1b1b18; }
             .cover-letter-paper-preview .letter-signature { margin-top: 6px; font-weight: 700; color: #1b1b18; }
-        `;
+        `
+        );
     }
 
     if (template === 'cl_creative' || template === 'philippine') {
-        return base + `
+        return (
+            base +
+            `
             .cover-letter-paper-preview .letter-header { text-align: left; border-bottom: 2px solid #6366f1; padding-bottom: 12px; margin-bottom: 20px; }
             .cover-letter-paper-preview .letter-name { font-size: 26px; font-weight: 800; color: #4338ca; letter-spacing: -0.02em; }
             .cover-letter-paper-preview .letter-contact-line { font-size: 12px; color: #6366f1; margin-top: 4px; font-weight: 500; }
@@ -688,10 +840,13 @@ function getScopedCoverLetterStyles(template: string): string {
             .cover-letter-paper-preview .letter-body p { margin-bottom: 16px; }
             .cover-letter-paper-preview .letter-closing { margin-top: 32px; font-weight: 600; color: #3730a3; }
             .cover-letter-paper-preview .letter-signature { margin-top: 8px; font-weight: 800; font-size: 15px; color: #3730a3; }
-        `;
+        `
+        );
     }
 
-    return base + `
+    return (
+        base +
+        `
         .cover-letter-paper-preview .letter-header { margin-bottom: 24px; border-bottom: 1px solid #e5e7eb; padding-bottom: 12px; }
         .cover-letter-paper-preview .letter-name { font-size: 22px; font-weight: 600; letter-spacing: -0.01em; color: #111827; }
         .cover-letter-paper-preview .letter-contact-line { font-size: 12px; color: #6b7280; margin-top: 2px; }
@@ -701,11 +856,18 @@ function getScopedCoverLetterStyles(template: string): string {
         .cover-letter-paper-preview .letter-body p { margin-bottom: 14px; }
         .cover-letter-paper-preview .letter-closing { margin-top: 24px; }
         .cover-letter-paper-preview .letter-signature { margin-top: 4px; font-weight: 600; color: #111827; }
-    `;
+    `
+    );
 }
 
-
-function PersonalInfoTab({ data, setData, errors, photoDataUrl, onPhotoDataUrlChange, onAiPolish }: {
+function PersonalInfoTab({
+    data,
+    setData,
+    errors,
+    photoDataUrl,
+    onPhotoDataUrlChange,
+    onAiPolish,
+}: {
     data: ResumeProfile;
     setData: (key: string, value: string) => void;
     errors: Record<string, string>;
@@ -715,7 +877,10 @@ function PersonalInfoTab({ data, setData, errors, photoDataUrl, onPhotoDataUrlCh
 }) {
     const hasPhotoUrl = !!(data.photo_url && data.photo_url.trim());
     const hasUploadedPhoto = !!photoDataUrl;
-    const previewSrc = photoDataUrl || (hasPhotoUrl ? getDirectImageUrl(data.photo_url) : null) || null;
+    const previewSrc =
+        photoDataUrl ||
+        (hasPhotoUrl ? getDirectImageUrl(data.photo_url) : null) ||
+        null;
 
     return (
         <div className="flex flex-col gap-6 rounded-xl border border-border bg-card p-4">
@@ -727,7 +892,7 @@ function PersonalInfoTab({ data, setData, errors, photoDataUrl, onPhotoDataUrlCh
                             src={previewSrc}
                             alt="Profile preview"
                             referrerPolicy="no-referrer"
-                            className="h-16 w-16 rounded-full object-cover border border-[#e3e3e0] dark:border-[#3E3E3A]"
+                            className="h-16 w-16 rounded-full border border-[#e3e3e0] object-cover dark:border-[#3E3E3A]"
                         />
                     ) : (
                         <div className="flex h-16 w-16 items-center justify-center rounded-full bg-muted">
@@ -767,14 +932,18 @@ function PersonalInfoTab({ data, setData, errors, photoDataUrl, onPhotoDataUrlCh
                     value={data.full_name}
                     onChange={(e) => setData('full_name', e.target.value)}
                     onFocus={() => {
- if (data.full_name === 'Juan Dela Cruz') {
-setData('full_name', '');
-} 
-}}
+                        if (data.full_name === 'Juan Dela Cruz') {
+                            setData('full_name', '');
+                        }
+                    }}
                     placeholder="Juan Dela Cruz"
                     aria-invalid={!!errors.full_name}
                 />
-                {errors.full_name && <p className="text-xs text-destructive">{errors.full_name}</p>}
+                {errors.full_name && (
+                    <p className="text-xs text-destructive">
+                        {errors.full_name}
+                    </p>
+                )}
             </div>
 
             <div className="flex flex-col gap-2">
@@ -791,7 +960,11 @@ setData('full_name', '');
                     placeholder="e.g. Senior Software Developer"
                     aria-invalid={!!errors.target_role}
                 />
-                {errors.target_role && <p className="text-xs text-destructive">{errors.target_role}</p>}
+                {errors.target_role && (
+                    <p className="text-xs text-destructive">
+                        {errors.target_role}
+                    </p>
+                )}
             </div>
 
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -803,14 +976,18 @@ setData('full_name', '');
                         value={data.email}
                         onChange={(e) => setData('email', e.target.value)}
                         onFocus={() => {
- if (data.email === 'juan@example.com') {
-setData('email', '');
-} 
-}}
+                            if (data.email === 'juan@example.com') {
+                                setData('email', '');
+                            }
+                        }}
                         placeholder="juan@example.com"
                         aria-invalid={!!errors.email}
                     />
-                    {errors.email && <p className="text-xs text-destructive">{errors.email}</p>}
+                    {errors.email && (
+                        <p className="text-xs text-destructive">
+                            {errors.email}
+                        </p>
+                    )}
                 </div>
 
                 <div className="flex flex-col gap-2">
@@ -820,14 +997,18 @@ setData('email', '');
                         value={data.phone}
                         onChange={(e) => setData('phone', e.target.value)}
                         onFocus={() => {
- if (data.phone === '+63 917 123 4567') {
-setData('phone', '');
-} 
-}}
+                            if (data.phone === '+63 917 123 4567') {
+                                setData('phone', '');
+                            }
+                        }}
                         placeholder="+63 917 123 4567"
                         aria-invalid={!!errors.phone}
                     />
-                    {errors.phone && <p className="text-xs text-destructive">{errors.phone}</p>}
+                    {errors.phone && (
+                        <p className="text-xs text-destructive">
+                            {errors.phone}
+                        </p>
+                    )}
                 </div>
             </div>
 
@@ -838,14 +1019,18 @@ setData('phone', '');
                     value={data.location}
                     onChange={(e) => setData('location', e.target.value)}
                     onFocus={() => {
- if (data.location === 'Metro Manila') {
-setData('location', '');
-} 
-}}
+                        if (data.location === 'Metro Manila') {
+                            setData('location', '');
+                        }
+                    }}
                     placeholder="Metro Manila"
                     aria-invalid={!!errors.location}
                 />
-                {errors.location && <p className="text-xs text-destructive">{errors.location}</p>}
+                {errors.location && (
+                    <p className="text-xs text-destructive">
+                        {errors.location}
+                    </p>
+                )}
             </div>
 
             <div className="flex flex-col gap-2">
@@ -855,10 +1040,13 @@ setData('location', '');
                     value={data.linkedin_url ?? ''}
                     onChange={(e) => setData('linkedin_url', e.target.value)}
                     onFocus={() => {
- if (data.linkedin_url === 'https://linkedin.com/in/juandelacruz') {
-setData('linkedin_url', '');
-} 
-}}
+                        if (
+                            data.linkedin_url ===
+                            'https://linkedin.com/in/juandelacruz'
+                        ) {
+                            setData('linkedin_url', '');
+                        }
+                    }}
                     placeholder="https://linkedin.com/in/juandelacruz"
                 />
             </div>
@@ -870,25 +1058,30 @@ setData('linkedin_url', '');
                     value={data.github_url ?? ''}
                     onChange={(e) => setData('github_url', e.target.value)}
                     onFocus={() => {
- if (data.github_url === 'https://github.com/juandelacruz') {
-setData('github_url', '');
-} 
-}}
+                        if (
+                            data.github_url ===
+                            'https://github.com/juandelacruz'
+                        ) {
+                            setData('github_url', '');
+                        }
+                    }}
                     placeholder="https://github.com/juandelacruz"
                 />
             </div>
 
             <div className="flex flex-col gap-2">
-                <Label htmlFor="website_url">Website / Portfolio URL (optional)</Label>
+                <Label htmlFor="website_url">
+                    Website / Portfolio URL (optional)
+                </Label>
                 <Input
                     id="website_url"
                     value={data.website_url ?? ''}
                     onChange={(e) => setData('website_url', e.target.value)}
                     onFocus={() => {
- if (data.website_url === 'https://juanportfolio.com') {
-setData('website_url', '');
-} 
-}}
+                        if (data.website_url === 'https://juanportfolio.com') {
+                            setData('website_url', '');
+                        }
+                    }}
                     placeholder="https://juanportfolio.com"
                 />
             </div>
@@ -898,9 +1091,11 @@ setData('website_url', '');
                     <Label htmlFor="summary">Professional Summary</Label>
                     <button
                         type="button"
-                        onClick={() => onAiPolish('summary', data.summary ?? '')}
+                        onClick={() =>
+                            onAiPolish('summary', data.summary ?? '')
+                        }
                         disabled={!data.summary}
-                        className="inline-flex items-center gap-1 text-xs text-[#706f6c] hover:text-[#1b1b18] dark:text-[#A1A09A] dark:hover:text-[#EDEDEC] transition-colors disabled:opacity-40"
+                        className="inline-flex items-center gap-1 text-xs text-[#706f6c] transition-colors hover:text-[#1b1b18] disabled:opacity-40 dark:text-[#A1A09A] dark:hover:text-[#EDEDEC]"
                     >
                         <Sparkles className="size-3" />
                         AI Polish
@@ -911,12 +1106,15 @@ setData('website_url', '');
                     value={data.summary ?? ''}
                     onChange={(e) => setData('summary', e.target.value)}
                     onFocus={() => {
- if (data.summary === 'Experienced software developer with expertise in building scalable web applications...') {
-setData('summary', '');
-} 
-}}
+                        if (
+                            data.summary ===
+                            'Experienced software developer with expertise in building scalable web applications...'
+                        ) {
+                            setData('summary', '');
+                        }
+                    }}
                     rows={4}
-                    className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring"
+                    className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus:ring-1 focus:ring-ring focus:outline-none"
                     placeholder="Experienced software developer with expertise in building scalable web applications..."
                 />
             </div>
@@ -924,7 +1122,15 @@ setData('summary', '');
     );
 }
 
-function WorkExperienceTab({ data, setData, onAiPolish }: { data: ResumeProfile; setData: (key: string, value: WorkExperience[]) => void; onAiPolish: (section: string, content: string) => void }) {
+function WorkExperienceTab({
+    data,
+    setData,
+    onAiPolish,
+}: {
+    data: ResumeProfile;
+    setData: (key: string, value: WorkExperience[]) => void;
+    onAiPolish: (section: string, content: string) => void;
+}) {
     const experiences = data.work_experience ?? [];
 
     function addExperience() {
@@ -934,22 +1140,29 @@ function WorkExperienceTab({ data, setData, onAiPolish }: { data: ResumeProfile;
         ]);
     }
 
-    function updateExperience(index: number, field: keyof WorkExperience, value: string) {
+    function updateExperience(
+        index: number,
+        field: keyof WorkExperience,
+        value: string,
+    ) {
         const updated = [...experiences];
         updated[index] = { ...updated[index], [field]: value };
         setData('work_experience', updated);
     }
 
     function removeExperience(index: number) {
-        setData('work_experience', experiences.filter((_, i) => i !== index));
+        setData(
+            'work_experience',
+            experiences.filter((_, i) => i !== index),
+        );
     }
 
     function moveExperience(index: number, direction: 'up' | 'down') {
         const target = direction === 'up' ? index - 1 : index + 1;
 
         if (target < 0 || target >= experiences.length) {
-return;
-}
+            return;
+        }
 
         const updated = [...experiences];
         [updated[index], updated[target]] = [updated[target], updated[index]];
@@ -959,19 +1172,32 @@ return;
     return (
         <div className="flex flex-col gap-6">
             {experiences.map((exp, index) => (
-                <div key={index} className="rounded-xl border border-border bg-card p-4">
+                <div
+                    key={index}
+                    className="rounded-xl border border-border bg-card p-4"
+                >
                     <div className="flex flex-col gap-4">
                         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                             <div className="flex flex-col gap-2">
                                 <Label>Company</Label>
                                 <Input
                                     value={exp.company}
-                                    onChange={(e) => updateExperience(index, 'company', e.target.value)}
+                                    onChange={(e) =>
+                                        updateExperience(
+                                            index,
+                                            'company',
+                                            e.target.value,
+                                        )
+                                    }
                                     onFocus={() => {
- if (exp.company === 'Acme Corp') {
-updateExperience(index, 'company', '');
-} 
-}}
+                                        if (exp.company === 'Acme Corp') {
+                                            updateExperience(
+                                                index,
+                                                'company',
+                                                '',
+                                            );
+                                        }
+                                    }}
                                     placeholder="Acme Corp"
                                 />
                             </div>
@@ -979,12 +1205,25 @@ updateExperience(index, 'company', '');
                                 <Label>Position</Label>
                                 <Input
                                     value={exp.position}
-                                    onChange={(e) => updateExperience(index, 'position', e.target.value)}
+                                    onChange={(e) =>
+                                        updateExperience(
+                                            index,
+                                            'position',
+                                            e.target.value,
+                                        )
+                                    }
                                     onFocus={() => {
- if (exp.position === 'Software Developer') {
-updateExperience(index, 'position', '');
-} 
-}}
+                                        if (
+                                            exp.position ===
+                                            'Software Developer'
+                                        ) {
+                                            updateExperience(
+                                                index,
+                                                'position',
+                                                '',
+                                            );
+                                        }
+                                    }}
                                     placeholder="Software Developer"
                                 />
                             </div>
@@ -993,12 +1232,18 @@ updateExperience(index, 'position', '');
                             <Label>Duration</Label>
                             <Input
                                 value={exp.duration}
-                                onChange={(e) => updateExperience(index, 'duration', e.target.value)}
+                                onChange={(e) =>
+                                    updateExperience(
+                                        index,
+                                        'duration',
+                                        e.target.value,
+                                    )
+                                }
                                 onFocus={() => {
- if (exp.duration === '2020 - 2023') {
-updateExperience(index, 'duration', '');
-} 
-}}
+                                    if (exp.duration === '2020 - 2023') {
+                                        updateExperience(index, 'duration', '');
+                                    }
+                                }}
                                 placeholder="2020 - 2023"
                             />
                         </div>
@@ -1006,7 +1251,13 @@ updateExperience(index, 'duration', '');
                             <Label>Location (optional)</Label>
                             <Input
                                 value={exp.location || ''}
-                                onChange={(e) => updateExperience(index, 'location', e.target.value)}
+                                onChange={(e) =>
+                                    updateExperience(
+                                        index,
+                                        'location',
+                                        e.target.value,
+                                    )
+                                }
                                 placeholder="Makati City, Metro Manila"
                             />
                         </div>
@@ -1015,9 +1266,14 @@ updateExperience(index, 'duration', '');
                                 <Label>Description</Label>
                                 <button
                                     type="button"
-                                    onClick={() => onAiPolish('work_experience', exp.description)}
+                                    onClick={() =>
+                                        onAiPolish(
+                                            'work_experience',
+                                            exp.description,
+                                        )
+                                    }
                                     disabled={!exp.description}
-                                    className="inline-flex items-center gap-1 text-xs text-[#706f6c] hover:text-[#1b1b18] dark:text-[#A1A09A] dark:hover:text-[#EDEDEC] transition-colors disabled:opacity-40"
+                                    className="inline-flex items-center gap-1 text-xs text-[#706f6c] transition-colors hover:text-[#1b1b18] disabled:opacity-40 dark:text-[#A1A09A] dark:hover:text-[#EDEDEC]"
                                 >
                                     <Sparkles className="size-3" />
                                     AI Polish
@@ -1025,12 +1281,25 @@ updateExperience(index, 'duration', '');
                             </div>
                             <Textarea
                                 value={exp.description}
-                                onChange={(e) => updateExperience(index, 'description', e.target.value)}
+                                onChange={(e) =>
+                                    updateExperience(
+                                        index,
+                                        'description',
+                                        e.target.value,
+                                    )
+                                }
                                 onFocus={() => {
- if (exp.description === 'Developed and maintained various web applications using Laravel and React.') {
-updateExperience(index, 'description', '');
-} 
-}}
+                                    if (
+                                        exp.description ===
+                                        'Developed and maintained various web applications using Laravel and React.'
+                                    ) {
+                                        updateExperience(
+                                            index,
+                                            'description',
+                                            '',
+                                        );
+                                    }
+                                }}
                                 rows={3}
                             />
                         </div>
@@ -1041,7 +1310,7 @@ updateExperience(index, 'description', '');
                                 type="button"
                                 onClick={() => moveExperience(index, 'up')}
                                 disabled={index === 0}
-                                className="rounded-sm p-1 text-[#706f6c] hover:bg-[#f5f5f4] hover:text-[#1b1b18] dark:text-[#A1A09A] dark:hover:bg-[#1C1C1A] dark:hover:text-[#EDEDEC] transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                                className="rounded-sm p-1 text-[#706f6c] transition-colors hover:bg-[#f5f5f4] hover:text-[#1b1b18] disabled:cursor-not-allowed disabled:opacity-30 dark:text-[#A1A09A] dark:hover:bg-[#1C1C1A] dark:hover:text-[#EDEDEC]"
                             >
                                 <ArrowUp className="size-4" />
                             </button>
@@ -1049,12 +1318,16 @@ updateExperience(index, 'description', '');
                                 type="button"
                                 onClick={() => moveExperience(index, 'down')}
                                 disabled={index === experiences.length - 1}
-                                className="rounded-sm p-1 text-[#706f6c] hover:bg-[#f5f5f4] hover:text-[#1b1b18] dark:text-[#A1A09A] dark:hover:bg-[#1C1C1A] dark:hover:text-[#EDEDEC] transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                                className="rounded-sm p-1 text-[#706f6c] transition-colors hover:bg-[#f5f5f4] hover:text-[#1b1b18] disabled:cursor-not-allowed disabled:opacity-30 dark:text-[#A1A09A] dark:hover:bg-[#1C1C1A] dark:hover:text-[#EDEDEC]"
                             >
                                 <ArrowDown className="size-4" />
                             </button>
                         </div>
-                        <Button variant="ghost" size="sm" onClick={() => removeExperience(index)}>
+                        <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => removeExperience(index)}
+                        >
                             Remove
                         </Button>
                     </div>
@@ -1067,7 +1340,13 @@ updateExperience(index, 'description', '');
     );
 }
 
-function EducationTab({ data, setData }: { data: ResumeProfile; setData: (key: string, value: Education[]) => void }) {
+function EducationTab({
+    data,
+    setData,
+}: {
+    data: ResumeProfile;
+    setData: (key: string, value: Education[]) => void;
+}) {
     const education = data.education ?? [];
 
     function addEducation() {
@@ -1077,22 +1356,29 @@ function EducationTab({ data, setData }: { data: ResumeProfile; setData: (key: s
         ]);
     }
 
-    function updateEducation(index: number, field: keyof Education, value: string) {
+    function updateEducation(
+        index: number,
+        field: keyof Education,
+        value: string,
+    ) {
         const updated = [...education];
         updated[index] = { ...updated[index], [field]: value };
         setData('education', updated);
     }
 
     function removeEducation(index: number) {
-        setData('education', education.filter((_, i) => i !== index));
+        setData(
+            'education',
+            education.filter((_, i) => i !== index),
+        );
     }
 
     function moveEducation(index: number, direction: 'up' | 'down') {
         const target = direction === 'up' ? index - 1 : index + 1;
 
         if (target < 0 || target >= education.length) {
-return;
-}
+            return;
+        }
 
         const updated = [...education];
         [updated[index], updated[target]] = [updated[target], updated[index]];
@@ -1102,19 +1388,32 @@ return;
     return (
         <div className="flex flex-col gap-6">
             {education.map((edu, index) => (
-                <div key={index} className="rounded-xl border border-border bg-card p-4">
+                <div
+                    key={index}
+                    className="rounded-xl border border-border bg-card p-4"
+                >
                     <div className="flex flex-col gap-4">
                         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                             <div className="flex flex-col gap-2">
                                 <Label>Institution</Label>
                                 <Input
                                     value={edu.institution}
-                                    onChange={(e) => updateEducation(index, 'institution', e.target.value)}
+                                    onChange={(e) =>
+                                        updateEducation(
+                                            index,
+                                            'institution',
+                                            e.target.value,
+                                        )
+                                    }
                                     onFocus={() => {
- if (edu.institution === 'UP Diliman') {
-updateEducation(index, 'institution', '');
-} 
-}}
+                                        if (edu.institution === 'UP Diliman') {
+                                            updateEducation(
+                                                index,
+                                                'institution',
+                                                '',
+                                            );
+                                        }
+                                    }}
                                     placeholder="UP Diliman"
                                 />
                             </div>
@@ -1122,12 +1421,24 @@ updateEducation(index, 'institution', '');
                                 <Label>Degree</Label>
                                 <Input
                                     value={edu.degree}
-                                    onChange={(e) => updateEducation(index, 'degree', e.target.value)}
+                                    onChange={(e) =>
+                                        updateEducation(
+                                            index,
+                                            'degree',
+                                            e.target.value,
+                                        )
+                                    }
                                     onFocus={() => {
- if (edu.degree === 'BS Computer Science') {
-updateEducation(index, 'degree', '');
-} 
-}}
+                                        if (
+                                            edu.degree === 'BS Computer Science'
+                                        ) {
+                                            updateEducation(
+                                                index,
+                                                'degree',
+                                                '',
+                                            );
+                                        }
+                                    }}
                                     placeholder="BS Computer Science"
                                 />
                             </div>
@@ -1136,12 +1447,18 @@ updateEducation(index, 'degree', '');
                             <Label>Year</Label>
                             <Input
                                 value={edu.year}
-                                onChange={(e) => updateEducation(index, 'year', e.target.value)}
+                                onChange={(e) =>
+                                    updateEducation(
+                                        index,
+                                        'year',
+                                        e.target.value,
+                                    )
+                                }
                                 onFocus={() => {
- if (edu.year === '2020') {
-updateEducation(index, 'year', '');
-} 
-}}
+                                    if (edu.year === '2020') {
+                                        updateEducation(index, 'year', '');
+                                    }
+                                }}
                                 placeholder="2020"
                             />
                         </div>
@@ -1149,7 +1466,13 @@ updateEducation(index, 'year', '');
                             <Label>Location (optional)</Label>
                             <Input
                                 value={edu.location || ''}
-                                onChange={(e) => updateEducation(index, 'location', e.target.value)}
+                                onChange={(e) =>
+                                    updateEducation(
+                                        index,
+                                        'location',
+                                        e.target.value,
+                                    )
+                                }
                                 placeholder="Quezon City"
                             />
                         </div>
@@ -1160,7 +1483,7 @@ updateEducation(index, 'year', '');
                                 type="button"
                                 onClick={() => moveEducation(index, 'up')}
                                 disabled={index === 0}
-                                className="rounded-sm p-1 text-[#706f6c] hover:bg-[#f5f5f4] hover:text-[#1b1b18] dark:text-[#A1A09A] dark:hover:bg-[#1C1C1A] dark:hover:text-[#EDEDEC] transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                                className="rounded-sm p-1 text-[#706f6c] transition-colors hover:bg-[#f5f5f4] hover:text-[#1b1b18] disabled:cursor-not-allowed disabled:opacity-30 dark:text-[#A1A09A] dark:hover:bg-[#1C1C1A] dark:hover:text-[#EDEDEC]"
                             >
                                 <ArrowUp className="size-4" />
                             </button>
@@ -1168,12 +1491,16 @@ updateEducation(index, 'year', '');
                                 type="button"
                                 onClick={() => moveEducation(index, 'down')}
                                 disabled={index === education.length - 1}
-                                className="rounded-sm p-1 text-[#706f6c] hover:bg-[#f5f5f4] hover:text-[#1b1b18] dark:text-[#A1A09A] dark:hover:bg-[#1C1C1A] dark:hover:text-[#EDEDEC] transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                                className="rounded-sm p-1 text-[#706f6c] transition-colors hover:bg-[#f5f5f4] hover:text-[#1b1b18] disabled:cursor-not-allowed disabled:opacity-30 dark:text-[#A1A09A] dark:hover:bg-[#1C1C1A] dark:hover:text-[#EDEDEC]"
                             >
                                 <ArrowDown className="size-4" />
                             </button>
                         </div>
-                        <Button variant="ghost" size="sm" onClick={() => removeEducation(index)}>
+                        <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => removeEducation(index)}
+                        >
                             Remove
                         </Button>
                     </div>
@@ -1186,7 +1513,13 @@ updateEducation(index, 'year', '');
     );
 }
 
-function SkillsTab({ data, setData }: { data: ResumeProfile; setData: (key: string, value: string[]) => void }) {
+function SkillsTab({
+    data,
+    setData,
+}: {
+    data: ResumeProfile;
+    setData: (key: string, value: string[]) => void;
+}) {
     const [skillInput, setSkillInput] = useState('');
     const skills = data.skills ?? [];
 
@@ -1200,7 +1533,10 @@ function SkillsTab({ data, setData }: { data: ResumeProfile; setData: (key: stri
     }
 
     function removeSkill(skill: string) {
-        setData('skills', skills.filter((s) => s !== skill));
+        setData(
+            'skills',
+            skills.filter((s) => s !== skill),
+        );
     }
 
     return (
@@ -1239,13 +1575,22 @@ function SkillsTab({ data, setData }: { data: ResumeProfile; setData: (key: stri
                 ))}
             </div>
             {skills.length === 0 && (
-                <p className="text-sm text-muted-foreground">No skills added yet. Add skills like PHP, Laravel, React, etc.</p>
+                <p className="text-sm text-muted-foreground">
+                    No skills added yet. Add skills like PHP, Laravel, React,
+                    etc.
+                </p>
             )}
         </div>
     );
 }
 
-function CertificationsTab({ data, setData }: { data: ResumeProfile; setData: (key: string, value: string[]) => void }) {
+function CertificationsTab({
+    data,
+    setData,
+}: {
+    data: ResumeProfile;
+    setData: (key: string, value: string[]) => void;
+}) {
     const [certInput, setCertInput] = useState('');
     const certifications = data.certifications ?? [];
 
@@ -1259,7 +1604,10 @@ function CertificationsTab({ data, setData }: { data: ResumeProfile; setData: (k
     }
 
     function removeCertification(cert: string) {
-        setData('certifications', certifications.filter((c) => c !== cert));
+        setData(
+            'certifications',
+            certifications.filter((c) => c !== cert),
+        );
     }
 
     return (
@@ -1276,7 +1624,11 @@ function CertificationsTab({ data, setData }: { data: ResumeProfile; setData: (k
                         }
                     }}
                 />
-                <Button type="button" variant="outline" onClick={addCertification}>
+                <Button
+                    type="button"
+                    variant="outline"
+                    onClick={addCertification}
+                >
                     Add
                 </Button>
             </div>
@@ -1298,19 +1650,36 @@ function CertificationsTab({ data, setData }: { data: ResumeProfile; setData: (k
                 ))}
             </div>
             {certifications.length === 0 && (
-                <p className="text-sm text-muted-foreground">No certifications added yet. Add certifications like AWS Solutions Architect, Google Cloud Professional, etc.</p>
+                <p className="text-sm text-muted-foreground">
+                    No certifications added yet. Add certifications like AWS
+                    Solutions Architect, Google Cloud Professional, etc.
+                </p>
             )}
         </div>
     );
 }
 
-function ProjectsTab({ data, setData, onAiPolish }: { data: ResumeProfile; setData: (key: string, value: Project[]) => void; onAiPolish: (section: string, content: string) => void }) {
+function ProjectsTab({
+    data,
+    setData,
+    onAiPolish,
+}: {
+    data: ResumeProfile;
+    setData: (key: string, value: Project[]) => void;
+    onAiPolish: (section: string, content: string) => void;
+}) {
     const projects = data.projects ?? [];
 
     function addProject() {
         setData('projects', [
             ...projects,
-            { title: '', description: '', url: '', github_url: '', technologies: '' },
+            {
+                title: '',
+                description: '',
+                url: '',
+                github_url: '',
+                technologies: '',
+            },
         ]);
     }
 
@@ -1321,15 +1690,18 @@ function ProjectsTab({ data, setData, onAiPolish }: { data: ResumeProfile; setDa
     }
 
     function removeProject(index: number) {
-        setData('projects', projects.filter((_, i) => i !== index));
+        setData(
+            'projects',
+            projects.filter((_, i) => i !== index),
+        );
     }
 
     function moveProject(index: number, direction: 'up' | 'down') {
         const target = direction === 'up' ? index - 1 : index + 1;
 
         if (target < 0 || target >= projects.length) {
-return;
-}
+            return;
+        }
 
         const updated = [...projects];
         [updated[index], updated[target]] = [updated[target], updated[index]];
@@ -1339,18 +1711,29 @@ return;
     return (
         <div className="flex flex-col gap-6">
             {projects.map((project, index) => (
-                <div key={index} className="rounded-xl border border-border bg-card p-4">
+                <div
+                    key={index}
+                    className="rounded-xl border border-border bg-card p-4"
+                >
                     <div className="flex flex-col gap-4">
                         <div className="flex flex-col gap-2">
                             <Label>Project Title</Label>
                             <Input
                                 value={project.title}
-                                onChange={(e) => updateProject(index, 'title', e.target.value)}
+                                onChange={(e) =>
+                                    updateProject(
+                                        index,
+                                        'title',
+                                        e.target.value,
+                                    )
+                                }
                                 onFocus={() => {
- if (project.title === 'E-commerce Platform') {
-updateProject(index, 'title', '');
-} 
-}}
+                                    if (
+                                        project.title === 'E-commerce Platform'
+                                    ) {
+                                        updateProject(index, 'title', '');
+                                    }
+                                }}
                                 placeholder="E-commerce Platform"
                             />
                         </div>
@@ -1358,7 +1741,13 @@ updateProject(index, 'title', '');
                             <Label>Date / Duration (optional)</Label>
                             <Input
                                 value={project.duration || ''}
-                                onChange={(e) => updateProject(index, 'duration', e.target.value)}
+                                onChange={(e) =>
+                                    updateProject(
+                                        index,
+                                        'duration',
+                                        e.target.value,
+                                    )
+                                }
                                 placeholder="February 2026 - Present"
                             />
                         </div>
@@ -1367,9 +1756,14 @@ updateProject(index, 'title', '');
                                 <Label>Description</Label>
                                 <button
                                     type="button"
-                                    onClick={() => onAiPolish('projects', project.description)}
+                                    onClick={() =>
+                                        onAiPolish(
+                                            'projects',
+                                            project.description,
+                                        )
+                                    }
                                     disabled={!project.description}
-                                    className="inline-flex items-center gap-1 text-xs text-[#706f6c] hover:text-[#1b1b18] dark:text-[#A1A09A] dark:hover:text-[#EDEDEC] transition-colors disabled:opacity-40"
+                                    className="inline-flex items-center gap-1 text-xs text-[#706f6c] transition-colors hover:text-[#1b1b18] disabled:opacity-40 dark:text-[#A1A09A] dark:hover:text-[#EDEDEC]"
                                 >
                                     <Sparkles className="size-3" />
                                     AI Polish
@@ -1377,12 +1771,21 @@ updateProject(index, 'title', '');
                             </div>
                             <Textarea
                                 value={project.description}
-                                onChange={(e) => updateProject(index, 'description', e.target.value)}
+                                onChange={(e) =>
+                                    updateProject(
+                                        index,
+                                        'description',
+                                        e.target.value,
+                                    )
+                                }
                                 onFocus={() => {
- if (project.description === 'Built a full-stack e-commerce platform with Next.js and Stripe.') {
-updateProject(index, 'description', '');
-} 
-}}
+                                    if (
+                                        project.description ===
+                                        'Built a full-stack e-commerce platform with Next.js and Stripe.'
+                                    ) {
+                                        updateProject(index, 'description', '');
+                                    }
+                                }}
                                 rows={3}
                             />
                         </div>
@@ -1390,12 +1793,25 @@ updateProject(index, 'description', '');
                             <Label>Technologies Used</Label>
                             <Input
                                 value={project.technologies}
-                                onChange={(e) => updateProject(index, 'technologies', e.target.value)}
+                                onChange={(e) =>
+                                    updateProject(
+                                        index,
+                                        'technologies',
+                                        e.target.value,
+                                    )
+                                }
                                 onFocus={() => {
- if (project.technologies === 'Laravel, React, PostgreSQL') {
-updateProject(index, 'technologies', '');
-} 
-}}
+                                    if (
+                                        project.technologies ===
+                                        'Laravel, React, PostgreSQL'
+                                    ) {
+                                        updateProject(
+                                            index,
+                                            'technologies',
+                                            '',
+                                        );
+                                    }
+                                }}
                                 placeholder="Laravel, React, PostgreSQL"
                             />
                         </div>
@@ -1404,7 +1820,13 @@ updateProject(index, 'technologies', '');
                                 <Label>Live Demo URL (optional)</Label>
                                 <Input
                                     value={project.url}
-                                    onChange={(e) => updateProject(index, 'url', e.target.value)}
+                                    onChange={(e) =>
+                                        updateProject(
+                                            index,
+                                            'url',
+                                            e.target.value,
+                                        )
+                                    }
                                     placeholder="https://myproject.com"
                                 />
                             </div>
@@ -1412,7 +1834,13 @@ updateProject(index, 'technologies', '');
                                 <Label>GitHub Repository URL (optional)</Label>
                                 <Input
                                     value={project.github_url || ''}
-                                    onChange={(e) => updateProject(index, 'github_url', e.target.value)}
+                                    onChange={(e) =>
+                                        updateProject(
+                                            index,
+                                            'github_url',
+                                            e.target.value,
+                                        )
+                                    }
                                     placeholder="https://github.com/user/project"
                                 />
                             </div>
@@ -1424,7 +1852,7 @@ updateProject(index, 'technologies', '');
                                 type="button"
                                 onClick={() => moveProject(index, 'up')}
                                 disabled={index === 0}
-                                className="rounded-sm p-1 text-[#706f6c] hover:bg-[#f5f5f4] hover:text-[#1b1b18] dark:text-[#A1A09A] dark:hover:bg-[#1C1C1A] dark:hover:text-[#EDEDEC] transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                                className="rounded-sm p-1 text-[#706f6c] transition-colors hover:bg-[#f5f5f4] hover:text-[#1b1b18] disabled:cursor-not-allowed disabled:opacity-30 dark:text-[#A1A09A] dark:hover:bg-[#1C1C1A] dark:hover:text-[#EDEDEC]"
                             >
                                 <ArrowUp className="size-4" />
                             </button>
@@ -1432,12 +1860,16 @@ updateProject(index, 'technologies', '');
                                 type="button"
                                 onClick={() => moveProject(index, 'down')}
                                 disabled={index === projects.length - 1}
-                                className="rounded-sm p-1 text-[#706f6c] hover:bg-[#f5f5f4] hover:text-[#1b1b18] dark:text-[#A1A09A] dark:hover:bg-[#1C1C1A] dark:hover:text-[#EDEDEC] transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                                className="rounded-sm p-1 text-[#706f6c] transition-colors hover:bg-[#f5f5f4] hover:text-[#1b1b18] disabled:cursor-not-allowed disabled:opacity-30 dark:text-[#A1A09A] dark:hover:bg-[#1C1C1A] dark:hover:text-[#EDEDEC]"
                             >
                                 <ArrowDown className="size-4" />
                             </button>
                         </div>
-                        <Button variant="ghost" size="sm" onClick={() => removeProject(index)}>
+                        <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => removeProject(index)}
+                        >
                             Remove
                         </Button>
                     </div>
@@ -1450,24 +1882,34 @@ updateProject(index, 'technologies', '');
     );
 }
 
-function AdditionalInfoTab({ data, setData }: { data: ResumeProfile; setData: (key: string, value: AdditionalInfo[]) => void }) {
+function AdditionalInfoTab({
+    data,
+    setData,
+}: {
+    data: ResumeProfile;
+    setData: (key: string, value: AdditionalInfo[]) => void;
+}) {
     const items = data.additional_info ?? [];
 
     function addItem() {
-        setData('additional_info', [
-            ...items,
-            { label: '', value: '' },
-        ]);
+        setData('additional_info', [...items, { label: '', value: '' }]);
     }
 
-    function updateItem(index: number, field: keyof AdditionalInfo, value: string) {
+    function updateItem(
+        index: number,
+        field: keyof AdditionalInfo,
+        value: string,
+    ) {
         const updated = [...items];
         updated[index] = { ...updated[index], [field]: value };
         setData('additional_info', updated);
     }
 
     function removeItem(index: number) {
-        setData('additional_info', items.filter((_, i) => i !== index));
+        setData(
+            'additional_info',
+            items.filter((_, i) => i !== index),
+        );
     }
 
     function moveItem(index: number, direction: 'up' | 'down') {
@@ -1485,14 +1927,23 @@ function AdditionalInfoTab({ data, setData }: { data: ResumeProfile; setData: (k
     return (
         <div className="flex flex-col gap-6">
             {items.map((item, index) => (
-                <div key={index} className="rounded-xl border border-border bg-card p-4">
+                <div
+                    key={index}
+                    className="rounded-xl border border-border bg-card p-4"
+                >
                     <div className="flex flex-col gap-4">
                         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                             <div className="flex flex-col gap-2">
                                 <Label>Label</Label>
                                 <Input
                                     value={item.label}
-                                    onChange={(e) => updateItem(index, 'label', e.target.value)}
+                                    onChange={(e) =>
+                                        updateItem(
+                                            index,
+                                            'label',
+                                            e.target.value,
+                                        )
+                                    }
                                     placeholder="Languages"
                                 />
                             </div>
@@ -1500,7 +1951,13 @@ function AdditionalInfoTab({ data, setData }: { data: ResumeProfile; setData: (k
                                 <Label>Value</Label>
                                 <Input
                                     value={item.value}
-                                    onChange={(e) => updateItem(index, 'value', e.target.value)}
+                                    onChange={(e) =>
+                                        updateItem(
+                                            index,
+                                            'value',
+                                            e.target.value,
+                                        )
+                                    }
                                     placeholder="English, Filipino, Japanese"
                                 />
                             </div>
@@ -1512,7 +1969,7 @@ function AdditionalInfoTab({ data, setData }: { data: ResumeProfile; setData: (k
                                 type="button"
                                 onClick={() => moveItem(index, 'up')}
                                 disabled={index === 0}
-                                className="rounded-sm p-1 text-[#706f6c] hover:bg-[#f5f5f4] hover:text-[#1b1b18] dark:text-[#A1A09A] dark:hover:bg-[#1C1C1A] dark:hover:text-[#EDEDEC] transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                                className="rounded-sm p-1 text-[#706f6c] transition-colors hover:bg-[#f5f5f4] hover:text-[#1b1b18] disabled:cursor-not-allowed disabled:opacity-30 dark:text-[#A1A09A] dark:hover:bg-[#1C1C1A] dark:hover:text-[#EDEDEC]"
                             >
                                 <ArrowUp className="size-4" />
                             </button>
@@ -1520,12 +1977,16 @@ function AdditionalInfoTab({ data, setData }: { data: ResumeProfile; setData: (k
                                 type="button"
                                 onClick={() => moveItem(index, 'down')}
                                 disabled={index === items.length - 1}
-                                className="rounded-sm p-1 text-[#706f6c] hover:bg-[#f5f5f4] hover:text-[#1b1b18] dark:text-[#A1A09A] dark:hover:bg-[#1C1C1A] dark:hover:text-[#EDEDEC] transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                                className="rounded-sm p-1 text-[#706f6c] transition-colors hover:bg-[#f5f5f4] hover:text-[#1b1b18] disabled:cursor-not-allowed disabled:opacity-30 dark:text-[#A1A09A] dark:hover:bg-[#1C1C1A] dark:hover:text-[#EDEDEC]"
                             >
                                 <ArrowDown className="size-4" />
                             </button>
                         </div>
-                        <Button variant="ghost" size="sm" onClick={() => removeItem(index)}>
+                        <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => removeItem(index)}
+                        >
                             Remove
                         </Button>
                     </div>
@@ -1569,33 +2030,43 @@ function renderFormattedBullet(text: string): React.ReactNode {
     return parts.length > 0 ? parts : text;
 }
 
-function renderSkillsWithCategoryBold(skills: string[], separator: string = ', '): React.ReactNode {
-    return skills.map((skill, i) => {
-        const colonIndex = skill.indexOf(':');
+function renderSkillsWithCategoryBold(
+    skills: string[],
+    separator: string = ', ',
+): React.ReactNode {
+    return skills
+        .map((skill, i) => {
+            const colonIndex = skill.indexOf(':');
 
-        if (colonIndex > 0 && colonIndex < 30) {
-            const prefix = skill.substring(0, colonIndex);
-            const rest = skill.substring(colonIndex + 1);
+            if (colonIndex > 0 && colonIndex < 30) {
+                const prefix = skill.substring(0, colonIndex);
+                const rest = skill.substring(colonIndex + 1);
 
-            return <span key={i}><strong>{prefix}:</strong>{rest}</span>;
-        }
+                return (
+                    <span key={i}>
+                        <strong>{prefix}:</strong>
+                        {rest}
+                    </span>
+                );
+            }
 
-        return <span key={i}>{skill}</span>;
-    }).reduce<React.ReactNode[]>((acc, curr, i, arr) => {
-        acc.push(curr);
+            return <span key={i}>{skill}</span>;
+        })
+        .reduce<React.ReactNode[]>((acc, curr, i, arr) => {
+            acc.push(curr);
 
-        if (i < arr.length - 1) {
-            acc.push(separator);
-        }
+            if (i < arr.length - 1) {
+                acc.push(separator);
+            }
 
-        return acc;
-    }, []);
+            return acc;
+        }, []);
 }
 
 function getDirectImageUrl(url: string | null): string | null {
     if (!url || !url.trim()) {
-return null;
-}
+        return null;
+    }
 
     const trimmed = url.trim();
 
@@ -1609,7 +2080,9 @@ return null;
 
     // Check Google Drive parameter URLs:
     // e.g. https://drive.google.com/open?id=1dsfk6o2fdsfdsdfsi1lAUiIDvH or https://drive.google.com/uc?id=...
-    const driveParamMatch = trimmed.match(/drive\.google\.com\/.*[?&]id=([a-zA-Z0-9_-]+)/);
+    const driveParamMatch = trimmed.match(
+        /drive\.google\.com\/.*[?&]id=([a-zA-Z0-9_-]+)/,
+    );
 
     if (driveParamMatch && driveParamMatch[1]) {
         return `https://lh3.googleusercontent.com/d/${driveParamMatch[1]}`;
@@ -1618,12 +2091,18 @@ return null;
     return trimmed;
 }
 
-function PhotoUploader({ currentDataUrl, onDataUrlChange, hidePreview = false }: {
+function PhotoUploader({
+    currentDataUrl,
+    onDataUrlChange,
+    hidePreview = false,
+}: {
     currentDataUrl: string | null;
     onDataUrlChange: (url: string | null) => void;
     hidePreview?: boolean;
 }) {
-    const [previewUrl, setPreviewUrl] = useState<string | null>(getDirectImageUrl(currentDataUrl));
+    const [previewUrl, setPreviewUrl] = useState<string | null>(
+        getDirectImageUrl(currentDataUrl),
+    );
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
@@ -1634,8 +2113,8 @@ function PhotoUploader({ currentDataUrl, onDataUrlChange, hidePreview = false }:
         const file = e.target.files?.[0];
 
         if (!file) {
-return;
-}
+            return;
+        }
 
         const reader = new FileReader();
         reader.onloadend = () => {
@@ -1657,7 +2136,7 @@ return;
 
     if (hidePreview) {
         return (
-            <div className="flex-1 flex items-center gap-2">
+            <div className="flex flex-1 items-center gap-2">
                 <Input
                     ref={fileInputRef}
                     type="file"
@@ -1665,7 +2144,7 @@ return;
                     onChange={handleFileChange}
                     className="cursor-pointer"
                 />
-                <p className="text-xs text-muted-foreground whitespace-nowrap">
+                <p className="text-xs whitespace-nowrap text-muted-foreground">
                     Upload a local file
                 </p>
             </div>
@@ -1682,9 +2161,14 @@ return;
                             src={previewUrl}
                             alt="Profile preview"
                             referrerPolicy="no-referrer"
-                            className="h-16 w-16 rounded-full object-cover border border-[#e3e3e0] dark:border-[#3E3E3A]"
+                            className="h-16 w-16 rounded-full border border-[#e3e3e0] object-cover dark:border-[#3E3E3A]"
                         />
-                        <Button type="button" variant="ghost" size="sm" onClick={handleClear}>
+                        <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            onClick={handleClear}
+                        >
                             Remove
                         </Button>
                     </>
@@ -1702,7 +2186,8 @@ return;
                         className="cursor-pointer"
                     />
                     <p className="mt-1 text-xs text-muted-foreground">
-                        Upload a photo for preview and PDF download (not saved to server).
+                        Upload a photo for preview and PDF download (not saved
+                        to server).
                     </p>
                 </div>
             </div>
@@ -1716,7 +2201,15 @@ Throughout my experience, I have successfully built and maintained scalable web 
 
 Thank you for considering my application. I welcome the opportunity to discuss how my skills and experience can benefit Acme Corp.`;
 
-function ResumePreview({ data, template, photoDataUrl }: { data: ResumeProfile; template: string; photoDataUrl: string | null }) {
+function ResumePreview({
+    data,
+    template,
+    photoDataUrl,
+}: {
+    data: ResumeProfile;
+    template: string;
+    photoDataUrl: string | null;
+}) {
     const previewRef = useRef<HTMLDivElement>(null);
     const [saveDialogOpen, setSaveDialogOpen] = useState(false);
     const [versionName, setVersionName] = useState('');
@@ -1728,14 +2221,14 @@ function ResumePreview({ data, template, photoDataUrl }: { data: ResumeProfile; 
         const printWindow = window.open('', '_blank');
 
         if (!printWindow) {
-return;
-}
+            return;
+        }
 
         const content = previewRef.current?.innerHTML;
 
         if (!content) {
-return;
-}
+            return;
+        }
 
         printWindow.document.write(`
             <!DOCTYPE html>
@@ -1757,7 +2250,9 @@ return;
 
     function handleSaveVersion() {
         setSaveDialogOpen(true);
-        setVersionName(`${data.full_name || 'Resume'} - ${TEMPLATES.find(t => t.id === template)?.name || template}`);
+        setVersionName(
+            `${data.full_name || 'Resume'} - ${TEMPLATES.find((t) => t.id === template)?.name || template}`,
+        );
     }
 
     function confirmSaveVersion() {
@@ -1772,30 +2267,30 @@ return;
 
     function formatDisplayUrl(url?: string | null): string {
         if (!url || !url.trim()) {
-return '';
-}
+            return '';
+        }
 
         return url.trim().replace(/^https?:\/\/(www\.)?/, '');
     }
 
     function ensureHttpUrl(url?: string | null): string {
         if (!url || !url.trim()) {
-return '#';
-}
+            return '#';
+        }
 
         const trimmed = url.trim();
 
         if (/^https?:\/\//i.test(trimmed)) {
-return trimmed;
-}
+            return trimmed;
+        }
 
         return `https://${trimmed}`;
     }
 
     function renderLink(url?: string | null) {
         if (!url || !url.trim()) {
-return null;
-}
+            return null;
+        }
 
         const href = ensureHttpUrl(url);
         const text = formatDisplayUrl(url);
@@ -1814,17 +2309,17 @@ return null;
 
     function renderAsBullets(text?: string | null) {
         if (!text || !text.trim()) {
-return null;
-}
+            return null;
+        }
 
         const lines = text
             .split(/\n|(?<=[\.\?!])\s+(?=[A-Z0-9])|•|▪|\*/)
-            .map(l => l.trim().replace(/^[-•*▪]\s*/, ''))
-            .filter(l => l.length > 0);
+            .map((l) => l.trim().replace(/^[-•*▪]\s*/, ''))
+            .filter((l) => l.length > 0);
 
         if (lines.length === 0) {
-return null;
-}
+            return null;
+        }
 
         return (
             <ul className="bullet-list">
@@ -1837,18 +2332,36 @@ return null;
     const photoSrc = getDirectImageUrl(photoDataUrl || data.photo_url) || '';
     const hasPhoto = !!photoSrc;
 
-    const sectionOrder = data.section_order || ['personal', 'work', 'education', 'skills', 'projects', 'certifications', 'additional_info'];
+    const sectionOrder = data.section_order || [
+        'personal',
+        'work',
+        'education',
+        'skills',
+        'projects',
+        'certifications',
+        'additional_info',
+    ];
     const getOrder = (id: string) => sectionOrder.indexOf(id);
 
-    const SectionWrapper = ({ id, children, className }: { id: string; children: React.ReactNode; className?: string }) => (
-        <div style={{ order: getOrder(id) }} className={className}>{children}</div>
+    const SectionWrapper = ({
+        id,
+        children,
+        className,
+    }: {
+        id: string;
+        children: React.ReactNode;
+        className?: string;
+    }) => (
+        <div style={{ order: getOrder(id) }} className={className}>
+            {children}
+        </div>
     );
 
     return (
-        <div className="flex flex-col items-center gap-4 min-w-0 max-w-full overflow-x-auto overflow-y-hidden pb-4">
+        <div className="flex max-w-full min-w-0 flex-col gap-4 overflow-x-auto overflow-y-hidden pb-4">
             <div
                 ref={previewRef}
-                className={`resume-paper-preview template-${template} w-full min-w-[210mm] max-w-[210mm] min-h-[297mm] bg-white text-[#1b1b18] shadow-lg ring-1 ring-black/5 rounded-xl p-8 flex flex-col`}
+                className={`resume-paper-preview template-${template} mx-auto flex min-h-[297mm] w-full max-w-[210mm] min-w-fit shrink-0 flex-col rounded-xl bg-white p-6 text-[#1b1b18] shadow-lg ring-1 ring-black/5 md:min-w-[210mm] md:p-8`}
             >
                 <style>{scopedStyles}</style>
 
@@ -1856,32 +2369,93 @@ return null;
                     <>
                         <SectionWrapper id="personal">
                             <div className="ats-header">
-                                {hasPhoto && <img src={photoSrc} alt="" className="photo" referrerPolicy="no-referrer" />}
-                                <div className="ats-name">{data.full_name || 'Your Name'}</div>
-                                {data.target_role && <div className="target-role">{data.target_role}</div>}
+                                {hasPhoto && (
+                                    <img
+                                        src={photoSrc}
+                                        alt=""
+                                        className="photo"
+                                        referrerPolicy="no-referrer"
+                                    />
+                                )}
+                                <div className="ats-name">
+                                    {data.full_name || 'Your Name'}
+                                </div>
+                                {data.target_role && (
+                                    <div className="target-role">
+                                        {data.target_role}
+                                    </div>
+                                )}
                                 <div className="ats-contact-line">
                                     {[
-                                        data.location ? <span key="loc">{data.location}</span> : null,
-                                        data.phone ? <span key="phone">{data.phone}</span> : null,
-                                        data.email ? <a key="email" href={`mailto:${data.email}`} style={{ color: 'inherit', textDecoration: 'underline' }}>{data.email}</a> : null,
-                                        data.linkedin_url ? <span key="li">{renderLink(data.linkedin_url)}</span> : null,
-                                        data.github_url ? <span key="gh">{renderLink(data.github_url)}</span> : null,
-                                        data.website_url ? <span key="web">{renderLink(data.website_url)}</span> : null,
-                                    ].filter(Boolean).reduce((acc: React.ReactNode[], curr, i, arr) => {
-                                        acc.push(curr);
+                                        data.location ? (
+                                            <span key="loc">
+                                                {data.location}
+                                            </span>
+                                        ) : null,
+                                        data.phone ? (
+                                            <span key="phone">
+                                                {data.phone}
+                                            </span>
+                                        ) : null,
+                                        data.email ? (
+                                            <a
+                                                key="email"
+                                                href={`mailto:${data.email}`}
+                                                style={{
+                                                    color: 'inherit',
+                                                    textDecoration: 'underline',
+                                                }}
+                                            >
+                                                {data.email}
+                                            </a>
+                                        ) : null,
+                                        data.linkedin_url ? (
+                                            <span key="li">
+                                                {renderLink(data.linkedin_url)}
+                                            </span>
+                                        ) : null,
+                                        data.github_url ? (
+                                            <span key="gh">
+                                                {renderLink(data.github_url)}
+                                            </span>
+                                        ) : null,
+                                        data.website_url ? (
+                                            <span key="web">
+                                                {renderLink(data.website_url)}
+                                            </span>
+                                        ) : null,
+                                    ]
+                                        .filter(Boolean)
+                                        .reduce(
+                                            (
+                                                acc: React.ReactNode[],
+                                                curr,
+                                                i,
+                                                arr,
+                                            ) => {
+                                                acc.push(curr);
 
-                                        if (i < arr.length - 1) {
-    acc.push(<span key={`sep-${i}`}>  •  </span>);
-    }
+                                                if (i < arr.length - 1) {
+                                                    acc.push(
+                                                        <span key={`sep-${i}`}>
+                                                            {' '}
+                                                            •{' '}
+                                                        </span>,
+                                                    );
+                                                }
 
-                                        return acc;
-                                    }, [])}
+                                                return acc;
+                                            },
+                                            [],
+                                        )}
                                 </div>
                             </div>
 
                             {data.summary && (
                                 <>
-                                    <div className="ats-section-title">Professional Summary</div>
+                                    <div className="ats-section-title">
+                                        Professional Summary
+                                    </div>
                                     <p className="ats-desc">{data.summary}</p>
                                 </>
                             )}
@@ -1890,16 +2464,26 @@ return null;
                         <SectionWrapper id="work">
                             {(data.work_experience?.length ?? 0) > 0 && (
                                 <>
-                                    <div className="ats-section-title">Work Experience</div>
+                                    <div className="ats-section-title">
+                                        Work Experience
+                                    </div>
                                     {data.work_experience?.map((job, i) => (
                                         <div key={i} className="ats-item">
                                             <div className="ats-item-header">
-                                                <span className="ats-title">{job.position || 'Position'}</span>
-                                                <span className="ats-date">{job.duration}</span>
+                                                <span className="ats-title">
+                                                    {job.position || 'Position'}
+                                                </span>
+                                                <span className="ats-date">
+                                                    {job.duration}
+                                                </span>
                                             </div>
-                                            <div className="ats-company">{job.company}</div>
+                                            <div className="ats-company">
+                                                {job.company}
+                                            </div>
                                             {job.description && (
-                                                <p className="ats-desc">{job.description}</p>
+                                                <p className="ats-desc">
+                                                    {job.description}
+                                                </p>
                                             )}
                                         </div>
                                     ))}
@@ -1910,14 +2494,22 @@ return null;
                         <SectionWrapper id="education">
                             {(data.education?.length ?? 0) > 0 && (
                                 <>
-                                    <div className="ats-section-title">Education</div>
+                                    <div className="ats-section-title">
+                                        Education
+                                    </div>
                                     {data.education?.map((edu, i) => (
                                         <div key={i} className="ats-item">
                                             <div className="ats-item-header">
-                                                <span className="ats-title">{edu.degree || 'Degree'}</span>
-                                                <span className="ats-date">{edu.year}</span>
+                                                <span className="ats-title">
+                                                    {edu.degree || 'Degree'}
+                                                </span>
+                                                <span className="ats-date">
+                                                    {edu.year}
+                                                </span>
                                             </div>
-                                            <div className="ats-company">{edu.institution}</div>
+                                            <div className="ats-company">
+                                                {edu.institution}
+                                            </div>
                                         </div>
                                     ))}
                                 </>
@@ -1927,8 +2519,14 @@ return null;
                         <SectionWrapper id="skills">
                             {(data.skills?.length ?? 0) > 0 && (
                                 <>
-                                    <div className="ats-section-title">Skills & Technologies</div>
-                                    <div className="ats-desc">{renderSkillsWithCategoryBold(data.skills || [])}</div>
+                                    <div className="ats-section-title">
+                                        Skills & Technologies
+                                    </div>
+                                    <div className="ats-desc">
+                                        {renderSkillsWithCategoryBold(
+                                            data.skills || [],
+                                        )}
+                                    </div>
                                 </>
                             )}
                         </SectionWrapper>
@@ -1936,8 +2534,12 @@ return null;
                         <SectionWrapper id="certifications">
                             {(data.certifications?.length ?? 0) > 0 && (
                                 <>
-                                    <div className="ats-section-title">Certifications</div>
-                                    <div className="ats-desc">{data.certifications?.join(' | ')}</div>
+                                    <div className="ats-section-title">
+                                        Certifications
+                                    </div>
+                                    <div className="ats-desc">
+                                        {data.certifications?.join(' | ')}
+                                    </div>
                                 </>
                             )}
                         </SectionWrapper>
@@ -1945,14 +2547,26 @@ return null;
                         <SectionWrapper id="projects">
                             {(data.projects?.length ?? 0) > 0 && (
                                 <>
-                                    <div className="ats-section-title">Projects</div>
+                                    <div className="ats-section-title">
+                                        Projects
+                                    </div>
                                     {data.projects?.map((project, i) => (
                                         <div key={i} className="ats-item">
                                             <div className="ats-item-header">
-                                                <span className="ats-title">{project.title}</span>
-                                                {project.technologies && <span className="ats-date">{project.technologies}</span>}
+                                                <span className="ats-title">
+                                                    {project.title}
+                                                </span>
+                                                {project.technologies && (
+                                                    <span className="ats-date">
+                                                        {project.technologies}
+                                                    </span>
+                                                )}
                                             </div>
-                                            {project.description && <p className="ats-desc">{project.description}</p>}
+                                            {project.description && (
+                                                <p className="ats-desc">
+                                                    {project.description}
+                                                </p>
+                                            )}
                                         </div>
                                     ))}
                                 </>
@@ -1962,10 +2576,21 @@ return null;
                         <SectionWrapper id="additional_info">
                             {(data.additional_info?.length ?? 0) > 0 && (
                                 <>
-                                    <div className="ats-section-title">Additional Information</div>
+                                    <div className="ats-section-title">
+                                        Additional Information
+                                    </div>
                                     {data.additional_info?.map((item, i) => (
-                                        <div key={i} className="ats-desc" style={{ marginBottom: '4px' }}>
-                                            <strong>{renderFormattedBullet(item.label)}:</strong>{' '}
+                                        <div
+                                            key={i}
+                                            className="ats-desc"
+                                            style={{ marginBottom: '4px' }}
+                                        >
+                                            <strong>
+                                                {renderFormattedBullet(
+                                                    item.label,
+                                                )}
+                                                :
+                                            </strong>{' '}
                                             {renderFormattedBullet(item.value)}
                                         </div>
                                     ))}
@@ -1979,32 +2604,93 @@ return null;
                     <>
                         <SectionWrapper id="personal">
                             <div className="exec-header">
-                                {hasPhoto && <img src={photoSrc} alt="" className="photo" referrerPolicy="no-referrer" />}
-                                <div className="exec-name">{data.full_name || 'Your Name'}</div>
-                                {data.target_role && <div className="target-role">{data.target_role}</div>}
+                                {hasPhoto && (
+                                    <img
+                                        src={photoSrc}
+                                        alt=""
+                                        className="photo"
+                                        referrerPolicy="no-referrer"
+                                    />
+                                )}
+                                <div className="exec-name">
+                                    {data.full_name || 'Your Name'}
+                                </div>
+                                {data.target_role && (
+                                    <div className="target-role">
+                                        {data.target_role}
+                                    </div>
+                                )}
                                 <div className="exec-contact-line">
                                     {[
-                                        data.location ? <span key="loc">{data.location}</span> : null,
-                                        data.phone ? <span key="phone">{data.phone}</span> : null,
-                                        data.email ? <a key="email" href={`mailto:${data.email}`} style={{ color: 'inherit', textDecoration: 'underline' }}>{data.email}</a> : null,
-                                        data.linkedin_url ? <span key="li">{renderLink(data.linkedin_url)}</span> : null,
-                                        data.github_url ? <span key="gh">{renderLink(data.github_url)}</span> : null,
-                                        data.website_url ? <span key="web">{renderLink(data.website_url)}</span> : null,
-                                    ].filter(Boolean).reduce((acc: React.ReactNode[], curr, i, arr) => {
-                                        acc.push(curr);
+                                        data.location ? (
+                                            <span key="loc">
+                                                {data.location}
+                                            </span>
+                                        ) : null,
+                                        data.phone ? (
+                                            <span key="phone">
+                                                {data.phone}
+                                            </span>
+                                        ) : null,
+                                        data.email ? (
+                                            <a
+                                                key="email"
+                                                href={`mailto:${data.email}`}
+                                                style={{
+                                                    color: 'inherit',
+                                                    textDecoration: 'underline',
+                                                }}
+                                            >
+                                                {data.email}
+                                            </a>
+                                        ) : null,
+                                        data.linkedin_url ? (
+                                            <span key="li">
+                                                {renderLink(data.linkedin_url)}
+                                            </span>
+                                        ) : null,
+                                        data.github_url ? (
+                                            <span key="gh">
+                                                {renderLink(data.github_url)}
+                                            </span>
+                                        ) : null,
+                                        data.website_url ? (
+                                            <span key="web">
+                                                {renderLink(data.website_url)}
+                                            </span>
+                                        ) : null,
+                                    ]
+                                        .filter(Boolean)
+                                        .reduce(
+                                            (
+                                                acc: React.ReactNode[],
+                                                curr,
+                                                i,
+                                                arr,
+                                            ) => {
+                                                acc.push(curr);
 
-                                        if (i < arr.length - 1) {
-    acc.push(<span key={`sep-${i}`}>  |  </span>);
-    }
+                                                if (i < arr.length - 1) {
+                                                    acc.push(
+                                                        <span key={`sep-${i}`}>
+                                                            {' '}
+                                                            |{' '}
+                                                        </span>,
+                                                    );
+                                                }
 
-                                        return acc;
-                                    }, [])}
+                                                return acc;
+                                            },
+                                            [],
+                                        )}
                                 </div>
                             </div>
 
                             {data.summary && (
                                 <>
-                                    <div className="exec-section-title">Executive Summary</div>
+                                    <div className="exec-section-title">
+                                        Executive Summary
+                                    </div>
                                     <p className="job-desc">{data.summary}</p>
                                 </>
                             )}
@@ -2013,16 +2699,26 @@ return null;
                         <SectionWrapper id="work">
                             {(data.work_experience?.length ?? 0) > 0 && (
                                 <>
-                                    <div className="exec-section-title">Professional Experience</div>
+                                    <div className="exec-section-title">
+                                        Professional Experience
+                                    </div>
                                     {data.work_experience?.map((job, i) => (
                                         <div key={i} className="job">
                                             <div className="job-row">
-                                                <span className="job-title">{job.position || 'Position'}</span>
-                                                <span className="job-duration">{job.duration}</span>
+                                                <span className="job-title">
+                                                    {job.position || 'Position'}
+                                                </span>
+                                                <span className="job-duration">
+                                                    {job.duration}
+                                                </span>
                                             </div>
-                                            <div className="job-company">{job.company}</div>
+                                            <div className="job-company">
+                                                {job.company}
+                                            </div>
                                             {job.description && (
-                                                <p className="job-desc">{job.description}</p>
+                                                <p className="job-desc">
+                                                    {job.description}
+                                                </p>
                                             )}
                                         </div>
                                     ))}
@@ -2033,14 +2729,22 @@ return null;
                         <SectionWrapper id="education">
                             {(data.education?.length ?? 0) > 0 && (
                                 <>
-                                    <div className="exec-section-title">Education</div>
+                                    <div className="exec-section-title">
+                                        Education
+                                    </div>
                                     {data.education?.map((edu, i) => (
                                         <div key={i} className="edu">
                                             <div className="edu-row">
-                                                <span className="edu-degree">{edu.degree || 'Degree'}</span>
-                                                <span className="edu-year">{edu.year}</span>
+                                                <span className="edu-degree">
+                                                    {edu.degree || 'Degree'}
+                                                </span>
+                                                <span className="edu-year">
+                                                    {edu.year}
+                                                </span>
                                             </div>
-                                            <div className="edu-institution">{edu.institution}</div>
+                                            <div className="edu-institution">
+                                                {edu.institution}
+                                            </div>
                                         </div>
                                     ))}
                                 </>
@@ -2050,8 +2754,14 @@ return null;
                         <SectionWrapper id="skills">
                             {(data.skills?.length ?? 0) > 0 && (
                                 <>
-                                    <div className="exec-section-title">Core Competencies</div>
-                                    <div className="skills">{renderSkillsWithCategoryBold(data.skills || [])}</div>
+                                    <div className="exec-section-title">
+                                        Core Competencies
+                                    </div>
+                                    <div className="skills">
+                                        {renderSkillsWithCategoryBold(
+                                            data.skills || [],
+                                        )}
+                                    </div>
                                 </>
                             )}
                         </SectionWrapper>
@@ -2059,8 +2769,12 @@ return null;
                         <SectionWrapper id="certifications">
                             {(data.certifications?.length ?? 0) > 0 && (
                                 <>
-                                    <div className="exec-section-title">Certifications</div>
-                                    <div className="certs">{data.certifications?.join(' | ')}</div>
+                                    <div className="exec-section-title">
+                                        Certifications
+                                    </div>
+                                    <div className="certs">
+                                        {data.certifications?.join(' | ')}
+                                    </div>
                                 </>
                             )}
                         </SectionWrapper>
@@ -2068,12 +2782,24 @@ return null;
                         <SectionWrapper id="projects">
                             {(data.projects?.length ?? 0) > 0 && (
                                 <>
-                                    <div className="exec-section-title">Featured Projects</div>
+                                    <div className="exec-section-title">
+                                        Featured Projects
+                                    </div>
                                     {data.projects?.map((project, i) => (
                                         <div key={i} className="project">
-                                            <div className="project-title">{project.title}</div>
-                                            {project.technologies && <div className="project-tech">{project.technologies}</div>}
-                                            {project.description && <p className="project-desc">{project.description}</p>}
+                                            <div className="project-title">
+                                                {project.title}
+                                            </div>
+                                            {project.technologies && (
+                                                <div className="project-tech">
+                                                    {project.technologies}
+                                                </div>
+                                            )}
+                                            {project.description && (
+                                                <p className="project-desc">
+                                                    {project.description}
+                                                </p>
+                                            )}
                                         </div>
                                     ))}
                                 </>
@@ -2083,10 +2809,21 @@ return null;
                         <SectionWrapper id="additional_info">
                             {(data.additional_info?.length ?? 0) > 0 && (
                                 <>
-                                    <div className="exec-section-title">Additional Information</div>
+                                    <div className="exec-section-title">
+                                        Additional Information
+                                    </div>
                                     {data.additional_info?.map((item, i) => (
-                                        <div key={i} className="job-desc" style={{ marginBottom: '4px' }}>
-                                            <strong>{renderFormattedBullet(item.label)}:</strong>{' '}
+                                        <div
+                                            key={i}
+                                            className="job-desc"
+                                            style={{ marginBottom: '4px' }}
+                                        >
+                                            <strong>
+                                                {renderFormattedBullet(
+                                                    item.label,
+                                                )}
+                                                :
+                                            </strong>{' '}
                                             {renderFormattedBullet(item.value)}
                                         </div>
                                     ))}
@@ -2100,32 +2837,93 @@ return null;
                     <>
                         <SectionWrapper id="personal">
                             <div className="bullet-header">
-                                {hasPhoto && <img src={photoSrc} alt="" className="photo" referrerPolicy="no-referrer" />}
-                                <div className="bullet-name">{data.full_name || 'Your Name'}</div>
-                                {data.target_role && <div className="target-role">{data.target_role}</div>}
+                                {hasPhoto && (
+                                    <img
+                                        src={photoSrc}
+                                        alt=""
+                                        className="photo"
+                                        referrerPolicy="no-referrer"
+                                    />
+                                )}
+                                <div className="bullet-name">
+                                    {data.full_name || 'Your Name'}
+                                </div>
+                                {data.target_role && (
+                                    <div className="target-role">
+                                        {data.target_role}
+                                    </div>
+                                )}
                                 <div className="bullet-contact">
                                     {[
-                                        data.location ? <span key="loc">{data.location}</span> : null,
-                                        data.phone ? <span key="phone">{data.phone}</span> : null,
-                                        data.email ? <a key="email" href={`mailto:${data.email}`} style={{ color: 'inherit', textDecoration: 'underline' }}>{data.email}</a> : null,
-                                        data.linkedin_url ? <span key="li">{renderLink(data.linkedin_url)}</span> : null,
-                                        data.github_url ? <span key="gh">{renderLink(data.github_url)}</span> : null,
-                                        data.website_url ? <span key="web">{renderLink(data.website_url)}</span> : null,
-                                    ].filter(Boolean).reduce((acc: React.ReactNode[], curr, i, arr) => {
-                                        acc.push(curr);
+                                        data.location ? (
+                                            <span key="loc">
+                                                {data.location}
+                                            </span>
+                                        ) : null,
+                                        data.phone ? (
+                                            <span key="phone">
+                                                {data.phone}
+                                            </span>
+                                        ) : null,
+                                        data.email ? (
+                                            <a
+                                                key="email"
+                                                href={`mailto:${data.email}`}
+                                                style={{
+                                                    color: 'inherit',
+                                                    textDecoration: 'underline',
+                                                }}
+                                            >
+                                                {data.email}
+                                            </a>
+                                        ) : null,
+                                        data.linkedin_url ? (
+                                            <span key="li">
+                                                {renderLink(data.linkedin_url)}
+                                            </span>
+                                        ) : null,
+                                        data.github_url ? (
+                                            <span key="gh">
+                                                {renderLink(data.github_url)}
+                                            </span>
+                                        ) : null,
+                                        data.website_url ? (
+                                            <span key="web">
+                                                {renderLink(data.website_url)}
+                                            </span>
+                                        ) : null,
+                                    ]
+                                        .filter(Boolean)
+                                        .reduce(
+                                            (
+                                                acc: React.ReactNode[],
+                                                curr,
+                                                i,
+                                                arr,
+                                            ) => {
+                                                acc.push(curr);
 
-                                        if (i < arr.length - 1) {
-    acc.push(<span key={`sep-${i}`}>  •  </span>);
-    }
+                                                if (i < arr.length - 1) {
+                                                    acc.push(
+                                                        <span key={`sep-${i}`}>
+                                                            {' '}
+                                                            •{' '}
+                                                        </span>,
+                                                    );
+                                                }
 
-                                        return acc;
-                                    }, [])}
+                                                return acc;
+                                            },
+                                            [],
+                                        )}
                                 </div>
                             </div>
 
                             {data.summary && (
                                 <>
-                                    <div className="bullet-section-title">Professional Summary</div>
+                                    <div className="bullet-section-title">
+                                        Professional Summary
+                                    </div>
                                     {renderAsBullets(data.summary)}
                                 </>
                             )}
@@ -2134,15 +2932,26 @@ return null;
                         <SectionWrapper id="work">
                             {(data.work_experience?.length ?? 0) > 0 && (
                                 <>
-                                    <div className="bullet-section-title">Work Experience</div>
+                                    <div className="bullet-section-title">
+                                        Work Experience
+                                    </div>
                                     {data.work_experience?.map((job, i) => (
                                         <div key={i} className="bullet-item">
                                             <div className="bullet-item-header">
-                                                <span className="bullet-title">{job.position || 'Position'}</span>
-                                                <span className="bullet-date">{job.duration}</span>
+                                                <span className="bullet-title">
+                                                    {job.position || 'Position'}
+                                                </span>
+                                                <span className="bullet-date">
+                                                    {job.duration}
+                                                </span>
                                             </div>
-                                            <div className="bullet-company">{job.company}</div>
-                                            {job.description && renderAsBullets(job.description)}
+                                            <div className="bullet-company">
+                                                {job.company}
+                                            </div>
+                                            {job.description &&
+                                                renderAsBullets(
+                                                    job.description,
+                                                )}
                                         </div>
                                     ))}
                                 </>
@@ -2152,14 +2961,22 @@ return null;
                         <SectionWrapper id="education">
                             {(data.education?.length ?? 0) > 0 && (
                                 <>
-                                    <div className="bullet-section-title">Education</div>
+                                    <div className="bullet-section-title">
+                                        Education
+                                    </div>
                                     {data.education?.map((edu, i) => (
                                         <div key={i} className="bullet-item">
                                             <div className="bullet-item-header">
-                                                <span className="bullet-title">{edu.degree || 'Degree'}</span>
-                                                <span className="bullet-date">{edu.year}</span>
+                                                <span className="bullet-title">
+                                                    {edu.degree || 'Degree'}
+                                                </span>
+                                                <span className="bullet-date">
+                                                    {edu.year}
+                                                </span>
                                             </div>
-                                            <div className="bullet-company">{edu.institution}</div>
+                                            <div className="bullet-company">
+                                                {edu.institution}
+                                            </div>
                                         </div>
                                     ))}
                                 </>
@@ -2169,7 +2986,9 @@ return null;
                         <SectionWrapper id="skills">
                             {(data.skills?.length ?? 0) > 0 && (
                                 <>
-                                    <div className="bullet-section-title">Skills & Core Competencies</div>
+                                    <div className="bullet-section-title">
+                                        Skills & Core Competencies
+                                    </div>
                                     <ul className="bullet-list">
                                         {data.skills?.map((skill, i) => (
                                             <li key={i}>{skill}</li>
@@ -2182,7 +3001,9 @@ return null;
                         <SectionWrapper id="certifications">
                             {(data.certifications?.length ?? 0) > 0 && (
                                 <>
-                                    <div className="bullet-section-title">Certifications</div>
+                                    <div className="bullet-section-title">
+                                        Certifications
+                                    </div>
                                     <ul className="bullet-list">
                                         {data.certifications?.map((cert, i) => (
                                             <li key={i}>{cert}</li>
@@ -2195,22 +3016,43 @@ return null;
                         <SectionWrapper id="projects">
                             {(data.projects?.length ?? 0) > 0 && (
                                 <>
-                                    <div className="bullet-section-title">Projects</div>
+                                    <div className="bullet-section-title">
+                                        Projects
+                                    </div>
                                     {data.projects?.map((project, i) => (
                                         <div key={i} className="bullet-item">
                                             <div className="bullet-item-header">
-                                                <span className="bullet-title">{project.title}</span>
-                                                {project.technologies && <span className="bullet-date">{project.technologies}</span>}
+                                                <span className="bullet-title">
+                                                    {project.title}
+                                                </span>
+                                                {project.technologies && (
+                                                    <span className="bullet-date">
+                                                        {project.technologies}
+                                                    </span>
+                                                )}
                                             </div>
-                                            {(project.url || project.github_url) && (
-                                                <div className="bullet-company" style={{ fontSize: '11px' }}>
+                                            {(project.url ||
+                                                project.github_url) && (
+                                                <div
+                                                    className="bullet-company"
+                                                    style={{ fontSize: '11px' }}
+                                                >
                                                     {[
-                                                        project.url ? `Demo: ${project.url}` : null,
-                                                        project.github_url ? `GitHub: ${project.github_url}` : null,
-                                                    ].filter(Boolean).join('  •  ')}
+                                                        project.url
+                                                            ? `Demo: ${project.url}`
+                                                            : null,
+                                                        project.github_url
+                                                            ? `GitHub: ${project.github_url}`
+                                                            : null,
+                                                    ]
+                                                        .filter(Boolean)
+                                                        .join('  •  ')}
                                                 </div>
                                             )}
-                                            {project.description && renderAsBullets(project.description)}
+                                            {project.description &&
+                                                renderAsBullets(
+                                                    project.description,
+                                                )}
                                         </div>
                                     ))}
                                 </>
@@ -2220,11 +3062,26 @@ return null;
                         <SectionWrapper id="additional_info">
                             {(data.additional_info?.length ?? 0) > 0 && (
                                 <>
-                                    <div className="bullet-section-title">Additional Information</div>
+                                    <div className="bullet-section-title">
+                                        Additional Information
+                                    </div>
                                     {data.additional_info?.map((item, i) => (
-                                        <div key={i} className="bullet-item" style={{ marginBottom: '4px' }}>
-                                            <span style={{ fontWeight: 600 }}>{renderFormattedBullet(item.label)}:</span>{' '}
-                                            <span>{renderFormattedBullet(item.value)}</span>
+                                        <div
+                                            key={i}
+                                            className="bullet-item"
+                                            style={{ marginBottom: '4px' }}
+                                        >
+                                            <span style={{ fontWeight: 600 }}>
+                                                {renderFormattedBullet(
+                                                    item.label,
+                                                )}
+                                                :
+                                            </span>{' '}
+                                            <span>
+                                                {renderFormattedBullet(
+                                                    item.value,
+                                                )}
+                                            </span>
                                         </div>
                                     ))}
                                 </>
@@ -2237,17 +3094,46 @@ return null;
                     <>
                         <SectionWrapper id="personal">
                             <div className="header">
-                                {hasPhoto && <img src={photoSrc} alt="" className="photo" referrerPolicy="no-referrer" />}
-                                <div className="name">{data.full_name || 'Your Name'}</div>
-                                {data.target_role && <div className="target-role">{data.target_role}</div>}
+                                {hasPhoto && (
+                                    <img
+                                        src={photoSrc}
+                                        alt=""
+                                        className="photo"
+                                        referrerPolicy="no-referrer"
+                                    />
+                                )}
+                                <div className="name">
+                                    {data.full_name || 'Your Name'}
+                                </div>
+                                {data.target_role && (
+                                    <div className="target-role">
+                                        {data.target_role}
+                                    </div>
+                                )}
                             </div>
                             <div className="contact">
-                                {data.email && <a href={`mailto:${data.email}`} style={{ color: 'inherit', textDecoration: 'underline' }}>{data.email}</a>}
+                                {data.email && (
+                                    <a
+                                        href={`mailto:${data.email}`}
+                                        style={{
+                                            color: 'inherit',
+                                            textDecoration: 'underline',
+                                        }}
+                                    >
+                                        {data.email}
+                                    </a>
+                                )}
                                 {data.phone && <span>{data.phone}</span>}
                                 {data.location && <span>{data.location}</span>}
-                                {data.linkedin_url && <span>{renderLink(data.linkedin_url)}</span>}
-                                {data.github_url && <span>{renderLink(data.github_url)}</span>}
-                                {data.website_url && <span>{renderLink(data.website_url)}</span>}
+                                {data.linkedin_url && (
+                                    <span>{renderLink(data.linkedin_url)}</span>
+                                )}
+                                {data.github_url && (
+                                    <span>{renderLink(data.github_url)}</span>
+                                )}
+                                {data.website_url && (
+                                    <span>{renderLink(data.website_url)}</span>
+                                )}
                             </div>
 
                             {data.summary && (
@@ -2265,12 +3151,20 @@ return null;
                                     {data.work_experience?.map((job, i) => (
                                         <div key={i} className="job">
                                             <div className="job-row">
-                                                <span className="job-title">{job.position || 'Position'}</span>
-                                                <span className="job-duration">{job.duration}</span>
+                                                <span className="job-title">
+                                                    {job.position || 'Position'}
+                                                </span>
+                                                <span className="job-duration">
+                                                    {job.duration}
+                                                </span>
                                             </div>
-                                            <div className="job-company">{job.company}</div>
+                                            <div className="job-company">
+                                                {job.company}
+                                            </div>
                                             {job.description && (
-                                                <p className="job-desc">{job.description}</p>
+                                                <p className="job-desc">
+                                                    {job.description}
+                                                </p>
                                             )}
                                         </div>
                                     ))}
@@ -2285,10 +3179,16 @@ return null;
                                     {data.education?.map((edu, i) => (
                                         <div key={i} className="edu">
                                             <div className="edu-row">
-                                                <span className="edu-degree">{edu.degree || 'Degree'}</span>
-                                                <span className="edu-year">{edu.year}</span>
+                                                <span className="edu-degree">
+                                                    {edu.degree || 'Degree'}
+                                                </span>
+                                                <span className="edu-year">
+                                                    {edu.year}
+                                                </span>
                                             </div>
-                                            <div className="edu-institution">{edu.institution}</div>
+                                            <div className="edu-institution">
+                                                {edu.institution}
+                                            </div>
                                         </div>
                                     ))}
                                 </>
@@ -2299,7 +3199,11 @@ return null;
                             {(data.skills?.length ?? 0) > 0 && (
                                 <>
                                     <h2>Skills</h2>
-                                    <div className="skills">{renderSkillsWithCategoryBold(data.skills || [])}</div>
+                                    <div className="skills">
+                                        {renderSkillsWithCategoryBold(
+                                            data.skills || [],
+                                        )}
+                                    </div>
                                 </>
                             )}
                         </SectionWrapper>
@@ -2308,7 +3212,9 @@ return null;
                             {(data.certifications?.length ?? 0) > 0 && (
                                 <>
                                     <h2>Certifications</h2>
-                                    <div className="certs">{data.certifications?.join(' | ')}</div>
+                                    <div className="certs">
+                                        {data.certifications?.join(' | ')}
+                                    </div>
                                 </>
                             )}
                         </SectionWrapper>
@@ -2319,25 +3225,75 @@ return null;
                                     <h2>Projects</h2>
                                     {data.projects?.map((project, i) => (
                                         <div key={i} className="project">
-                                            <div className="project-title">{project.title}</div>
-                                            {project.technologies && <div className="project-tech">{project.technologies}</div>}
-                                            {(project.url || project.github_url) && (
-                                                <div className="project-tech" style={{ fontSize: '11px', opacity: 0.85 }}>
-                                                    {[
-                                                        project.url ? <span key="demo">{renderLink(project.url)}</span> : null,
-                                                        project.github_url ? <span key="gh">{renderLink(project.github_url)}</span> : null,
-                                                    ].filter(Boolean).reduce((acc: React.ReactNode[], curr, i, arr) => {
-                                                        acc.push(curr);
-
-                                                        if (i < arr.length - 1) {
-    acc.push(<span key={`psep-${i}`}>  •  </span>);
-    }
-
-                                                        return acc;
-                                                    }, [])}
+                                            <div className="project-title">
+                                                {project.title}
+                                            </div>
+                                            {project.technologies && (
+                                                <div className="project-tech">
+                                                    {project.technologies}
                                                 </div>
                                             )}
-                                            {project.description && <p className="project-desc">{project.description}</p>}
+                                            {(project.url ||
+                                                project.github_url) && (
+                                                <div
+                                                    className="project-tech"
+                                                    style={{
+                                                        fontSize: '11px',
+                                                        opacity: 0.85,
+                                                    }}
+                                                >
+                                                    {[
+                                                        project.url ? (
+                                                            <span key="demo">
+                                                                {renderLink(
+                                                                    project.url,
+                                                                )}
+                                                            </span>
+                                                        ) : null,
+                                                        project.github_url ? (
+                                                            <span key="gh">
+                                                                {renderLink(
+                                                                    project.github_url,
+                                                                )}
+                                                            </span>
+                                                        ) : null,
+                                                    ]
+                                                        .filter(Boolean)
+                                                        .reduce(
+                                                            (
+                                                                acc: React.ReactNode[],
+                                                                curr,
+                                                                i,
+                                                                arr,
+                                                            ) => {
+                                                                acc.push(curr);
+
+                                                                if (
+                                                                    i <
+                                                                    arr.length -
+                                                                        1
+                                                                ) {
+                                                                    acc.push(
+                                                                        <span
+                                                                            key={`psep-${i}`}
+                                                                        >
+                                                                            {' '}
+                                                                            •{' '}
+                                                                        </span>,
+                                                                    );
+                                                                }
+
+                                                                return acc;
+                                                            },
+                                                            [],
+                                                        )}
+                                                </div>
+                                            )}
+                                            {project.description && (
+                                                <p className="project-desc">
+                                                    {project.description}
+                                                </p>
+                                            )}
                                         </div>
                                     ))}
                                 </>
@@ -2349,8 +3305,19 @@ return null;
                                 <>
                                     <h2>Additional Information</h2>
                                     {data.additional_info?.map((item, i) => (
-                                        <div key={i} style={{ marginBottom: '4px', fontSize: '13px' }}>
-                                            <strong>{renderFormattedBullet(item.label)}:</strong>{' '}
+                                        <div
+                                            key={i}
+                                            style={{
+                                                marginBottom: '4px',
+                                                fontSize: '13px',
+                                            }}
+                                        >
+                                            <strong>
+                                                {renderFormattedBullet(
+                                                    item.label,
+                                                )}
+                                                :
+                                            </strong>{' '}
                                             {renderFormattedBullet(item.value)}
                                         </div>
                                     ))}
@@ -2363,22 +3330,51 @@ return null;
                 {template === 'modern' && (
                     <>
                         <div className="header">
-                            {hasPhoto && <img src={photoSrc} alt="" className="photo" referrerPolicy="no-referrer" />}
-                            <div className="name">{data.full_name || 'Your Name'}</div>
-                            {data.target_role && <div className="target-role">{data.target_role}</div>}
+                            {hasPhoto && (
+                                <img
+                                    src={photoSrc}
+                                    alt=""
+                                    className="photo"
+                                    referrerPolicy="no-referrer"
+                                />
+                            )}
+                            <div className="name">
+                                {data.full_name || 'Your Name'}
+                            </div>
+                            {data.target_role && (
+                                <div className="target-role">
+                                    {data.target_role}
+                                </div>
+                            )}
                             <div className="contact">
-                                {data.email && <a href={`mailto:${data.email}`} style={{ color: 'inherit', textDecoration: 'underline' }}>{data.email}</a>}
+                                {data.email && (
+                                    <a
+                                        href={`mailto:${data.email}`}
+                                        style={{
+                                            color: 'inherit',
+                                            textDecoration: 'underline',
+                                        }}
+                                    >
+                                        {data.email}
+                                    </a>
+                                )}
                                 {data.phone && <span>{data.phone}</span>}
                                 {data.location && <span>{data.location}</span>}
                             </div>
                             {data.linkedin_url && (
-                                <div className="linkedin">{renderLink(data.linkedin_url)}</div>
+                                <div className="linkedin">
+                                    {renderLink(data.linkedin_url)}
+                                </div>
                             )}
                             {data.github_url && (
-                                <div className="linkedin">{renderLink(data.github_url)}</div>
+                                <div className="linkedin">
+                                    {renderLink(data.github_url)}
+                                </div>
                             )}
                             {data.website_url && (
-                                <div className="linkedin">{renderLink(data.website_url)}</div>
+                                <div className="linkedin">
+                                    {renderLink(data.website_url)}
+                                </div>
                             )}
                         </div>
 
@@ -2399,12 +3395,21 @@ return null;
                                         {data.work_experience?.map((job, i) => (
                                             <div key={i} className="job">
                                                 <div className="job-row">
-                                                    <span className="job-title">{job.position || 'Position'}</span>
-                                                    <span className="job-duration">{job.duration}</span>
+                                                    <span className="job-title">
+                                                        {job.position ||
+                                                            'Position'}
+                                                    </span>
+                                                    <span className="job-duration">
+                                                        {job.duration}
+                                                    </span>
                                                 </div>
-                                                <div className="job-company">{job.company}</div>
+                                                <div className="job-company">
+                                                    {job.company}
+                                                </div>
                                                 {job.description && (
-                                                    <p className="job-desc">{job.description}</p>
+                                                    <p className="job-desc">
+                                                        {job.description}
+                                                    </p>
                                                 )}
                                             </div>
                                         ))}
@@ -2419,10 +3424,16 @@ return null;
                                         {data.education?.map((edu, i) => (
                                             <div key={i} className="edu">
                                                 <div className="edu-row">
-                                                    <span className="edu-degree">{edu.degree || 'Degree'}</span>
-                                                    <span className="edu-year">{edu.year}</span>
+                                                    <span className="edu-degree">
+                                                        {edu.degree || 'Degree'}
+                                                    </span>
+                                                    <span className="edu-year">
+                                                        {edu.year}
+                                                    </span>
                                                 </div>
-                                                <div className="edu-institution">{edu.institution}</div>
+                                                <div className="edu-institution">
+                                                    {edu.institution}
+                                                </div>
                                             </div>
                                         ))}
                                     </>
@@ -2433,7 +3444,11 @@ return null;
                                 {(data.skills?.length ?? 0) > 0 && (
                                     <>
                                         <h2>Skills</h2>
-                                        <div className="skills">{renderSkillsWithCategoryBold(data.skills || [])}</div>
+                                        <div className="skills">
+                                            {renderSkillsWithCategoryBold(
+                                                data.skills || [],
+                                            )}
+                                        </div>
                                     </>
                                 )}
                             </SectionWrapper>
@@ -2442,7 +3457,9 @@ return null;
                                 {(data.certifications?.length ?? 0) > 0 && (
                                     <>
                                         <h2>Certifications</h2>
-                                        <div className="certs">{data.certifications?.join(' | ')}</div>
+                                        <div className="certs">
+                                            {data.certifications?.join(' | ')}
+                                        </div>
                                     </>
                                 )}
                             </SectionWrapper>
@@ -2452,42 +3469,109 @@ return null;
                                     <>
                                         <h2>Projects</h2>
                                         {data.projects?.map((project, i) => (
-                                        <div key={i} className="project">
-                                            <div className="project-title">{project.title}</div>
-                                            {project.technologies && <div className="project-tech">{project.technologies}</div>}
-                                            {(project.url || project.github_url) && (
-                                                <div className="project-tech" style={{ fontSize: '11px', opacity: 0.85 }}>
-                                                    {[
-                                                        project.url ? <span key="demo">{renderLink(project.url)}</span> : null,
-                                                        project.github_url ? <span key="gh">{renderLink(project.github_url)}</span> : null,
-                                                    ].filter(Boolean).reduce((acc: React.ReactNode[], curr, i, arr) => {
-                                                        acc.push(curr);
-
-                                                        if (i < arr.length - 1) {
-acc.push(<span key={`psep-${i}`}>  •  </span>);
-}
-
-                                                        return acc;
-                                                    }, [])}
+                                            <div key={i} className="project">
+                                                <div className="project-title">
+                                                    {project.title}
                                                 </div>
-                                            )}
-                                            {project.description && <p className="project-desc">{project.description}</p>}
-                                        </div>
-                                    ))}
-                                </>
-                            )}
+                                                {project.technologies && (
+                                                    <div className="project-tech">
+                                                        {project.technologies}
+                                                    </div>
+                                                )}
+                                                {(project.url ||
+                                                    project.github_url) && (
+                                                    <div
+                                                        className="project-tech"
+                                                        style={{
+                                                            fontSize: '11px',
+                                                            opacity: 0.85,
+                                                        }}
+                                                    >
+                                                        {[
+                                                            project.url ? (
+                                                                <span key="demo">
+                                                                    {renderLink(
+                                                                        project.url,
+                                                                    )}
+                                                                </span>
+                                                            ) : null,
+                                                            project.github_url ? (
+                                                                <span key="gh">
+                                                                    {renderLink(
+                                                                        project.github_url,
+                                                                    )}
+                                                                </span>
+                                                            ) : null,
+                                                        ]
+                                                            .filter(Boolean)
+                                                            .reduce(
+                                                                (
+                                                                    acc: React.ReactNode[],
+                                                                    curr,
+                                                                    i,
+                                                                    arr,
+                                                                ) => {
+                                                                    acc.push(
+                                                                        curr,
+                                                                    );
+
+                                                                    if (
+                                                                        i <
+                                                                        arr.length -
+                                                                            1
+                                                                    ) {
+                                                                        acc.push(
+                                                                            <span
+                                                                                key={`psep-${i}`}
+                                                                            >
+                                                                                {' '}
+                                                                                •{' '}
+                                                                            </span>,
+                                                                        );
+                                                                    }
+
+                                                                    return acc;
+                                                                },
+                                                                [],
+                                                            )}
+                                                    </div>
+                                                )}
+                                                {project.description && (
+                                                    <p className="project-desc">
+                                                        {project.description}
+                                                    </p>
+                                                )}
+                                            </div>
+                                        ))}
+                                    </>
+                                )}
                             </SectionWrapper>
 
                             <SectionWrapper id="additional_info">
                                 {(data.additional_info?.length ?? 0) > 0 && (
                                     <>
                                         <h2>Additional Information</h2>
-                                        {data.additional_info?.map((item, i) => (
-                                            <div key={i} style={{ marginBottom: '4px', fontSize: '13px' }}>
-                                                <strong>{renderFormattedBullet(item.label)}:</strong>{' '}
-                                                {renderFormattedBullet(item.value)}
-                                            </div>
-                                        ))}
+                                        {data.additional_info?.map(
+                                            (item, i) => (
+                                                <div
+                                                    key={i}
+                                                    style={{
+                                                        marginBottom: '4px',
+                                                        fontSize: '13px',
+                                                    }}
+                                                >
+                                                    <strong>
+                                                        {renderFormattedBullet(
+                                                            item.label,
+                                                        )}
+                                                        :
+                                                    </strong>{' '}
+                                                    {renderFormattedBullet(
+                                                        item.value,
+                                                    )}
+                                                </div>
+                                            ),
+                                        )}
                                     </>
                                 )}
                             </SectionWrapper>
@@ -2499,22 +3583,53 @@ acc.push(<span key={`psep-${i}`}>  •  </span>);
                     <>
                         <SectionWrapper id="personal">
                             <div className="header">
-                                {hasPhoto && <img src={photoSrc} alt="" className="photo" referrerPolicy="no-referrer" />}
-                                <div className="name">{data.full_name || 'Your Name'}</div>
-                                {data.target_role && <div className="target-role">{data.target_role}</div>}
+                                {hasPhoto && (
+                                    <img
+                                        src={photoSrc}
+                                        alt=""
+                                        className="photo"
+                                        referrerPolicy="no-referrer"
+                                    />
+                                )}
+                                <div className="name">
+                                    {data.full_name || 'Your Name'}
+                                </div>
+                                {data.target_role && (
+                                    <div className="target-role">
+                                        {data.target_role}
+                                    </div>
+                                )}
                                 <div className="contact">
-                                    {data.location && <span>{data.location}</span>}
+                                    {data.location && (
+                                        <span>{data.location}</span>
+                                    )}
                                     {data.phone && <span>{data.phone}</span>}
-                                    {data.email && <a href={`mailto:${data.email}`} style={{ color: 'inherit', textDecoration: 'underline' }}>{data.email}</a>}
+                                    {data.email && (
+                                        <a
+                                            href={`mailto:${data.email}`}
+                                            style={{
+                                                color: 'inherit',
+                                                textDecoration: 'underline',
+                                            }}
+                                        >
+                                            {data.email}
+                                        </a>
+                                    )}
                                 </div>
                                 {data.linkedin_url && (
-                                    <div className="linkedin">{renderLink(data.linkedin_url)}</div>
+                                    <div className="linkedin">
+                                        {renderLink(data.linkedin_url)}
+                                    </div>
                                 )}
                                 {data.github_url && (
-                                    <div className="linkedin">{renderLink(data.github_url)}</div>
+                                    <div className="linkedin">
+                                        {renderLink(data.github_url)}
+                                    </div>
                                 )}
                                 {data.website_url && (
-                                    <div className="linkedin">{renderLink(data.website_url)}</div>
+                                    <div className="linkedin">
+                                        {renderLink(data.website_url)}
+                                    </div>
                                 )}
                             </div>
 
@@ -2534,13 +3649,21 @@ acc.push(<span key={`psep-${i}`}>  •  </span>);
                                     <div className="section-line" />
                                     {data.work_experience?.map((job, i) => (
                                         <div key={i} className="job">
-                                            <div className="job-company">{job.company || 'Company'}</div>
+                                            <div className="job-company">
+                                                {job.company || 'Company'}
+                                            </div>
                                             <div className="job-row">
-                                                <span className="job-position">{job.position}</span>
-                                                <span className="job-duration">{job.duration}</span>
+                                                <span className="job-position">
+                                                    {job.position}
+                                                </span>
+                                                <span className="job-duration">
+                                                    {job.duration}
+                                                </span>
                                             </div>
                                             {job.description && (
-                                                <p className="job-desc">{job.description}</p>
+                                                <p className="job-desc">
+                                                    {job.description}
+                                                </p>
                                             )}
                                         </div>
                                     ))}
@@ -2556,10 +3679,16 @@ acc.push(<span key={`psep-${i}`}>  •  </span>);
                                     {data.education?.map((edu, i) => (
                                         <div key={i} className="edu">
                                             <div className="edu-row">
-                                                <span className="edu-degree">{edu.degree || 'Degree'}</span>
-                                                <span className="edu-year">{edu.year}</span>
+                                                <span className="edu-degree">
+                                                    {edu.degree || 'Degree'}
+                                                </span>
+                                                <span className="edu-year">
+                                                    {edu.year}
+                                                </span>
                                             </div>
-                                            <div className="edu-institution">{edu.institution}</div>
+                                            <div className="edu-institution">
+                                                {edu.institution}
+                                            </div>
                                         </div>
                                     ))}
                                 </>
@@ -2571,7 +3700,12 @@ acc.push(<span key={`psep-${i}`}>  •  </span>);
                                 <>
                                     <h2>IV. SKILLS & COMPETENCIES</h2>
                                     <div className="section-line" />
-                                    <div className="skills-text">{renderSkillsWithCategoryBold(data.skills || [], ' / ')}</div>
+                                    <div className="skills-text">
+                                        {renderSkillsWithCategoryBold(
+                                            data.skills || [],
+                                            ' / ',
+                                        )}
+                                    </div>
                                 </>
                             )}
                         </SectionWrapper>
@@ -2581,7 +3715,9 @@ acc.push(<span key={`psep-${i}`}>  •  </span>);
                                 <>
                                     <h2>V. CERTIFICATIONS & SEMINARS</h2>
                                     <div className="section-line" />
-                                    <div className="certs">{data.certifications?.join(' | ')}</div>
+                                    <div className="certs">
+                                        {data.certifications?.join(' | ')}
+                                    </div>
                                 </>
                             )}
                         </SectionWrapper>
@@ -2593,17 +3729,40 @@ acc.push(<span key={`psep-${i}`}>  •  </span>);
                                     <div className="section-line" />
                                     {data.projects?.map((project, i) => (
                                         <div key={i} className="project">
-                                            <div className="project-title">{project.title}</div>
-                                            {project.technologies && <div className="project-tech">{project.technologies}</div>}
-                                            {(project.url || project.github_url) && (
-                                                <div className="project-tech" style={{ fontSize: '11px', opacity: 0.85 }}>
-                                                    {[
-                                                        project.url ? `Demo: ${project.url}` : null,
-                                                        project.github_url ? `GitHub: ${project.github_url}` : null,
-                                                    ].filter(Boolean).join('  •  ')}
+                                            <div className="project-title">
+                                                {project.title}
+                                            </div>
+                                            {project.technologies && (
+                                                <div className="project-tech">
+                                                    {project.technologies}
                                                 </div>
                                             )}
-                                            {project.description && <p className="project-desc">{project.description}</p>}
+                                            {(project.url ||
+                                                project.github_url) && (
+                                                <div
+                                                    className="project-tech"
+                                                    style={{
+                                                        fontSize: '11px',
+                                                        opacity: 0.85,
+                                                    }}
+                                                >
+                                                    {[
+                                                        project.url
+                                                            ? `Demo: ${project.url}`
+                                                            : null,
+                                                        project.github_url
+                                                            ? `GitHub: ${project.github_url}`
+                                                            : null,
+                                                    ]
+                                                        .filter(Boolean)
+                                                        .join('  •  ')}
+                                                </div>
+                                            )}
+                                            {project.description && (
+                                                <p className="project-desc">
+                                                    {project.description}
+                                                </p>
+                                            )}
                                         </div>
                                     ))}
                                 </>
@@ -2616,8 +3775,19 @@ acc.push(<span key={`psep-${i}`}>  •  </span>);
                                     <h2>VII. ADDITIONAL INFORMATION</h2>
                                     <div className="section-line" />
                                     {data.additional_info?.map((item, i) => (
-                                        <div key={i} style={{ marginBottom: '4px', fontSize: '13px' }}>
-                                            <strong>{renderFormattedBullet(item.label)}:</strong>{' '}
+                                        <div
+                                            key={i}
+                                            style={{
+                                                marginBottom: '4px',
+                                                fontSize: '13px',
+                                            }}
+                                        >
+                                            <strong>
+                                                {renderFormattedBullet(
+                                                    item.label,
+                                                )}
+                                                :
+                                            </strong>{' '}
                                             {renderFormattedBullet(item.value)}
                                         </div>
                                     ))}
@@ -2625,16 +3795,63 @@ acc.push(<span key={`psep-${i}`}>  •  </span>);
                             )}
                         </SectionWrapper>
 
-                        <div className="ph-certification-block" style={{ marginTop: '24px', paddingTop: '16px', borderTop: '1px solid #e3e3e0' }}>
-                            <p style={{ fontSize: '11px', fontStyle: 'italic', color: '#706f6c' }}>
-                                I hereby declare that the information contained herein is true and correct to the best of my knowledge and ability.
-                            </p>
-                            <div style={{ marginTop: '32px', display: 'flex', justifyContent: 'flex-end' }}>
-                                <div style={{ textAlign: 'center', minWidth: '200px' }}>
-                                    <div style={{ borderBottom: '1px solid #1b1b18', paddingBottom: '2px', fontWeight: 600, fontSize: '13px' }}>
-                                        {data.full_name || 'Your Name'}
+                        <div
+                            style={{ order: 999 }}
+                            className="ph-certification-block-wrapper w-full"
+                        >
+                            <div
+                                className="ph-certification-block"
+                                style={{
+                                    marginTop: '24px',
+                                    paddingTop: '16px',
+                                    borderTop: '1px solid #e3e3e0',
+                                }}
+                            >
+                                <p
+                                    style={{
+                                        fontSize: '11px',
+                                        fontStyle: 'italic',
+                                        color: '#706f6c',
+                                    }}
+                                >
+                                    I hereby declare that the information
+                                    contained herein is true and correct to the
+                                    best of my knowledge and ability.
+                                </p>
+                                <div
+                                    style={{
+                                        marginTop: '32px',
+                                        display: 'flex',
+                                        justifyContent: 'flex-end',
+                                    }}
+                                >
+                                    <div
+                                        style={{
+                                            textAlign: 'center',
+                                            minWidth: '200px',
+                                        }}
+                                    >
+                                        <div
+                                            style={{
+                                                borderBottom:
+                                                    '1px solid #1b1b18',
+                                                paddingBottom: '2px',
+                                                fontWeight: 600,
+                                                fontSize: '13px',
+                                            }}
+                                        >
+                                            {data.full_name || 'Your Name'}
+                                        </div>
+                                        <div
+                                            style={{
+                                                fontSize: '11px',
+                                                color: '#706f6c',
+                                                marginTop: '2px',
+                                            }}
+                                        >
+                                            Signature over Printed Name
+                                        </div>
                                     </div>
-                                    <div style={{ fontSize: '11px', color: '#706f6c', marginTop: '2px' }}>Signature over Printed Name</div>
                                 </div>
                             </div>
                         </div>
@@ -2644,34 +3861,152 @@ acc.push(<span key={`psep-${i}`}>  •  </span>);
                 {template === 'ats_single_column' && (
                     <>
                         <SectionWrapper id="personal">
-                            <div style={{ textAlign: 'center', marginBottom: '16px', borderBottom: '1px solid #d1d5db', paddingBottom: '12px' }}>
-                                {hasPhoto && <img src={photoSrc} alt="" className="photo" referrerPolicy="no-referrer" style={{ width: '80px', height: '80px', borderRadius: '50%', objectFit: 'cover', margin: '0 auto 8px', display: 'block' }} />}
-                                <div style={{ fontFamily: "'Instrument Sans', Inter, Arial, sans-serif", fontSize: '22px', fontWeight: 700, letterSpacing: '-0.01em', color: '#111827' }}>{data.full_name || 'Your Name'}</div>
-                                {data.target_role && <div style={{ fontSize: '12px', fontWeight: 500, color: '#6b7280', marginTop: '2px' }}>{data.target_role}</div>}
-                                <div style={{ fontSize: '11px', color: '#6b7280', marginTop: '6px' }}>
+                            <div
+                                style={{
+                                    textAlign: 'center',
+                                    marginBottom: '16px',
+                                    borderBottom: '1px solid #d1d5db',
+                                    paddingBottom: '12px',
+                                }}
+                            >
+                                {hasPhoto && (
+                                    <img
+                                        src={photoSrc}
+                                        alt=""
+                                        className="photo"
+                                        referrerPolicy="no-referrer"
+                                        style={{
+                                            width: '80px',
+                                            height: '80px',
+                                            borderRadius: '50%',
+                                            objectFit: 'cover',
+                                            margin: '0 auto 8px',
+                                            display: 'block',
+                                        }}
+                                    />
+                                )}
+                                <div
+                                    style={{
+                                        fontFamily:
+                                            "'Instrument Sans', Inter, Arial, sans-serif",
+                                        fontSize: '22px',
+                                        fontWeight: 700,
+                                        letterSpacing: '-0.01em',
+                                        color: '#111827',
+                                    }}
+                                >
+                                    {data.full_name || 'Your Name'}
+                                </div>
+                                {data.target_role && (
+                                    <div
+                                        style={{
+                                            fontSize: '12px',
+                                            fontWeight: 500,
+                                            color: '#6b7280',
+                                            marginTop: '2px',
+                                        }}
+                                    >
+                                        {data.target_role}
+                                    </div>
+                                )}
+                                <div
+                                    style={{
+                                        fontSize: '11px',
+                                        color: '#6b7280',
+                                        marginTop: '6px',
+                                    }}
+                                >
                                     {[
-                                        data.phone ? <span key="phone">{data.phone}</span> : null,
-                                        data.email ? <a key="email" href={`mailto:${data.email}`} style={{ color: 'inherit', textDecoration: 'underline' }}>{data.email}</a> : null,
-                                        data.location ? <span key="loc">{data.location}</span> : null,
-                                        data.linkedin_url ? <span key="li">{renderLink(data.linkedin_url)}</span> : null,
-                                        data.github_url ? <span key="gh">{renderLink(data.github_url)}</span> : null,
-                                        data.website_url ? <span key="web">{renderLink(data.website_url)}</span> : null,
-                                    ].filter(Boolean).reduce((acc: React.ReactNode[], curr, i, arr) => {
-                                        acc.push(curr);
+                                        data.phone ? (
+                                            <span key="phone">
+                                                {data.phone}
+                                            </span>
+                                        ) : null,
+                                        data.email ? (
+                                            <a
+                                                key="email"
+                                                href={`mailto:${data.email}`}
+                                                style={{
+                                                    color: 'inherit',
+                                                    textDecoration: 'underline',
+                                                }}
+                                            >
+                                                {data.email}
+                                            </a>
+                                        ) : null,
+                                        data.location ? (
+                                            <span key="loc">
+                                                {data.location}
+                                            </span>
+                                        ) : null,
+                                        data.linkedin_url ? (
+                                            <span key="li">
+                                                {renderLink(data.linkedin_url)}
+                                            </span>
+                                        ) : null,
+                                        data.github_url ? (
+                                            <span key="gh">
+                                                {renderLink(data.github_url)}
+                                            </span>
+                                        ) : null,
+                                        data.website_url ? (
+                                            <span key="web">
+                                                {renderLink(data.website_url)}
+                                            </span>
+                                        ) : null,
+                                    ]
+                                        .filter(Boolean)
+                                        .reduce(
+                                            (
+                                                acc: React.ReactNode[],
+                                                curr,
+                                                i,
+                                                arr,
+                                            ) => {
+                                                acc.push(curr);
 
-                                        if (i < arr.length - 1) {
-                                            acc.push(<span key={`sep-${i}`}> | </span>);
-                                        }
+                                                if (i < arr.length - 1) {
+                                                    acc.push(
+                                                        <span key={`sep-${i}`}>
+                                                            {' '}
+                                                            |{' '}
+                                                        </span>,
+                                                    );
+                                                }
 
-                                        return acc;
-                                    }, [])}
+                                                return acc;
+                                            },
+                                            [],
+                                        )}
                                 </div>
                             </div>
 
                             {data.summary && (
                                 <>
-                                    <div style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#374151', marginBottom: '6px', borderBottom: '1px solid #d1d5db', paddingBottom: '3px' }}>Summary</div>
-                                    <p style={{ fontSize: '12px', lineHeight: 1.5, color: '#111827', marginBottom: '12px' }}>{data.summary}</p>
+                                    <div
+                                        style={{
+                                            fontSize: '11px',
+                                            fontWeight: 700,
+                                            textTransform: 'uppercase',
+                                            letterSpacing: '0.1em',
+                                            color: '#374151',
+                                            marginBottom: '6px',
+                                            borderBottom: '1px solid #d1d5db',
+                                            paddingBottom: '3px',
+                                        }}
+                                    >
+                                        Summary
+                                    </div>
+                                    <p
+                                        style={{
+                                            fontSize: '12px',
+                                            lineHeight: 1.5,
+                                            color: '#111827',
+                                            marginBottom: '12px',
+                                        }}
+                                    >
+                                        {data.summary}
+                                    </p>
                                 </>
                             )}
                         </SectionWrapper>
@@ -2679,21 +4014,96 @@ acc.push(<span key={`psep-${i}`}>  •  </span>);
                         <SectionWrapper id="work">
                             {(data.work_experience?.length ?? 0) > 0 && (
                                 <>
-                                    <div style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#374151', marginBottom: '6px', borderBottom: '1px solid #d1d5db', paddingBottom: '3px' }}>Work Experience</div>
+                                    <div
+                                        style={{
+                                            fontSize: '11px',
+                                            fontWeight: 700,
+                                            textTransform: 'uppercase',
+                                            letterSpacing: '0.1em',
+                                            color: '#374151',
+                                            marginBottom: '6px',
+                                            borderBottom: '1px solid #d1d5db',
+                                            paddingBottom: '3px',
+                                        }}
+                                    >
+                                        Work Experience
+                                    </div>
                                     {data.work_experience?.map((job, i) => (
-                                        <div key={i} style={{ marginBottom: '10px' }}>
-                                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
-                                                <span style={{ fontSize: '13px', fontWeight: 600, color: '#111827' }}>{job.position || 'Position'}</span>
-                                                <span style={{ fontSize: '11px', color: '#6b7280', whiteSpace: 'nowrap' }}>{job.duration}</span>
+                                        <div
+                                            key={i}
+                                            style={{ marginBottom: '10px' }}
+                                        >
+                                            <div
+                                                style={{
+                                                    display: 'flex',
+                                                    justifyContent:
+                                                        'space-between',
+                                                    alignItems: 'baseline',
+                                                }}
+                                            >
+                                                <span
+                                                    style={{
+                                                        fontSize: '13px',
+                                                        fontWeight: 600,
+                                                        color: '#111827',
+                                                    }}
+                                                >
+                                                    {job.position || 'Position'}
+                                                </span>
+                                                <span
+                                                    style={{
+                                                        fontSize: '11px',
+                                                        color: '#6b7280',
+                                                        whiteSpace: 'nowrap',
+                                                    }}
+                                                >
+                                                    {job.duration}
+                                                </span>
                                             </div>
-                                            <div style={{ fontSize: '12px', color: '#6b7280' }}>
-                                                {job.company}{job.location ? `, ${job.location}` : ''}
+                                            <div
+                                                style={{
+                                                    fontSize: '12px',
+                                                    color: '#6b7280',
+                                                }}
+                                            >
+                                                {job.company}
+                                                {job.location
+                                                    ? `, ${job.location}`
+                                                    : ''}
                                             </div>
                                             {job.description && (
-                                                <ul style={{ marginTop: '4px', paddingLeft: '18px', listStyleType: 'disc', fontSize: '12px', lineHeight: 1.45, color: '#111827' }}>
-                                                    {job.description.split(/\n|(?<=[\.\?!])\s+(?=[A-Z0-9])|•|▪|\*/).map(l => l.trim().replace(/^[-•*▪]\s*/, '')).filter(l => l.length > 0).map((line, li) => (
-                                                        <li key={li}>{renderFormattedBullet(line)}</li>
-                                                    ))}
+                                                <ul
+                                                    style={{
+                                                        marginTop: '4px',
+                                                        paddingLeft: '18px',
+                                                        listStyleType: 'disc',
+                                                        fontSize: '12px',
+                                                        lineHeight: 1.45,
+                                                        color: '#111827',
+                                                    }}
+                                                >
+                                                    {job.description
+                                                        .split(
+                                                            /\n|(?<=[\.\?!])\s+(?=[A-Z0-9])|•|▪|\*/,
+                                                        )
+                                                        .map((l) =>
+                                                            l
+                                                                .trim()
+                                                                .replace(
+                                                                    /^[-•*▪]\s*/,
+                                                                    '',
+                                                                ),
+                                                        )
+                                                        .filter(
+                                                            (l) => l.length > 0,
+                                                        )
+                                                        .map((line, li) => (
+                                                            <li key={li}>
+                                                                {renderFormattedBullet(
+                                                                    line,
+                                                                )}
+                                                            </li>
+                                                        ))}
                                                 </ul>
                                             )}
                                         </div>
@@ -2705,15 +4115,62 @@ acc.push(<span key={`psep-${i}`}>  •  </span>);
                         <SectionWrapper id="education">
                             {(data.education?.length ?? 0) > 0 && (
                                 <>
-                                    <div style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#374151', marginBottom: '6px', borderBottom: '1px solid #d1d5db', paddingBottom: '3px' }}>Education</div>
+                                    <div
+                                        style={{
+                                            fontSize: '11px',
+                                            fontWeight: 700,
+                                            textTransform: 'uppercase',
+                                            letterSpacing: '0.1em',
+                                            color: '#374151',
+                                            marginBottom: '6px',
+                                            borderBottom: '1px solid #d1d5db',
+                                            paddingBottom: '3px',
+                                        }}
+                                    >
+                                        Education
+                                    </div>
                                     {data.education?.map((edu, i) => (
-                                        <div key={i} style={{ marginBottom: '8px' }}>
-                                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
-                                                <span style={{ fontSize: '13px', fontWeight: 600, color: '#111827' }}>{edu.degree || 'Degree'}</span>
-                                                <span style={{ fontSize: '11px', color: '#6b7280', whiteSpace: 'nowrap' }}>{edu.year}</span>
+                                        <div
+                                            key={i}
+                                            style={{ marginBottom: '8px' }}
+                                        >
+                                            <div
+                                                style={{
+                                                    display: 'flex',
+                                                    justifyContent:
+                                                        'space-between',
+                                                    alignItems: 'baseline',
+                                                }}
+                                            >
+                                                <span
+                                                    style={{
+                                                        fontSize: '13px',
+                                                        fontWeight: 600,
+                                                        color: '#111827',
+                                                    }}
+                                                >
+                                                    {edu.degree || 'Degree'}
+                                                </span>
+                                                <span
+                                                    style={{
+                                                        fontSize: '11px',
+                                                        color: '#6b7280',
+                                                        whiteSpace: 'nowrap',
+                                                    }}
+                                                >
+                                                    {edu.year}
+                                                </span>
                                             </div>
-                                            <div style={{ fontSize: '12px', color: '#6b7280' }}>
-                                                {edu.institution}{edu.location ? `, ${edu.location}` : ''}
+                                            <div
+                                                style={{
+                                                    fontSize: '12px',
+                                                    color: '#6b7280',
+                                                }}
+                                            >
+                                                {edu.institution}
+                                                {edu.location
+                                                    ? `, ${edu.location}`
+                                                    : ''}
                                             </div>
                                         </div>
                                     ))}
@@ -2724,16 +4181,51 @@ acc.push(<span key={`psep-${i}`}>  •  </span>);
                         <SectionWrapper id="skills">
                             {(data.skills?.length ?? 0) > 0 && (
                                 <>
-                                    <div style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#374151', marginBottom: '6px', borderBottom: '1px solid #d1d5db', paddingBottom: '3px' }}>Skills</div>
-                                    <div style={{ fontSize: '12px', lineHeight: 1.5, color: '#111827' }}>
+                                    <div
+                                        style={{
+                                            fontSize: '11px',
+                                            fontWeight: 700,
+                                            textTransform: 'uppercase',
+                                            letterSpacing: '0.1em',
+                                            color: '#374151',
+                                            marginBottom: '6px',
+                                            borderBottom: '1px solid #d1d5db',
+                                            paddingBottom: '3px',
+                                        }}
+                                    >
+                                        Skills
+                                    </div>
+                                    <div
+                                        style={{
+                                            fontSize: '12px',
+                                            lineHeight: 1.5,
+                                            color: '#111827',
+                                        }}
+                                    >
                                         {data.skills?.map((skill, i) => {
-                                            const colonIndex = skill.indexOf(':');
+                                            const colonIndex =
+                                                skill.indexOf(':');
 
-                                            if (colonIndex > 0 && colonIndex < 30) {
-                                                const prefix = skill.substring(0, colonIndex);
-                                                const rest = skill.substring(colonIndex + 1);
+                                            if (
+                                                colonIndex > 0 &&
+                                                colonIndex < 30
+                                            ) {
+                                                const prefix = skill.substring(
+                                                    0,
+                                                    colonIndex,
+                                                );
+                                                const rest = skill.substring(
+                                                    colonIndex + 1,
+                                                );
 
-                                                return <div key={i}><strong>{prefix}:</strong>{rest}</div>;
+                                                return (
+                                                    <div key={i}>
+                                                        <strong>
+                                                            {prefix}:
+                                                        </strong>
+                                                        {rest}
+                                                    </div>
+                                                );
                                             }
 
                                             return <div key={i}>{skill}</div>;
@@ -2746,19 +4238,98 @@ acc.push(<span key={`psep-${i}`}>  •  </span>);
                         <SectionWrapper id="projects">
                             {(data.projects?.length ?? 0) > 0 && (
                                 <>
-                                    <div style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#374151', marginBottom: '6px', borderBottom: '1px solid #d1d5db', paddingBottom: '3px' }}>Projects</div>
+                                    <div
+                                        style={{
+                                            fontSize: '11px',
+                                            fontWeight: 700,
+                                            textTransform: 'uppercase',
+                                            letterSpacing: '0.1em',
+                                            color: '#374151',
+                                            marginBottom: '6px',
+                                            borderBottom: '1px solid #d1d5db',
+                                            paddingBottom: '3px',
+                                        }}
+                                    >
+                                        Projects
+                                    </div>
                                     {data.projects?.map((project, i) => (
-                                        <div key={i} style={{ marginBottom: '10px' }}>
-                                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
-                                                <span style={{ fontSize: '13px', fontWeight: 600, color: '#111827' }}>{project.title}</span>
-                                                {project.duration && <span style={{ fontSize: '11px', color: '#6b7280', whiteSpace: 'nowrap' }}>{project.duration}</span>}
+                                        <div
+                                            key={i}
+                                            style={{ marginBottom: '10px' }}
+                                        >
+                                            <div
+                                                style={{
+                                                    display: 'flex',
+                                                    justifyContent:
+                                                        'space-between',
+                                                    alignItems: 'baseline',
+                                                }}
+                                            >
+                                                <span
+                                                    style={{
+                                                        fontSize: '13px',
+                                                        fontWeight: 600,
+                                                        color: '#111827',
+                                                    }}
+                                                >
+                                                    {project.title}
+                                                </span>
+                                                {project.duration && (
+                                                    <span
+                                                        style={{
+                                                            fontSize: '11px',
+                                                            color: '#6b7280',
+                                                            whiteSpace:
+                                                                'nowrap',
+                                                        }}
+                                                    >
+                                                        {project.duration}
+                                                    </span>
+                                                )}
                                             </div>
-                                            {project.technologies && <div style={{ fontSize: '11px', color: '#6b7280' }}>{project.technologies}</div>}
+                                            {project.technologies && (
+                                                <div
+                                                    style={{
+                                                        fontSize: '11px',
+                                                        color: '#6b7280',
+                                                    }}
+                                                >
+                                                    {project.technologies}
+                                                </div>
+                                            )}
                                             {project.description && (
-                                                <ul style={{ marginTop: '4px', paddingLeft: '18px', listStyleType: 'disc', fontSize: '12px', lineHeight: 1.45, color: '#111827' }}>
-                                                    {project.description.split(/\n|(?<=[\.\?!])\s+(?=[A-Z0-9])|•|▪|\*/).map(l => l.trim().replace(/^[-•*▪]\s*/, '')).filter(l => l.length > 0).map((line, li) => (
-                                                        <li key={li}>{renderFormattedBullet(line)}</li>
-                                                    ))}
+                                                <ul
+                                                    style={{
+                                                        marginTop: '4px',
+                                                        paddingLeft: '18px',
+                                                        listStyleType: 'disc',
+                                                        fontSize: '12px',
+                                                        lineHeight: 1.45,
+                                                        color: '#111827',
+                                                    }}
+                                                >
+                                                    {project.description
+                                                        .split(
+                                                            /\n|(?<=[\.\?!])\s+(?=[A-Z0-9])|•|▪|\*/,
+                                                        )
+                                                        .map((l) =>
+                                                            l
+                                                                .trim()
+                                                                .replace(
+                                                                    /^[-•*▪]\s*/,
+                                                                    '',
+                                                                ),
+                                                        )
+                                                        .filter(
+                                                            (l) => l.length > 0,
+                                                        )
+                                                        .map((line, li) => (
+                                                            <li key={li}>
+                                                                {renderFormattedBullet(
+                                                                    line,
+                                                                )}
+                                                            </li>
+                                                        ))}
                                                 </ul>
                                             )}
                                         </div>
@@ -2770,8 +4341,29 @@ acc.push(<span key={`psep-${i}`}>  •  </span>);
                         <SectionWrapper id="certifications">
                             {(data.certifications?.length ?? 0) > 0 && (
                                 <>
-                                    <div style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#374151', marginBottom: '6px', borderBottom: '1px solid #d1d5db', paddingBottom: '3px' }}>Certifications</div>
-                                    <ul style={{ paddingLeft: '18px', listStyleType: 'disc', fontSize: '12px', lineHeight: 1.5, color: '#111827' }}>
+                                    <div
+                                        style={{
+                                            fontSize: '11px',
+                                            fontWeight: 700,
+                                            textTransform: 'uppercase',
+                                            letterSpacing: '0.1em',
+                                            color: '#374151',
+                                            marginBottom: '6px',
+                                            borderBottom: '1px solid #d1d5db',
+                                            paddingBottom: '3px',
+                                        }}
+                                    >
+                                        Certifications
+                                    </div>
+                                    <ul
+                                        style={{
+                                            paddingLeft: '18px',
+                                            listStyleType: 'disc',
+                                            fontSize: '12px',
+                                            lineHeight: 1.5,
+                                            color: '#111827',
+                                        }}
+                                    >
                                         {data.certifications?.map((cert, i) => (
                                             <li key={i}>{cert}</li>
                                         ))}
@@ -2783,10 +4375,36 @@ acc.push(<span key={`psep-${i}`}>  •  </span>);
                         <SectionWrapper id="additional_info">
                             {(data.additional_info?.length ?? 0) > 0 && (
                                 <>
-                                    <div style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#374151', marginBottom: '6px', borderBottom: '1px solid #d1d5db', paddingBottom: '3px' }}>Additional Information</div>
+                                    <div
+                                        style={{
+                                            fontSize: '11px',
+                                            fontWeight: 700,
+                                            textTransform: 'uppercase',
+                                            letterSpacing: '0.1em',
+                                            color: '#374151',
+                                            marginBottom: '6px',
+                                            borderBottom: '1px solid #d1d5db',
+                                            paddingBottom: '3px',
+                                        }}
+                                    >
+                                        Additional Information
+                                    </div>
                                     {data.additional_info?.map((item, i) => (
-                                        <div key={i} style={{ fontSize: '12px', lineHeight: 1.5, color: '#111827', marginBottom: '4px' }}>
-                                            <strong>{renderFormattedBullet(item.label)}:</strong>{' '}
+                                        <div
+                                            key={i}
+                                            style={{
+                                                fontSize: '12px',
+                                                lineHeight: 1.5,
+                                                color: '#111827',
+                                                marginBottom: '4px',
+                                            }}
+                                        >
+                                            <strong>
+                                                {renderFormattedBullet(
+                                                    item.label,
+                                                )}
+                                                :
+                                            </strong>{' '}
                                             {renderFormattedBullet(item.value)}
                                         </div>
                                     ))}
@@ -2799,34 +4417,159 @@ acc.push(<span key={`psep-${i}`}>  •  </span>);
                 {template === 'ats_classic_serif' && (
                     <>
                         <SectionWrapper id="personal">
-                            <div style={{ marginBottom: '16px', paddingBottom: '12px', borderBottom: '1px solid #d1d5db' }}>
-                                {hasPhoto && <img src={photoSrc} alt="" className="photo" referrerPolicy="no-referrer" style={{ width: '80px', height: '80px', borderRadius: '4px', objectFit: 'cover', float: 'right', marginLeft: '16px' }} />}
-                                <div style={{ fontFamily: "'Times New Roman', Garamond, Georgia, serif", fontSize: '24px', fontWeight: 700, color: '#111827', marginBottom: '4px' }}>{data.full_name || 'Your Name'}</div>
-                                {data.target_role && <div style={{ fontFamily: "'Times New Roman', Garamond, Georgia, serif", fontSize: '13px', fontWeight: 500, color: '#374151', marginBottom: '4px' }}>{data.target_role}</div>}
-                                <div style={{ fontFamily: "'Times New Roman', Garamond, Georgia, serif", fontSize: '11px', color: '#6b7280' }}>
+                            <div
+                                style={{
+                                    marginBottom: '16px',
+                                    paddingBottom: '12px',
+                                    borderBottom: '1px solid #d1d5db',
+                                }}
+                            >
+                                {hasPhoto && (
+                                    <img
+                                        src={photoSrc}
+                                        alt=""
+                                        className="photo"
+                                        referrerPolicy="no-referrer"
+                                        style={{
+                                            width: '80px',
+                                            height: '80px',
+                                            borderRadius: '4px',
+                                            objectFit: 'cover',
+                                            float: 'right',
+                                            marginLeft: '16px',
+                                        }}
+                                    />
+                                )}
+                                <div
+                                    style={{
+                                        fontFamily:
+                                            "'Times New Roman', Garamond, Georgia, serif",
+                                        fontSize: '24px',
+                                        fontWeight: 700,
+                                        color: '#111827',
+                                        marginBottom: '4px',
+                                    }}
+                                >
+                                    {data.full_name || 'Your Name'}
+                                </div>
+                                {data.target_role && (
+                                    <div
+                                        style={{
+                                            fontFamily:
+                                                "'Times New Roman', Garamond, Georgia, serif",
+                                            fontSize: '13px',
+                                            fontWeight: 500,
+                                            color: '#374151',
+                                            marginBottom: '4px',
+                                        }}
+                                    >
+                                        {data.target_role}
+                                    </div>
+                                )}
+                                <div
+                                    style={{
+                                        fontFamily:
+                                            "'Times New Roman', Garamond, Georgia, serif",
+                                        fontSize: '11px',
+                                        color: '#6b7280',
+                                    }}
+                                >
                                     {[
-                                        data.phone ? <span key="phone">{data.phone}</span> : null,
-                                        data.email ? <a key="email" href={`mailto:${data.email}`} style={{ color: 'inherit', textDecoration: 'underline' }}>{data.email}</a> : null,
-                                        data.location ? <span key="loc">{data.location}</span> : null,
-                                        data.linkedin_url ? <span key="li">{renderLink(data.linkedin_url)}</span> : null,
-                                        data.github_url ? <span key="gh">{renderLink(data.github_url)}</span> : null,
-                                        data.website_url ? <span key="web">{renderLink(data.website_url)}</span> : null,
-                                    ].filter(Boolean).reduce((acc: React.ReactNode[], curr, i, arr) => {
-                                        acc.push(curr);
+                                        data.phone ? (
+                                            <span key="phone">
+                                                {data.phone}
+                                            </span>
+                                        ) : null,
+                                        data.email ? (
+                                            <a
+                                                key="email"
+                                                href={`mailto:${data.email}`}
+                                                style={{
+                                                    color: 'inherit',
+                                                    textDecoration: 'underline',
+                                                }}
+                                            >
+                                                {data.email}
+                                            </a>
+                                        ) : null,
+                                        data.location ? (
+                                            <span key="loc">
+                                                {data.location}
+                                            </span>
+                                        ) : null,
+                                        data.linkedin_url ? (
+                                            <span key="li">
+                                                {renderLink(data.linkedin_url)}
+                                            </span>
+                                        ) : null,
+                                        data.github_url ? (
+                                            <span key="gh">
+                                                {renderLink(data.github_url)}
+                                            </span>
+                                        ) : null,
+                                        data.website_url ? (
+                                            <span key="web">
+                                                {renderLink(data.website_url)}
+                                            </span>
+                                        ) : null,
+                                    ]
+                                        .filter(Boolean)
+                                        .reduce(
+                                            (
+                                                acc: React.ReactNode[],
+                                                curr,
+                                                i,
+                                                arr,
+                                            ) => {
+                                                acc.push(curr);
 
-                                        if (i < arr.length - 1) {
-                                            acc.push(<span key={`sep-${i}`}> | </span>);
-                                        }
+                                                if (i < arr.length - 1) {
+                                                    acc.push(
+                                                        <span key={`sep-${i}`}>
+                                                            {' '}
+                                                            |{' '}
+                                                        </span>,
+                                                    );
+                                                }
 
-                                        return acc;
-                                    }, [])}
+                                                return acc;
+                                            },
+                                            [],
+                                        )}
                                 </div>
                             </div>
 
                             {data.summary && (
                                 <>
-                                    <div style={{ fontFamily: "'Times New Roman', Garamond, Georgia, serif", fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: '#111827', marginBottom: '6px' }}>SUMMARY</div>
-                                    <p style={{ fontFamily: "'Times New Roman', Garamond, Georgia, serif", fontSize: '12px', lineHeight: 1.5, color: '#111827', marginBottom: '12px' }}>{data.summary}</p>
+                                    <div
+                                        style={{
+                                            fontFamily:
+                                                "'Times New Roman', Garamond, Georgia, serif",
+                                            fontSize: '11px',
+                                            fontWeight: 700,
+                                            textTransform: 'uppercase',
+                                            letterSpacing: '0.08em',
+                                            color: '#111827',
+                                            marginBottom: '8px',
+                                            marginTop: '12px',
+                                            borderBottom: '1px solid #d1d5db',
+                                            paddingBottom: '3px',
+                                        }}
+                                    >
+                                        SUMMARY
+                                    </div>
+                                    <p
+                                        style={{
+                                            fontFamily:
+                                                "'Times New Roman', Garamond, Georgia, serif",
+                                            fontSize: '12px',
+                                            lineHeight: 1.5,
+                                            color: '#111827',
+                                            marginBottom: '12px',
+                                        }}
+                                    >
+                                        {data.summary}
+                                    </p>
                                 </>
                             )}
                         </SectionWrapper>
@@ -2834,21 +4577,113 @@ acc.push(<span key={`psep-${i}`}>  •  </span>);
                         <SectionWrapper id="work">
                             {(data.work_experience?.length ?? 0) > 0 && (
                                 <>
-                                    <div style={{ fontFamily: "'Times New Roman', Garamond, Georgia, serif", fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: '#111827', marginBottom: '6px' }}>EXPERIENCE</div>
+                                    <div
+                                        style={{
+                                            fontFamily:
+                                                "'Times New Roman', Garamond, Georgia, serif",
+                                            fontSize: '11px',
+                                            fontWeight: 700,
+                                            textTransform: 'uppercase',
+                                            letterSpacing: '0.08em',
+                                            color: '#111827',
+                                            marginBottom: '8px',
+                                            marginTop: '12px',
+                                            borderBottom: '1px solid #d1d5db',
+                                            paddingBottom: '3px',
+                                        }}
+                                    >
+                                        EXPERIENCE
+                                    </div>
                                     {data.work_experience?.map((job, i) => (
-                                        <div key={i} style={{ marginBottom: '10px' }}>
-                                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
-                                                <span style={{ fontFamily: "'Times New Roman', Garamond, Georgia, serif", fontSize: '13px', fontWeight: 600, color: '#111827' }}>{job.position || 'Position'}</span>
-                                                <span style={{ fontFamily: "'Times New Roman', Garamond, Georgia, serif", fontSize: '11px', color: '#6b7280', whiteSpace: 'nowrap' }}>{job.duration}</span>
+                                        <div
+                                            key={i}
+                                            style={{ marginBottom: '12px' }}
+                                        >
+                                            <div
+                                                style={{
+                                                    display: 'flex',
+                                                    justifyContent:
+                                                        'space-between',
+                                                    alignItems: 'baseline',
+                                                }}
+                                            >
+                                                <span
+                                                    style={{
+                                                        fontFamily:
+                                                            "'Times New Roman', Garamond, Georgia, serif",
+                                                        fontSize: '13px',
+                                                        fontWeight: 600,
+                                                        color: '#111827',
+                                                    }}
+                                                >
+                                                    {job.position || 'Position'}
+                                                </span>
+                                                <span
+                                                    style={{
+                                                        fontFamily:
+                                                            "'Times New Roman', Garamond, Georgia, serif",
+                                                        fontSize: '11px',
+                                                        color: '#6b7280',
+                                                        whiteSpace: 'nowrap',
+                                                    }}
+                                                >
+                                                    {job.duration}
+                                                </span>
                                             </div>
-                                            <div style={{ fontFamily: "'Times New Roman', Garamond, Georgia, serif", fontSize: '12px', color: '#6b7280' }}>
-                                                {job.company}{job.location ? `, ${job.location}` : ''}
+                                            <div
+                                                style={{
+                                                    fontFamily:
+                                                        "'Times New Roman', Garamond, Georgia, serif",
+                                                    fontSize: '12px',
+                                                    color: '#6b7280',
+                                                }}
+                                            >
+                                                {job.company}
+                                                {job.location
+                                                    ? `, ${job.location}`
+                                                    : ''}
                                             </div>
                                             {job.description && (
-                                                <ul style={{ marginTop: '4px', paddingLeft: '18px', fontSize: '12px', lineHeight: 1.45, color: '#111827', fontFamily: "'Times New Roman', Garamond, Georgia, serif" }}>
-                                                    {job.description.split(/\n|(?<=[\.\?!])\s+(?=[A-Z0-9])|•|▪|\*/).map(l => l.trim().replace(/^[-•*▪]\s*/, '')).filter(l => l.length > 0).map((line, li) => (
-                                                        <li key={li} style={{ marginBottom: '3px' }}>{renderFormattedBullet(line)}</li>
-                                                    ))}
+                                                <ul
+                                                    style={{
+                                                        marginTop: '4px',
+                                                        paddingLeft: '18px',
+                                                        listStyleType: 'disc',
+                                                        fontSize: '12px',
+                                                        lineHeight: 1.45,
+                                                        color: '#111827',
+                                                        fontFamily:
+                                                            "'Times New Roman', Garamond, Georgia, serif",
+                                                    }}
+                                                >
+                                                    {job.description
+                                                        .split(
+                                                            /\n|(?<=[\.\?!])\s+(?=[A-Z0-9])|•|▪|\*/,
+                                                        )
+                                                        .map((l) =>
+                                                            l
+                                                                .trim()
+                                                                .replace(
+                                                                    /^[-•*▪]\s*/,
+                                                                    '',
+                                                                ),
+                                                        )
+                                                        .filter(
+                                                            (l) => l.length > 0,
+                                                        )
+                                                        .map((line, li) => (
+                                                            <li
+                                                                key={li}
+                                                                style={{
+                                                                    marginBottom:
+                                                                        '3px',
+                                                                }}
+                                                            >
+                                                                {renderFormattedBullet(
+                                                                    line,
+                                                                )}
+                                                            </li>
+                                                        ))}
                                                 </ul>
                                             )}
                                         </div>
@@ -2860,15 +4695,71 @@ acc.push(<span key={`psep-${i}`}>  •  </span>);
                         <SectionWrapper id="education">
                             {(data.education?.length ?? 0) > 0 && (
                                 <>
-                                    <div style={{ fontFamily: "'Times New Roman', Garamond, Georgia, serif", fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: '#111827', marginBottom: '6px' }}>EDUCATION</div>
+                                    <div
+                                        style={{
+                                            fontFamily:
+                                                "'Times New Roman', Garamond, Georgia, serif",
+                                            fontSize: '11px',
+                                            fontWeight: 700,
+                                            textTransform: 'uppercase',
+                                            letterSpacing: '0.08em',
+                                            color: '#111827',
+                                            marginBottom: '8px',
+                                            marginTop: '12px',
+                                            borderBottom: '1px solid #d1d5db',
+                                            paddingBottom: '3px',
+                                        }}
+                                    >
+                                        EDUCATION
+                                    </div>
                                     {data.education?.map((edu, i) => (
-                                        <div key={i} style={{ marginBottom: '8px' }}>
-                                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
-                                                <span style={{ fontFamily: "'Times New Roman', Garamond, Georgia, serif", fontSize: '13px', fontWeight: 600, color: '#111827' }}>{edu.degree || 'Degree'}</span>
-                                                <span style={{ fontFamily: "'Times New Roman', Garamond, Georgia, serif", fontSize: '11px', color: '#6b7280', whiteSpace: 'nowrap' }}>{edu.year}</span>
+                                        <div
+                                            key={i}
+                                            style={{ marginBottom: '10px' }}
+                                        >
+                                            <div
+                                                style={{
+                                                    display: 'flex',
+                                                    justifyContent:
+                                                        'space-between',
+                                                    alignItems: 'baseline',
+                                                }}
+                                            >
+                                                <span
+                                                    style={{
+                                                        fontFamily:
+                                                            "'Times New Roman', Garamond, Georgia, serif",
+                                                        fontSize: '13px',
+                                                        fontWeight: 600,
+                                                        color: '#111827',
+                                                    }}
+                                                >
+                                                    {edu.degree || 'Degree'}
+                                                </span>
+                                                <span
+                                                    style={{
+                                                        fontFamily:
+                                                            "'Times New Roman', Garamond, Georgia, serif",
+                                                        fontSize: '11px',
+                                                        color: '#6b7280',
+                                                        whiteSpace: 'nowrap',
+                                                    }}
+                                                >
+                                                    {edu.year}
+                                                </span>
                                             </div>
-                                            <div style={{ fontFamily: "'Times New Roman', Garamond, Georgia, serif", fontSize: '12px', color: '#6b7280' }}>
-                                                {edu.institution}{edu.location ? `, ${edu.location}` : ''}
+                                            <div
+                                                style={{
+                                                    fontFamily:
+                                                        "'Times New Roman', Garamond, Georgia, serif",
+                                                    fontSize: '12px',
+                                                    color: '#6b7280',
+                                                }}
+                                            >
+                                                {edu.institution}
+                                                {edu.location
+                                                    ? `, ${edu.location}`
+                                                    : ''}
                                             </div>
                                         </div>
                                     ))}
@@ -2879,16 +4770,56 @@ acc.push(<span key={`psep-${i}`}>  •  </span>);
                         <SectionWrapper id="skills">
                             {(data.skills?.length ?? 0) > 0 && (
                                 <>
-                                    <div style={{ fontFamily: "'Times New Roman', Garamond, Georgia, serif", fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: '#111827', marginBottom: '6px' }}>SKILLS</div>
-                                    <div style={{ fontFamily: "'Times New Roman', Garamond, Georgia, serif", fontSize: '12px', lineHeight: 1.5, color: '#111827' }}>
+                                    <div
+                                        style={{
+                                            fontFamily:
+                                                "'Times New Roman', Garamond, Georgia, serif",
+                                            fontSize: '11px',
+                                            fontWeight: 700,
+                                            textTransform: 'uppercase',
+                                            letterSpacing: '0.08em',
+                                            color: '#111827',
+                                            marginBottom: '8px',
+                                            marginTop: '12px',
+                                            borderBottom: '1px solid #d1d5db',
+                                            paddingBottom: '3px',
+                                        }}
+                                    >
+                                        SKILLS
+                                    </div>
+                                    <div
+                                        style={{
+                                            fontFamily:
+                                                "'Times New Roman', Garamond, Georgia, serif",
+                                            fontSize: '12px',
+                                            lineHeight: 1.5,
+                                            color: '#111827',
+                                        }}
+                                    >
                                         {data.skills?.map((skill, i) => {
-                                            const colonIndex = skill.indexOf(':');
+                                            const colonIndex =
+                                                skill.indexOf(':');
 
-                                            if (colonIndex > 0 && colonIndex < 30) {
-                                                const prefix = skill.substring(0, colonIndex);
-                                                const rest = skill.substring(colonIndex + 1);
+                                            if (
+                                                colonIndex > 0 &&
+                                                colonIndex < 30
+                                            ) {
+                                                const prefix = skill.substring(
+                                                    0,
+                                                    colonIndex,
+                                                );
+                                                const rest = skill.substring(
+                                                    colonIndex + 1,
+                                                );
 
-                                                return <div key={i}><strong>{prefix}:</strong>{rest}</div>;
+                                                return (
+                                                    <div key={i}>
+                                                        <strong>
+                                                            {prefix}:
+                                                        </strong>
+                                                        {rest}
+                                                    </div>
+                                                );
                                             }
 
                                             return <div key={i}>{skill}</div>;
@@ -2901,19 +4832,115 @@ acc.push(<span key={`psep-${i}`}>  •  </span>);
                         <SectionWrapper id="projects">
                             {(data.projects?.length ?? 0) > 0 && (
                                 <>
-                                    <div style={{ fontFamily: "'Times New Roman', Garamond, Georgia, serif", fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: '#111827', marginBottom: '6px' }}>PROJECTS</div>
+                                    <div
+                                        style={{
+                                            fontFamily:
+                                                "'Times New Roman', Garamond, Georgia, serif",
+                                            fontSize: '11px',
+                                            fontWeight: 700,
+                                            textTransform: 'uppercase',
+                                            letterSpacing: '0.08em',
+                                            color: '#111827',
+                                            marginBottom: '8px',
+                                            marginTop: '12px',
+                                            borderBottom: '1px solid #d1d5db',
+                                            paddingBottom: '3px',
+                                        }}
+                                    >
+                                        PROJECTS
+                                    </div>
                                     {data.projects?.map((project, i) => (
-                                        <div key={i} style={{ marginBottom: '10px' }}>
-                                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
-                                                <span style={{ fontFamily: "'Times New Roman', Garamond, Georgia, serif", fontSize: '13px', fontWeight: 600, color: '#111827' }}>{project.title}</span>
-                                                {project.duration && <span style={{ fontFamily: "'Times New Roman', Garamond, Georgia, serif", fontSize: '11px', color: '#6b7280', whiteSpace: 'nowrap' }}>{project.duration}</span>}
+                                        <div
+                                            key={i}
+                                            style={{ marginBottom: '12px' }}
+                                        >
+                                            <div
+                                                style={{
+                                                    display: 'flex',
+                                                    justifyContent:
+                                                        'space-between',
+                                                    alignItems: 'baseline',
+                                                }}
+                                            >
+                                                <span
+                                                    style={{
+                                                        fontFamily:
+                                                            "'Times New Roman', Garamond, Georgia, serif",
+                                                        fontSize: '13px',
+                                                        fontWeight: 600,
+                                                        color: '#111827',
+                                                    }}
+                                                >
+                                                    {project.title}
+                                                </span>
+                                                {project.duration && (
+                                                    <span
+                                                        style={{
+                                                            fontFamily:
+                                                                "'Times New Roman', Garamond, Georgia, serif",
+                                                            fontSize: '11px',
+                                                            color: '#6b7280',
+                                                            whiteSpace:
+                                                                'nowrap',
+                                                        }}
+                                                    >
+                                                        {project.duration}
+                                                    </span>
+                                                )}
                                             </div>
-                                            {project.technologies && <div style={{ fontFamily: "'Times New Roman', Garamond, Georgia, serif", fontSize: '11px', color: '#6b7280' }}>{project.technologies}</div>}
+                                            {project.technologies && (
+                                                <div
+                                                    style={{
+                                                        fontFamily:
+                                                            "'Times New Roman', Garamond, Georgia, serif",
+                                                        fontSize: '11px',
+                                                        color: '#6b7280',
+                                                    }}
+                                                >
+                                                    {project.technologies}
+                                                </div>
+                                            )}
                                             {project.description && (
-                                                <ul style={{ marginTop: '4px', paddingLeft: '18px', fontSize: '12px', lineHeight: 1.45, color: '#111827', fontFamily: "'Times New Roman', Garamond, Georgia, serif" }}>
-                                                    {project.description.split(/\n|(?<=[\.\?!])\s+(?=[A-Z0-9])|•|▪|\*/).map(l => l.trim().replace(/^[-•*▪]\s*/, '')).filter(l => l.length > 0).map((line, li) => (
-                                                        <li key={li} style={{ marginBottom: '3px' }}>{renderFormattedBullet(line)}</li>
-                                                    ))}
+                                                <ul
+                                                    style={{
+                                                        marginTop: '4px',
+                                                        paddingLeft: '18px',
+                                                        listStyleType: 'disc',
+                                                        fontSize: '12px',
+                                                        lineHeight: 1.45,
+                                                        color: '#111827',
+                                                        fontFamily:
+                                                            "'Times New Roman', Garamond, Georgia, serif",
+                                                    }}
+                                                >
+                                                    {project.description
+                                                        .split(
+                                                            /\n|(?<=[\.\?!])\s+(?=[A-Z0-9])|•|▪|\*/,
+                                                        )
+                                                        .map((l) =>
+                                                            l
+                                                                .trim()
+                                                                .replace(
+                                                                    /^[-•*▪]\s*/,
+                                                                    '',
+                                                                ),
+                                                        )
+                                                        .filter(
+                                                            (l) => l.length > 0,
+                                                        )
+                                                        .map((line, li) => (
+                                                            <li
+                                                                key={li}
+                                                                style={{
+                                                                    marginBottom:
+                                                                        '3px',
+                                                                }}
+                                                            >
+                                                                {renderFormattedBullet(
+                                                                    line,
+                                                                )}
+                                                            </li>
+                                                        ))}
                                                 </ul>
                                             )}
                                         </div>
@@ -2925,8 +4952,33 @@ acc.push(<span key={`psep-${i}`}>  •  </span>);
                         <SectionWrapper id="certifications">
                             {(data.certifications?.length ?? 0) > 0 && (
                                 <>
-                                    <div style={{ fontFamily: "'Times New Roman', Garamond, Georgia, serif", fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: '#111827', marginBottom: '6px' }}>CERTIFICATIONS</div>
-                                    <div style={{ fontFamily: "'Times New Roman', Garamond, Georgia, serif", fontSize: '12px', lineHeight: 1.5, color: '#111827' }}>
+                                    <div
+                                        style={{
+                                            fontFamily:
+                                                "'Times New Roman', Garamond, Georgia, serif",
+                                            fontSize: '11px',
+                                            fontWeight: 700,
+                                            textTransform: 'uppercase',
+                                            letterSpacing: '0.08em',
+                                            color: '#111827',
+                                            marginBottom: '8px',
+                                            marginTop: '12px',
+                                            borderBottom: '1px solid #d1d5db',
+                                            paddingBottom: '3px',
+                                        }}
+                                    >
+                                        CERTIFICATIONS
+                                    </div>
+                                    <div
+                                        style={{
+                                            fontFamily:
+                                                "'Times New Roman', Garamond, Georgia, serif",
+                                            fontSize: '12px',
+                                            lineHeight: 1.5,
+                                            color: '#111827',
+                                            marginBottom: '8px',
+                                        }}
+                                    >
                                         {data.certifications?.join(' | ')}
                                     </div>
                                 </>
@@ -2936,10 +4988,41 @@ acc.push(<span key={`psep-${i}`}>  •  </span>);
                         <SectionWrapper id="additional_info">
                             {(data.additional_info?.length ?? 0) > 0 && (
                                 <>
-                                    <div style={{ fontFamily: "'Times New Roman', Garamond, Georgia, serif", fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: '#111827', marginBottom: '6px' }}>ADDITIONAL INFORMATION</div>
+                                    <div
+                                        style={{
+                                            fontFamily:
+                                                "'Times New Roman', Garamond, Georgia, serif",
+                                            fontSize: '11px',
+                                            fontWeight: 700,
+                                            textTransform: 'uppercase',
+                                            letterSpacing: '0.08em',
+                                            color: '#111827',
+                                            marginBottom: '8px',
+                                            marginTop: '12px',
+                                            borderBottom: '1px solid #d1d5db',
+                                            paddingBottom: '3px',
+                                        }}
+                                    >
+                                        ADDITIONAL INFORMATION
+                                    </div>
                                     {data.additional_info?.map((item, i) => (
-                                        <div key={i} style={{ fontFamily: "'Times New Roman', Garamond, Georgia, serif", fontSize: '12px', lineHeight: 1.5, color: '#111827', marginBottom: '4px' }}>
-                                            <strong>{renderFormattedBullet(item.label)}:</strong>{' '}
+                                        <div
+                                            key={i}
+                                            style={{
+                                                fontFamily:
+                                                    "'Times New Roman', Garamond, Georgia, serif",
+                                                fontSize: '12px',
+                                                lineHeight: 1.5,
+                                                color: '#111827',
+                                                marginBottom: '4px',
+                                            }}
+                                        >
+                                            <strong>
+                                                {renderFormattedBullet(
+                                                    item.label,
+                                                )}
+                                                :
+                                            </strong>{' '}
                                             {renderFormattedBullet(item.value)}
                                         </div>
                                     ))}
@@ -2949,7 +5032,7 @@ acc.push(<span key={`psep-${i}`}>  •  </span>);
                     </>
                 )}
             </div>
-            <div className="flex justify-end gap-2 w-full max-w-[210mm]">
+            <div className="flex w-full max-w-[210mm] justify-end gap-2">
                 <Button variant="outline" onClick={handleSaveVersion}>
                     <Save className="mr-2 size-4" />
                     Save Version
@@ -2979,10 +5062,17 @@ acc.push(<span key={`psep-${i}`}>  •  </span>);
                             />
                         </div>
                         <DialogFooter>
-                            <DialogClose render={<Button type="button" variant="outline" />}>
+                            <DialogClose
+                                render={
+                                    <Button type="button" variant="outline" />
+                                }
+                            >
                                 Cancel
                             </DialogClose>
-                            <Button onClick={confirmSaveVersion} disabled={!versionName.trim()}>
+                            <Button
+                                onClick={confirmSaveVersion}
+                                disabled={!versionName.trim()}
+                            >
                                 Save
                             </Button>
                         </DialogFooter>
@@ -2993,7 +5083,15 @@ acc.push(<span key={`psep-${i}`}>  •  </span>);
     );
 }
 
-function CoverLetterPreview({ content, template, fullName, targetCompany, targetJobTitle, jobDescription, recipient }: {
+function CoverLetterPreview({
+    content,
+    template,
+    fullName,
+    targetCompany,
+    targetJobTitle,
+    jobDescription,
+    recipient,
+}: {
     content: string;
     template: string;
     fullName: string;
@@ -3005,7 +5103,11 @@ function CoverLetterPreview({ content, template, fullName, targetCompany, target
     const previewRef = useRef<HTMLDivElement>(null);
     const scopedStyles = getScopedCoverLetterStyles(template);
     const printStyles = getCoverLetterPrintStyles(template);
-    const today = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+    const today = new Date().toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+    });
 
     const displayContent = content.trim() || DEFAULT_COVER_LETTER;
     const displayCompany = targetCompany.trim() || 'Acme Corp';
@@ -3016,14 +5118,14 @@ function CoverLetterPreview({ content, template, fullName, targetCompany, target
         const printWindow = window.open('', '_blank');
 
         if (!printWindow) {
-return;
-}
+            return;
+        }
 
         const contentHtml = previewRef.current?.innerHTML;
 
         if (!contentHtml) {
-return;
-}
+            return;
+        }
 
         printWindow.document.write(`
             <!DOCTYPE html>
@@ -3055,10 +5157,10 @@ return;
     }
 
     return (
-        <div className="flex flex-col items-center gap-4">
+        <div className="flex max-w-full min-w-0 flex-col gap-4 overflow-x-auto overflow-y-hidden pb-4">
             <div
                 ref={previewRef}
-                className={`cover-letter-paper-preview template-${template} w-full max-w-[210mm] min-h-[297mm] bg-white text-[#1b1b18] shadow-lg ring-1 ring-black/5 rounded-xl p-8`}
+                className={`cover-letter-paper-preview template-${template} mx-auto min-h-[297mm] w-full max-w-[210mm] min-w-fit shrink-0 rounded-xl bg-white p-6 text-[#1b1b18] shadow-lg ring-1 ring-black/5 md:min-w-[210mm] md:p-8`}
             >
                 <style>{scopedStyles}</style>
 
@@ -3066,26 +5168,39 @@ return;
                     <div className="letter-date">{today}</div>
                 </div>
 
-                <div className="letter-recipient" style={{ marginBottom: '16px' }}>
+                <div
+                    className="letter-recipient"
+                    style={{ marginBottom: '16px' }}
+                >
                     <div>{displayRecipient}</div>
                     <div>{displayCompany}</div>
-                    <div style={{ marginBottom: '16px' }}>Re: {displayJobTitle} Position</div>
+                    <div style={{ marginBottom: '16px' }}>
+                        Re: {displayJobTitle} Position
+                    </div>
                 </div>
 
-                <div className="letter-salutation">Dear {displayRecipient},</div>
+                <div className="letter-salutation">
+                    Dear {displayRecipient},
+                </div>
 
                 <div className="letter-body">
-                    {displayContent.split('\n').map((paragraph, i) => (
-                        paragraph.trim() ? <p key={i}>{paragraph}</p> : null
-                    ))}
+                    {displayContent
+                        .split('\n')
+                        .map((paragraph, i) =>
+                            paragraph.trim() ? (
+                                <p key={i}>{paragraph}</p>
+                            ) : null,
+                        )}
                 </div>
 
                 <div className="letter-closing">
                     <p>Sincerely,</p>
-                    <p className="letter-signature">{fullName || 'Your Name'}</p>
+                    <p className="letter-signature">
+                        {fullName || 'Your Name'}
+                    </p>
                 </div>
             </div>
-            <div className="flex justify-end gap-2 w-full max-w-[210mm]">
+            <div className="flex w-full max-w-[210mm] justify-end gap-2">
                 <Button variant="outline" onClick={handleSaveVersion}>
                     <Save className="mr-2 size-4" />
                     Save Version
@@ -3138,7 +5253,15 @@ function CoverLetterBuilder({
     const [saveSuccess, setSaveSuccess] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [loadDialogOpen, setLoadDialogOpen] = useState(false);
-    const [savedLetters, setSavedLetters] = useState<Array<{ id: number; content: string; target_company: string | null; target_job_title: string | null; created_at: string }>>([]);
+    const [savedLetters, setSavedLetters] = useState<
+        Array<{
+            id: number;
+            content: string;
+            target_company: string | null;
+            target_job_title: string | null;
+            created_at: string;
+        }>
+    >([]);
     const [loadingLetters, setLoadingLetters] = useState(false);
 
     useEffect(() => {
@@ -3151,35 +5274,49 @@ function CoverLetterBuilder({
 
     async function handleGenerate() {
         if (!jobDescription.trim()) {
-return;
-}
+            return;
+        }
 
         setGenerating(true);
         setError(null);
         setSaveSuccess(false);
 
         try {
-            const token = (document.querySelector('meta[name="csrf-token"]') as HTMLMetaElement)?.content ?? '';
+            const token =
+                (
+                    document.querySelector(
+                        'meta[name="csrf-token"]',
+                    ) as HTMLMetaElement
+                )?.content ?? '';
             const response = await fetch('/documents/cover-letter', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Accept': 'application/json',
+                    Accept: 'application/json',
                     'X-CSRF-TOKEN': token,
                 },
                 body: JSON.stringify({ job_description: jobDescription }),
             });
 
-            const isJson = response.headers.get('content-type')?.includes('application/json');
+            const isJson = response.headers
+                .get('content-type')
+                ?.includes('application/json');
             const data = isJson ? await response.json() : null;
 
             if (!response.ok) {
-                throw new Error(data?.message || `Generation failed (HTTP ${response.status})`);
+                throw new Error(
+                    data?.message ||
+                        `Generation failed (HTTP ${response.status})`,
+                );
             }
 
             onCoverLetterContentChange(data.cover_letter);
         } catch (err) {
-            setError(err instanceof Error ? err.message : 'Failed to generate cover letter');
+            setError(
+                err instanceof Error
+                    ? err.message
+                    : 'Failed to generate cover letter',
+            );
         } finally {
             setGenerating(false);
         }
@@ -3187,8 +5324,8 @@ return;
 
     async function handlePolish(preset: string) {
         if (!coverLetterContent.trim()) {
-return;
-}
+            return;
+        }
 
         setPolishingPreset(preset);
         setPolishing(true);
@@ -3196,27 +5333,41 @@ return;
         setSaveSuccess(false);
 
         try {
-            const token = (document.querySelector('meta[name="csrf-token"]') as HTMLMetaElement)?.content ?? '';
+            const token =
+                (
+                    document.querySelector(
+                        'meta[name="csrf-token"]',
+                    ) as HTMLMetaElement
+                )?.content ?? '';
             const response = await fetch('/documents/ai-improve-cover-letter', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Accept': 'application/json',
+                    Accept: 'application/json',
                     'X-CSRF-TOKEN': token,
                 },
                 body: JSON.stringify({ content: coverLetterContent, preset }),
             });
 
-            const isJson = response.headers.get('content-type')?.includes('application/json');
+            const isJson = response.headers
+                .get('content-type')
+                ?.includes('application/json');
             const data = isJson ? await response.json() : null;
 
             if (!response.ok) {
-                throw new Error(data?.message || `Improvement failed (HTTP ${response.status})`);
+                throw new Error(
+                    data?.message ||
+                        `Improvement failed (HTTP ${response.status})`,
+                );
             }
 
             onCoverLetterContentChange(data.improved);
         } catch (err) {
-            setError(err instanceof Error ? err.message : 'Failed to improve cover letter');
+            setError(
+                err instanceof Error
+                    ? err.message
+                    : 'Failed to improve cover letter',
+            );
         } finally {
             setPolishing(false);
             setPolishingPreset(null);
@@ -3225,20 +5376,25 @@ return;
 
     async function handleSave() {
         if (!coverLetterContent.trim()) {
-return;
-}
+            return;
+        }
 
         setSaving(true);
         setError(null);
         setSaveSuccess(false);
 
         try {
-            const token = (document.querySelector('meta[name="csrf-token"]') as HTMLMetaElement)?.content ?? '';
+            const token =
+                (
+                    document.querySelector(
+                        'meta[name="csrf-token"]',
+                    ) as HTMLMetaElement
+                )?.content ?? '';
             const response = await fetch('/documents/save-cover-letter', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Accept': 'application/json',
+                    Accept: 'application/json',
                     'X-CSRF-TOKEN': token,
                 },
                 body: JSON.stringify({
@@ -3251,17 +5407,25 @@ return;
                 }),
             });
 
-            const isJson = response.headers.get('content-type')?.includes('application/json');
+            const isJson = response.headers
+                .get('content-type')
+                ?.includes('application/json');
             const data = isJson ? await response.json() : null;
 
             if (!response.ok) {
-                throw new Error(data?.message || `Save failed (HTTP ${response.status})`);
+                throw new Error(
+                    data?.message || `Save failed (HTTP ${response.status})`,
+                );
             }
 
             setSaveSuccess(true);
             setTimeout(() => setSaveSuccess(false), 5000);
         } catch (err) {
-            setError(err instanceof Error ? err.message : 'Failed to save cover letter');
+            setError(
+                err instanceof Error
+                    ? err.message
+                    : 'Failed to save cover letter',
+            );
         } finally {
             setSaving(false);
         }
@@ -3281,14 +5445,21 @@ return;
         setError(null);
 
         try {
-            const token = (document.querySelector('meta[name="csrf-token"]') as HTMLMetaElement)?.content ?? '';
+            const token =
+                (
+                    document.querySelector(
+                        'meta[name="csrf-token"]',
+                    ) as HTMLMetaElement
+                )?.content ?? '';
             const response = await fetch('/documents/saved-cover-letters', {
                 headers: {
-                    'Accept': 'application/json',
+                    Accept: 'application/json',
                     'X-CSRF-TOKEN': token,
                 },
             });
-            const isJson = response.headers.get('content-type')?.includes('application/json');
+            const isJson = response.headers
+                .get('content-type')
+                ?.includes('application/json');
             const data = isJson ? await response.json() : null;
             setSavedLetters(data?.coverLetters ?? []);
         } catch {
@@ -3298,7 +5469,12 @@ return;
         }
     }
 
-    function handleLoadLetter(letter: { id: number; content: string; target_company: string | null; target_job_title: string | null }) {
+    function handleLoadLetter(letter: {
+        id: number;
+        content: string;
+        target_company: string | null;
+        target_job_title: string | null;
+    }) {
         onCoverLetterContentChange(letter.content);
 
         if (letter.target_company) {
@@ -3312,7 +5488,6 @@ return;
         setLoadDialogOpen(false);
     }
 
-
     const polishPresets = [
         { id: 'polish', label: 'Polish & Grammar', icon: Wand2 },
         { id: 'concise', label: 'Make Concise', icon: FileText },
@@ -3321,142 +5496,168 @@ return;
 
     function handleTemplateSelect(value: string) {
         onTemplateChange(value);
-        const predefinedText = getPredefinedCoverLetter(value, jobTitle, companyName, profile?.full_name || 'Applicant');
+        const predefinedText = getPredefinedCoverLetter(
+            value,
+            jobTitle,
+            companyName,
+            profile?.full_name || 'Applicant',
+        );
         onCoverLetterContentChange(predefinedText);
     }
 
     return (
-        <Card className="flex flex-col h-full">
+        <Card className="flex h-full flex-col">
             <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                     <FileText className="size-4" />
                     Cover Letter Editor
                 </CardTitle>
                 <CardDescription>
-                    Provide target job details and use AI to generate or polish your cover letter.
+                    Provide target job details and use AI to generate or polish
+                    your cover letter.
                 </CardDescription>
             </CardHeader>
-            <CardContent className="flex flex-col gap-4 flex-1 min-h-0">
+            <CardContent className="flex min-h-0 flex-1 flex-col gap-4">
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-                <div className="flex flex-col gap-2">
-                    <Label htmlFor="target_job_title">Target Job Title</Label>
-                    <Input
-                        id="target_job_title"
-                        value={jobTitle}
-                        onChange={(e) => setJobTitle(e.target.value)}
-                        onFocus={() => {
-                            if (jobTitle === 'Software Developer') {
-                                setJobTitle('');
+                    <div className="flex flex-col gap-2">
+                        <Label htmlFor="target_job_title">
+                            Target Job Title
+                        </Label>
+                        <Input
+                            id="target_job_title"
+                            value={jobTitle}
+                            onChange={(e) => setJobTitle(e.target.value)}
+                            onFocus={() => {
+                                if (jobTitle === 'Software Developer') {
+                                    setJobTitle('');
+                                }
+                            }}
+                            placeholder="e.g. Senior Software Engineer"
+                        />
+                    </div>
+                    <div className="flex flex-col gap-2">
+                        <Label htmlFor="target_company">Target Company</Label>
+                        <Input
+                            id="target_company"
+                            value={companyName}
+                            onChange={(e) => setCompanyName(e.target.value)}
+                            onFocus={() => {
+                                if (companyName === 'Acme Corp') {
+                                    setCompanyName('');
+                                }
+                            }}
+                            placeholder="e.g. TechCorp"
+                        />
+                    </div>
+                    <div className="flex flex-col gap-2">
+                        <Label htmlFor="recipient">
+                            Address To / Recipient
+                        </Label>
+                        <Input
+                            id="recipient"
+                            value={recipient}
+                            onChange={(e) => setRecipient(e.target.value)}
+                            onFocus={() => {
+                                if (recipient === 'Hiring Manager') {
+                                    setRecipient('');
+                                }
+                            }}
+                            placeholder="e.g. Hiring Manager"
+                        />
+                    </div>
+                    <div className="flex flex-col gap-2 sm:col-span-3 lg:col-span-1">
+                        <Label>Cover Letter Style</Label>
+                        <Select
+                            value={template}
+                            onValueChange={(value: string | null) =>
+                                value && handleTemplateSelect(value)
                             }
-                        }}
-                        placeholder="e.g. Senior Software Engineer"
+                        >
+                            <SelectTrigger>
+                                <SelectValue placeholder="Select style">
+                                    {COVER_LETTER_TEMPLATES.find(
+                                        (t) => t.id === template,
+                                    )?.name || 'Select style'}
+                                </SelectValue>
+                            </SelectTrigger>
+                            <SelectContent>
+                                {COVER_LETTER_TEMPLATES.map((t) => (
+                                    <SelectItem key={t.id} value={t.id}>
+                                        {t.name}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                    </div>
+                </div>
+
+                <div className="flex flex-col gap-2">
+                    <Label htmlFor="job_description">Job Description</Label>
+                    <Textarea
+                        id="job_description"
+                        value={jobDescription}
+                        onChange={(e) => onJobDescriptionChange(e.target.value)}
+                        rows={3}
+                        placeholder="Paste the job description here to generate a tailored cover letter..."
                     />
                 </div>
-                <div className="flex flex-col gap-2">
-                    <Label htmlFor="target_company">Target Company</Label>
-                    <Input
-                        id="target_company"
-                        value={companyName}
-                        onChange={(e) => setCompanyName(e.target.value)}
-                        onFocus={() => {
-                            if (companyName === 'Acme Corp') {
-                                setCompanyName('');
+
+                {/* Action buttons moved to bottom footer */}
+
+                {error && (
+                    <div className="flex items-center gap-2 rounded-lg border border-destructive/20 bg-destructive/5 p-3 text-sm text-destructive">
+                        <AlertCircle className="size-4 shrink-0" />
+                        {error}
+                    </div>
+                )}
+
+                {saveSuccess && (
+                    <div className="flex items-center gap-2 rounded-lg border border-emerald-500/20 bg-emerald-500/10 p-3 text-sm text-emerald-600 dark:text-emerald-400">
+                        <Sparkles className="size-4 shrink-0 text-emerald-500" />
+                        Cover letter saved successfully! You can load it anytime
+                        via "Load Saved".
+                    </div>
+                )}
+
+                <div className="flex flex-wrap items-center gap-2">
+                    <span className="text-xs font-medium text-muted-foreground">
+                        AI Polish:
+                    </span>
+                    {polishPresets.map((preset) => (
+                        <button
+                            key={preset.id}
+                            type="button"
+                            onClick={() => handlePolish(preset.id)}
+                            disabled={
+                                polishing ||
+                                !coverLetterContent.trim() ||
+                                aiLimit.exhausted
                             }
-                        }}
-                        placeholder="e.g. TechCorp"
+                            className="inline-flex items-center gap-1 rounded-md border border-border bg-card px-2.5 py-1 text-xs text-[#706f6c] transition-colors hover:bg-[#f5f5f4] hover:text-[#1b1b18] disabled:opacity-40 dark:text-[#A1A09A] dark:hover:bg-[#1C1C1A] dark:hover:text-[#EDEDEC]"
+                        >
+                            {polishing && polishingPreset === preset.id ? (
+                                <Loader2 className="size-3 animate-spin" />
+                            ) : (
+                                <preset.icon className="size-3" />
+                            )}
+                            {preset.label}
+                        </button>
+                    ))}
+                </div>
+
+                <div className="flex min-h-0 flex-1 flex-col gap-2">
+                    <Label htmlFor="cover_letter_content">Cover Letter</Label>
+                    <Textarea
+                        id="cover_letter_content"
+                        value={coverLetterContent}
+                        onChange={(e) =>
+                            onCoverLetterContentChange(e.target.value)
+                        }
+                        rows={18}
+                        className="flex-1 resize-none font-mono leading-relaxed"
+                        placeholder="Write your cover letter here, or select a template to load predefined text..."
                     />
                 </div>
-                <div className="flex flex-col gap-2">
-                    <Label htmlFor="recipient">Address To / Recipient</Label>
-                    <Input
-                        id="recipient"
-                        value={recipient}
-                        onChange={(e) => setRecipient(e.target.value)}
-                        onFocus={() => {
-                            if (recipient === 'Hiring Manager') {
-                                setRecipient('');
-                            }
-                        }}
-                        placeholder="e.g. Hiring Manager"
-                    />
-                </div>
-                <div className="flex flex-col gap-2 sm:col-span-3 lg:col-span-1">
-                    <Label>Cover Letter Style</Label>
-                    <Select value={template} onValueChange={(value: string | null) => value && handleTemplateSelect(value)}>
-                        <SelectTrigger>
-                            <SelectValue placeholder="Select style">
-                                {COVER_LETTER_TEMPLATES.find(t => t.id === template)?.name || "Select style"}
-                            </SelectValue>
-                        </SelectTrigger>
-                        <SelectContent>
-                            {COVER_LETTER_TEMPLATES.map((t) => (
-                                <SelectItem key={t.id} value={t.id}>
-                                    {t.name}
-                                </SelectItem>
-                            ))}
-                        </SelectContent>
-                    </Select>
-                </div>
-            </div>
-
-            <div className="flex flex-col gap-2">
-                <Label htmlFor="job_description">Job Description</Label>
-                <Textarea
-                    id="job_description"
-                    value={jobDescription}
-                    onChange={(e) => onJobDescriptionChange(e.target.value)}
-                    rows={3}
-                    placeholder="Paste the job description here to generate a tailored cover letter..."
-                />
-            </div>
-
-            {/* Action buttons moved to bottom footer */}
-
-            {error && (
-                <div className="flex items-center gap-2 rounded-lg border border-destructive/20 bg-destructive/5 p-3 text-sm text-destructive">
-                    <AlertCircle className="size-4 shrink-0" />
-                    {error}
-                </div>
-            )}
-
-            {saveSuccess && (
-                <div className="flex items-center gap-2 rounded-lg border border-emerald-500/20 bg-emerald-500/10 p-3 text-sm text-emerald-600 dark:text-emerald-400">
-                    <Sparkles className="size-4 shrink-0 text-emerald-500" />
-                    Cover letter saved successfully! You can load it anytime via "Load Saved".
-                </div>
-            )}
-
-            <div className="flex flex-wrap items-center gap-2">
-                <span className="text-xs font-medium text-muted-foreground">AI Polish:</span>
-                {polishPresets.map((preset) => (
-                    <button
-                        key={preset.id}
-                        type="button"
-                        onClick={() => handlePolish(preset.id)}
-                        disabled={polishing || !coverLetterContent.trim() || aiLimit.exhausted}
-                        className="inline-flex items-center gap-1 rounded-md border border-border bg-card px-2.5 py-1 text-xs text-[#706f6c] hover:bg-[#f5f5f4] hover:text-[#1b1b18] dark:text-[#A1A09A] dark:hover:bg-[#1C1C1A] dark:hover:text-[#EDEDEC] transition-colors disabled:opacity-40"
-                    >
-                        {polishing && polishingPreset === preset.id ? (
-                            <Loader2 className="size-3 animate-spin" />
-                        ) : (
-                            <preset.icon className="size-3" />
-                        )}
-                        {preset.label}
-                    </button>
-                ))}
-            </div>
-
-            <div className="flex flex-col gap-2 flex-1 min-h-0">
-                <Label htmlFor="cover_letter_content">Cover Letter</Label>
-                <Textarea
-                    id="cover_letter_content"
-                    value={coverLetterContent}
-                    onChange={(e) => onCoverLetterContentChange(e.target.value)}
-                    rows={18}
-                    className="flex-1 font-mono leading-relaxed resize-none"
-                    placeholder="Write your cover letter here, or select a template to load predefined text..."
-                />
-            </div>
             </CardContent>
 
             <div className="flex items-center justify-between border-t px-(--card-spacing) py-(--card-spacing)">
@@ -3465,7 +5666,11 @@ return;
                         type="button"
                         variant="default"
                         onClick={handleGenerate}
-                        disabled={generating || !jobDescription.trim() || aiLimit.exhausted}
+                        disabled={
+                            generating ||
+                            !jobDescription.trim() ||
+                            aiLimit.exhausted
+                        }
                     >
                         {generating ? (
                             <Loader2 className="mr-2 size-4 animate-spin" />
@@ -3474,9 +5679,11 @@ return;
                         )}
                         {generating ? 'Generating...' : 'AI Generate'}
                     </Button>
-                    <div className="hidden sm:flex items-center gap-1 text-xs text-muted-foreground">
+                    <div className="hidden items-center gap-1 text-xs text-muted-foreground sm:flex">
                         <Sparkles className="size-3" />
-                        <span>{aiLimit.remaining}/{aiLimit.total} AI uses today</span>
+                        <span>
+                            {aiLimit.remaining}/{aiLimit.total} AI uses today
+                        </span>
                     </div>
                 </div>
                 <div className="flex items-center gap-2">
@@ -3520,25 +5727,28 @@ return;
             </div>
 
             <Dialog open={loadDialogOpen} onOpenChange={setLoadDialogOpen}>
-                <DialogContent className="max-w-lg max-h-[70vh] flex flex-col">
+                <DialogContent className="flex max-h-[70vh] max-w-lg flex-col">
                     <DialogHeader>
                         <DialogTitle className="flex items-center gap-2">
                             <FolderGit2 className="size-4" />
                             Load Saved Cover Letter
                         </DialogTitle>
                         <DialogDescription>
-                            Select a previously saved cover letter to load into the editor.
+                            Select a previously saved cover letter to load into
+                            the editor.
                         </DialogDescription>
                     </DialogHeader>
-                    <div className="flex-1 overflow-y-auto min-h-0">
+                    <div className="min-h-0 flex-1 overflow-y-auto">
                         {loadingLetters ? (
                             <div className="flex items-center justify-center py-8">
                                 <Loader2 className="size-6 animate-spin text-muted-foreground" />
                             </div>
                         ) : savedLetters.length === 0 ? (
                             <div className="flex flex-col items-center justify-center py-8 text-center">
-                                <FileText className="h-8 w-8 text-muted-foreground mb-2" />
-                                <p className="text-sm text-muted-foreground">No saved cover letters yet.</p>
+                                <FileText className="mb-2 h-8 w-8 text-muted-foreground" />
+                                <p className="text-sm text-muted-foreground">
+                                    No saved cover letters yet.
+                                </p>
                             </div>
                         ) : (
                             <div className="flex flex-col gap-2">
@@ -3547,17 +5757,25 @@ return;
                                         key={letter.id}
                                         type="button"
                                         onClick={() => handleLoadLetter(letter)}
-                                        className="flex flex-col gap-1 rounded-lg border border-border bg-card p-3 text-left text-sm hover:bg-[#f5f5f4] dark:hover:bg-[#1C1C1A] transition-colors"
+                                        className="flex flex-col gap-1 rounded-lg border border-border bg-card p-3 text-left text-sm transition-colors hover:bg-[#f5f5f4] dark:hover:bg-[#1C1C1A]"
                                     >
                                         <div className="flex items-center justify-between">
                                             <span className="font-medium text-foreground">
-                                                {letter.target_company || letter.target_job_title
-                                                    ? [letter.target_company, letter.target_job_title].filter(Boolean).join(' - ')
+                                                {letter.target_company ||
+                                                letter.target_job_title
+                                                    ? [
+                                                          letter.target_company,
+                                                          letter.target_job_title,
+                                                      ]
+                                                          .filter(Boolean)
+                                                          .join(' - ')
                                                     : 'Cover Letter'}
                                             </span>
-                                            <span className="text-xs text-muted-foreground">{letter.created_at}</span>
+                                            <span className="text-xs text-muted-foreground">
+                                                {letter.created_at}
+                                            </span>
                                         </div>
-                                        <p className="text-xs text-muted-foreground line-clamp-2">
+                                        <p className="line-clamp-2 text-xs text-muted-foreground">
                                             {letter.content}
                                         </p>
                                     </button>
@@ -3566,11 +5784,12 @@ return;
                         )}
                     </div>
                     <DialogFooter>
-                        <DialogClose render={<Button variant="outline">Cancel</Button>} />
+                        <DialogClose
+                            render={<Button variant="outline">Cancel</Button>}
+                        />
                     </DialogFooter>
                 </DialogContent>
             </Dialog>
-
         </Card>
     );
 }
@@ -3590,7 +5809,14 @@ function SortableTab({
     onClick: () => void;
     isFirst: boolean;
 }) {
-    const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    const {
+        attributes,
+        listeners,
+        setNodeRef,
+        transform,
+        transition,
+        isDragging,
+    } = useSortable({
         id,
         disabled: isFirst, // disable dragging for the first item (personal)
     });
@@ -3615,7 +5841,7 @@ function SortableTab({
             {!isFirst && (
                 <button
                     type="button"
-                    className="pl-2 pr-1 py-1.5 cursor-grab active:cursor-grabbing text-muted-foreground hover:text-foreground touch-none"
+                    className="cursor-grab touch-none py-1.5 pr-1 pl-2 text-muted-foreground hover:text-foreground active:cursor-grabbing"
                     {...attributes}
                     {...listeners}
                 >
@@ -3634,8 +5860,22 @@ function SortableTab({
     );
 }
 
-const VALID_EDITOR_TABS = ['personal', 'work', 'education', 'skills', 'projects', 'certifications', 'additional_info'];
-const VALID_VIEWS = ['resume-edit', 'resume-preview', 'cover-letter', 'cover-letter-preview', 'portfolio'];
+const VALID_EDITOR_TABS = [
+    'personal',
+    'work',
+    'education',
+    'skills',
+    'projects',
+    'certifications',
+    'additional_info',
+];
+const VALID_VIEWS = [
+    'resume-edit',
+    'resume-preview',
+    'cover-letter',
+    'cover-letter-preview',
+    'portfolio',
+];
 
 function getInitialEditorTab(): string {
     if (typeof window !== 'undefined') {
@@ -3667,13 +5907,26 @@ function getInitialView(defaultView: string): string {
     return defaultView;
 }
 
-export default function DocumentsIndex({ profile, aiLimit, loadedResume, loadedCoverLetter, flash }: DocumentsPageProps) {
-    const initialView = loadedResume ? 'resume-preview' : (loadedCoverLetter ? 'cover-letter-preview' : 'resume-edit');
+export default function DocumentsIndex({
+    profile,
+    aiLimit,
+    loadedResume,
+    loadedCoverLetter,
+    flash,
+}: DocumentsPageProps) {
+    const initialView = loadedResume
+        ? 'resume-preview'
+        : loadedCoverLetter
+          ? 'cover-letter-preview'
+          : 'resume-edit';
     const initialTemplate = loadedResume?.template || 'ats_classic';
     const initialCLTemplate = loadedCoverLetter?.template || 'cl_formal';
 
-    const [activeEditorTab, setActiveEditorTabState] = useState<string>(getInitialEditorTab);
-    const [activeView, setActiveViewState] = useState<string>(() => getInitialView(initialView));
+    const [activeEditorTab, setActiveEditorTabState] =
+        useState<string>(getInitialEditorTab);
+    const [activeView, setActiveViewState] = useState<string>(() =>
+        getInitialView(initialView),
+    );
 
     const setActiveEditorTab = (tab: string) => {
         setActiveEditorTabState(tab);
@@ -3700,57 +5953,117 @@ export default function DocumentsIndex({ profile, aiLimit, loadedResume, loadedC
     const [photoDataUrl, setPhotoDataUrl] = useState<string | null>(null);
     const [aiPolishing, setAiPolishing] = useState(false);
     const [aiError, setAiError] = useState<string | null>(null);
-    const [coverLetterContent, setCoverLetterContent] = useState(loadedCoverLetter?.content || DEFAULT_COVER_LETTER);
-    const [coverLetterCompany, setCoverLetterCompany] = useState(loadedCoverLetter?.target_company || 'Acme Corp');
-    const [coverLetterJobTitle, setCoverLetterJobTitle] = useState(loadedCoverLetter?.target_job_title || 'Software Developer');
-    const [coverLetterJobDescription, setCoverLetterJobDescription] = useState(loadedCoverLetter?.job_description || '');
-    const [coverLetterRecipient, setCoverLetterRecipient] = useState(loadedCoverLetter?.recipient || 'Hiring Manager');
+    const [coverLetterContent, setCoverLetterContent] = useState(
+        loadedCoverLetter?.content || DEFAULT_COVER_LETTER,
+    );
+    const [coverLetterCompany, setCoverLetterCompany] = useState(
+        loadedCoverLetter?.target_company || 'Acme Corp',
+    );
+    const [coverLetterJobTitle, setCoverLetterJobTitle] = useState(
+        loadedCoverLetter?.target_job_title || 'Software Developer',
+    );
+    const [coverLetterJobDescription, setCoverLetterJobDescription] = useState(
+        loadedCoverLetter?.job_description || '',
+    );
+    const [coverLetterRecipient, setCoverLetterRecipient] = useState(
+        loadedCoverLetter?.recipient || 'Hiring Manager',
+    );
     const [loadResumeDialogOpen, setLoadResumeDialogOpen] = useState(false);
-    const [savedResumes, setSavedResumes] = useState<Array<{ id: number; name: string; template: string; profile_data: ResumeProfile; created_at: string }>>([]);
+    const [savedResumes, setSavedResumes] = useState<
+        Array<{
+            id: number;
+            name: string;
+            template: string;
+            profile_data: ResumeProfile;
+            created_at: string;
+        }>
+    >([]);
     const [loadingResumes, setLoadingResumes] = useState(false);
 
     const isNew = !profile || !profile.id;
     const activeProfileData = loadedResume?.profile_data || profile;
 
-    const { data, setData, put, processing, errors, recentlySuccessful } = useForm<ResumeProfile>({
-        full_name: activeProfileData?.full_name ?? (isNew ? 'Juan Dela Cruz' : ''),
-        email: activeProfileData?.email ?? (isNew ? 'juan@example.com' : ''),
-        phone: activeProfileData?.phone ?? (isNew ? '+63 917 123 4567' : ''),
-        location: activeProfileData?.location ?? (isNew ? 'Metro Manila' : ''),
-        photo_url: activeProfileData?.photo_url ?? '',
-        linkedin_url: activeProfileData?.linkedin_url ?? (isNew ? 'https://linkedin.com/in/juandelacruz' : ''),
-        github_url: activeProfileData?.github_url ?? (isNew ? 'https://github.com/juandelacruz' : ''),
-        website_url: activeProfileData?.website_url ?? (isNew ? 'https://juanportfolio.com' : ''),
-        target_role: activeProfileData?.target_role || 'Senior Software Developer',
-        summary: activeProfileData?.summary || 'Experienced software developer with expertise in building scalable web applications...',
-        work_experience: (activeProfileData?.work_experience?.length ?? 0) > 0 ? (activeProfileData?.work_experience || []) : [
-            {
-                company: 'Acme Corp',
-                position: 'Software Developer',
-                duration: '2020 - 2023',
-                description: 'Developed and maintained various web applications using Laravel and React.'
-            }
-        ],
-        education: (activeProfileData?.education?.length ?? 0) > 0 ? (activeProfileData?.education || []) : [
-            {
-                institution: 'UP Diliman',
-                degree: 'BS Computer Science',
-                year: '2020'
-            }
-        ],
-        skills: (activeProfileData?.skills?.length ?? 0) > 0 ? (activeProfileData?.skills || []) : ['PHP', 'Laravel', 'React', 'TypeScript'],
-        certifications: (activeProfileData?.certifications?.length ?? 0) > 0 ? (activeProfileData?.certifications || []) : ['AWS Certified Solutions Architect'],
-        projects: (activeProfileData?.projects?.length ?? 0) > 0 ? (activeProfileData?.projects || []) : [
-            {
-                title: 'E-commerce Platform',
-                description: 'Built a full-stack e-commerce platform with Next.js and Stripe.',
-                url: '',
-                technologies: 'Laravel, React, PostgreSQL'
-            }
-        ],
-        additional_info: (activeProfileData?.additional_info?.length ?? 0) > 0 ? (activeProfileData?.additional_info || []) : [],
-        section_order: activeProfileData?.section_order ?? ['personal', 'work', 'education', 'skills', 'projects', 'certifications', 'additional_info'],
-    });
+    const { data, setData, put, processing, errors, recentlySuccessful } =
+        useForm<ResumeProfile>({
+            full_name:
+                activeProfileData?.full_name ?? (isNew ? 'Juan Dela Cruz' : ''),
+            email:
+                activeProfileData?.email ?? (isNew ? 'juan@example.com' : ''),
+            phone:
+                activeProfileData?.phone ?? (isNew ? '+63 917 123 4567' : ''),
+            location:
+                activeProfileData?.location ?? (isNew ? 'Metro Manila' : ''),
+            photo_url: activeProfileData?.photo_url ?? '',
+            linkedin_url:
+                activeProfileData?.linkedin_url ??
+                (isNew ? 'https://linkedin.com/in/juandelacruz' : ''),
+            github_url:
+                activeProfileData?.github_url ??
+                (isNew ? 'https://github.com/juandelacruz' : ''),
+            website_url:
+                activeProfileData?.website_url ??
+                (isNew ? 'https://juanportfolio.com' : ''),
+            target_role:
+                activeProfileData?.target_role || 'Senior Software Developer',
+            summary:
+                activeProfileData?.summary ||
+                'Experienced software developer with expertise in building scalable web applications...',
+            work_experience:
+                (activeProfileData?.work_experience?.length ?? 0) > 0
+                    ? activeProfileData?.work_experience || []
+                    : [
+                          {
+                              company: 'Acme Corp',
+                              position: 'Software Developer',
+                              duration: '2020 - 2023',
+                              description:
+                                  'Developed and maintained various web applications using Laravel and React.',
+                          },
+                      ],
+            education:
+                (activeProfileData?.education?.length ?? 0) > 0
+                    ? activeProfileData?.education || []
+                    : [
+                          {
+                              institution: 'UP Diliman',
+                              degree: 'BS Computer Science',
+                              year: '2020',
+                          },
+                      ],
+            skills:
+                (activeProfileData?.skills?.length ?? 0) > 0
+                    ? activeProfileData?.skills || []
+                    : ['PHP', 'Laravel', 'React', 'TypeScript'],
+            certifications:
+                (activeProfileData?.certifications?.length ?? 0) > 0
+                    ? activeProfileData?.certifications || []
+                    : ['AWS Certified Solutions Architect'],
+            projects:
+                (activeProfileData?.projects?.length ?? 0) > 0
+                    ? activeProfileData?.projects || []
+                    : [
+                          {
+                              title: 'E-commerce Platform',
+                              description:
+                                  'Built a full-stack e-commerce platform with Next.js and Stripe.',
+                              url: '',
+                              technologies: 'Laravel, React, PostgreSQL',
+                          },
+                      ],
+            additional_info:
+                (activeProfileData?.additional_info?.length ?? 0) > 0
+                    ? activeProfileData?.additional_info || []
+                    : [],
+            section_order: activeProfileData?.section_order ?? [
+                'personal',
+                'work',
+                'education',
+                'skills',
+                'projects',
+                'certifications',
+                'additional_info',
+            ],
+        });
 
     function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
@@ -3765,14 +6078,21 @@ export default function DocumentsIndex({ profile, aiLimit, loadedResume, loadedC
         setLoadingResumes(true);
 
         try {
-            const token = (document.querySelector('meta[name="csrf-token"]') as HTMLMetaElement)?.content ?? '';
+            const token =
+                (
+                    document.querySelector(
+                        'meta[name="csrf-token"]',
+                    ) as HTMLMetaElement
+                )?.content ?? '';
             const response = await fetch('/documents/saved-resumes', {
                 headers: {
-                    'Accept': 'application/json',
+                    Accept: 'application/json',
                     'X-CSRF-TOKEN': token,
                 },
             });
-            const isJson = response.headers.get('content-type')?.includes('application/json');
+            const isJson = response.headers
+                .get('content-type')
+                ?.includes('application/json');
             const data = isJson ? await response.json() : null;
             setSavedResumes(data?.resumes ?? []);
         } catch {
@@ -3782,7 +6102,10 @@ export default function DocumentsIndex({ profile, aiLimit, loadedResume, loadedC
         }
     }
 
-    function handleLoadResume(resume: { template: string; profile_data: ResumeProfile }) {
+    function handleLoadResume(resume: {
+        template: string;
+        profile_data: ResumeProfile;
+    }) {
         setTemplate(resume.template);
         setData({
             full_name: resume.profile_data.full_name || '',
@@ -3801,7 +6124,15 @@ export default function DocumentsIndex({ profile, aiLimit, loadedResume, loadedC
             certifications: resume.profile_data.certifications || [],
             projects: resume.profile_data.projects || [],
             additional_info: resume.profile_data.additional_info || [],
-            section_order: resume.profile_data.section_order || ['personal', 'work', 'education', 'skills', 'projects', 'certifications', 'additional_info']
+            section_order: resume.profile_data.section_order || [
+                'personal',
+                'work',
+                'education',
+                'skills',
+                'projects',
+                'certifications',
+                'additional_info',
+            ],
         });
         setLoadResumeDialogOpen(false);
     }
@@ -3814,14 +6145,22 @@ export default function DocumentsIndex({ profile, aiLimit, loadedResume, loadedC
         }),
         useSensor(KeyboardSensor, {
             coordinateGetter: sortableKeyboardCoordinates,
-        })
+        }),
     );
 
     function handleDragEnd(event: DragEndEvent) {
         const { active, over } = event;
 
         if (over && active.id !== over.id) {
-            const currentOrder = data.section_order || ['personal', 'work', 'education', 'skills', 'projects', 'certifications', 'additional_info'];
+            const currentOrder = data.section_order || [
+                'personal',
+                'work',
+                'education',
+                'skills',
+                'projects',
+                'certifications',
+                'additional_info',
+            ];
             const oldIndex = currentOrder.indexOf(active.id as string);
             const newIndex = currentOrder.indexOf(over.id as string);
 
@@ -3830,35 +6169,47 @@ export default function DocumentsIndex({ profile, aiLimit, loadedResume, loadedC
                 return;
             }
 
-            setData('section_order', arrayMove(currentOrder, oldIndex, newIndex));
+            setData(
+                'section_order',
+                arrayMove(currentOrder, oldIndex, newIndex),
+            );
         }
     }
 
     async function handleAiPolish(section: string, content: string) {
         if (!content.trim() || aiLimit.exhausted) {
-return;
-}
+            return;
+        }
 
         setAiPolishing(true);
         setAiError(null);
 
         try {
-            const token = (document.querySelector('meta[name="csrf-token"]') as HTMLMetaElement)?.content ?? '';
+            const token =
+                (
+                    document.querySelector(
+                        'meta[name="csrf-token"]',
+                    ) as HTMLMetaElement
+                )?.content ?? '';
             const response = await fetch('/documents/ai-polish-resume', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Accept': 'application/json',
+                    Accept: 'application/json',
                     'X-CSRF-TOKEN': token,
                 },
                 body: JSON.stringify({ section, content }),
             });
 
-            const isJson = response.headers.get('content-type')?.includes('application/json');
+            const isJson = response.headers
+                .get('content-type')
+                ?.includes('application/json');
             const data = isJson ? await response.json() : null;
 
             if (!response.ok) {
-                throw new Error(data?.message || `Polish failed (HTTP ${response.status})`);
+                throw new Error(
+                    data?.message || `Polish failed (HTTP ${response.status})`,
+                );
             }
 
             if (section === 'summary') {
@@ -3885,7 +6236,9 @@ return;
                 setData('projects', updated);
             }
         } catch (err) {
-            setAiError(err instanceof Error ? err.message : 'Failed to polish section');
+            setAiError(
+                err instanceof Error ? err.message : 'Failed to polish section',
+            );
             setTimeout(() => setAiError(null), 3000);
         } finally {
             setAiPolishing(false);
@@ -3896,14 +6249,15 @@ return;
         <>
             <Head title="Documents" />
 
-            <div className="flex flex-1 min-h-0 flex-col gap-4 sm:gap-6">
+            <div className="flex min-h-0 flex-1 flex-col gap-4 sm:gap-6">
                 <div className="flex shrink-0 items-center justify-between">
                     <div className="flex flex-col gap-1">
                         <h1 className="text-2xl font-semibold text-foreground">
                             Documents
                         </h1>
                         <p className="text-sm text-muted-foreground">
-                            Build your resume and cover letter, then preview them with matched styling.
+                            Build your resume and cover letter, then preview
+                            them with matched styling.
                         </p>
                     </div>
                     <div className="flex items-center gap-2">
@@ -3913,12 +6267,19 @@ return;
                                     render={
                                         <span className="inline-flex cursor-help items-center gap-1.5 rounded-full border border-border bg-card px-3 py-1 text-xs text-muted-foreground transition-colors hover:text-foreground">
                                             <Sparkles className="size-3 text-amber-500" />
-                                            {aiLimit.remaining}/{aiLimit.total} AI uses today
+                                            {aiLimit.remaining}/{aiLimit.total}{' '}
+                                            AI uses today
                                         </span>
                                     }
                                 />
-                                <TooltipContent side="bottom" className="max-w-xs text-xs">
-                                    Shared daily limit (10 uncached requests/day) across AI Assist and Document Generator. Cached requests are unlimited and free.
+                                <TooltipContent
+                                    side="bottom"
+                                    className="max-w-xs text-xs"
+                                >
+                                    Shared daily limit (10 uncached
+                                    requests/day) across AI Assist and Document
+                                    Generator. Cached requests are unlimited and
+                                    free.
                                 </TooltipContent>
                             </Tooltip>
                         </TooltipProvider>
@@ -3941,14 +6302,18 @@ return;
                 {loadedResume && (
                     <div className="flex items-center gap-2 rounded-lg border border-emerald-500/20 bg-emerald-500/10 p-3 text-sm font-medium text-emerald-600 dark:text-emerald-400">
                         <Sparkles className="size-4 shrink-0 text-emerald-500" />
-                        Loaded saved resume version: "{loadedResume.name}". You can customize details in Resume Builder or switch templates above.
+                        Loaded saved resume version: "{loadedResume.name}". You
+                        can customize details in Resume Builder or switch
+                        templates above.
                     </div>
                 )}
 
                 {loadedCoverLetter && (
                     <div className="flex items-center gap-2 rounded-lg border border-emerald-500/20 bg-emerald-500/10 p-3 text-sm font-medium text-emerald-600 dark:text-emerald-400">
                         <Sparkles className="size-4 shrink-0 text-emerald-500" />
-                        Loaded saved cover letter for "{loadedCoverLetter.target_company || 'Target Company'}". You can customize text in Cover Letter Builder.
+                        Loaded saved cover letter for "
+                        {loadedCoverLetter.target_company || 'Target Company'}".
+                        You can customize text in Cover Letter Builder.
                     </div>
                 )}
 
@@ -3977,9 +6342,12 @@ return;
                     ))}
                 </div>
 
-                <div className="flex-1 min-w-0 min-h-0 overflow-y-auto overflow-x-hidden">
+                <div className="min-h-0 min-w-0 flex-1 overflow-x-hidden overflow-y-auto">
                     {activeView === 'resume-edit' && (
-                        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+                        <form
+                            onSubmit={handleSubmit}
+                            className="flex flex-col gap-4"
+                        >
                             <Card>
                                 <CardHeader>
                                     <CardTitle className="flex items-center gap-2">
@@ -3987,22 +6355,51 @@ return;
                                         Resume Profile
                                     </CardTitle>
                                     <CardDescription>
-                                        Fill in your details to build your ATS-friendly resume.
+                                        Fill in your details to build your
+                                        ATS-friendly resume.
                                     </CardDescription>
                                 </CardHeader>
                                 <CardContent className="flex flex-col gap-4">
                                     <div className="flex flex-wrap gap-1 rounded-lg bg-[#f5f5f4] p-1 dark:bg-[#1C1C1A]">
-                                        <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+                                        <DndContext
+                                            sensors={sensors}
+                                            collisionDetection={closestCenter}
+                                            onDragEnd={handleDragEnd}
+                                        >
                                             <SortableContext
-                                                items={data.section_order || ['personal', 'work', 'education', 'skills', 'projects', 'certifications', 'additional_info']}
-                                                strategy={horizontalListSortingStrategy}
+                                                items={
+                                                    data.section_order || [
+                                                        'personal',
+                                                        'work',
+                                                        'education',
+                                                        'skills',
+                                                        'projects',
+                                                        'certifications',
+                                                        'additional_info',
+                                                    ]
+                                                }
+                                                strategy={
+                                                    horizontalListSortingStrategy
+                                                }
                                             >
-                                                {(data.section_order || ['personal', 'work', 'education', 'skills', 'projects', 'certifications', 'additional_info']).map((id, index) => {
-                                                    const tab = TABS.find(t => t.id === id);
+                                                {(
+                                                    data.section_order || [
+                                                        'personal',
+                                                        'work',
+                                                        'education',
+                                                        'skills',
+                                                        'projects',
+                                                        'certifications',
+                                                        'additional_info',
+                                                    ]
+                                                ).map((id, index) => {
+                                                    const tab = TABS.find(
+                                                        (t) => t.id === id,
+                                                    );
 
                                                     if (!tab) {
-return null;
-}
+                                                        return null;
+                                                    }
 
                                                     return (
                                                         <SortableTab
@@ -4010,9 +6407,18 @@ return null;
                                                             id={id}
                                                             label={tab.label}
                                                             icon={tab.icon}
-                                                            isActive={activeEditorTab === id}
-                                                            onClick={() => setActiveEditorTab(id)}
-                                                            isFirst={index === 0}
+                                                            isActive={
+                                                                activeEditorTab ===
+                                                                id
+                                                            }
+                                                            onClick={() =>
+                                                                setActiveEditorTab(
+                                                                    id,
+                                                                )
+                                                            }
+                                                            isFirst={
+                                                                index === 0
+                                                            }
                                                         />
                                                     );
                                                 })}
@@ -4027,7 +6433,9 @@ return null;
                                                 setData={setData}
                                                 errors={errors}
                                                 photoDataUrl={photoDataUrl}
-                                                onPhotoDataUrlChange={setPhotoDataUrl}
+                                                onPhotoDataUrlChange={
+                                                    setPhotoDataUrl
+                                                }
                                                 onAiPolish={handleAiPolish}
                                             />
                                         )}
@@ -4039,10 +6447,16 @@ return null;
                                             />
                                         )}
                                         {activeEditorTab === 'education' && (
-                                            <EducationTab data={data} setData={setData} />
+                                            <EducationTab
+                                                data={data}
+                                                setData={setData}
+                                            />
                                         )}
                                         {activeEditorTab === 'skills' && (
-                                            <SkillsTab data={data} setData={setData} />
+                                            <SkillsTab
+                                                data={data}
+                                                setData={setData}
+                                            />
                                         )}
                                         {activeEditorTab === 'projects' && (
                                             <ProjectsTab
@@ -4051,11 +6465,19 @@ return null;
                                                 onAiPolish={handleAiPolish}
                                             />
                                         )}
-                                        {activeEditorTab === 'certifications' && (
-                                            <CertificationsTab data={data} setData={setData} />
+                                        {activeEditorTab ===
+                                            'certifications' && (
+                                            <CertificationsTab
+                                                data={data}
+                                                setData={setData}
+                                            />
                                         )}
-                                        {activeEditorTab === 'additional_info' && (
-                                            <AdditionalInfoTab data={data} setData={setData} />
+                                        {activeEditorTab ===
+                                            'additional_info' && (
+                                            <AdditionalInfoTab
+                                                data={data}
+                                                setData={setData}
+                                            />
                                         )}
                                     </div>
                                 </CardContent>
@@ -4096,43 +6518,75 @@ return null;
                                                     phone: '+63 917 123 4567',
                                                     location: 'Metro Manila',
                                                     photo_url: '',
-                                                    linkedin_url: 'https://linkedin.com/in/juandelacruz',
-                                                    github_url: 'https://github.com/juandelacruz',
-                                                    website_url: 'https://juanportfolio.com',
-                                                    target_role: 'Senior Software Developer',
-                                                    summary: 'Experienced software developer with expertise in building scalable web applications...',
+                                                    linkedin_url:
+                                                        'https://linkedin.com/in/juandelacruz',
+                                                    github_url:
+                                                        'https://github.com/juandelacruz',
+                                                    website_url:
+                                                        'https://juanportfolio.com',
+                                                    target_role:
+                                                        'Senior Software Developer',
+                                                    summary:
+                                                        'Experienced software developer with expertise in building scalable web applications...',
                                                     work_experience: [
                                                         {
-                                                            company: 'Acme Corp',
-                                                            position: 'Software Developer',
-                                                            duration: '2020 - 2023',
-                                                            description: 'Developed and maintained various web applications using Laravel and React.'
-                                                        }
+                                                            company:
+                                                                'Acme Corp',
+                                                            position:
+                                                                'Software Developer',
+                                                            duration:
+                                                                '2020 - 2023',
+                                                            description:
+                                                                'Developed and maintained various web applications using Laravel and React.',
+                                                        },
                                                     ],
                                                     education: [
                                                         {
-                                                            institution: 'UP Diliman',
+                                                            institution:
+                                                                'UP Diliman',
                                                             degree: 'BS Computer Science',
-                                                            year: '2020'
-                                                        }
+                                                            year: '2020',
+                                                        },
                                                     ],
-                                                    skills: ['PHP', 'Laravel', 'React', 'TypeScript'],
-                                                    certifications: ['AWS Certified Solutions Architect'],
+                                                    skills: [
+                                                        'PHP',
+                                                        'Laravel',
+                                                        'React',
+                                                        'TypeScript',
+                                                    ],
+                                                    certifications: [
+                                                        'AWS Certified Solutions Architect',
+                                                    ],
                                                     projects: [
                                                         {
                                                             title: 'E-commerce Platform',
-                                                            description: 'Built a full-stack e-commerce platform with Next.js and Stripe.',
+                                                            description:
+                                                                'Built a full-stack e-commerce platform with Next.js and Stripe.',
                                                             url: '',
-                                                            technologies: 'Laravel, React, PostgreSQL'
-                                                        }
+                                                            technologies:
+                                                                'Laravel, React, PostgreSQL',
+                                                        },
                                                     ],
                                                     additional_info: [],
-                                                    section_order: ['personal', 'work', 'education', 'skills', 'projects', 'certifications', 'additional_info']
+                                                    section_order: [
+                                                        'personal',
+                                                        'work',
+                                                        'education',
+                                                        'skills',
+                                                        'projects',
+                                                        'certifications',
+                                                        'additional_info',
+                                                    ],
                                                 });
                                             }}
                                         />
-                                        <Button type="submit" disabled={processing}>
-                                            {processing ? 'Saving...' : 'Save Profile'}
+                                        <Button
+                                            type="submit"
+                                            disabled={processing}
+                                        >
+                                            {processing
+                                                ? 'Saving...'
+                                                : 'Save Profile'}
                                         </Button>
                                     </div>
                                 </div>
@@ -4153,7 +6607,9 @@ return null;
                                 setCoverLetterJobTitle(jobTitle);
                             }}
                             jobDescription={coverLetterJobDescription}
-                            onJobDescriptionChange={setCoverLetterJobDescription}
+                            onJobDescriptionChange={
+                                setCoverLetterJobDescription
+                            }
                             initialCompany={coverLetterCompany}
                             initialJobTitle={coverLetterJobTitle}
                             initialRecipient={coverLetterRecipient}
@@ -4165,10 +6621,17 @@ return null;
                         <div className="flex flex-col gap-4">
                             <div className="flex shrink-0 items-center justify-between">
                                 <Label>Template</Label>
-                                <Select value={template} onValueChange={(value: string | null) => value && setTemplate(value)}>
+                                <Select
+                                    value={template}
+                                    onValueChange={(value: string | null) =>
+                                        value && setTemplate(value)
+                                    }
+                                >
                                     <SelectTrigger className="w-auto min-w-[260px] bg-background text-foreground">
                                         <SelectValue placeholder="Select template">
-                                            {TEMPLATES.find(t => t.id === template)?.name || "Select template"}
+                                            {TEMPLATES.find(
+                                                (t) => t.id === template,
+                                            )?.name || 'Select template'}
                                         </SelectValue>
                                     </SelectTrigger>
                                     <SelectContent align="end">
@@ -4180,7 +6643,11 @@ return null;
                                     </SelectContent>
                                 </Select>
                             </div>
-                            <ResumePreview data={data} template={template} photoDataUrl={photoDataUrl} />
+                            <ResumePreview
+                                data={data}
+                                template={template}
+                                photoDataUrl={photoDataUrl}
+                            />
                         </div>
                     )}
 
@@ -4188,10 +6655,17 @@ return null;
                         <div className="flex flex-col gap-4">
                             <div className="flex shrink-0 items-center justify-between">
                                 <Label>Cover Letter Style</Label>
-                                <Select value={clTemplate} onValueChange={(value: string | null) => value && setCLTemplate(value)}>
+                                <Select
+                                    value={clTemplate}
+                                    onValueChange={(value: string | null) =>
+                                        value && setCLTemplate(value)
+                                    }
+                                >
                                     <SelectTrigger className="w-auto min-w-[260px] bg-background text-foreground">
                                         <SelectValue placeholder="Select style">
-                                            {COVER_LETTER_TEMPLATES.find(t => t.id === clTemplate)?.name || "Select style"}
+                                            {COVER_LETTER_TEMPLATES.find(
+                                                (t) => t.id === clTemplate,
+                                            )?.name || 'Select style'}
                                         </SelectValue>
                                     </SelectTrigger>
                                     <SelectContent align="end">
@@ -4215,26 +6689,32 @@ return null;
                         </div>
                     )}
 
-                    <Dialog open={loadResumeDialogOpen} onOpenChange={setLoadResumeDialogOpen}>
-                        <DialogContent className="max-w-lg max-h-[70vh] flex flex-col">
+                    <Dialog
+                        open={loadResumeDialogOpen}
+                        onOpenChange={setLoadResumeDialogOpen}
+                    >
+                        <DialogContent className="flex max-h-[70vh] max-w-lg flex-col">
                             <DialogHeader>
                                 <DialogTitle className="flex items-center gap-2">
                                     <FolderGit2 className="size-4" />
                                     Load Saved Resume
                                 </DialogTitle>
                                 <DialogDescription>
-                                    Select a previously saved resume profile to load into the editor.
+                                    Select a previously saved resume profile to
+                                    load into the editor.
                                 </DialogDescription>
                             </DialogHeader>
-                            <div className="flex-1 overflow-y-auto min-h-0">
+                            <div className="min-h-0 flex-1 overflow-y-auto">
                                 {loadingResumes ? (
                                     <div className="flex items-center justify-center py-8">
                                         <Loader2 className="size-6 animate-spin text-muted-foreground" />
                                     </div>
                                 ) : savedResumes.length === 0 ? (
                                     <div className="flex flex-col items-center justify-center py-8 text-center">
-                                        <FileText className="h-8 w-8 text-muted-foreground mb-2" />
-                                        <p className="text-sm text-muted-foreground">No saved resumes yet.</p>
+                                        <FileText className="mb-2 h-8 w-8 text-muted-foreground" />
+                                        <p className="text-sm text-muted-foreground">
+                                            No saved resumes yet.
+                                        </p>
                                     </div>
                                 ) : (
                                     <div className="flex flex-col gap-2">
@@ -4242,17 +6722,25 @@ return null;
                                             <button
                                                 key={resume.id}
                                                 type="button"
-                                                onClick={() => handleLoadResume(resume)}
-                                                className="flex flex-col gap-1 rounded-lg border border-border bg-card p-3 text-left text-sm hover:bg-[#f5f5f4] dark:hover:bg-[#1C1C1A] transition-colors"
+                                                onClick={() =>
+                                                    handleLoadResume(resume)
+                                                }
+                                                className="flex flex-col gap-1 rounded-lg border border-border bg-card p-3 text-left text-sm transition-colors hover:bg-[#f5f5f4] dark:hover:bg-[#1C1C1A]"
                                             >
                                                 <div className="flex items-center justify-between">
                                                     <span className="font-medium text-foreground">
-                                                        {resume.name || 'Resume'}
+                                                        {resume.name ||
+                                                            'Resume'}
                                                     </span>
-                                                    <span className="text-xs text-muted-foreground">{resume.created_at}</span>
+                                                    <span className="text-xs text-muted-foreground">
+                                                        {resume.created_at}
+                                                    </span>
                                                 </div>
-                                                <p className="text-xs text-muted-foreground line-clamp-2">
-                                                    Target Role: {resume.profile_data?.target_role || 'Not specified'}
+                                                <p className="line-clamp-2 text-xs text-muted-foreground">
+                                                    Target Role:{' '}
+                                                    {resume.profile_data
+                                                        ?.target_role ||
+                                                        'Not specified'}
                                                 </p>
                                             </button>
                                         ))}
@@ -4260,7 +6748,13 @@ return null;
                                 )}
                             </div>
                             <DialogFooter>
-                                <DialogClose render={<Button variant="outline">Cancel</Button>} />
+                                <DialogClose
+                                    render={
+                                        <Button variant="outline">
+                                            Cancel
+                                        </Button>
+                                    }
+                                />
                             </DialogFooter>
                         </DialogContent>
                     </Dialog>

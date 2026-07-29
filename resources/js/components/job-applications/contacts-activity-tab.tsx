@@ -1,10 +1,5 @@
 import { router } from '@inertiajs/react';
-import {
-    UsersIcon,
-    LinkIcon,
-    ClockIcon,
-    LoaderIcon,
-} from 'lucide-react';
+import { UsersIcon, LinkIcon, ClockIcon, LoaderIcon } from 'lucide-react';
 import { useState, useCallback } from 'react';
 import { ActivityTimeline } from '@/components/job-applications/activity-timeline';
 import { Badge } from '@/components/ui/badge';
@@ -30,36 +25,44 @@ export default function ContactsActivityTab({
     const [newContactEmail, setNewContactEmail] = useState('');
     const [newContactRole, setNewContactRole] = useState('');
     const [creatingContact, setCreatingContact] = useState(false);
-    const [localContacts, setLocalContacts] = useState(application.contacts ?? []);
+    const [localContacts, setLocalContacts] = useState(
+        application.contacts ?? [],
+    );
 
-    const handleMarkAsContacted = useCallback(async (dateVal: string | null = 'now') => {
-        setContacting(true);
+    const handleMarkAsContacted = useCallback(
+        async (dateVal: string | null = 'now') => {
+            setContacting(true);
 
-        try {
-            const response = await fetch(
-                `/job-applications/${application.id}/mark-as-contacted`,
-                {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json',
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? '',
+            try {
+                const response = await fetch(
+                    `/job-applications/${application.id}/mark-as-contacted`,
+                    {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            Accept: 'application/json',
+                            'X-CSRF-TOKEN':
+                                document
+                                    .querySelector('meta[name="csrf-token"]')
+                                    ?.getAttribute('content') ?? '',
+                        },
+                        body: JSON.stringify({ date: dateVal }),
                     },
-                    body: JSON.stringify({ date: dateVal }),
-                },
-            );
+                );
 
-            if (!response.ok) {
-                throw new Error('Failed to mark as contacted.');
+                if (!response.ok) {
+                    throw new Error('Failed to mark as contacted.');
+                }
+
+                const result = await response.json();
+                router.reload();
+            } catch (error) {
+            } finally {
+                setContacting(false);
             }
-
-            const result = await response.json();
-            router.reload();
-        } catch (error) {
-        } finally {
-            setContacting(false);
-        }
-    }, [application.id]);
+        },
+        [application.id],
+    );
 
     return (
         <div className="flex flex-col gap-5">
@@ -79,21 +82,33 @@ export default function ContactsActivityTab({
                 </div>
                 {localContacts.length > 0 ? (
                     <div className="flex flex-wrap gap-1">
-                        {localContacts.map((contact: Pick<Contact, 'id' | 'name' | 'email' | 'phone' | 'company_name' | 'role'>) => (
-                            <Badge
-                                key={contact.id}
-                                variant="secondary"
-                                className="gap-1 text-xs"
-                            >
-                                <UsersIcon className="size-2.5" />
-                                {contact.name}
-                                {contact.role && (
-                                    <span className="text-muted-foreground">
-                                        ({contact.role})
-                                    </span>
-                                )}
-                            </Badge>
-                        ))}
+                        {localContacts.map(
+                            (
+                                contact: Pick<
+                                    Contact,
+                                    | 'id'
+                                    | 'name'
+                                    | 'email'
+                                    | 'phone'
+                                    | 'company_name'
+                                    | 'role'
+                                >,
+                            ) => (
+                                <Badge
+                                    key={contact.id}
+                                    variant="secondary"
+                                    className="gap-1 text-xs"
+                                >
+                                    <UsersIcon className="size-2.5" />
+                                    {contact.name}
+                                    {contact.role && (
+                                        <span className="text-muted-foreground">
+                                            ({contact.role})
+                                        </span>
+                                    )}
+                                </Badge>
+                            ),
+                        )}
                     </div>
                 ) : (
                     <p className="text-xs text-muted-foreground italic">
@@ -110,7 +125,17 @@ export default function ContactsActivityTab({
                                 .filter(
                                     (c) =>
                                         !localContacts.some(
-                                            (ec: Pick<Contact, 'id' | 'name' | 'email' | 'phone' | 'company_name' | 'role'>) => ec.id === c.id,
+                                            (
+                                                ec: Pick<
+                                                    Contact,
+                                                    | 'id'
+                                                    | 'name'
+                                                    | 'email'
+                                                    | 'phone'
+                                                    | 'company_name'
+                                                    | 'role'
+                                                >,
+                                            ) => ec.id === c.id,
                                         ),
                                 )
                                 .map((contact) => (
@@ -120,11 +145,17 @@ export default function ContactsActivityTab({
                                         size="sm"
                                         className="h-6 px-2 text-xs"
                                         onClick={() => {
-                                            setLocalContacts((prev) => [...prev, contact]);
+                                            setLocalContacts((prev) => [
+                                                ...prev,
+                                                contact,
+                                            ]);
                                             router.post(
-                                                linkContactRoute.url(contact.id),
+                                                linkContactRoute.url(
+                                                    contact.id,
+                                                ),
                                                 {
-                                                    job_application_id: application.id,
+                                                    job_application_id:
+                                                        application.id,
                                                 },
                                                 { preserveState: true },
                                             );
@@ -178,8 +209,14 @@ export default function ContactsActivityTab({
                 <div className="flex items-center gap-2">
                     <Input
                         type="date"
-                        value={application.last_contacted_at ? application.last_contacted_at.split('T')[0] : ''}
-                        onChange={(e) => handleMarkAsContacted(e.target.value || null)}
+                        value={
+                            application.last_contacted_at
+                                ? application.last_contacted_at.split('T')[0]
+                                : ''
+                        }
+                        onChange={(e) =>
+                            handleMarkAsContacted(e.target.value || null)
+                        }
                         disabled={contacting}
                         className="h-8 text-xs"
                     />
@@ -193,14 +230,16 @@ export default function ContactsActivityTab({
             {createContactOpen && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
                     <div className="w-full max-w-md rounded-lg bg-popover p-4 shadow-lg">
-                        <h3 className="text-base font-medium mb-4">Quick Create Contact</h3>
+                        <h3 className="mb-4 text-base font-medium">
+                            Quick Create Contact
+                        </h3>
                         <form
                             onSubmit={(e) => {
                                 e.preventDefault();
 
                                 if (!newContactName.trim()) {
-return;
-}
+                                    return;
+                                }
 
                                 setCreatingContact(true);
 
@@ -221,43 +260,50 @@ return;
                                             setNewContactRole('');
                                             setCreateContactOpen(false);
                                         },
-                                        onFinish: () => setCreatingContact(false),
+                                        onFinish: () =>
+                                            setCreatingContact(false),
                                     },
                                 );
                             }}
                             className="flex flex-col gap-3"
                         >
                             <div className="flex flex-col gap-1">
-                                <label className="text-xs text-muted-foreground font-medium">
+                                <label className="text-xs font-medium text-muted-foreground">
                                     Name *
                                 </label>
                                 <Input
                                     value={newContactName}
-                                    onChange={(e) => setNewContactName(e.target.value)}
+                                    onChange={(e) =>
+                                        setNewContactName(e.target.value)
+                                    }
                                     placeholder="e.g. Jane Doe"
                                     required
                                 />
                             </div>
 
                             <div className="flex flex-col gap-1">
-                                <label className="text-xs text-muted-foreground font-medium">
+                                <label className="text-xs font-medium text-muted-foreground">
                                     Role / Title
                                 </label>
                                 <Input
                                     value={newContactRole}
-                                    onChange={(e) => setNewContactRole(e.target.value)}
+                                    onChange={(e) =>
+                                        setNewContactRole(e.target.value)
+                                    }
                                     placeholder="e.g. Senior Recruiter"
                                 />
                             </div>
 
                             <div className="flex flex-col gap-1">
-                                <label className="text-xs text-muted-foreground font-medium">
+                                <label className="text-xs font-medium text-muted-foreground">
                                     Email
                                 </label>
                                 <Input
                                     type="email"
                                     value={newContactEmail}
-                                    onChange={(e) => setNewContactEmail(e.target.value)}
+                                    onChange={(e) =>
+                                        setNewContactEmail(e.target.value)
+                                    }
                                     placeholder="jane@company.com"
                                 />
                             </div>
@@ -270,7 +316,13 @@ return;
                                 >
                                     Cancel
                                 </Button>
-                                <Button type="submit" disabled={creatingContact || !newContactName.trim()}>
+                                <Button
+                                    type="submit"
+                                    disabled={
+                                        creatingContact ||
+                                        !newContactName.trim()
+                                    }
+                                >
                                     {creatingContact ? (
                                         <>
                                             <LoaderIcon className="size-3 animate-spin" />

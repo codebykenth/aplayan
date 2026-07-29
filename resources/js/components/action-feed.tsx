@@ -69,7 +69,7 @@ function ActionCard({
     return (
         <div
             className={cn(
-                'flex h-full items-start gap-3 rounded-r-xl border-l-[3px] bg-card py-3 pl-4 pr-3 ring-1 ring-foreground/10',
+                'flex h-full items-start gap-3 rounded-r-xl border-l-[3px] bg-card py-3 pr-3 pl-4 ring-1 ring-foreground/10',
                 style.border,
                 item.priority === 'urgent' && 'animate-pulse-border',
             )}
@@ -89,7 +89,7 @@ function ActionCard({
             </div>
 
             <div className="flex min-w-0 flex-1 flex-col gap-1">
-                <div className="flex items-center gap-2 flex-wrap">
+                <div className="flex flex-wrap items-center gap-2">
                     <span className="truncate text-sm font-medium text-foreground">
                         {item.company_name}
                     </span>
@@ -106,7 +106,7 @@ function ActionCard({
                 <button
                     type="button"
                     onClick={() => onSelectApplication(item.application_id)}
-                    className="mt-1 flex shrink-0 items-center gap-1 rounded-lg px-2 py-1 text-xs font-medium text-foreground transition-colors hover:bg-muted cursor-pointer"
+                    className="mt-1 flex shrink-0 cursor-pointer items-center gap-1 rounded-lg px-2 py-1 text-xs font-medium text-foreground transition-colors hover:bg-muted"
                 >
                     View
                     <ArrowRight className="size-3" />
@@ -131,7 +131,9 @@ export default function ActionFeed({
     items: ActionItem[];
     onSelectApplication?: (id: number) => void;
 }) {
-    const filteredItems = items.filter((item) => item.type !== 'missing_ai_evaluation');
+    const filteredItems = items.filter(
+        (item) => item.type !== 'missing_ai_evaluation',
+    );
     const scrollContainerRef = useRef<HTMLDivElement>(null);
     const [canScrollLeft, setCanScrollLeft] = useState(false);
     const [canScrollRight, setCanScrollRight] = useState(false);
@@ -140,8 +142,8 @@ export default function ActionFeed({
         const el = scrollContainerRef.current;
 
         if (!el) {
-return;
-}
+            return;
+        }
 
         const left = el.scrollLeft;
         const maxScroll = el.scrollWidth - el.clientWidth;
@@ -167,8 +169,8 @@ return;
         const el = scrollContainerRef.current;
 
         if (!el) {
-return;
-}
+            return;
+        }
 
         el.scrollBy({ left: -el.clientWidth, behavior: 'smooth' });
     }
@@ -177,8 +179,8 @@ return;
         const el = scrollContainerRef.current;
 
         if (!el) {
-return;
-}
+            return;
+        }
 
         el.scrollBy({ left: el.clientWidth, behavior: 'smooth' });
     }
@@ -193,7 +195,7 @@ return;
                     Today's Action Feed
                 </h2>
                 {urgentCount > 0 && (
-                    <span className="rounded-full bg-rose-100 px-1.5 py-0.5 text-[11px] font-medium leading-none text-rose-600 dark:bg-rose-900/30 dark:text-rose-300">
+                    <span className="rounded-full bg-rose-100 px-1.5 py-0.5 text-[11px] leading-none font-medium text-rose-600 dark:bg-rose-900/30 dark:text-rose-300">
                         {urgentCount} urgent
                     </span>
                 )}
@@ -228,14 +230,17 @@ return;
             <div
                 ref={scrollContainerRef}
                 onScroll={updateScrollState}
-                className="flex gap-3 overflow-x-auto scroll-smooth snap-x snap-mandatory p-0.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+                className="flex snap-x snap-mandatory [scrollbar-width:none] gap-3 overflow-x-auto scroll-smooth p-0.5 [&::-webkit-scrollbar]:hidden"
             >
                 {items.map((item) => (
                     <div
                         key={`${item.type}-${item.application_id}`}
                         className="w-full shrink-0 snap-start sm:w-[calc((100%-0.75rem)/2)] lg:w-[calc((100%-1.5rem)/3)]"
                     >
-                        <ActionCard item={item} onSelectApplication={onSelectApplication} />
+                        <ActionCard
+                            item={item}
+                            onSelectApplication={onSelectApplication}
+                        />
                     </div>
                 ))}
             </div>

@@ -3,9 +3,24 @@ import { FileText, Mail, Trash2, Eye, Download, ArrowLeft } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/card';
+import {
+    Card,
+    CardHeader,
+    CardTitle,
+    CardDescription,
+    CardContent,
+    CardFooter,
+} from '@/components/ui/card';
 import { ConfirmDestructiveDialog } from '@/components/ui/confirm-destructive-dialog';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogClose } from '@/components/ui/dialog';
+import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+    DialogDescription,
+    DialogFooter,
+    DialogClose,
+} from '@/components/ui/dialog';
 import AppLayout from '@/layouts/app-layout';
 
 type SavedResume = {
@@ -23,11 +38,21 @@ type SavedResume = {
         website_url: string | null;
         target_role: string | null;
         summary: string | null;
-        work_experience: Array<{ company: string; position: string; duration: string; description: string }>;
+        work_experience: Array<{
+            company: string;
+            position: string;
+            duration: string;
+            description: string;
+        }>;
         education: Array<{ institution: string; degree: string; year: string }>;
         skills: string[];
         certifications: string[];
-        projects: Array<{ title: string; description: string; url: string; technologies: string }>;
+        projects: Array<{
+            title: string;
+            description: string;
+            url: string;
+            technologies: string;
+        }>;
     };
     photo_url: string | null;
     created_at: string;
@@ -78,7 +103,13 @@ function formatDate(dateString: string): string {
     });
 }
 
-function ResumeCard({ resume, onDelete }: { resume: SavedResume; onDelete: (id: number) => void }) {
+function ResumeCard({
+    resume,
+    onDelete,
+}: {
+    resume: SavedResume;
+    onDelete: (id: number) => void;
+}) {
     const [deleteOpen, setDeleteOpen] = useState(false);
     const [previewOpen, setPreviewOpen] = useState(false);
     const [viewingContent, setViewingContent] = useState(false);
@@ -104,15 +135,17 @@ function ResumeCard({ resume, onDelete }: { resume: SavedResume; onDelete: (id: 
                         {resume.name}
                     </CardTitle>
                     <CardDescription>
-                        {getTemplateLabel(resume.template)} &middot; {formatDate(resume.created_at)}
+                        {getTemplateLabel(resume.template)} &middot;{' '}
+                        {formatDate(resume.created_at)}
                     </CardDescription>
                 </CardHeader>
                 <CardContent>
                     <p className="text-sm text-[#706f6c] dark:text-[#A1A09A]">
-                        {data.full_name}{data.email ? ` - ${data.email}` : ''}
+                        {data.full_name}
+                        {data.email ? ` - ${data.email}` : ''}
                     </p>
                     {data.summary && (
-                        <p className="mt-1 text-xs text-[#706f6c] line-clamp-2 dark:text-[#A1A09A]">
+                        <p className="mt-1 line-clamp-2 text-xs text-[#706f6c] dark:text-[#A1A09A]">
                             {data.summary}
                         </p>
                     )}
@@ -124,7 +157,11 @@ function ResumeCard({ resume, onDelete }: { resume: SavedResume; onDelete: (id: 
                             Load & Preview
                         </Button>
                     </Link>
-                    <Button variant="outline" size="sm" onClick={() => setDeleteOpen(true)}>
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setDeleteOpen(true)}
+                    >
                         <Trash2 className="mr-1 h-3.5 w-3.5" />
                         Delete
                     </Button>
@@ -140,70 +177,121 @@ function ResumeCard({ resume, onDelete }: { resume: SavedResume; onDelete: (id: 
             />
 
             <Dialog open={previewOpen} onOpenChange={setPreviewOpen}>
-                <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+                <DialogContent className="max-h-[80vh] max-w-2xl overflow-y-auto">
                     <DialogHeader>
                         <DialogTitle>{resume.name}</DialogTitle>
-                        <DialogDescription>{getTemplateLabel(resume.template)}</DialogDescription>
+                        <DialogDescription>
+                            {getTemplateLabel(resume.template)}
+                        </DialogDescription>
                     </DialogHeader>
-                    <div className="text-sm leading-relaxed space-y-3">
+                    <div className="space-y-3 text-sm leading-relaxed">
                         <div>
                             <strong>{data.full_name}</strong>
-                            {data.target_role && <div className="text-sm font-medium mt-0.5 text-[#1b1b18]">{data.target_role}</div>}
+                            {data.target_role && (
+                                <div className="mt-0.5 text-sm font-medium text-[#1b1b18]">
+                                    {data.target_role}
+                                </div>
+                            )}
                             <div className="text-[#706f6c]">
                                 {data.email} | {data.phone} | {data.location}
                             </div>
-                            {data.linkedin_url && <div className="text-[#706f6c] text-xs">LinkedIn: {data.linkedin_url}</div>}
-                            {data.github_url && <div className="text-[#706f6c] text-xs">GitHub: {data.github_url}</div>}
-                            {data.website_url && <div className="text-[#706f6c] text-xs">Web: {data.website_url}</div>}
+                            {data.linkedin_url && (
+                                <div className="text-xs text-[#706f6c]">
+                                    LinkedIn: {data.linkedin_url}
+                                </div>
+                            )}
+                            {data.github_url && (
+                                <div className="text-xs text-[#706f6c]">
+                                    GitHub: {data.github_url}
+                                </div>
+                            )}
+                            {data.website_url && (
+                                <div className="text-xs text-[#706f6c]">
+                                    Web: {data.website_url}
+                                </div>
+                            )}
                         </div>
                         {data.summary && (
                             <div>
-                                <h4 className="font-semibold text-xs uppercase tracking-wider text-[#706f6c] mb-1">Summary</h4>
+                                <h4 className="mb-1 text-xs font-semibold tracking-wider text-[#706f6c] uppercase">
+                                    Summary
+                                </h4>
                                 <p>{data.summary}</p>
                             </div>
                         )}
                         {data.work_experience?.length > 0 && (
                             <div>
-                                <h4 className="font-semibold text-xs uppercase tracking-wider text-[#706f6c] mb-1">Work Experience</h4>
+                                <h4 className="mb-1 text-xs font-semibold tracking-wider text-[#706f6c] uppercase">
+                                    Work Experience
+                                </h4>
                                 {data.work_experience.map((job, i) => (
                                     <div key={i} className="mb-2">
-                                        <div className="font-medium">{job.position}</div>
-                                        <div className="text-[#706f6c]">{job.company} | {job.duration}</div>
-                                        {job.description && <p className="text-xs mt-0.5">{job.description}</p>}
+                                        <div className="font-medium">
+                                            {job.position}
+                                        </div>
+                                        <div className="text-[#706f6c]">
+                                            {job.company} | {job.duration}
+                                        </div>
+                                        {job.description && (
+                                            <p className="mt-0.5 text-xs">
+                                                {job.description}
+                                            </p>
+                                        )}
                                     </div>
                                 ))}
                             </div>
                         )}
                         {data.education?.length > 0 && (
                             <div>
-                                <h4 className="font-semibold text-xs uppercase tracking-wider text-[#706f6c] mb-1">Education</h4>
+                                <h4 className="mb-1 text-xs font-semibold tracking-wider text-[#706f6c] uppercase">
+                                    Education
+                                </h4>
                                 {data.education.map((edu, i) => (
                                     <div key={i} className="mb-1">
-                                        <span className="font-medium">{edu.degree}</span> - {edu.institution} ({edu.year})
+                                        <span className="font-medium">
+                                            {edu.degree}
+                                        </span>{' '}
+                                        - {edu.institution} ({edu.year})
                                     </div>
                                 ))}
                             </div>
                         )}
                         {data.skills?.length > 0 && (
                             <div>
-                                <h4 className="font-semibold text-xs uppercase tracking-wider text-[#706f6c] mb-1">Skills</h4>
+                                <h4 className="mb-1 text-xs font-semibold tracking-wider text-[#706f6c] uppercase">
+                                    Skills
+                                </h4>
                                 <p>{data.skills.join(', ')}</p>
                             </div>
                         )}
                         {data.certifications?.length > 0 && (
                             <div>
-                                <h4 className="font-semibold text-xs uppercase tracking-wider text-[#706f6c] mb-1">Certifications</h4>
+                                <h4 className="mb-1 text-xs font-semibold tracking-wider text-[#706f6c] uppercase">
+                                    Certifications
+                                </h4>
                                 <p>{data.certifications.join(', ')}</p>
                             </div>
                         )}
                         {data.projects?.length > 0 && (
                             <div>
-                                <h4 className="font-semibold text-xs uppercase tracking-wider text-[#706f6c] mb-1">Projects</h4>
+                                <h4 className="mb-1 text-xs font-semibold tracking-wider text-[#706f6c] uppercase">
+                                    Projects
+                                </h4>
                                 {data.projects.map((project, i) => (
                                     <div key={i} className="mb-2">
-                                        <div className="font-medium">{project.title}</div>
-                                        {project.technologies && <div className="text-xs text-[#706f6c]">{project.technologies}</div>}
-                                        {project.description && <p className="text-xs mt-0.5">{project.description}</p>}
+                                        <div className="font-medium">
+                                            {project.title}
+                                        </div>
+                                        {project.technologies && (
+                                            <div className="text-xs text-[#706f6c]">
+                                                {project.technologies}
+                                            </div>
+                                        )}
+                                        {project.description && (
+                                            <p className="mt-0.5 text-xs">
+                                                {project.description}
+                                            </p>
+                                        )}
                                     </div>
                                 ))}
                             </div>
@@ -220,7 +308,13 @@ function ResumeCard({ resume, onDelete }: { resume: SavedResume; onDelete: (id: 
     );
 }
 
-function CoverLetterCard({ letter, onDelete }: { letter: SavedCoverLetter; onDelete: (id: number) => void }) {
+function CoverLetterCard({
+    letter,
+    onDelete,
+}: {
+    letter: SavedCoverLetter;
+    onDelete: (id: number) => void;
+}) {
     const [deleteOpen, setDeleteOpen] = useState(false);
     const [previewOpen, setPreviewOpen] = useState(false);
 
@@ -240,7 +334,9 @@ function CoverLetterCard({ letter, onDelete }: { letter: SavedCoverLetter; onDel
                     <CardTitle className="flex items-center gap-2 text-base">
                         <Mail className="h-4 w-4 text-[#706f6c]" />
                         {letter.target_company || letter.target_job_title
-                            ? [letter.target_job_title, letter.target_company].filter(Boolean).join(' at ')
+                            ? [letter.target_job_title, letter.target_company]
+                                  .filter(Boolean)
+                                  .join(' at ')
                             : 'Cover Letter'}
                     </CardTitle>
                     <CardDescription>
@@ -253,11 +349,18 @@ function CoverLetterCard({ letter, onDelete }: { letter: SavedCoverLetter; onDel
                             To: {letter.recipient}
                         </p>
                     )}
-                    <p className="text-xs text-[#706f6c] line-clamp-2 dark:text-[#A1A09A]">
+                    <p className="line-clamp-2 text-xs text-[#706f6c] dark:text-[#A1A09A]">
                         {letter.job_description ? (
-                            <>{letter.job_description.slice(0, 200)}{letter.job_description.length > 200 ? '...' : ''}</>
+                            <>
+                                {letter.job_description.slice(0, 200)}
+                                {letter.job_description.length > 200
+                                    ? '...'
+                                    : ''}
+                            </>
                         ) : (
-                            <span className="italic">No job description provided</span>
+                            <span className="italic">
+                                No job description provided
+                            </span>
                         )}
                     </p>
                 </CardContent>
@@ -268,7 +371,11 @@ function CoverLetterCard({ letter, onDelete }: { letter: SavedCoverLetter; onDel
                             Load & Preview
                         </Button>
                     </Link>
-                    <Button variant="outline" size="sm" onClick={() => setDeleteOpen(true)}>
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setDeleteOpen(true)}
+                    >
                         <Trash2 className="mr-1 h-3.5 w-3.5" />
                         Delete
                     </Button>
@@ -284,12 +391,14 @@ function CoverLetterCard({ letter, onDelete }: { letter: SavedCoverLetter; onDel
             />
 
             <Dialog open={previewOpen} onOpenChange={setPreviewOpen}>
-                <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+                <DialogContent className="max-h-[80vh] max-w-2xl overflow-y-auto">
                     <DialogHeader>
                         <DialogTitle>Cover Letter</DialogTitle>
-                        <DialogDescription>{formatDate(letter.created_at)}</DialogDescription>
+                        <DialogDescription>
+                            {formatDate(letter.created_at)}
+                        </DialogDescription>
                     </DialogHeader>
-                    <div className="max-h-96 overflow-y-auto whitespace-pre-wrap rounded-lg border border-[#e3e3e0] bg-[#FDFDFC] p-4 text-sm leading-relaxed dark:border-[#3E3E3A] dark:bg-[#161615]">
+                    <div className="max-h-96 overflow-y-auto rounded-lg border border-[#e3e3e0] bg-[#FDFDFC] p-4 text-sm leading-relaxed whitespace-pre-wrap dark:border-[#3E3E3A] dark:bg-[#161615]">
                         {letter.content}
                     </div>
                     <DialogFooter>
@@ -307,7 +416,10 @@ function CoverLetterCard({ letter, onDelete }: { letter: SavedCoverLetter; onDel
     );
 }
 
-export default function SavedDocuments({ resumes, coverLetters }: SavedDocumentsProps) {
+export default function SavedDocuments({
+    resumes,
+    coverLetters,
+}: SavedDocumentsProps) {
     return (
         <>
             <Head title="Saved Documents" />
@@ -319,7 +431,8 @@ export default function SavedDocuments({ resumes, coverLetters }: SavedDocuments
                             Saved Documents
                         </h1>
                         <p className="text-sm text-muted-foreground">
-                            View and manage your saved resume versions and cover letters.
+                            View and manage your saved resume versions and cover
+                            letters.
                         </p>
                     </div>
                     <Link href="/documents">
@@ -333,27 +446,34 @@ export default function SavedDocuments({ resumes, coverLetters }: SavedDocuments
                 <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
                     {/* Saved Resumes */}
                     <div className="flex flex-col gap-4">
-                        <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
+                        <h2 className="flex items-center gap-2 text-lg font-semibold text-foreground">
                             <FileText className="size-4" />
                             Saved Resumes
                             {resumes.length > 0 && (
-                                <span className="text-xs font-normal text-[#706f6c]">({resumes.length})</span>
+                                <span className="text-xs font-normal text-[#706f6c]">
+                                    ({resumes.length})
+                                </span>
                             )}
                         </h2>
                         {resumes.length === 0 ? (
                             <div className="flex flex-col items-center justify-center rounded-lg border border-dashed border-[#e3e3e0] p-8 text-center dark:border-[#3E3E3A]">
-                                <FileText className="h-8 w-8 text-[#706f6c] mb-2" />
+                                <FileText className="mb-2 h-8 w-8 text-[#706f6c]" />
                                 <p className="text-sm text-[#706f6c]">
                                     No saved resume versions yet.
                                 </p>
-                                <p className="text-xs text-[#706f6c] mt-1">
-                                    Save a version from the Resume Builder to see it here.
+                                <p className="mt-1 text-xs text-[#706f6c]">
+                                    Save a version from the Resume Builder to
+                                    see it here.
                                 </p>
                             </div>
                         ) : (
                             <div className="flex flex-col gap-3">
                                 {resumes.map((resume) => (
-                                    <ResumeCard key={resume.id} resume={resume} onDelete={() => {}} />
+                                    <ResumeCard
+                                        key={resume.id}
+                                        resume={resume}
+                                        onDelete={() => {}}
+                                    />
                                 ))}
                             </div>
                         )}
@@ -361,27 +481,34 @@ export default function SavedDocuments({ resumes, coverLetters }: SavedDocuments
 
                     {/* Saved Cover Letters */}
                     <div className="flex flex-col gap-4">
-                        <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
+                        <h2 className="flex items-center gap-2 text-lg font-semibold text-foreground">
                             <Mail className="size-4" />
                             Saved Cover Letters
                             {coverLetters.length > 0 && (
-                                <span className="text-xs font-normal text-[#706f6c]">({coverLetters.length})</span>
+                                <span className="text-xs font-normal text-[#706f6c]">
+                                    ({coverLetters.length})
+                                </span>
                             )}
                         </h2>
                         {coverLetters.length === 0 ? (
                             <div className="flex flex-col items-center justify-center rounded-lg border border-dashed border-[#e3e3e0] p-8 text-center dark:border-[#3E3E3A]">
-                                <Mail className="h-8 w-8 text-[#706f6c] mb-2" />
+                                <Mail className="mb-2 h-8 w-8 text-[#706f6c]" />
                                 <p className="text-sm text-[#706f6c]">
                                     No saved cover letters yet.
                                 </p>
-                                <p className="text-xs text-[#706f6c] mt-1">
-                                    Generate and save a cover letter from the Resume Builder.
+                                <p className="mt-1 text-xs text-[#706f6c]">
+                                    Generate and save a cover letter from the
+                                    Resume Builder.
                                 </p>
                             </div>
                         ) : (
                             <div className="flex flex-col gap-3">
                                 {coverLetters.map((letter) => (
-                                    <CoverLetterCard key={letter.id} letter={letter} onDelete={() => {}} />
+                                    <CoverLetterCard
+                                        key={letter.id}
+                                        letter={letter}
+                                        onDelete={() => {}}
+                                    />
                                 ))}
                             </div>
                         )}

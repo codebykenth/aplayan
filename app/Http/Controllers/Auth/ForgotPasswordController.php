@@ -34,7 +34,7 @@ class ForgotPasswordController extends Controller
             'turnstile' => ['required', 'string'],
         ]);
 
-        if (!$this->turnstile->verify($data['turnstile'])) {
+        if (! $this->turnstile->verify($data['turnstile'])) {
             return back()->withErrors([
                 'security_check_failed' => 'Please complete the security check, then try again.',
             ]);

@@ -48,8 +48,13 @@
 }
 
 @keyframes pulse-border {
-    0%, 100% { border-left-color: oklch(0.637 0.237 25.331); }
-    50% { border-left-color: oklch(0.577 0.245 27.325); }
+    0%,
+    100% {
+        border-left-color: oklch(0.637 0.237 25.331);
+    }
+    50% {
+        border-left-color: oklch(0.577 0.245 27.325);
+    }
 }
 
 :root {
@@ -112,7 +117,7 @@
 }
 
 /* Color theme: Emerald */
-:root[data-color-theme="emerald"] {
+:root[data-color-theme='emerald'] {
     --primary: oklch(0.448 0.154 164.978);
     --primary-foreground: oklch(0.985 0 0);
     --ring: oklch(0.448 0.154 164.978);
@@ -120,7 +125,7 @@
     --sidebar-primary-foreground: oklch(0.985 0 0);
 }
 
-:root.dark[data-color-theme="emerald"] {
+:root.dark[data-color-theme='emerald'] {
     --primary: oklch(0.696 0.17 162.48);
     --primary-foreground: oklch(0.145 0 0);
     --ring: oklch(0.696 0.17 162.48);
@@ -129,7 +134,7 @@
 }
 
 /* Color theme: Ocean */
-:root[data-color-theme="ocean"] {
+:root[data-color-theme='ocean'] {
     --primary: oklch(0.375 0.143 259.433);
     --primary-foreground: oklch(0.985 0 0);
     --ring: oklch(0.375 0.143 259.433);
@@ -137,7 +142,7 @@
     --sidebar-primary-foreground: oklch(0.985 0 0);
 }
 
-:root.dark[data-color-theme="ocean"] {
+:root.dark[data-color-theme='ocean'] {
     --primary: oklch(0.594 0.184 254.624);
     --primary-foreground: oklch(0.145 0 0);
     --ring: oklch(0.594 0.184 254.624);
@@ -146,7 +151,7 @@
 }
 
 /* Color theme: Indigo */
-:root[data-color-theme="indigo"] {
+:root[data-color-theme='indigo'] {
     --primary: oklch(0.398 0.154 286.027);
     --primary-foreground: oklch(0.985 0 0);
     --ring: oklch(0.398 0.154 286.027);
@@ -154,7 +159,7 @@
     --sidebar-primary-foreground: oklch(0.985 0 0);
 }
 
-:root.dark[data-color-theme="indigo"] {
+:root.dark[data-color-theme='indigo'] {
     --primary: oklch(0.612 0.214 282.755);
     --primary-foreground: oklch(0.145 0 0);
     --ring: oklch(0.612 0.214 282.755);
@@ -163,7 +168,7 @@
 }
 
 /* Color theme: Sunset */
-:root[data-color-theme="sunset"] {
+:root[data-color-theme='sunset'] {
     --primary: oklch(0.544 0.185 22.555);
     --primary-foreground: oklch(0.985 0 0);
     --ring: oklch(0.544 0.185 22.555);
@@ -171,7 +176,7 @@
     --sidebar-primary-foreground: oklch(0.985 0 0);
 }
 
-:root.dark[data-color-theme="sunset"] {
+:root.dark[data-color-theme='sunset'] {
     --primary: oklch(0.715 0.194 22.555);
     --primary-foreground: oklch(0.145 0 0);
     --ring: oklch(0.715 0.194 22.555);

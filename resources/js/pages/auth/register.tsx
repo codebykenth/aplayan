@@ -4,21 +4,32 @@ import type { FormEvent } from 'react';
 import type { Auth } from '@/types/auth';
 import { registerSchema, validateWithZod } from '@/lib/validations';
 import Turnstile from '@/components/Turnstile';
+import { PasswordInput } from '@/components/ui/password-input';
 
 export default function Register() {
-    const { errors: pageErrors } = usePage<{ errors: Record<string, string> }>().props;
-    const turnstileRef = useRef<{ execute: () => Promise<string | null> }>(null);
+    const { errors: pageErrors } = usePage<{ errors: Record<string, string> }>()
+        .props;
+    const turnstileRef = useRef<{ execute: () => Promise<string | null> }>(
+        null,
+    );
 
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [passwordConfirmation, setPasswordConfirmation] = useState('');
-    const [clientErrors, setClientErrors] = useState<Record<string, string>>({});
+    const [clientErrors, setClientErrors] = useState<Record<string, string>>(
+        {},
+    );
 
     function submit(e: FormEvent) {
         e.preventDefault();
 
-        const validation = validateWithZod(registerSchema, { name, email, password, password_confirmation: passwordConfirmation });
+        const validation = validateWithZod(registerSchema, {
+            name,
+            email,
+            password,
+            password_confirmation: passwordConfirmation,
+        });
 
         if (!validation.success) {
             setClientErrors(validation.errors);
@@ -31,10 +42,14 @@ export default function Register() {
 
     async function submitForm() {
         const token = await turnstileRef.current?.execute();
-        const form = document.querySelector('form[action="/register"]') as HTMLFormElement | null;
+        const form = document.querySelector(
+            'form[action="/register"]',
+        ) as HTMLFormElement | null;
         if (!form) return;
 
-        let input = form.querySelector('input[name="turnstile"]') as HTMLInputElement | null;
+        let input = form.querySelector(
+            'input[name="turnstile"]',
+        ) as HTMLInputElement | null;
         if (!input) {
             input = document.createElement('input');
             input.type = 'hidden';
@@ -54,11 +69,23 @@ export default function Register() {
                     Create your account
                 </h1>
 
-                <form action="/register" method="POST" onSubmit={submit} className="space-y-4">
-                    <input type="hidden" name="_token" value={usePage().props.csrf_token as string} />
+                <form
+                    action="/register"
+                    method="POST"
+                    onSubmit={submit}
+                    className="space-y-4"
+                >
+                    <input
+                        type="hidden"
+                        name="_token"
+                        value={usePage().props.csrf_token as string}
+                    />
 
                     <div>
-                        <label htmlFor="name" className="block text-sm font-medium text-foreground">
+                        <label
+                            htmlFor="name"
+                            className="block text-sm font-medium text-foreground"
+                        >
                             Name
                         </label>
                         <input
@@ -73,12 +100,17 @@ export default function Register() {
                             placeholder="Your name"
                         />
                         {(clientErrors.name || pageErrors?.name) && (
-                            <p className="mt-1 text-sm text-destructive">{clientErrors.name || pageErrors?.name}</p>
+                            <p className="mt-1 text-sm text-destructive">
+                                {clientErrors.name || pageErrors?.name}
+                            </p>
                         )}
                     </div>
 
                     <div>
-                        <label htmlFor="email" className="block text-sm font-medium text-foreground">
+                        <label
+                            htmlFor="email"
+                            className="block text-sm font-medium text-foreground"
+                        >
                             Email
                         </label>
                         <input
@@ -92,52 +124,64 @@ export default function Register() {
                             placeholder="you@example.com"
                         />
                         {(clientErrors.email || pageErrors?.email) && (
-                            <p className="mt-1 text-sm text-destructive">{clientErrors.email || pageErrors?.email}</p>
+                            <p className="mt-1 text-sm text-destructive">
+                                {clientErrors.email || pageErrors?.email}
+                            </p>
                         )}
                     </div>
 
                     <div>
-                        <label htmlFor="password" className="block text-sm font-medium text-foreground">
+                        <label
+                            htmlFor="password"
+                            className="mb-1 block text-sm font-medium text-foreground"
+                        >
                             Password
                         </label>
-                        <input
+                        <PasswordInput
                             id="password"
                             name="password"
-                            type="password"
                             required
                             autoComplete="new-password"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
-                            className="mt-1 block w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground placeholder-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
                             placeholder="Password"
                         />
                         {(clientErrors.password || pageErrors?.password) && (
-                            <p className="mt-1 text-sm text-destructive">{clientErrors.password || pageErrors?.password}</p>
+                            <p className="mt-1 text-sm text-destructive">
+                                {clientErrors.password || pageErrors?.password}
+                            </p>
                         )}
                     </div>
 
                     <div>
-                        <label htmlFor="password_confirmation" className="block text-sm font-medium text-foreground">
+                        <label
+                            htmlFor="password_confirmation"
+                            className="mb-1 block text-sm font-medium text-foreground"
+                        >
                             Confirm Password
                         </label>
-                        <input
+                        <PasswordInput
                             id="password_confirmation"
                             name="password_confirmation"
-                            type="password"
                             required
                             value={passwordConfirmation}
-                            onChange={(e) => setPasswordConfirmation(e.target.value)}
-                            className="mt-1 block w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground placeholder-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
+                            onChange={(e) =>
+                                setPasswordConfirmation(e.target.value)
+                            }
                             placeholder="Confirm password"
                         />
-                        {(clientErrors.password_confirmation) && (
-                            <p className="mt-1 text-sm text-destructive">{clientErrors.password_confirmation}</p>
+                        {clientErrors.password_confirmation && (
+                            <p className="mt-1 text-sm text-destructive">
+                                {clientErrors.password_confirmation}
+                            </p>
                         )}
                     </div>
 
                     <div className="mt-4">
                         <Turnstile
-                            siteKey={usePage().props.turnstile_site_key as string}
+                            siteKey={
+                                usePage().props.turnstile_site_key as string
+                            }
                             ref={turnstileRef}
                         />
                     </div>

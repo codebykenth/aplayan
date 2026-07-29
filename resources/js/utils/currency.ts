@@ -25,7 +25,10 @@ export function getCurrencyName(code: string): string {
     return CURRENCIES.find((c) => c.code === code)?.name ?? code;
 }
 
-export function formatSalary(amount: number | null, currency: string = 'PHP'): string | null {
+export function formatSalary(
+    amount: number | null,
+    currency: string = 'PHP',
+): string | null {
     if (amount === null) {
         return null;
     }
@@ -41,18 +44,22 @@ export function formatSalary(amount: number | null, currency: string = 'PHP'): s
 
 export const RATES_TO_PHP: Record<string, number> = {
     PHP: 1.0,
-    USD: 57.50,
-    EUR: 62.00,
-    GBP: 73.00,
-    AUD: 37.50,
-    CAD: 41.50,
-    SGD: 42.50,
+    USD: 57.5,
+    EUR: 62.0,
+    GBP: 73.0,
+    AUD: 37.5,
+    CAD: 41.5,
+    SGD: 42.5,
     JPY: 0.38,
     AED: 15.65,
-    NZD: 34.50,
+    NZD: 34.5,
 };
 
-export function convertCurrency(amount: number, fromCurrency: string, toCurrency: string): number {
+export function convertCurrency(
+    amount: number,
+    fromCurrency: string,
+    toCurrency: string,
+): number {
     if (!amount || fromCurrency === toCurrency) {
         return amount;
     }
@@ -66,7 +73,10 @@ export function convertCurrency(amount: number, fromCurrency: string, toCurrency
     return Math.round(converted);
 }
 
-export function formatSalaryWithPeriod(amount: number | null, currency: string = 'PHP'): string | null {
+export function formatSalaryWithPeriod(
+    amount: number | null,
+    currency: string = 'PHP',
+): string | null {
     const formatted = formatSalary(amount, currency);
 
     return formatted ? `${formatted} / mo` : null;
