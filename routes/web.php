@@ -18,13 +18,18 @@ use App\Http\Controllers\JobApplicationExportController;
 use App\Http\Controllers\JobApplicationImportController;
 use App\Http\Controllers\JobApplicationSalaryController;
 use App\Http\Controllers\OfferComparisonController;
+use App\Http\Controllers\PrivacyPolicyController;
 use App\Http\Controllers\SettingsController;
+use App\Http\Controllers\TermsOfServiceController;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
 Route::inertia('/', 'welcome')->name('home');
+
+Route::get('privacy-policy', PrivacyPolicyController::class)->name('privacy-policy');
+Route::get('terms-of-service', TermsOfServiceController::class)->name('terms-of-service');
 
 Route::middleware('guest')->group(function () {
     Route::get('register', [AuthController::class, 'create'])->name('register');

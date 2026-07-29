@@ -1,5 +1,7 @@
 import { Link } from '@inertiajs/react';
 import { ExternalLink, Heart, Sparkles } from 'lucide-react';
+import ApplicationLogo from '@/components/ui/application-logo';
+import { privacyPolicy, termsOfService } from '@/routes';
 
 export default function Footer() {
     return (
@@ -10,12 +12,9 @@ export default function Footer() {
                     <div className="space-y-4 md:col-span-2">
                         <Link
                             href="/"
-                            className="inline-flex items-center gap-1.5 text-xl font-bold text-foreground"
+                            className="inline-flex items-center"
                         >
-                            Aplayan
-                            <span className="flex h-5 w-5 items-center justify-center rounded-full bg-primary/15 text-[10px] font-bold text-primary">
-                                ₱
-                            </span>
+                            <ApplicationLogo />
                         </Link>
                         <p className="max-w-sm text-sm leading-relaxed font-medium text-zinc-600 dark:text-zinc-400">
                             The all-in-one AI-powered job application tracker
@@ -106,6 +105,22 @@ export default function Footer() {
                                     className="text-zinc-600 transition-colors hover:text-primary dark:text-zinc-400 dark:hover:text-primary"
                                 >
                                     Frequently Asked Questions
+                                </Link>
+                            </li>
+                            <li>
+                                <Link
+                                    href={privacyPolicy.url()}
+                                    className="text-zinc-600 transition-colors hover:text-primary dark:text-zinc-400 dark:hover:text-primary"
+                                >
+                                    Privacy Policy
+                                </Link>
+                            </li>
+                            <li>
+                                <Link
+                                    href={termsOfService.url()}
+                                    className="text-zinc-600 transition-colors hover:text-primary dark:text-zinc-400 dark:hover:text-primary"
+                                >
+                                    Terms of Service
                                 </Link>
                             </li>
                         </ul>

@@ -19,6 +19,7 @@ import {
     Moon,
     Monitor,
 } from 'lucide-react';
+import ApplicationLogo from '@/components/ui/application-logo';
 import { useState, useEffect } from 'react';
 import {
     Tooltip,
@@ -27,6 +28,7 @@ import {
     TooltipTrigger,
 } from '@/components/ui/tooltip';
 import { useTheme } from '@/hooks/use-theme';
+import { privacyPolicy, termsOfService } from '@/routes';
 import type { Auth } from '@/types/auth';
 
 const sidebarLinks = [
@@ -243,9 +245,9 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                         <>
                             <Link
                                 href="/dashboard"
-                                className="text-lg font-semibold text-foreground"
+                                className="flex items-center"
                             >
-                                Aplayan
+                                <ApplicationLogo />
                             </Link>
                             <div className="flex-1" />
                             <TooltipProvider delay={100}>
@@ -380,6 +382,21 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                 >
                     <UserProfileMenu user={auth.user} isExpanded={isExpanded} />
                 </div>
+
+                {/* Legal links */}
+                <div
+                    className={`shrink-0 border-t border-border px-3 py-2 text-xs text-muted-foreground ${isExpanded ? '' : 'hidden'}`}
+                >
+                    <div className="flex items-center justify-center gap-3">
+                        <Link href={privacyPolicy.url()} className="hover:text-foreground transition-colors">
+                            Privacy
+                        </Link>
+                        <span className="text-border">|</span>
+                        <Link href={termsOfService.url()} className="hover:text-foreground transition-colors">
+                            Terms
+                        </Link>
+                    </div>
+                </div>
             </aside>
 
             {/* Main content area */}
@@ -398,9 +415,9 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                     </button>
                     <Link
                         href="/"
-                        className="text-lg font-semibold text-foreground"
+                        className="flex items-center"
                     >
-                        Aplayan
+                        <ApplicationLogo />
                     </Link>
                 </header>
 
