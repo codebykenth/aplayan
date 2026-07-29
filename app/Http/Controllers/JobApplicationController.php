@@ -38,11 +38,16 @@ class JobApplicationController extends Controller
 
         $templates = $this->templateService->listForUser(auth()->user());
         $contacts = $this->contactService->listForUser(auth()->user());
+        $user = auth()->user();
+        $resumeProfile = $user->resumeProfile;
+        $savedResumes = $user->savedResumes()->get(['id', 'name', 'template', 'profile_data']);
 
         return Inertia::render('job-applications/index', [
             'applications' => JobApplicationResource::collection($applications),
             'templates' => $templates,
             'contacts' => $contacts,
+            'resumeProfile' => $resumeProfile,
+            'savedResumes' => $savedResumes,
             'filters' => [
                 'search' => $search,
             ],
@@ -58,13 +63,17 @@ class JobApplicationController extends Controller
         return to_route('job-applications.index');
     }
 
-    public function show(JobApplication $jobApplication): JobApplicationResource
+    public function show(Request $request, JobApplication $jobApplication): JobApplicationResource|RedirectResponse
     {
         $this->authorize('view', $jobApplication);
 
         $jobApplication->load(['activities', 'contacts']);
 
-        return new JobApplicationResource($jobApplication);
+        if ($request->wantsJson() && ! $request->header('X-Inertia')) {
+            return new JobApplicationResource($jobApplication);
+        }
+
+        return redirect()->route('job-applications.index', ['selected' => $jobApplication->id]);
     }
 
     public function update(UpdateJobApplicationRequest $request, JobApplication $jobApplication): JobApplicationResource|RedirectResponse|JsonResponse

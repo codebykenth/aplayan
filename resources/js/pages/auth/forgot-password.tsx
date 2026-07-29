@@ -8,19 +8,25 @@ export default function ForgotPassword() {
     const turnstileRef = useRef<{ execute: () => Promise<string | null> }>(null);
 
     const [email, setEmail] = useState('');
-    const [turnstileToken, setTurnstileToken] = useState('');
-
     function submit(e: FormEvent) {
         e.preventDefault();
         submitForm();
     }
 
     async function submitForm() {
-        setTurnstileToken('');
         const token = await turnstileRef.current?.execute();
-        setTurnstileToken(token ?? '');
         const form = document.querySelector('form[action="/forgot-password"]') as HTMLFormElement | null;
-        form?.submit();
+        if (!form) return;
+
+        let input = form.querySelector('input[name="turnstile"]') as HTMLInputElement | null;
+        if (!input) {
+            input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = 'turnstile';
+            form.appendChild(input);
+        }
+        input.value = token ?? '';
+        form.submit();
     }
 
     return (
@@ -43,7 +49,6 @@ export default function ForgotPassword() {
 
                 <form action="/forgot-password" method="POST" onSubmit={submit} className="space-y-4">
                     <input type="hidden" name="_token" value={usePage().props.csrf_token as string} />
-                    {turnstileToken && <input type="hidden" name="turnstile" value={turnstileToken} />}
 
                     <div>
                         <label htmlFor="email" className="block text-sm font-medium text-foreground">

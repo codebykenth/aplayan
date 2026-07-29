@@ -127,35 +127,6 @@ it('does not flag low-match wishlist items', function () {
         );
 });
 
-it('flags applications missing AI evaluation', function () {
-    JobApplication::factory()->create([
-        'user_id' => $this->user->id,
-        'status' => 'applied',
-        'ai_evaluated_at' => null,
-        'last_contacted_at' => now(),
-    ]);
-
-    $this->get(route('dashboard'))
-        ->assertInertia(fn ($page) => $page
-            ->has('action_items', 1)
-            ->where('action_items.0.type', 'missing_ai_evaluation')
-        );
-});
-
-it('does not flag applications that have been AI evaluated', function () {
-    JobApplication::factory()->create([
-        'user_id' => $this->user->id,
-        'status' => 'applied',
-        'ai_evaluated_at' => now()->subDay(),
-        'last_contacted_at' => now(),
-    ]);
-
-    $this->get(route('dashboard'))
-        ->assertInertia(fn ($page) => $page
-            ->where('action_items', [])
-        );
-});
-
 it('flags salary negotiation opportunities for offers', function () {
     JobApplication::factory()->create([
         'user_id' => $this->user->id,

@@ -103,4 +103,3 @@ it('redirects to job-applications after email verification', function () {
         ->get($uri)
         ->assertRedirect(route('job-applications.index'));
 });
-

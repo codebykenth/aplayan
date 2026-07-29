@@ -14,7 +14,6 @@ export default function Register() {
     const [password, setPassword] = useState('');
     const [passwordConfirmation, setPasswordConfirmation] = useState('');
     const [clientErrors, setClientErrors] = useState<Record<string, string>>({});
-    const [turnstileToken, setTurnstileToken] = useState('');
 
     function submit(e: FormEvent) {
         e.preventDefault();
@@ -31,11 +30,19 @@ export default function Register() {
     }
 
     async function submitForm() {
-        setTurnstileToken('');
         const token = await turnstileRef.current?.execute();
-        setTurnstileToken(token ?? '');
         const form = document.querySelector('form[action="/register"]') as HTMLFormElement | null;
-        form?.submit();
+        if (!form) return;
+
+        let input = form.querySelector('input[name="turnstile"]') as HTMLInputElement | null;
+        if (!input) {
+            input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = 'turnstile';
+            form.appendChild(input);
+        }
+        input.value = token ?? '';
+        form.submit();
     }
 
     return (
@@ -49,7 +56,6 @@ export default function Register() {
 
                 <form action="/register" method="POST" onSubmit={submit} className="space-y-4">
                     <input type="hidden" name="_token" value={usePage().props.csrf_token as string} />
-                    {turnstileToken && <input type="hidden" name="turnstile" value={turnstileToken} />}
 
                     <div>
                         <label htmlFor="name" className="block text-sm font-medium text-foreground">

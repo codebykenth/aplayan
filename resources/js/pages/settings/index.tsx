@@ -449,6 +449,10 @@ function TaxSettingsSection({ user }: { user: UserData }) {
             regime: user.tax_settings?.regime ?? 'ph_regular',
             allowances: user.tax_settings?.allowances ?? [],
             custom_deductions: user.tax_settings?.custom_deductions ?? [],
+            override_sss: user.tax_settings?.override_sss ?? null,
+            override_philhealth: user.tax_settings?.override_philhealth ?? null,
+            override_pagibig: user.tax_settings?.override_pagibig ?? null,
+            override_bir_tax: user.tax_settings?.override_bir_tax ?? null,
         },
     });
     const taxSettings = data.tax_settings;
@@ -513,7 +517,7 @@ function TaxSettingsSection({ user }: { user: UserData }) {
                     Global Tax Preferences
                 </CardTitle>
                 <CardDescription>
-                    Set default tax regime and standard allowances. These apply to all new offers unless overridden per-offer.
+                    Set default tax regime, standard allowances, and statutory contribution overrides. These apply to all offer comparisons unless customized per-offer.
                 </CardDescription>
             </CardHeader>
             <CardContent className="flex flex-col gap-4">
@@ -541,6 +545,81 @@ function TaxSettingsSection({ user }: { user: UserData }) {
                                 ))}
                             </SelectContent>
                         </Select>
+                </div>
+
+                <div className="flex flex-col gap-3 border-t border-border pt-4">
+                    <div>
+                        <Label className="text-sm font-semibold">Statutory Contribution Overrides (Optional)</Label>
+                        <p className="text-xs text-muted-foreground">
+                            Leave empty to automatically calculate deductions using official 2026 Philippine government statutory rates.
+                        </p>
+                    </div>
+                    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                        <div className="flex flex-col gap-1.5">
+                            <Label htmlFor="override_sss" className="text-xs">SSS Monthly (₱)</Label>
+                            <Input
+                                id="override_sss"
+                                type="number"
+                                min={0}
+                                placeholder="Auto (2026 SSS Table)"
+                                value={taxSettings.override_sss ?? ''}
+                                onChange={(e) =>
+                                    updateSettings((prev) => ({
+                                        ...prev,
+                                        override_sss: e.target.value !== '' ? parseFloat(e.target.value) : null,
+                                    }))
+                                }
+                            />
+                        </div>
+                        <div className="flex flex-col gap-1.5">
+                            <Label htmlFor="override_philhealth" className="text-xs">PhilHealth Monthly (₱)</Label>
+                            <Input
+                                id="override_philhealth"
+                                type="number"
+                                min={0}
+                                placeholder="Auto (5% Share)"
+                                value={taxSettings.override_philhealth ?? ''}
+                                onChange={(e) =>
+                                    updateSettings((prev) => ({
+                                        ...prev,
+                                        override_philhealth: e.target.value !== '' ? parseFloat(e.target.value) : null,
+                                    }))
+                                }
+                            />
+                        </div>
+                        <div className="flex flex-col gap-1.5">
+                            <Label htmlFor="override_pagibig" className="text-xs">Pag-IBIG Monthly (₱)</Label>
+                            <Input
+                                id="override_pagibig"
+                                type="number"
+                                min={0}
+                                placeholder="Auto (₱100 Cap)"
+                                value={taxSettings.override_pagibig ?? ''}
+                                onChange={(e) =>
+                                    updateSettings((prev) => ({
+                                        ...prev,
+                                        override_pagibig: e.target.value !== '' ? parseFloat(e.target.value) : null,
+                                    }))
+                                }
+                            />
+                        </div>
+                        <div className="flex flex-col gap-1.5">
+                            <Label htmlFor="override_bir_tax" className="text-xs">BIR Income Tax Monthly (₱)</Label>
+                            <Input
+                                id="override_bir_tax"
+                                type="number"
+                                min={0}
+                                placeholder="Auto (BIR TRAIN Law)"
+                                value={taxSettings.override_bir_tax ?? ''}
+                                onChange={(e) =>
+                                    updateSettings((prev) => ({
+                                        ...prev,
+                                        override_bir_tax: e.target.value !== '' ? parseFloat(e.target.value) : null,
+                                    }))
+                                }
+                            />
+                        </div>
+                    </div>
                 </div>
 
                 <div className="flex flex-col gap-2">

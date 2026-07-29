@@ -56,7 +56,13 @@ const PRIORITY_STYLES = {
     },
 };
 
-function ActionCard({ item }: { item: ActionItem }) {
+function ActionCard({
+    item,
+    onSelectApplication,
+}: {
+    item: ActionItem;
+    onSelectApplication?: (id: number) => void;
+}) {
     const Icon = ACTION_ICONS[item.type] ?? Bell;
     const style = PRIORITY_STYLES[item.priority];
 
@@ -96,18 +102,36 @@ function ActionCard({ item }: { item: ActionItem }) {
                 </p>
             </div>
 
-            <Link
-                href={showRoute.url(item.application_id)}
-                className="mt-1 flex shrink-0 items-center gap-1 rounded-lg px-2 py-1 text-xs font-medium text-foreground transition-colors hover:bg-muted"
-            >
-                View
-                <ArrowRight className="size-3" />
-            </Link>
+            {onSelectApplication ? (
+                <button
+                    type="button"
+                    onClick={() => onSelectApplication(item.application_id)}
+                    className="mt-1 flex shrink-0 items-center gap-1 rounded-lg px-2 py-1 text-xs font-medium text-foreground transition-colors hover:bg-muted cursor-pointer"
+                >
+                    View
+                    <ArrowRight className="size-3" />
+                </button>
+            ) : (
+                <Link
+                    href={showRoute.url(item.application_id)}
+                    className="mt-1 flex shrink-0 items-center gap-1 rounded-lg px-2 py-1 text-xs font-medium text-foreground transition-colors hover:bg-muted"
+                >
+                    View
+                    <ArrowRight className="size-3" />
+                </Link>
+            )}
         </div>
     );
 }
 
-export default function ActionFeed({ items }: { items: ActionItem[] }) {
+export default function ActionFeed({
+    items,
+    onSelectApplication,
+}: {
+    items: ActionItem[];
+    onSelectApplication?: (id: number) => void;
+}) {
+    const filteredItems = items.filter((item) => item.type !== 'missing_ai_evaluation');
     const scrollContainerRef = useRef<HTMLDivElement>(null);
     const [canScrollLeft, setCanScrollLeft] = useState(false);
     const [canScrollRight, setCanScrollRight] = useState(false);
@@ -211,7 +235,7 @@ return;
                         key={`${item.type}-${item.application_id}`}
                         className="w-full shrink-0 snap-start sm:w-[calc((100%-0.75rem)/2)] lg:w-[calc((100%-1.5rem)/3)]"
                     >
-                        <ActionCard item={item} />
+                        <ActionCard item={item} onSelectApplication={onSelectApplication} />
                     </div>
                 ))}
             </div>

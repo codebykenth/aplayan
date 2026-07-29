@@ -6,6 +6,7 @@ use App\Models\AiResponseCache;
 use Illuminate\Cache\RateLimiter;
 use Illuminate\Http\Client\RequestException;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
 use JsonException;
 
 class AiCacheService
@@ -21,18 +22,21 @@ class AiCacheService
         private RateLimiter $rateLimiter,
     ) {}
 
-    public function resumeMatch(string $companyName, string $jobTitle, string $jobDescription, string $resumeText, int $userId): array
+    public function resumeMatch(string $companyName, string $jobTitle, string $jobDescription, string $resumeText, int $userId, bool $forceRefresh = false): array
     {
-        $canonicalKey = $this->normalizer->generateCanonicalKey('job_match', $companyName, $jobTitle, $jobDescription);
+        $resumeFingerprint = $this->normalizer->createDescriptionFingerprint($resumeText);
+        $canonicalKey = $this->normalizer->generateCanonicalKey('job_match', $companyName, $jobTitle, $jobDescription.'|resume:'.$resumeFingerprint);
 
-        $cached = $this->getFromCache($canonicalKey);
-        if ($cached !== null) {
-            return $cached;
+        if (! $forceRefresh) {
+            $cached = $this->getFromCache($canonicalKey);
+            if ($cached !== null) {
+                return $cached;
+            }
         }
 
         $uncachedKey = "ai-uncached:{$userId}";
 
-        if ($this->rateLimiter->tooManyAttempts($uncachedKey, self::UNCACHED_LIMIT)) {
+        if ($this->isUncachedLimitReached($uncachedKey)) {
             return $this->fallback->computeJobMatchScore($jobDescription, $resumeText);
         }
 
@@ -44,8 +48,13 @@ class AiCacheService
             $this->rateLimiter->hit($uncachedKey, 86400);
 
             return $result;
-        } catch (RequestException|JsonException $e) {
-            return $this->fallback->computeJobMatchScore($jobDescription, $resumeText);
+        } catch (\Throwable $e) {
+            Log::error('Gemini API resume match error: '.$e->getMessage(), ['exception' => $e]);
+
+            $fallback = $this->fallback->computeJobMatchScore($jobDescription, $resumeText);
+            $fallback['_error'] = $e->getMessage();
+
+            return $fallback;
         }
     }
 
@@ -60,7 +69,7 @@ class AiCacheService
 
         $uncachedKey = "ai-uncached:{$userId}";
 
-        if ($this->rateLimiter->tooManyAttempts($uncachedKey, self::UNCACHED_LIMIT)) {
+        if ($this->isUncachedLimitReached($uncachedKey)) {
             return $this->fallback->computeJobMatchScore($jobDescription ?? '', $jobTitle);
         }
 
@@ -72,8 +81,13 @@ class AiCacheService
             $this->rateLimiter->hit($uncachedKey, 86400);
 
             return $result;
-        } catch (RequestException|JsonException $e) {
-            return $this->fallback->computeJobMatchScore($jobDescription ?? '', $jobTitle);
+        } catch (\Throwable $e) {
+            Log::error('Gemini API salary check error: '.$e->getMessage(), ['exception' => $e]);
+
+            $fallback = $this->fallback->computeJobMatchScore($jobDescription ?? '', $jobTitle);
+            $fallback['_error'] = $e->getMessage();
+
+            return $fallback;
         }
     }
 
@@ -88,7 +102,7 @@ class AiCacheService
 
         $uncachedKey = "ai-uncached:{$userId}";
 
-        if ($this->rateLimiter->tooManyAttempts($uncachedKey, self::UNCACHED_LIMIT)) {
+        if ($this->isUncachedLimitReached($uncachedKey)) {
             return [
                 'questions' => ['Tell me about yourself'],
                 'talking_points' => ['Review the job description'],
@@ -106,13 +120,16 @@ class AiCacheService
             $this->rateLimiter->hit($uncachedKey, 86400);
 
             return $result;
-        } catch (RequestException|JsonException $e) {
+        } catch (\Throwable $e) {
+            Log::error('Gemini API interview prep error: '.$e->getMessage(), ['exception' => $e]);
+
             return [
                 'questions' => ['Tell me about yourself'],
                 'talking_points' => ['Review the job description'],
                 'tips' => ['Prepare based on the job requirements'],
                 '_fallback' => true,
                 '_badge' => 'Generated via Smart Analysis (AI provider busy)',
+                '_error' => $e->getMessage(),
             ];
         }
     }
@@ -129,7 +146,7 @@ class AiCacheService
 
         $uncachedKey = "ai-uncached:{$userId}";
 
-        if ($this->rateLimiter->tooManyAttempts($uncachedKey, self::UNCACHED_LIMIT)) {
+        if ($this->isUncachedLimitReached($uncachedKey)) {
             return 'Generated via Smart Analysis (AI provider busy)';
         }
 
@@ -158,7 +175,7 @@ class AiCacheService
 
         $uncachedKey = "ai-uncached:{$userId}";
 
-        if ($this->rateLimiter->tooManyAttempts($uncachedKey, self::UNCACHED_LIMIT)) {
+        if ($this->isUncachedLimitReached($uncachedKey)) {
             return $this->fallback->polishText($content);
         }
 
@@ -187,7 +204,7 @@ class AiCacheService
 
         $uncachedKey = "ai-uncached:{$userId}";
 
-        if ($this->rateLimiter->tooManyAttempts($uncachedKey, self::UNCACHED_LIMIT)) {
+        if ($this->isUncachedLimitReached($uncachedKey)) {
             return $this->fallback->polishText($content);
         }
 
@@ -216,7 +233,7 @@ class AiCacheService
 
         $uncachedKey = "ai-uncached:{$userId}";
 
-        if ($this->rateLimiter->tooManyAttempts($uncachedKey, self::UNCACHED_LIMIT)) {
+        if ($this->isUncachedLimitReached($uncachedKey)) {
             return 'Generated via Smart Analysis (AI provider busy)';
         }
 
@@ -235,6 +252,14 @@ class AiCacheService
 
     public function getRateLimitInfo(int $userId): array
     {
+        if (! app()->isProduction()) {
+            return [
+                'remaining' => 999,
+                'total' => 999,
+                'exhausted' => false,
+            ];
+        }
+
         $uncachedKey = "ai-uncached:{$userId}";
 
         $remaining = max(0, self::UNCACHED_LIMIT - $this->rateLimiter->attempts($uncachedKey));
@@ -244,6 +269,15 @@ class AiCacheService
             'total' => self::UNCACHED_LIMIT,
             'exhausted' => $remaining <= 0,
         ];
+    }
+
+    private function isUncachedLimitReached(string $uncachedKey): bool
+    {
+        if (! app()->isProduction()) {
+            return false;
+        }
+
+        return $this->rateLimiter->tooManyAttempts($uncachedKey, self::UNCACHED_LIMIT);
     }
 
     private function getFromCache(string $canonicalKey): ?array
@@ -274,13 +308,15 @@ class AiCacheService
 
     private function storeInCache(string $canonicalKey, string $featureType, ?string $normalizedCompany, ?string $normalizedTitle, array $responseData): void
     {
-        AiResponseCache::create([
-            'canonical_key' => $canonicalKey,
-            'feature_type' => $featureType,
-            'normalized_company' => $normalizedCompany,
-            'normalized_title' => $normalizedTitle,
-            'response_data' => $responseData,
-        ]);
+        AiResponseCache::updateOrCreate(
+            ['canonical_key' => $canonicalKey],
+            [
+                'feature_type' => $featureType,
+                'normalized_company' => $normalizedCompany,
+                'normalized_title' => $normalizedTitle,
+                'response_data' => $responseData,
+            ]
+        );
 
         $ramKey = "ai_cache:{$canonicalKey}";
         Cache::put($ramKey, $responseData, now()->addSeconds(self::CACHE_TTL_SECONDS));

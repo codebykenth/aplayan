@@ -53,9 +53,20 @@ export default function JobApplicationsIndex({
     const [importModalOpen, setImportModalOpen] = useState(false);
 
     useEffect(() => {
+        const params = new URLSearchParams(window.location.search);
+        const selectedId = params.get('selected');
+        if (selectedId) {
+            const found = applicationList.find((app) => app.id === Number(selectedId));
+            if (found) {
+                setViewingApplication(found);
+            }
+        }
+    }, [applicationList]);
+
+    useEffect(() => {
         if (!exportOpen) {
-return;
-}
+            return;
+        }
 
         function handleClickOutside() {
             setExportOpen(false);

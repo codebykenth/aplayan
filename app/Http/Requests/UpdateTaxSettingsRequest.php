@@ -24,6 +24,10 @@ class UpdateTaxSettingsRequest extends FormRequest
             'tax_settings.custom_deductions' => ['nullable', 'array'],
             'tax_settings.custom_deductions.*.name' => ['required_with:tax_settings.custom_deductions', 'string', 'max:255'],
             'tax_settings.custom_deductions.*.amount' => ['required_with:tax_settings.custom_deductions', 'numeric', 'min:0'],
+            'tax_settings.override_sss' => ['nullable', 'numeric', 'min:0'],
+            'tax_settings.override_philhealth' => ['nullable', 'numeric', 'min:0'],
+            'tax_settings.override_pagibig' => ['nullable', 'numeric', 'min:0'],
+            'tax_settings.override_bir_tax' => ['nullable', 'numeric', 'min:0'],
         ];
     }
 

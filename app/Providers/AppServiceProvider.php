@@ -78,19 +78,25 @@ class AppServiceProvider extends ServiceProvider
         });
 
         RateLimiter::for('ai', function (Request $request) {
-            $user = $request->user();
+            if (! app()->isProduction()) {
+                return Limit::none();
+            }
 
+            $user = $request->user();
             $key = 'ai:'.($user ? $user->id : $request->ip());
 
-            return Limit::perDay(10)->by($key);
+            return Limit::perDay(500)->by($key);
         });
 
         RateLimiter::for('ai-uncached', function (Request $request) {
-            $user = $request->user();
+            if (! app()->isProduction()) {
+                return Limit::none();
+            }
 
+            $user = $request->user();
             $key = 'ai-uncached:'.($user ? $user->id : $request->ip());
 
-            return Limit::perDay(10)->by($key);
+            return Limit::perDay(500)->by($key);
         });
     }
 

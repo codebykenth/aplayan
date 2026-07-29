@@ -148,7 +148,7 @@ throw new Error('Failed to fetch application');
                 <PageHeader title="Dashboard" description="Overview of your job search activity" />
 
                 {/* Action Feed */}
-                <ActionFeed items={action_items} />
+                <ActionFeed items={action_items} onSelectApplication={handleSelectApplication} />
 
                 <div className="grid gap-6 lg:grid-cols-[1fr_320px]">
                     <div className="flex min-w-0 flex-col gap-6">

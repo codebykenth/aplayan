@@ -510,4 +510,3 @@ it('resends the verification email', function () {
 
     Notification::assertSentTo($user, VerifyEmail::class);
 });
-

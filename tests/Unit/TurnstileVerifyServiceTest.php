@@ -1,7 +1,7 @@
 <?php
 
 use App\Services\TurnstileVerifyService;
-use Illuminate\Http\Client\RequestException;
+use Illuminate\Http\Client\Request;
 use Illuminate\Support\Facades\Http;
 
 beforeEach(function () {
@@ -17,7 +17,7 @@ it('returns true when Cloudflare returns success', function () {
         ]),
     ]);
 
-    $service = new TurnstileVerifyService();
+    $service = new TurnstileVerifyService;
 
     expect($service->verify('test-turnstile-token'))->toBeTrue();
 });
@@ -32,7 +32,7 @@ it('returns false when Cloudflare returns failure', function () {
         ]),
     ]);
 
-    $service = new TurnstileVerifyService();
+    $service = new TurnstileVerifyService;
 
     expect($service->verify('invalid-token'))->toBeFalse();
 });
@@ -44,7 +44,7 @@ it('returns false when Cloudflare API returns an error', function () {
         'challenges.cloudflare.com/turnstile/v0/siteverify' => Http::response([], 500),
     ]);
 
-    $service = new TurnstileVerifyService();
+    $service = new TurnstileVerifyService;
 
     expect($service->verify('test-token'))->toBeFalse();
 });
@@ -58,11 +58,11 @@ it('sends the correct request to the Cloudflare verification endpoint', function
         ]),
     ]);
 
-    $service = new TurnstileVerifyService();
+    $service = new TurnstileVerifyService;
 
     $service->verify('my-turnstile-token');
 
-    Http::assertSent(function (\Illuminate\Http\Client\Request $request) {
+    Http::assertSent(function (Request $request) {
         expect($request->url())->toBe('https://challenges.cloudflare.com/turnstile/v0/siteverify');
         expect($request->method())->toBe('POST');
         expect($request->body())->toContain('secret=test-secret-key');

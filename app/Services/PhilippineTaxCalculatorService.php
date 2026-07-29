@@ -181,6 +181,10 @@ class PhilippineTaxCalculatorService
             'allowances' => $offerConfig['allowances'] ?? $userDefaults['allowances'] ?? [],
             'custom_deductions' => $offerConfig['custom_deductions'] ?? $userDefaults['custom_deductions'] ?? [],
             'manual_net_override' => $offerConfig['manual_net_override'] ?? null,
+            'override_sss' => $offerConfig['override_sss'] ?? $userDefaults['override_sss'] ?? null,
+            'override_philhealth' => $offerConfig['override_philhealth'] ?? $userDefaults['override_philhealth'] ?? null,
+            'override_pagibig' => $offerConfig['override_pagibig'] ?? $userDefaults['override_pagibig'] ?? null,
+            'override_bir_tax' => $offerConfig['override_bir_tax'] ?? $userDefaults['override_bir_tax'] ?? null,
         ];
 
         return $resolved;
