@@ -8,8 +8,9 @@ import {
     CheckIcon,
     XIcon,
 } from 'lucide-react';
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import type { JobApplication } from '@/types/job-application';
 
@@ -23,8 +24,8 @@ interface AiCopilotTabProps {
 
 function formatSalary(amount: number | null): string | null {
     if (amount === null) {
-return null;
-}
+        return null;
+    }
 
     return `₱${amount.toLocaleString('en-PH', {
         minimumFractionDigits: 0,
@@ -32,13 +33,112 @@ return null;
     })}`;
 }
 
+function formatResumeToText(profile: any): string {
+    if (!profile) {
+        return '';
+    }
+
+    const fullName = profile.full_name || '';
+    const targetRole = profile.target_role || '';
+    const summary = profile.summary || '';
+
+    const lines: string[] = [];
+
+    if (fullName) {
+        lines.push(fullName + (targetRole ? ` — ${targetRole}` : ''));
+    }
+
+    if (summary) {
+        lines.push(`\nSUMMARY:\n${summary.trim()}`);
+    }
+
+    if (Array.isArray(profile.work_experience) && profile.work_experience.length > 0) {
+        lines.push('\nWORK EXPERIENCE:');
+        profile.work_experience.forEach((job: any) => {
+            const title = job.position || job.title || 'Role';
+            const company = job.company || 'Company';
+            const dateStr = job.duration || job.year || (job.start_date ? `${job.start_date} - ${job.end_date || 'Present'}` : 'N/A');
+            lines.push(`• ${title} at ${company} (${dateStr})`);
+            if (job.description) {
+                const descLines = String(job.description)
+                    .split('\n')
+                    .map((l: string) => l.trim())
+                    .filter(Boolean);
+                descLines.forEach((descLine: string) => {
+                    const formatted = /^[-*•]\s*/.test(descLine)
+                        ? `  ${descLine.replace(/^[-*•]\s*/, '• ')}`
+                        : `  • ${descLine}`;
+                    lines.push(formatted);
+                });
+            }
+        });
+    }
+
+    if (Array.isArray(profile.education) && profile.education.length > 0) {
+        lines.push('\nEDUCATION:');
+        profile.education.forEach((edu: any) => {
+            const degree = edu.degree || 'Degree';
+            const inst = edu.institution || 'Institution';
+            const dateStr = edu.year || edu.duration || 'N/A';
+            lines.push(`• ${degree} — ${inst} (${dateStr})`);
+        });
+    }
+
+    if (Array.isArray(profile.skills) && profile.skills.length > 0) {
+        const skillList = profile.skills.filter(Boolean).join(', ');
+        if (skillList) {
+            lines.push(`\nSKILLS:\n${skillList}`);
+        }
+    }
+
+    if (Array.isArray(profile.projects) && profile.projects.length > 0) {
+        lines.push('\nPROJECTS:');
+        profile.projects.forEach((proj: any) => {
+            lines.push(`• ${proj.title || 'Project'}: ${proj.description || ''}`);
+        });
+    }
+
+    if (Array.isArray(profile.certifications) && profile.certifications.length > 0) {
+        const certList = profile.certifications.filter(Boolean).join(', ');
+        if (certList) {
+            lines.push(`\nCERTIFICATIONS:\n${certList}`);
+        }
+    }
+
+    return lines.join('\n');
+}
+
 export default function AiCopilotTab({
     application,
 }: AiCopilotTabProps) {
-    const { aiLimit } = usePage<{ aiLimit?: { remaining: number; total: number; exhausted: boolean } }>().props;
+    const { aiLimit, resumeProfile, savedResumes } = usePage<{
+        aiLimit?: { remaining: number; total: number; exhausted: boolean };
+        resumeProfile?: any;
+        savedResumes?: any[];
+    }>().props;
+
     const [resumeText, setResumeText] = useState('');
+    const [selectedResumeId, setSelectedResumeId] = useState<string>('master');
+
+    useEffect(() => {
+        if (application.ai_resume_text) {
+            setResumeText(application.ai_resume_text);
+            setSelectedResumeId('custom');
+        } else if (!resumeText && resumeProfile) {
+            const formatted = formatResumeToText(resumeProfile);
+            if (formatted) {
+                setResumeText(formatted);
+                setSelectedResumeId('master');
+            }
+        }
+    }, [application.ai_resume_text, resumeProfile]);
+
+    const hasSubScores = application.ai_tech_stack_percentage !== null
+        || application.ai_experience_percentage !== null
+        || application.ai_education_percentage !== null;
     const [analyzing, setAnalyzing] = useState(false);
     const [analyzeError, setAnalyzeError] = useState<string | null>(null);
+    const [matchBadge, setMatchBadge] = useState<string | null>(null);
     const [salaryChecking, setSalaryChecking] = useState(false);
     const [salaryError, setSalaryError] = useState<string | null>(null);
     const [prepGenerating, setPrepGenerating] = useState(false);
@@ -63,7 +163,7 @@ return;
                     'Accept': 'application/json',
                     'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? '',
                 },
-                body: JSON.stringify({ resume_text: resumeText }),
+                body: JSON.stringify({ resume_text: resumeText, force_refresh: true }),
             });
 
             if (!response.ok) {
@@ -73,6 +173,19 @@ return;
             }
 
             const result = await response.json();
+
+            if (result._error) {
+                setAnalyzeError(`AI Service Notice: ${result._error}`);
+            } else {
+                setAnalyzeError(null);
+            }
+
+            if (result._badge) {
+                setMatchBadge(result._badge);
+            } else {
+                setMatchBadge(null);
+            }
+
             router.reload();
         } catch (error) {
             setAnalyzeError(error instanceof Error ? error.message : 'An unexpected error occurred');
@@ -188,16 +301,67 @@ return;
                 </div>
             )}
 
+            {!application.job_description?.trim() && (
+                <div className="rounded-lg border border-amber-200 bg-amber-50/50 p-3 text-xs font-medium text-amber-800 dark:border-amber-900/30 dark:bg-amber-900/10 dark:text-amber-300">
+                    💡 <strong>Missing Job Description</strong>: Please edit this application to add a job description so the AI can accurately match your resume against the role requirements.
+                </div>
+            )}
+
             <div className="flex flex-col gap-3">
-                <span className="text-xs text-muted-foreground">
-                    Run AI Resume Match
-                </span>
+                <div className="flex items-center justify-between gap-2">
+                    <span className="text-xs font-medium text-muted-foreground">
+                        Resume Content
+                    </span>
+                    {(resumeProfile || (savedResumes && savedResumes.length > 0)) && (
+                        <Select
+                            value={selectedResumeId}
+                            onValueChange={(val) => {
+                                if (!val) return;
+                                setSelectedResumeId(val);
+                                if (val === 'master' && resumeProfile) {
+                                    setResumeText(formatResumeToText(resumeProfile));
+                                } else {
+                                    const selectedSaved = savedResumes?.find((r: any) => String(r.id) === val);
+                                    if (selectedSaved?.profile_data) {
+                                        setResumeText(formatResumeToText(selectedSaved.profile_data));
+                                    }
+                                }
+                            }}
+                        >
+                            <SelectTrigger className="h-8 w-[240px] text-xs">
+                                <SelectValue placeholder="⚡ Load from profile/resume...">
+                                    {selectedResumeId === 'master'
+                                        ? '📌 Master Resume Profile'
+                                        : selectedResumeId === 'custom'
+                                          ? '✏️ Custom / Analyzed Resume Text'
+                                          : savedResumes?.find((r: any) => String(r.id) === selectedResumeId)
+                                            ? `📄 ${savedResumes.find((r: any) => String(r.id) === selectedResumeId)?.name}`
+                                            : null}
+                                </SelectValue>
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="custom">✏️ Custom / Analyzed Resume Text</SelectItem>
+                                {resumeProfile && (
+                                    <SelectItem value="master">📌 Master Resume Profile</SelectItem>
+                                )}
+                                {savedResumes?.map((r: any) => (
+                                    <SelectItem key={r.id} value={String(r.id)}>
+                                        📄 {r.name}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                    )}
+                </div>
                 <textarea
                     value={resumeText}
-                    onChange={(e) => setResumeText(e.target.value)}
+                    onChange={(e) => {
+                        setResumeText(e.target.value);
+                        setSelectedResumeId('custom');
+                    }}
                     placeholder="Paste your resume text here..."
-                    rows={4}
-                    className="w-full resize-none rounded-lg border border-input bg-transparent p-2 text-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
+                    rows={6}
+                    className="min-h-[120px] w-full resize rounded-lg border border-input bg-transparent p-2 text-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
                 />
                 <label className="flex cursor-pointer items-center gap-2 text-sm text-muted-foreground hover:text-foreground">
                     <input
@@ -221,11 +385,26 @@ return;
                     (.txt or .pdf, text will be extracted)
                 </label>
                 {analyzeError && (
-                    <p className="text-xs text-destructive">{analyzeError}</p>
+                    <div className="rounded-lg border border-amber-500/30 bg-amber-500/10 p-3 text-xs font-medium text-amber-900 dark:text-amber-200">
+                        <div className="flex items-start gap-2">
+                            <span className="shrink-0 text-sm">⚠️</span>
+                            <div>
+                                <p className="font-semibold">{analyzeError}</p>
+                                {application.ai_strengths?.[0]?.startsWith('Matching keyword:') && (
+                                    <p className="mt-1 text-[11px] opacity-80">Fallback keyword analysis was used. For details, view <code>storage/logs/laravel.log</code>.</p>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+                )}
+                {!resumeText.trim() && application.job_description?.trim() && (
+                    <p className="text-[11px] text-muted-foreground">
+                        ℹ️ Please paste or upload your resume text into the text area above to enable AI Match.
+                    </p>
                 )}
                 <Button
                     onClick={handleAnalyzeMatch}
-                    disabled={analyzing || !resumeText.trim()}
+                    disabled={analyzing || !resumeText.trim() || !application.job_description?.trim()}
                 >
                     {analyzing ? (
                         <>
@@ -242,51 +421,118 @@ return;
             </div>
 
             {application.ai_match_percentage !== null && (
-                <div className="flex flex-col gap-2">
-                    <span className="text-xs text-muted-foreground">
-                        Resume Match Score
-                    </span>
-                    <div className="flex items-center gap-3">
-                        <span
-                            className={`inline-flex size-10 shrink-0 items-center justify-center rounded-full text-sm font-bold ${
-                                application.ai_match_percentage >= 70
-                                    ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300'
-                                    : application.ai_match_percentage >= 40
-                                      ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300'
-                                      : 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300'
-                            }`}
-                        >
-                            {application.ai_match_percentage}%
-                        </span>
-                        <div className="flex flex-col gap-1 text-xs text-muted-foreground">
+                <div className="rounded-xl border border-border bg-card/60 p-4 flex flex-col gap-3">
+                    <div className="flex flex-wrap items-center justify-between gap-3">
+                        <div className="flex items-center gap-3">
+                            <span
+                                className={`inline-flex size-12 shrink-0 items-center justify-center rounded-xl text-base font-bold shadow-xs ${
+                                    application.ai_match_percentage >= 70
+                                        ? 'bg-green-500/10 text-green-700 dark:text-green-300 border border-green-500/20'
+                                        : application.ai_match_percentage >= 40
+                                          ? 'bg-amber-500/10 text-amber-700 dark:text-amber-300 border border-amber-500/20'
+                                          : 'bg-red-500/10 text-red-700 dark:text-red-300 border border-red-500/20'
+                                }`}
+                            >
+                                {application.ai_match_percentage}%
+                            </span>
+                            <div className="flex flex-col">
+                                <span className="text-xs font-semibold text-foreground">Resume Match Score</span>
+                                <span className="text-[11px] text-muted-foreground">
+                                    {application.ai_match_percentage >= 70
+                                        ? 'Strong alignment with job requirements'
+                                        : application.ai_match_percentage >= 40
+                                          ? 'Moderate match — consider tailoring key skills'
+                                          : 'Low match — several key requirements missing'}
+                                </span>
+                            </div>
+                        </div>
+                        {(matchBadge || application.ai_strengths?.[0]?.startsWith('Matching keyword:')) && (
+                            <span className="inline-flex items-center gap-1 rounded-md bg-amber-500/10 border border-amber-500/20 px-2.5 py-1 text-[11px] font-medium text-amber-800 dark:text-amber-300">
+                                ⚡ {matchBadge || 'Smart Keyword Analysis (Fallback Mode)'}
+                            </span>
+                        )}
+                    </div>
+
+                    {hasSubScores && (
+                        <div className="flex flex-col gap-2 pt-3 border-t border-border/60">
+                            <span className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">
+                                Category Breakdown
+                            </span>
+                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                                {[
+                                    { key: 'tech_stack', label: 'Tech Stack', value: application.ai_tech_stack_percentage },
+                                    { key: 'experience', label: 'Experience', value: application.ai_experience_percentage },
+                                    { key: 'education', label: 'Education', value: application.ai_education_percentage },
+                                ].map(({ key, label, value }) => value !== null && (
+                                    <div key={key} className="flex flex-col gap-1">
+                                        <div className="flex items-center justify-between text-xs">
+                                            <span className="font-medium text-foreground">{label}</span>
+                                            <span className={`font-bold tabular-nums ${
+                                                value >= 70
+                                                    ? 'text-green-600 dark:text-green-400'
+                                                    : value >= 40
+                                                      ? 'text-amber-600 dark:text-amber-400'
+                                                      : 'text-red-600 dark:text-red-400'
+                                            }`}>
+                                                {value}%
+                                            </span>
+                                        </div>
+                                        <div className="h-1.5 w-full rounded-full bg-muted/60 overflow-hidden">
+                                            <div
+                                                className={`h-full rounded-full transition-all duration-500 ${
+                                                    value >= 70
+                                                        ? 'bg-green-500/70'
+                                                        : value >= 40
+                                                          ? 'bg-amber-500/70'
+                                                          : 'bg-red-500/70'
+                                                }`}
+                                                style={{ width: `${value}%` }}
+                                            />
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+
+                    {(application.ai_strengths?.length || application.ai_gaps?.length) ? (
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-3 border-t border-border/60">
                             {application.ai_strengths && application.ai_strengths.length > 0 && (
-                                <div className="flex flex-wrap gap-1">
-                                    {application.ai_strengths.map((s, i) => (
-                                        <span
-                                            key={i}
-                                            className="inline-flex items-center gap-0.5 rounded-full bg-green-100 px-2 py-0.5 text-[11px] text-green-700 dark:bg-green-900/20 dark:text-green-300"
-                                        >
-                                            <CheckIcon className="size-3" />
-                                            {s}
-                                        </span>
-                                    ))}
+                                <div className="flex flex-col gap-1.5">
+                                    <span className="text-[11px] font-semibold text-green-700 dark:text-green-400 flex items-center gap-1">
+                                        <CheckIcon className="size-3" /> Key Strengths ({application.ai_strengths.length})
+                                    </span>
+                                    <div className="flex flex-wrap gap-1.5">
+                                        {application.ai_strengths.map((s, i) => (
+                                            <span
+                                                key={i}
+                                                className="inline-flex items-center gap-1 rounded-md bg-green-500/10 border border-green-500/20 px-2 py-0.5 text-xs text-green-800 dark:text-green-300"
+                                            >
+                                                {s}
+                                            </span>
+                                        ))}
+                                    </div>
                                 </div>
                             )}
                             {application.ai_gaps && application.ai_gaps.length > 0 && (
-                                <div className="flex flex-wrap gap-1">
-                                    {application.ai_gaps.map((g, i) => (
-                                        <span
-                                            key={i}
-                                            className="inline-flex items-center gap-0.5 rounded-full bg-red-100 px-2 py-0.5 text-[11px] text-red-700 dark:bg-red-900/20 dark:text-red-300"
-                                        >
-                                            <XIcon className="size-3" />
-                                            {g}
-                                        </span>
-                                    ))}
+                                <div className="flex flex-col gap-1.5">
+                                    <span className="text-[11px] font-semibold text-red-700 dark:text-red-400 flex items-center gap-1">
+                                        <XIcon className="size-3" /> Missing / Skill Gaps ({application.ai_gaps.length})
+                                    </span>
+                                    <div className="flex flex-wrap gap-1.5">
+                                        {application.ai_gaps.map((g, i) => (
+                                            <span
+                                                key={i}
+                                                className="inline-flex items-center gap-1 rounded-md bg-red-500/10 border border-red-500/20 px-2 py-0.5 text-xs text-red-800 dark:text-red-300"
+                                            >
+                                                {g}
+                                            </span>
+                                        ))}
+                                    </div>
                                 </div>
                             )}
                         </div>
-                    </div>
+                    ) : null}
                 </div>
             )}
 

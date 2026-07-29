@@ -25,6 +25,9 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property string $currency
  * @property string|null $notes
  * @property int|null $ai_match_percentage
+ * @property int|null $ai_tech_stack_percentage
+ * @property int|null $ai_experience_percentage
+ * @property int|null $ai_education_percentage
  * @property array|null $ai_strengths
  * @property array|null $ai_gaps
  * @property int|null $ai_salary_min
@@ -62,11 +65,15 @@ class JobApplication extends Model
         'interview_notes',
         'ai_interview_prep',
         'ai_match_percentage',
+        'ai_tech_stack_percentage',
+        'ai_experience_percentage',
+        'ai_education_percentage',
         'ai_strengths',
         'ai_gaps',
         'ai_salary_min',
         'ai_salary_max',
         'ai_salary_notes',
+        'ai_resume_text',
         'ai_evaluated_at',
     ];
 
@@ -78,6 +85,9 @@ class JobApplication extends Model
             'offered_salary' => 'integer',
             'tax_config' => 'array',
             'ai_match_percentage' => 'integer',
+            'ai_tech_stack_percentage' => 'integer',
+            'ai_experience_percentage' => 'integer',
+            'ai_education_percentage' => 'integer',
             'ai_strengths' => 'array',
             'ai_gaps' => 'array',
             'ai_salary_min' => 'integer',

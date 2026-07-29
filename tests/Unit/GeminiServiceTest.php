@@ -14,7 +14,7 @@ it('analyzes resume match and returns structured result', function () {
                 [
                     'content' => [
                         'parts' => [
-                            ['text' => '{"match_percentage": 85, "strengths": ["Strong communication", "Technical leadership"], "gaps": ["No Python experience", "Limited cloud architecture"]}'],
+                            ['text' => '{"match_percentage": 85, "tech_stack_percentage": 90, "experience_percentage": 80, "education_percentage": 75, "strengths": ["Strong communication", "Technical leadership"], "gaps": ["No Python experience", "Limited cloud architecture"]}'],
                         ],
                     ],
                 ],
@@ -30,6 +30,9 @@ it('analyzes resume match and returns structured result', function () {
 
     expect($result)->toEqual([
         'match_percentage' => 85,
+        'tech_stack_percentage' => 90,
+        'experience_percentage' => 80,
+        'education_percentage' => 75,
         'strengths' => ['Strong communication', 'Technical leadership'],
         'gaps' => ['No Python experience', 'Limited cloud architecture'],
     ]);
@@ -102,7 +105,7 @@ it('sends the correct request payload to Gemini API', function () {
                 [
                     'content' => [
                         'parts' => [
-                            ['text' => '{"match_percentage": 75, "strengths": [], "gaps": []}'],
+                            ['text' => '{"match_percentage": 75, "tech_stack_percentage": 70, "experience_percentage": 75, "education_percentage": 80, "strengths": [], "gaps": []}'],
                         ],
                     ],
                 ],

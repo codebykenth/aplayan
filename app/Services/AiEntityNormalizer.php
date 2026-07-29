@@ -85,6 +85,38 @@ class AiEntityNormalizer
         return mb_substr($cleaned, 0, 500);
     }
 
+    public function normalizeResumeText(string $rawText): string
+    {
+        $text = trim($rawText);
+
+        $sectionHeaders = [
+            '/^summary\s*$/im' => '## SUMMARY',
+            '/^work\s*experience\s*$/im' => '## WORK EXPERIENCE',
+            '/^(skills|technical\s*skills|technologies|tech\s*stack)\s*$/im' => '## SKILLS & TECHNOLOGIES',
+            '/^education\s*$/im' => '## EDUCATION & CERTIFICATIONS',
+            '/^certifications?\s*$/im' => '## EDUCATION & CERTIFICATIONS',
+            '/^projects?\s*$/im' => '## PROJECTS',
+            '/^additional\s*information\s*$/im' => '## ADDITIONAL INFORMATION',
+        ];
+
+        foreach ($sectionHeaders as $pattern => $replacement) {
+            $text = preg_replace($pattern, $replacement, $text);
+        }
+
+        if (! preg_match('/^##\s+SUMMARY/im', $text)) {
+            $text = "## SUMMARY\n\n{$text}";
+        }
+
+        $sections = ['## WORK EXPERIENCE', '## SKILLS & TECHNOLOGIES', '## EDUCATION & CERTIFICATIONS'];
+        foreach ($sections as $section) {
+            if (! preg_match('/^'.preg_quote($section, '/').'/im', $text)) {
+                $text .= "\n\n{$section}\n\n";
+            }
+        }
+
+        return trim($text);
+    }
+
     public function generateCanonicalKey(string $featureType, string $company, string $jobTitle, string $description): string
     {
         $normalizedCompany = $this->normalizeCompany($company);

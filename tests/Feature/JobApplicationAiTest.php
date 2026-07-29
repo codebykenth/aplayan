@@ -41,7 +41,7 @@ it('analyzes resume match and returns JSON with saved AI fields', function () {
                 [
                     'content' => [
                         'parts' => [
-                            ['text' => '{"match_percentage": 78, "strengths": ["Strong PHP skills", "Laravel experience"], "gaps": ["No cloud experience", "Limited testing knowledge"]}'],
+                            ['text' => '{"match_percentage": 78, "tech_stack_percentage": 80, "experience_percentage": 75, "education_percentage": 70, "strengths": ["Strong PHP skills", "Laravel experience"], "gaps": ["No cloud experience", "Limited testing knowledge"]}'],
                         ],
                     ],
                 ],
@@ -57,18 +57,27 @@ it('analyzes resume match and returns JSON with saved AI fields', function () {
     $response->assertSuccessful()
         ->assertJsonStructure([
             'match_percentage',
+            'tech_stack_percentage',
+            'experience_percentage',
+            'education_percentage',
             'strengths',
             'gaps',
             'evaluated_at',
         ]);
 
     expect($response->json('match_percentage'))->toBe(78);
+    expect($response->json('tech_stack_percentage'))->toBe(80);
+    expect($response->json('experience_percentage'))->toBe(75);
+    expect($response->json('education_percentage'))->toBe(70);
     expect($response->json('strengths'))->toContain('Strong PHP skills', 'Laravel experience');
     expect($response->json('gaps'))->toContain('No cloud experience', 'Limited testing knowledge');
 
     $this->assertDatabaseHas('job_applications', [
         'id' => $this->application->id,
         'ai_match_percentage' => 78,
+        'ai_tech_stack_percentage' => 80,
+        'ai_experience_percentage' => 75,
+        'ai_education_percentage' => 70,
     ]);
 
     $fresh = $this->application->fresh();
@@ -86,7 +95,7 @@ it('sends the job description and resume text to Gemini', function () {
                 [
                     'content' => [
                         'parts' => [
-                            ['text' => '{"match_percentage": 50, "strengths": [], "gaps": []}'],
+                            ['text' => '{"match_percentage": 50, "tech_stack_percentage": 50, "experience_percentage": 50, "education_percentage": 50, "strengths": [], "gaps": []}'],
                         ],
                     ],
                 ],
@@ -125,33 +134,14 @@ it('returns fallback data when Gemini API fails instead of 503', function () {
     expect($response->json('match_percentage'))->toBeGreaterThanOrEqual(0);
 });
 
-it('works without job description (empty string fallback)', function () {
-    Http::preventStrayRequests();
-
+it('returns 422 when job description is missing', function () {
     $applicationWithoutJobDesc = JobApplication::factory()->create([
         'user_id' => $this->user->id,
         'job_description' => null,
     ]);
 
-    Http::fake([
-        'generativelanguage.googleapis.com/*' => Http::response([
-            'candidates' => [
-                [
-                    'content' => [
-                        'parts' => [
-                            ['text' => '{"match_percentage": 60, "strengths": ["Communication"], "gaps": ["Technical depth"]}'],
-                        ],
-                    ],
-                ],
-            ],
-        ]),
-    ]);
-
-    $response = $this->actingAs($this->user)->postJson(
+    $this->actingAs($this->user)->postJson(
         route('job-applications.ai-match', $applicationWithoutJobDesc),
         ['resume_text' => 'Good communicator.'],
-    );
-
-    $response->assertSuccessful();
-    expect($response->json('match_percentage'))->toBe(60);
+    )->assertStatus(422);
 });

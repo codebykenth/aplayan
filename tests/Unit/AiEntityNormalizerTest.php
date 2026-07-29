@@ -115,6 +115,36 @@ it('generates different canonical keys for different inputs', function () {
     expect($key1)->not->toBe($key2);
 });
 
+it('normalizes resume text by adding markdown section headers when missing', function () {
+    $raw = "5 years of PHP development experience.\nStrong Laravel and React skills.\nBSc Computer Science.";
+    $result = $this->normalizer->normalizeResumeText($raw);
+
+    expect($result)->toContain('## SUMMARY');
+    expect($result)->toContain('## WORK EXPERIENCE');
+    expect($result)->toContain('## SKILLS & TECHNOLOGIES');
+    expect($result)->toContain('## EDUCATION & CERTIFICATIONS');
+});
+
+it('preserves existing markdown section headers during normalization', function () {
+    $raw = "## SUMMARY\nExperienced developer.\n## WORK EXPERIENCE\nSenior dev at Acme.";
+    $result = $this->normalizer->normalizeResumeText($raw);
+
+    expect($result)->toContain('## SUMMARY');
+    expect($result)->toContain('## WORK EXPERIENCE');
+    expect($result)->toContain('## SKILLS & TECHNOLOGIES');
+    expect($result)->toContain('## EDUCATION & CERTIFICATIONS');
+    expect(substr_count($result, '## SUMMARY'))->toBe(1);
+});
+
+it('normalizes common section header variations to standard format', function () {
+    $raw = "Summary:\nExperienced.\n\nSkills:\nPHP, Laravel, React\n\nEducation:\nBSc CS";
+    $result = $this->normalizer->normalizeResumeText($raw);
+
+    expect($result)->toContain('## SUMMARY');
+    expect($result)->toContain('## SKILLS & TECHNOLOGIES');
+    expect($result)->toContain('## EDUCATION & CERTIFICATIONS');
+});
+
 it('normalizes different company suffix variants to same canonical key', function () {
     $key1 = $this->normalizer->generateCanonicalKey(
         'job_match',

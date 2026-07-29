@@ -57,6 +57,10 @@ export interface TaxSettings {
     regime: 'ph_regular' | 'ph_freelance_8' | 'tax_exempt' | 'custom';
     allowances: TaxAllowance[];
     custom_deductions: TaxCustomDeduction[];
+    override_sss?: number | null;
+    override_philhealth?: number | null;
+    override_pagibig?: number | null;
+    override_bir_tax?: number | null;
 }
 
 export const TAX_REGIMES = [
@@ -87,11 +91,15 @@ export interface JobApplication {
     staleness_level: 'warning' | 'alert' | null;
     days_since_update: number;
     ai_match_percentage: number | null;
+    ai_tech_stack_percentage: number | null;
+    ai_experience_percentage: number | null;
+    ai_education_percentage: number | null;
     ai_strengths: string[] | null;
     ai_gaps: string[] | null;
     ai_salary_min: number | null;
     ai_salary_max: number | null;
     ai_salary_notes: string | null;
+    ai_resume_text?: string | null;
     ai_evaluated_at: string | null;
     ai_interview_prep: {
         questions: string[];

@@ -3,13 +3,15 @@
 namespace App\Services;
 
 use Illuminate\Http\Client\PendingRequest;
+use Illuminate\Http\Client\RequestException;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use JsonException;
 
 class GeminiService
 {
-    private const string MODEL = 'gemini-2.5-flash';
+    private const string MODEL = 'gemini-1.5-flash';
 
     private const int TIMEOUT = 30;
 
@@ -18,22 +20,47 @@ class GeminiService
     public function analyzeResumeMatch(string $jobDescription, string $resumeText): array
     {
         $prompt = <<<PROMPT
-You are an expert resume analyst. Analyze the following job description and resume text.
-Return a JSON object with these exact keys:
-- match_percentage (integer 0-100)
-- strengths (array of strings)
-- gaps (array of strings)
+You are an elite ATS and technical recruiter evaluation agent. Perform a rigorous, step-by-step evaluation comparing the provided Job Description and Candidate Resume.
+
+Follow this Chain-of-Thought reasoning process:
+1. Extract all required skills, technologies, and qualifications from the Job Description.
+2. Compare each requirement against the Candidate Resume section by section.
+3. For each of the 4 rubric pillars below, calculate an individual score before computing the weighted total.
+4. For ecosystem-adjacent technologies (e.g. React -> Next.js, MySQL -> PostgreSQL, Docker -> Kubernetes), award 75% partial credit.
+
+EVALUATION RUBRIC & WEIGHTING:
+1. Technical Skills & Tech Stack Match (40% weight): Compare exact tools, frameworks, and languages. Award 100% for direct matches, 75% for ecosystem-adjacent technologies.
+2. Work Experience & Relevance (35% weight): Compare years of experience, industry alignment, and direct job responsibilities.
+3. Seniority & Scope of Responsibility (15% weight): Compare title hierarchy (Junior, Mid, Senior, Lead) and team/project scale.
+4. Education, Certifications & Soft Skills (10% weight): Compare degree relevance, professional certifications, and communication/leadership evidence.
+
+Calculate the final `match_percentage` as the weighted sum of these 4 pillars.
+
+Return ONLY a raw valid JSON object (no markdown code fences or backticks) with these exact keys:
+- match_percentage (integer 0-100, weighted overall score)
+- tech_stack_percentage (integer 0-100)
+- experience_percentage (integer 0-100)
+- education_percentage (integer 0-100)
+- strengths (array of concise, specific matching bullet points)
+- gaps (array of concise, missing skill or experience bullet points)
 
 Job Description:
 {$jobDescription}
 
-Resume:
+Candidate Resume:
 {$resumeText}
 PROMPT;
 
         $response = $this->sendRequest($prompt);
 
-        return $this->extractJson($response, ['match_percentage', 'strengths', 'gaps']);
+        return $this->extractJson($response, [
+            'match_percentage',
+            'tech_stack_percentage',
+            'experience_percentage',
+            'education_percentage',
+            'strengths',
+            'gaps',
+        ]);
     }
 
     public function estimateSalary(string $jobTitle, string $location, ?string $jobDescription): array
@@ -44,7 +71,7 @@ PROMPT;
 
         $prompt = <<<PROMPT
 You are a salary estimation expert. Based on the following job details, estimate the salary range.
-Return a JSON object with these exact keys:
+Return ONLY a raw valid JSON object (no markdown code fences or backticks) with these exact keys:
 - min_salary_php (integer, annual PHP salary)
 - max_salary_php (integer, annual PHP salary)
 - market_context (string, brief explanation of the market context)
@@ -87,7 +114,7 @@ PROMPT;
         $prompt = <<<PROMPT
 You are an expert interview coach. Based on the following job description, generate interview preparation content.
 
-Return a JSON object with these exact keys:
+Return ONLY a raw valid JSON object (no markdown code fences or backticks) with these exact keys:
 - questions (array of strings): common interview questions for this role
 - talking_points (array of strings): key points to highlight during the interview
 - tips (array of strings): tips for acing this specific type of interview
@@ -195,26 +222,57 @@ PROMPT;
 
     private function sendRequest(string $prompt): array
     {
-        return $this->client()
-            ->retry([100, 500])
-            ->post('/'.self::MODEL.':generateContent', [
-                'contents' => [
-                    [
-                        'parts' => [
-                            ['text' => $prompt],
+        $model = config('services.gemini.model', 'gemini-1.5-flash');
+        $apiKey = config('services.gemini.key');
+
+        if (blank($apiKey)) {
+            Log::error('Gemini API Error: GEMINI_API_KEY is not set in environment or config.');
+            throw new \InvalidArgumentException('GEMINI_API_KEY is missing from environment.');
+        }
+
+        try {
+            return $this->client()
+                ->retry([100, 500])
+                ->post('/'.$model.':generateContent', [
+                    'contents' => [
+                        [
+                            'parts' => [
+                                ['text' => $prompt],
+                            ],
                         ],
                     ],
-                ],
-            ])
-            ->throw()
-            ->json();
+                ])
+                ->throw()
+                ->json();
+        } catch (RequestException $e) {
+            $responseBody = $e->response ? $e->response->body() : 'No response body';
+            Log::error("Gemini API Request Failed [Model: {$model}]: ".$e->getMessage(), [
+                'status' => $e->response?->status(),
+                'response_body' => $responseBody,
+                'model' => $model,
+            ]);
+
+            throw $e;
+        } catch (\Throwable $e) {
+            Log::error("Gemini API Exception [Model: {$model}]: ".$e->getMessage(), [
+                'exception' => $e,
+                'model' => $model,
+            ]);
+
+            throw $e;
+        }
     }
 
     private function extractJson(array $response, array $expectedKeys): array
     {
         $text = $response['candidates'][0]['content']['parts'][0]['text'] ?? throw new JsonException('Unexpected API response structure');
 
-        $parsed = json_decode($text, true, flags: JSON_THROW_ON_ERROR);
+        $cleanText = preg_replace('/^```(?:json)?\s*|\s*```$/i', '', trim($text));
+        if (preg_match('/\{[\s\S]*\}/', $cleanText, $matches)) {
+            $cleanText = $matches[0];
+        }
+
+        $parsed = json_decode($cleanText, true, flags: JSON_THROW_ON_ERROR);
 
         $missing = array_diff($expectedKeys, array_keys($parsed));
         if ($missing !== []) {

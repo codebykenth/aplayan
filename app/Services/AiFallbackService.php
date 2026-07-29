@@ -26,6 +26,9 @@ class AiFallbackService
 
         return [
             'match_percentage' => $percentage,
+            'tech_stack_percentage' => $percentage,
+            'experience_percentage' => $percentage,
+            'education_percentage' => $percentage,
             'strengths' => $strengths ?: ['Resume submitted for review'],
             'gaps' => $gaps ?: ['Unable to determine all requirements'],
             '_fallback' => true,
@@ -71,6 +74,10 @@ class AiFallbackService
             'down', 'out', 'off', 'over', 'under', 'then', 'once', 'here',
             'there', 'when', 'where', 'why', 'how', 'which', 'who', 'whom',
             'what', 'if', 'while', 'because', 'until', 'although', 'though',
+            'job', 'title', 'department', 'employment', 'type', 'location',
+            'role', 'overview', 'responsibilities', 'qualifications', 'skills',
+            'experience', 'level', 'nice', 'have', 'required', 'preferred',
+            'key', 'plus', 'requirements', 'summary', 'details',
         ];
 
         return array_values(array_filter($words, fn (string $word) => ! in_array($word, $stopWords, true) && strlen($word) > 2));
