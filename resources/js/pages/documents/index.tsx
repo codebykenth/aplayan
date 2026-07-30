@@ -104,6 +104,16 @@ type Project = {
     duration?: string;
 };
 
+type SectionTitles = {
+    summary?: string;
+    skills?: string;
+    work?: string;
+    education?: string;
+    projects?: string;
+    certifications?: string;
+    additional_info?: string;
+};
+
 type ResumeProfile = {
     id?: number;
     full_name: string;
@@ -123,6 +133,7 @@ type ResumeProfile = {
     projects: Project[];
     additional_info?: AdditionalInfo[];
     section_order?: string[];
+    section_titles?: SectionTitles;
 };
 
 type AdditionalInfo = {
@@ -170,14 +181,8 @@ const TEMPLATES = [
     { id: 'ats_classic', name: 'ATS Classic (One-Line Contact)' },
     { id: 'ats_executive', name: 'ATS Executive (High Density)' },
     { id: 'ats_bullet', name: 'ATS Bulleted (High Scannability)' },
-    {
-        id: 'ats_single_column',
-        name: 'ATS Standard Bulleted (High Scannability)',
-    },
-    {
-        id: 'ats_classic_serif',
-        name: 'ATS Executive Serif (Classic Corporate)',
-    },
+    { id: 'ats_single_column', name: 'ATS Single Column' },
+    { id: 'ats_classic_serif', name: 'ATS Classic Serif' },
     { id: 'modern', name: 'Modern Professional' },
     { id: 'philippine', name: 'Philippine Standard (CV)' },
 ] as const;
@@ -382,16 +387,20 @@ function getPrintStyles(template: string): string {
         return (
             base +
             `
-            body { font-family: 'Instrument Sans', Inter, Arial, sans-serif; }
-            .section-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: #374151; margin-bottom: 6px; border-bottom: 1px solid #d1d5db; padding-bottom: 3px; }
+            body { font-family: 'Instrument Sans', Inter, Arial, sans-serif; color: #111827; }
+            .header { text-align: left; border-bottom: 1px solid #d1d5db; padding-bottom: 12px; margin-bottom: 16px; }
+            .name { font-size: 20px; font-weight: 700; letter-spacing: -0.01em; color: #111827; }
+            .target-role { font-size: 12px; font-weight: 500; color: #4b5563; margin-top: 2px; }
+            .contact { font-size: 11px; color: #6b7280; margin-top: 6px; display: flex; gap: 8px; flex-wrap: wrap; }
+            .section-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: #374151; margin-top: 12px; margin-bottom: 6px; border-bottom: 1px solid #d1d5db; padding-bottom: 3px; }
             .item-header { display: flex; justify-content: space-between; align-items: baseline; }
-            .item-title { font-size: 13px; font-weight: 600; }
+            .item-title { font-size: 13px; font-weight: 600; color: #111827; }
             .item-date { font-size: 11px; color: #6b7280; white-space: nowrap; }
             .item-subtitle { font-size: 12px; color: #6b7280; }
             .item-desc { font-size: 12px; margin-top: 4px; line-height: 1.45; }
-            .bullet-list { padding-left: 18px; list-style-type: disc; }
+            .bullet-list { padding-left: 18px; list-style-type: disc; margin-top: 4px; }
             .bullet-list li { font-size: 12px; margin-bottom: 3px; line-height: 1.45; }
-            .photo { width: 80px; height: 80px; border-radius: 50%; object-fit: cover; margin: 0 auto 8px; display: block; }
+            .photo { width: 80px; height: 80px; border-radius: 50%; object-fit: cover; float: right; margin-left: 16px; display: block; }
         `
         );
     }
@@ -400,14 +409,18 @@ function getPrintStyles(template: string): string {
         return (
             base +
             `
-            body { font-family: 'Times New Roman', Garamond, Georgia, serif; }
-            .section-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px; }
+            body { font-family: 'Times New Roman', Garamond, Georgia, serif; color: #111827; }
+            .header { text-align: center; border-bottom: 3px double #d1d5db; padding-bottom: 12px; margin-bottom: 16px; }
+            .name { font-size: 22px; font-weight: 700; letter-spacing: 0.02em; color: #111827; }
+            .target-role { font-size: 12px; font-weight: 500; font-style: italic; color: #374151; margin-top: 4px; }
+            .contact { font-size: 11px; color: #6b7280; margin-top: 6px; display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; }
+            .section-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: #111827; margin-top: 14px; margin-bottom: 8px; border-bottom: 1px solid #d1d5db; padding-bottom: 3px; }
             .item-header { display: flex; justify-content: space-between; align-items: baseline; }
-            .item-title { font-size: 13px; font-weight: 600; }
-            .item-date { font-size: 11px; color: #6b7280; white-space: nowrap; }
-            .item-subtitle { font-size: 12px; color: #6b7280; }
+            .item-title { font-size: 13px; font-weight: 700; color: #111827; }
+            .item-date { font-size: 11px; font-weight: 500; font-style: italic; color: #6b7280; white-space: nowrap; }
+            .item-subtitle { font-size: 12px; font-style: italic; color: #6b7280; }
             .item-desc { font-size: 12px; margin-top: 4px; line-height: 1.45; }
-            .bullet-list { padding-left: 18px; list-style-type: disc; }
+            .bullet-list { padding-left: 18px; list-style-type: disc; margin-top: 4px; }
             .bullet-list li { font-size: 12px; margin-bottom: 3px; line-height: 1.45; }
             .photo { width: 80px; height: 80px; border-radius: 4px; object-fit: cover; float: right; margin-left: 16px; }
         `
@@ -1117,6 +1130,24 @@ function PersonalInfoTab({
                     className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus:ring-1 focus:ring-ring focus:outline-none"
                     placeholder="Experienced software developer with expertise in building scalable web applications..."
                 />
+                <p className="text-xs text-muted-foreground">
+                    Use <code className="rounded bg-muted px-1">**bold text**</code> for emphasis. Press Enter to start a new paragraph.
+                </p>
+            </div>
+
+            <div className="flex flex-col gap-2">
+                <Label htmlFor="summary_title" className="text-xs text-muted-foreground">Summary Section Title (optional)</Label>
+                <Input
+                    id="summary_title"
+                    value={data.section_titles?.summary ?? ''}
+                    onChange={(e) =>
+                        setData('section_titles', {
+                            ...(data.section_titles || {}),
+                            summary: e.target.value,
+                        })
+                    }
+                    placeholder="e.g. Professional Summary, Executive Summary, About Me"
+                />
             </div>
         </div>
     );
@@ -1128,7 +1159,7 @@ function WorkExperienceTab({
     onAiPolish,
 }: {
     data: ResumeProfile;
-    setData: (key: string, value: WorkExperience[]) => void;
+    setData: (key: any, value: any) => void;
     onAiPolish: (section: string, content: string) => void;
 }) {
     const experiences = data.work_experience ?? [];
@@ -1171,6 +1202,21 @@ function WorkExperienceTab({
 
     return (
         <div className="flex flex-col gap-6">
+            <div className="rounded-xl border border-border bg-card p-4">
+                <div className="flex flex-col gap-2">
+                    <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Section Title (optional)</Label>
+                    <Input
+                        value={data.section_titles?.work ?? ''}
+                        onChange={(e) =>
+                            setData('section_titles', {
+                                ...(data.section_titles || {}),
+                                work: e.target.value,
+                            })
+                        }
+                        placeholder="e.g. Work Experience, Professional Experience, Employment History"
+                    />
+                </div>
+            </div>
             {experiences.map((exp, index) => (
                 <div
                     key={index}
@@ -1302,6 +1348,9 @@ function WorkExperienceTab({
                                 }}
                                 rows={3}
                             />
+                            <p className="text-xs text-muted-foreground">
+                                Use <code className="rounded bg-muted px-1">**bold text**</code> for emphasis. Press Enter to start a new bullet point.
+                            </p>
                         </div>
                     </div>
                     <div className="mt-3 flex items-center justify-between">
@@ -1345,7 +1394,7 @@ function EducationTab({
     setData,
 }: {
     data: ResumeProfile;
-    setData: (key: string, value: Education[]) => void;
+    setData: (key: any, value: any) => void;
 }) {
     const education = data.education ?? [];
 
@@ -1387,6 +1436,21 @@ function EducationTab({
 
     return (
         <div className="flex flex-col gap-6">
+            <div className="rounded-xl border border-border bg-card p-4">
+                <div className="flex flex-col gap-2">
+                    <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Section Title (optional)</Label>
+                    <Input
+                        value={data.section_titles?.education ?? ''}
+                        onChange={(e) =>
+                            setData('section_titles', {
+                                ...(data.section_titles || {}),
+                                education: e.target.value,
+                            })
+                        }
+                        placeholder="e.g. Education, Educational Background, Academic Qualifications"
+                    />
+                </div>
+            </div>
             {education.map((edu, index) => (
                 <div
                     key={index}
@@ -1518,7 +1582,7 @@ function SkillsTab({
     setData,
 }: {
     data: ResumeProfile;
-    setData: (key: string, value: string[]) => void;
+    setData: (key: any, value: any) => void;
 }) {
     const [skillInput, setSkillInput] = useState('');
     const skills = data.skills ?? [];
@@ -1539,24 +1603,82 @@ function SkillsTab({
         );
     }
 
+    const sampleCategories = [
+        'Languages: PHP, TypeScript, JavaScript, SQL, Python',
+        'Frameworks: Laravel, React, Vue.js, Express.js, Django',
+        'Tools: Docker, Kubernetes, AWS, CI/CD, Git, Linux',
+        'Databases: PostgreSQL, MySQL, MongoDB, Redis',
+    ];
+
+    function addCategoryPreset(preset: string) {
+        if (!skills.includes(preset)) {
+            setData('skills', [...skills, preset]);
+        }
+    }
+
     return (
         <div className="flex flex-col gap-6">
-            <div className="flex gap-2">
-                <Input
-                    value={skillInput}
-                    onChange={(e) => setSkillInput(e.target.value)}
-                    placeholder="Add a skill"
-                    onKeyDown={(e) => {
-                        if (e.key === 'Enter') {
-                            e.preventDefault();
-                            addSkill();
+            <div className="rounded-xl border border-border bg-card p-4">
+                <div className="flex flex-col gap-2">
+                    <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Section Title (optional)</Label>
+                    <Input
+                        value={data.section_titles?.skills ?? ''}
+                        onChange={(e) =>
+                            setData('section_titles', {
+                                ...(data.section_titles || {}),
+                                skills: e.target.value,
+                            })
                         }
-                    }}
-                />
-                <Button type="button" variant="outline" onClick={addSkill}>
-                    Add
-                </Button>
+                        placeholder="e.g. Technical Skills, Core Competencies, Skills & Tools"
+                    />
+                </div>
             </div>
+            <div className="flex flex-col gap-2">
+                <div className="flex gap-2">
+                    <Input
+                        value={skillInput}
+                        onChange={(e) => setSkillInput(e.target.value)}
+                        placeholder="e.g. Languages: PHP, TypeScript, SQL or React"
+                        onKeyDown={(e) => {
+                            if (e.key === 'Enter') {
+                                e.preventDefault();
+                                addSkill();
+                            }
+                        }}
+                    />
+                    <Button type="button" variant="outline" onClick={addSkill}>
+                        Add
+                    </Button>
+                </div>
+                <p className="text-xs text-muted-foreground">
+                    Tip: Use <code className="rounded bg-muted px-1">Category: Skill 1, Skill 2</code> (e.g., <code className="rounded bg-muted px-1">Languages: PHP, Python</code>) to display bold category headers like on the landing page preview.
+                </p>
+            </div>
+
+            <div className="flex flex-col gap-2">
+                <Label className="text-xs text-muted-foreground">Quick Add Sample Categories:</Label>
+                <div className="flex flex-wrap gap-2">
+                    {sampleCategories.map((preset) => {
+                        const categoryName = preset.split(':')[0];
+                        const isAdded = skills.includes(preset);
+
+                        return (
+                            <Button
+                                key={categoryName}
+                                type="button"
+                                variant="outline"
+                                size="sm"
+                                disabled={isAdded}
+                                onClick={() => addCategoryPreset(preset)}
+                                className="text-xs"
+                            >
+                                + {categoryName} Category
+                            </Button>
+                        );
+                    })}
+                </div>
+            </div>
+
             <div className="flex flex-wrap gap-2">
                 {skills.map((skill) => (
                     <span
@@ -1576,8 +1698,7 @@ function SkillsTab({
             </div>
             {skills.length === 0 && (
                 <p className="text-sm text-muted-foreground">
-                    No skills added yet. Add skills like PHP, Laravel, React,
-                    etc.
+                    No skills added yet. Add individual skills or categorized items above.
                 </p>
             )}
         </div>
@@ -1589,7 +1710,7 @@ function CertificationsTab({
     setData,
 }: {
     data: ResumeProfile;
-    setData: (key: string, value: string[]) => void;
+    setData: (key: any, value: any) => void;
 }) {
     const [certInput, setCertInput] = useState('');
     const certifications = data.certifications ?? [];
@@ -1612,6 +1733,21 @@ function CertificationsTab({
 
     return (
         <div className="flex flex-col gap-6">
+            <div className="rounded-xl border border-border bg-card p-4">
+                <div className="flex flex-col gap-2">
+                    <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Section Title (optional)</Label>
+                    <Input
+                        value={data.section_titles?.certifications ?? ''}
+                        onChange={(e) =>
+                            setData('section_titles', {
+                                ...(data.section_titles || {}),
+                                certifications: e.target.value,
+                            })
+                        }
+                        placeholder="e.g. Certifications, Licenses & Certifications, Professional Credentials"
+                    />
+                </div>
+            </div>
             <div className="flex gap-2">
                 <Input
                     value={certInput}
@@ -1665,7 +1801,7 @@ function ProjectsTab({
     onAiPolish,
 }: {
     data: ResumeProfile;
-    setData: (key: string, value: Project[]) => void;
+    setData: (key: any, value: any) => void;
     onAiPolish: (section: string, content: string) => void;
 }) {
     const projects = data.projects ?? [];
@@ -1710,6 +1846,21 @@ function ProjectsTab({
 
     return (
         <div className="flex flex-col gap-6">
+            <div className="rounded-xl border border-border bg-card p-4">
+                <div className="flex flex-col gap-2">
+                    <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Section Title (optional)</Label>
+                    <Input
+                        value={data.section_titles?.projects ?? ''}
+                        onChange={(e) =>
+                            setData('section_titles', {
+                                ...(data.section_titles || {}),
+                                projects: e.target.value,
+                            })
+                        }
+                        placeholder="e.g. Projects, Featured Projects, Key Projects"
+                    />
+                </div>
+            </div>
             {projects.map((project, index) => (
                 <div
                     key={index}
@@ -1788,6 +1939,9 @@ function ProjectsTab({
                                 }}
                                 rows={3}
                             />
+                            <p className="text-xs text-muted-foreground">
+                                Use <code className="rounded bg-muted px-1">**bold text**</code> for emphasis. Press Enter to start a new bullet point.
+                            </p>
                         </div>
                         <div className="flex flex-col gap-2">
                             <Label>Technologies Used</Label>
@@ -1887,7 +2041,7 @@ function AdditionalInfoTab({
     setData,
 }: {
     data: ResumeProfile;
-    setData: (key: string, value: AdditionalInfo[]) => void;
+    setData: (key: any, value: any) => void;
 }) {
     const items = data.additional_info ?? [];
 
@@ -1926,6 +2080,21 @@ function AdditionalInfoTab({
 
     return (
         <div className="flex flex-col gap-6">
+            <div className="rounded-xl border border-border bg-card p-4">
+                <div className="flex flex-col gap-2">
+                    <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Section Title (optional)</Label>
+                    <Input
+                        value={data.section_titles?.additional_info ?? ''}
+                        onChange={(e) =>
+                            setData('section_titles', {
+                                ...(data.section_titles || {}),
+                                additional_info: e.target.value,
+                            })
+                        }
+                        placeholder="e.g. Additional Information, Languages & Interests, Honors"
+                    />
+                </div>
+            </div>
             {items.map((item, index) => (
                 <div
                     key={index}
@@ -2332,16 +2501,50 @@ function ResumePreview({
     const photoSrc = getDirectImageUrl(photoDataUrl || data.photo_url) || '';
     const hasPhoto = !!photoSrc;
 
-    const sectionOrder = data.section_order || [
-        'personal',
-        'work',
-        'education',
-        'skills',
-        'projects',
-        'certifications',
-        'additional_info',
-    ];
+    const defaultSectionOrder =
+        template === 'ats_single_column' || template === 'ats_classic_serif'
+            ? [
+                  'personal',
+                  'skills',
+                  'work',
+                  'education',
+                  'projects',
+                  'certifications',
+                  'additional_info',
+              ]
+            : [
+                  'personal',
+                  'work',
+                  'education',
+                  'skills',
+                  'projects',
+                  'certifications',
+                  'additional_info',
+              ];
+
+    const isDefaultStandardOrder =
+        !data.section_order ||
+        JSON.stringify(data.section_order) ===
+            JSON.stringify([
+                'personal',
+                'work',
+                'education',
+                'skills',
+                'projects',
+                'certifications',
+                'additional_info',
+            ]);
+
+    const sectionOrder =
+        (template === 'ats_single_column' || template === 'ats_classic_serif') &&
+        isDefaultStandardOrder
+            ? defaultSectionOrder
+            : data.section_order || defaultSectionOrder;
     const getOrder = (id: string) => sectionOrder.indexOf(id);
+
+    const getTitle = (key: keyof SectionTitles, fallback: string) => {
+        return data.section_titles?.[key] || fallback;
+    };
 
     const SectionWrapper = ({
         id,
@@ -2454,7 +2657,7 @@ function ResumePreview({
                             {data.summary && (
                                 <>
                                     <div className="ats-section-title">
-                                        Professional Summary
+                                        {getTitle('summary', 'Professional Summary')}
                                     </div>
                                     <p className="ats-desc">{data.summary}</p>
                                 </>
@@ -2465,7 +2668,7 @@ function ResumePreview({
                             {(data.work_experience?.length ?? 0) > 0 && (
                                 <>
                                     <div className="ats-section-title">
-                                        Work Experience
+                                        {getTitle('work', 'Work Experience')}
                                     </div>
                                     {data.work_experience?.map((job, i) => (
                                         <div key={i} className="ats-item">
@@ -2495,7 +2698,7 @@ function ResumePreview({
                             {(data.education?.length ?? 0) > 0 && (
                                 <>
                                     <div className="ats-section-title">
-                                        Education
+                                        {getTitle('education', 'Education')}
                                     </div>
                                     {data.education?.map((edu, i) => (
                                         <div key={i} className="ats-item">
@@ -2520,7 +2723,7 @@ function ResumePreview({
                             {(data.skills?.length ?? 0) > 0 && (
                                 <>
                                     <div className="ats-section-title">
-                                        Skills & Technologies
+                                        {getTitle('skills', 'Skills & Technologies')}
                                     </div>
                                     <div className="ats-desc">
                                         {renderSkillsWithCategoryBold(
@@ -2535,7 +2738,7 @@ function ResumePreview({
                             {(data.certifications?.length ?? 0) > 0 && (
                                 <>
                                     <div className="ats-section-title">
-                                        Certifications
+                                        {getTitle('certifications', 'Certifications')}
                                     </div>
                                     <div className="ats-desc">
                                         {data.certifications?.join(' | ')}
@@ -2548,7 +2751,7 @@ function ResumePreview({
                             {(data.projects?.length ?? 0) > 0 && (
                                 <>
                                     <div className="ats-section-title">
-                                        Projects
+                                        {getTitle('projects', 'Projects')}
                                     </div>
                                     {data.projects?.map((project, i) => (
                                         <div key={i} className="ats-item">
@@ -2577,7 +2780,7 @@ function ResumePreview({
                             {(data.additional_info?.length ?? 0) > 0 && (
                                 <>
                                     <div className="ats-section-title">
-                                        Additional Information
+                                        {getTitle('additional_info', 'Additional Information')}
                                     </div>
                                     {data.additional_info?.map((item, i) => (
                                         <div
@@ -3863,7 +4066,7 @@ function ResumePreview({
                         <SectionWrapper id="personal">
                             <div
                                 style={{
-                                    textAlign: 'center',
+                                    textAlign: 'left',
                                     marginBottom: '16px',
                                     borderBottom: '1px solid #d1d5db',
                                     paddingBottom: '12px',
@@ -3880,7 +4083,8 @@ function ResumePreview({
                                             height: '80px',
                                             borderRadius: '50%',
                                             objectFit: 'cover',
-                                            margin: '0 auto 8px',
+                                            float: 'right',
+                                            marginLeft: '16px',
                                             display: 'block',
                                         }}
                                     />
@@ -3889,7 +4093,7 @@ function ResumePreview({
                                     style={{
                                         fontFamily:
                                             "'Instrument Sans', Inter, Arial, sans-serif",
-                                        fontSize: '22px',
+                                        fontSize: '20px',
                                         fontWeight: 700,
                                         letterSpacing: '-0.01em',
                                         color: '#111827',
@@ -3902,7 +4106,7 @@ function ResumePreview({
                                         style={{
                                             fontSize: '12px',
                                             fontWeight: 500,
-                                            color: '#6b7280',
+                                            color: '#4b5563',
                                             marginTop: '2px',
                                         }}
                                     >
@@ -3995,7 +4199,7 @@ function ResumePreview({
                                             paddingBottom: '3px',
                                         }}
                                     >
-                                        Summary
+                                        {getTitle('summary', 'PROFESSIONAL SUMMARY').toUpperCase()}
                                     </div>
                                     <p
                                         style={{
@@ -4007,6 +4211,64 @@ function ResumePreview({
                                     >
                                         {data.summary}
                                     </p>
+                                </>
+                            )}
+                        </SectionWrapper>
+
+                        <SectionWrapper id="skills">
+                            {(data.skills?.length ?? 0) > 0 && (
+                                <>
+                                    <div
+                                        style={{
+                                            fontSize: '11px',
+                                            fontWeight: 700,
+                                            textTransform: 'uppercase',
+                                            letterSpacing: '0.1em',
+                                            color: '#374151',
+                                            marginBottom: '6px',
+                                            borderBottom: '1px solid #d1d5db',
+                                            paddingBottom: '3px',
+                                        }}
+                                    >
+                                        {getTitle('skills', 'TECHNICAL SKILLS').toUpperCase()}
+                                    </div>
+                                    <div
+                                        style={{
+                                            fontSize: '12px',
+                                            lineHeight: 1.5,
+                                            color: '#111827',
+                                            marginBottom: '12px',
+                                        }}
+                                    >
+                                        {data.skills?.map((skill, i) => {
+                                            const colonIndex =
+                                                skill.indexOf(':');
+
+                                            if (
+                                                colonIndex > 0 &&
+                                                colonIndex < 30
+                                            ) {
+                                                const prefix = skill.substring(
+                                                    0,
+                                                    colonIndex,
+                                                );
+                                                const rest = skill.substring(
+                                                    colonIndex + 1,
+                                                );
+
+                                                return (
+                                                    <div key={i} style={{ marginBottom: '3px' }}>
+                                                        <strong style={{ fontWeight: 600 }}>
+                                                            {prefix}:
+                                                        </strong>
+                                                        {renderFormattedBullet(rest)}
+                                                    </div>
+                                                );
+                                            }
+
+                                            return <div key={i} style={{ marginBottom: '3px' }}>{renderFormattedBullet(skill)}</div>;
+                                        })}
+                                    </div>
                                 </>
                             )}
                         </SectionWrapper>
@@ -4026,7 +4288,7 @@ function ResumePreview({
                                             paddingBottom: '3px',
                                         }}
                                     >
-                                        Work Experience
+                                        {getTitle('work', 'EXPERIENCE').toUpperCase()}
                                     </div>
                                     {data.work_experience?.map((job, i) => (
                                         <div
@@ -4127,7 +4389,7 @@ function ResumePreview({
                                             paddingBottom: '3px',
                                         }}
                                     >
-                                        Education
+                                        {getTitle('education', 'EDUCATION').toUpperCase()}
                                     </div>
                                     {data.education?.map((edu, i) => (
                                         <div
@@ -4178,63 +4440,6 @@ function ResumePreview({
                             )}
                         </SectionWrapper>
 
-                        <SectionWrapper id="skills">
-                            {(data.skills?.length ?? 0) > 0 && (
-                                <>
-                                    <div
-                                        style={{
-                                            fontSize: '11px',
-                                            fontWeight: 700,
-                                            textTransform: 'uppercase',
-                                            letterSpacing: '0.1em',
-                                            color: '#374151',
-                                            marginBottom: '6px',
-                                            borderBottom: '1px solid #d1d5db',
-                                            paddingBottom: '3px',
-                                        }}
-                                    >
-                                        Skills
-                                    </div>
-                                    <div
-                                        style={{
-                                            fontSize: '12px',
-                                            lineHeight: 1.5,
-                                            color: '#111827',
-                                        }}
-                                    >
-                                        {data.skills?.map((skill, i) => {
-                                            const colonIndex =
-                                                skill.indexOf(':');
-
-                                            if (
-                                                colonIndex > 0 &&
-                                                colonIndex < 30
-                                            ) {
-                                                const prefix = skill.substring(
-                                                    0,
-                                                    colonIndex,
-                                                );
-                                                const rest = skill.substring(
-                                                    colonIndex + 1,
-                                                );
-
-                                                return (
-                                                    <div key={i}>
-                                                        <strong>
-                                                            {prefix}:
-                                                        </strong>
-                                                        {rest}
-                                                    </div>
-                                                );
-                                            }
-
-                                            return <div key={i}>{skill}</div>;
-                                        })}
-                                    </div>
-                                </>
-                            )}
-                        </SectionWrapper>
-
                         <SectionWrapper id="projects">
                             {(data.projects?.length ?? 0) > 0 && (
                                 <>
@@ -4250,7 +4455,7 @@ function ResumePreview({
                                             paddingBottom: '3px',
                                         }}
                                     >
-                                        Projects
+                                        {getTitle('projects', 'PROJECTS').toUpperCase()}
                                     </div>
                                     {data.projects?.map((project, i) => (
                                         <div
@@ -4353,7 +4558,7 @@ function ResumePreview({
                                             paddingBottom: '3px',
                                         }}
                                     >
-                                        Certifications
+                                        {getTitle('certifications', 'CERTIFICATIONS').toUpperCase()}
                                     </div>
                                     <ul
                                         style={{
@@ -4387,7 +4592,7 @@ function ResumePreview({
                                             paddingBottom: '3px',
                                         }}
                                     >
-                                        Additional Information
+                                        {getTitle('additional_info', 'ADDITIONAL INFORMATION').toUpperCase()}
                                     </div>
                                     {data.additional_info?.map((item, i) => (
                                         <div
@@ -4421,7 +4626,8 @@ function ResumePreview({
                                 style={{
                                     marginBottom: '16px',
                                     paddingBottom: '12px',
-                                    borderBottom: '1px solid #d1d5db',
+                                    borderBottom: '3px double #d1d5db',
+                                    textAlign: 'center',
                                 }}
                             >
                                 {hasPhoto && (
@@ -4435,8 +4641,7 @@ function ResumePreview({
                                             height: '80px',
                                             borderRadius: '4px',
                                             objectFit: 'cover',
-                                            float: 'right',
-                                            marginLeft: '16px',
+                                            margin: '0 auto 12px auto',
                                         }}
                                     />
                                 )}
@@ -4444,10 +4649,11 @@ function ResumePreview({
                                     style={{
                                         fontFamily:
                                             "'Times New Roman', Garamond, Georgia, serif",
-                                        fontSize: '24px',
+                                        fontSize: '22px',
                                         fontWeight: 700,
                                         color: '#111827',
                                         marginBottom: '4px',
+                                        letterSpacing: '0.025em',
                                     }}
                                 >
                                     {data.full_name || 'Your Name'}
@@ -4459,6 +4665,7 @@ function ResumePreview({
                                                 "'Times New Roman', Garamond, Georgia, serif",
                                             fontSize: '13px',
                                             fontWeight: 500,
+                                            fontStyle: 'italic',
                                             color: '#374151',
                                             marginBottom: '4px',
                                         }}
@@ -4552,11 +4759,9 @@ function ResumePreview({
                                             color: '#111827',
                                             marginBottom: '8px',
                                             marginTop: '12px',
-                                            borderBottom: '1px solid #d1d5db',
-                                            paddingBottom: '3px',
                                         }}
                                     >
-                                        SUMMARY
+                                        {getTitle('summary', 'PROFESSIONAL SUMMARY').toUpperCase()}
                                     </div>
                                     <p
                                         style={{
@@ -4570,6 +4775,69 @@ function ResumePreview({
                                     >
                                         {data.summary}
                                     </p>
+                                </>
+                            )}
+                        </SectionWrapper>
+
+                        <SectionWrapper id="skills">
+                            {(data.skills?.length ?? 0) > 0 && (
+                                <>
+                                    <div
+                                        style={{
+                                            fontFamily:
+                                                "'Times New Roman', Garamond, Georgia, serif",
+                                            fontSize: '11px',
+                                            fontWeight: 700,
+                                            textTransform: 'uppercase',
+                                            letterSpacing: '0.08em',
+                                            color: '#111827',
+                                            marginBottom: '8px',
+                                            marginTop: '12px',
+                                            borderBottom: '1px solid #d1d5db',
+                                            paddingBottom: '3px',
+                                        }}
+                                    >
+                                        {getTitle('skills', 'TECHNICAL SKILLS').toUpperCase()}
+                                    </div>
+                                    <div
+                                        style={{
+                                            fontFamily:
+                                                "'Times New Roman', Garamond, Georgia, serif",
+                                            fontSize: '12px',
+                                            lineHeight: 1.5,
+                                            color: '#111827',
+                                            marginBottom: '12px',
+                                        }}
+                                    >
+                                        {data.skills?.map((skill, i) => {
+                                            const colonIndex =
+                                                skill.indexOf(':');
+
+                                            if (
+                                                colonIndex > 0 &&
+                                                colonIndex < 30
+                                            ) {
+                                                const prefix = skill.substring(
+                                                    0,
+                                                    colonIndex,
+                                                );
+                                                const rest = skill.substring(
+                                                    colonIndex + 1,
+                                                );
+
+                                                return (
+                                                    <div key={i} style={{ marginBottom: '3px' }}>
+                                                        <strong style={{ fontWeight: 600 }}>
+                                                            {prefix}:
+                                                        </strong>
+                                                        {renderFormattedBullet(rest)}
+                                                    </div>
+                                                );
+                                            }
+
+                                            return <div key={i} style={{ marginBottom: '3px' }}>{renderFormattedBullet(skill)}</div>;
+                                        })}
+                                    </div>
                                 </>
                             )}
                         </SectionWrapper>
@@ -4592,7 +4860,7 @@ function ResumePreview({
                                             paddingBottom: '3px',
                                         }}
                                     >
-                                        EXPERIENCE
+                                        {getTitle('work', 'PROFESSIONAL EXPERIENCE').toUpperCase()}
                                     </div>
                                     {data.work_experience?.map((job, i) => (
                                         <div
@@ -4710,7 +4978,7 @@ function ResumePreview({
                                             paddingBottom: '3px',
                                         }}
                                     >
-                                        EDUCATION
+                                        {getTitle('education', 'EDUCATION').toUpperCase()}
                                     </div>
                                     {data.education?.map((edu, i) => (
                                         <div
@@ -4767,68 +5035,6 @@ function ResumePreview({
                             )}
                         </SectionWrapper>
 
-                        <SectionWrapper id="skills">
-                            {(data.skills?.length ?? 0) > 0 && (
-                                <>
-                                    <div
-                                        style={{
-                                            fontFamily:
-                                                "'Times New Roman', Garamond, Georgia, serif",
-                                            fontSize: '11px',
-                                            fontWeight: 700,
-                                            textTransform: 'uppercase',
-                                            letterSpacing: '0.08em',
-                                            color: '#111827',
-                                            marginBottom: '8px',
-                                            marginTop: '12px',
-                                            borderBottom: '1px solid #d1d5db',
-                                            paddingBottom: '3px',
-                                        }}
-                                    >
-                                        SKILLS
-                                    </div>
-                                    <div
-                                        style={{
-                                            fontFamily:
-                                                "'Times New Roman', Garamond, Georgia, serif",
-                                            fontSize: '12px',
-                                            lineHeight: 1.5,
-                                            color: '#111827',
-                                        }}
-                                    >
-                                        {data.skills?.map((skill, i) => {
-                                            const colonIndex =
-                                                skill.indexOf(':');
-
-                                            if (
-                                                colonIndex > 0 &&
-                                                colonIndex < 30
-                                            ) {
-                                                const prefix = skill.substring(
-                                                    0,
-                                                    colonIndex,
-                                                );
-                                                const rest = skill.substring(
-                                                    colonIndex + 1,
-                                                );
-
-                                                return (
-                                                    <div key={i}>
-                                                        <strong>
-                                                            {prefix}:
-                                                        </strong>
-                                                        {rest}
-                                                    </div>
-                                                );
-                                            }
-
-                                            return <div key={i}>{skill}</div>;
-                                        })}
-                                    </div>
-                                </>
-                            )}
-                        </SectionWrapper>
-
                         <SectionWrapper id="projects">
                             {(data.projects?.length ?? 0) > 0 && (
                                 <>
@@ -4847,7 +5053,7 @@ function ResumePreview({
                                             paddingBottom: '3px',
                                         }}
                                     >
-                                        PROJECTS
+                                        {getTitle('projects', 'PROJECTS').toUpperCase()}
                                     </div>
                                     {data.projects?.map((project, i) => (
                                         <div
@@ -4967,7 +5173,7 @@ function ResumePreview({
                                             paddingBottom: '3px',
                                         }}
                                     >
-                                        CERTIFICATIONS
+                                        {getTitle('certifications', 'CERTIFICATIONS').toUpperCase()}
                                     </div>
                                     <div
                                         style={{
@@ -5003,7 +5209,7 @@ function ResumePreview({
                                             paddingBottom: '3px',
                                         }}
                                     >
-                                        ADDITIONAL INFORMATION
+                                        {getTitle('additional_info', 'ADDITIONAL INFORMATION').toUpperCase()}
                                     </div>
                                     {data.additional_info?.map((item, i) => (
                                         <div
@@ -5188,7 +5394,7 @@ function CoverLetterPreview({
                         .split('\n')
                         .map((paragraph, i) =>
                             paragraph.trim() ? (
-                                <p key={i}>{paragraph}</p>
+                                <p key={i}>{renderFormattedBullet(paragraph)}</p>
                             ) : null,
                         )}
                 </div>
@@ -5600,6 +5806,9 @@ function CoverLetterBuilder({
                         rows={3}
                         placeholder="Paste the job description here to generate a tailored cover letter..."
                     />
+                    <p className="text-xs text-muted-foreground">
+                        Paste the full job description for best AI-generated results.
+                    </p>
                 </div>
 
                 {/* Action buttons moved to bottom footer */}
@@ -5657,6 +5866,9 @@ function CoverLetterBuilder({
                         className="flex-1 resize-none font-mono leading-relaxed"
                         placeholder="Write your cover letter here, or select a template to load predefined text..."
                     />
+                    <p className="text-xs text-muted-foreground">
+                        Press Enter to start a new paragraph. Use <code className="rounded bg-muted px-1">**bold text**</code> for emphasis (renders in PDF).
+                    </p>
                 </div>
             </CardContent>
 
@@ -6063,6 +6275,7 @@ export default function DocumentsIndex({
                 'certifications',
                 'additional_info',
             ],
+            section_titles: activeProfileData?.section_titles ?? {},
         });
 
     function handleSubmit(e: React.FormEvent) {
