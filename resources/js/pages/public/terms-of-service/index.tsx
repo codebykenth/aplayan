@@ -5,8 +5,15 @@ import SeoHead from '@/components/ui/seo-head';
 import { ArrowLeft, FileCheck, AlertTriangle, Scale, CheckCircle2, UserCheck } from 'lucide-react';
 import { home, termsOfService, privacyPolicy } from '@/routes';
 
-export default function TermsOfService() {
-    const lastUpdated = 'July 30, 2026';
+interface LegalDocument {
+    key: string;
+    title: string;
+    content: string;
+    version: number;
+}
+
+export default function TermsOfService({ document }: { document?: LegalDocument | null }) {
+    const lastUpdated = document ? `Version ${document.version}` : 'July 30, 2026';
 
     return (
         <>
@@ -82,76 +89,84 @@ export default function TermsOfService() {
 
                     {/* Full Document Body */}
                     <div className="prose prose-slate max-w-none rounded-2xl border border-slate-200 bg-white p-6 sm:p-10 dark:prose-invert dark:border-slate-800 dark:bg-slate-900">
-                        <section className="mb-8">
-                            <h2 className="flex items-center gap-2 text-xl font-bold text-slate-900 dark:text-white">
-                                <FileCheck className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
-                                1. Acceptance of Terms
-                            </h2>
-                            <p className="text-sm leading-relaxed text-slate-600 dark:text-slate-300">
-                                By accessing or using <strong>Aplayan</strong> ("the Service"), you agree to be bound by these Terms of Service. If you do not agree to these terms, please do not access or use the application.
-                            </p>
-                        </section>
+                        {document ? (
+                            <div className="whitespace-pre-line text-sm leading-relaxed text-slate-600 dark:text-slate-300">
+                                {document.content}
+                            </div>
+                        ) : (
+                            <>
+                                <section className="mb-8">
+                                    <h2 className="flex items-center gap-2 text-xl font-bold text-slate-900 dark:text-white">
+                                        <FileCheck className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
+                                        1. Acceptance of Terms
+                                    </h2>
+                                    <p className="text-sm leading-relaxed text-slate-600 dark:text-slate-300">
+                                        By accessing or using <strong>Aplayan</strong> ("the Service"), you agree to be bound by these Terms of Service. If you do not agree to these terms, please do not access or use the application.
+                                    </p>
+                                </section>
 
-                        <section className="mb-8 border-t border-slate-100 pt-6 dark:border-slate-800/80">
-                            <h2 className="flex items-center gap-2 text-xl font-bold text-slate-900 dark:text-white">
-                                <UserCheck className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
-                                2. AI Content Generation & User Responsibility
-                            </h2>
-                            <p className="text-sm leading-relaxed text-slate-600 dark:text-slate-300">
-                                Aplayan offers AI-assisted features (such as resume matching, cover letter drafting, and salary insight calculations) powered by third-party language models.
-                            </p>
-                            <ul className="mt-3 list-disc space-y-2 pl-5 text-sm text-slate-600 dark:text-slate-300">
-                                <li>
-                                    <strong>Verification Required:</strong> AI output is provided for assistance purposes only. You are solely responsible for reviewing, factual checking, and ensuring the accuracy of all resume content, experience descriptions, and emails before sending them to recruiters or employers.
-                                </li>
-                                <li>
-                                    <strong>No Misrepresentation:</strong> You agree not to use AI generation to create fraudulent career credentials or intentionally mislead potential employers.
-                                </li>
-                            </ul>
-                        </section>
+                                <section className="mb-8 border-t border-slate-100 pt-6 dark:border-slate-800/80">
+                                    <h2 className="flex items-center gap-2 text-xl font-bold text-slate-900 dark:text-white">
+                                        <UserCheck className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
+                                        2. AI Content Generation & User Responsibility
+                                    </h2>
+                                    <p className="text-sm leading-relaxed text-slate-600 dark:text-slate-300">
+                                        Aplayan offers AI-assisted features (such as resume matching, cover letter drafting, and salary insight calculations) powered by third-party language models.
+                                    </p>
+                                    <ul className="mt-3 list-disc space-y-2 pl-5 text-sm text-slate-600 dark:text-slate-300">
+                                        <li>
+                                            <strong>Verification Required:</strong> AI output is provided for assistance purposes only. You are solely responsible for reviewing, factual checking, and ensuring the accuracy of all resume content, experience descriptions, and emails before sending them to recruiters or employers.
+                                        </li>
+                                        <li>
+                                            <strong>No Misrepresentation:</strong> You agree not to use AI generation to create fraudulent career credentials or intentionally mislead potential employers.
+                                        </li>
+                                    </ul>
+                                </section>
 
-                        <section className="mb-8 border-t border-slate-100 pt-6 dark:border-slate-800/80">
-                            <h2 className="flex items-center gap-2 text-xl font-bold text-slate-900 dark:text-white">
-                                <AlertTriangle className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
-                                3. Disclaimer of Warranties & Limitation of Liability
-                            </h2>
-                            <p className="text-sm leading-relaxed text-slate-600 dark:text-slate-300">
-                                Aplayan is provided on an "AS IS" and "AS AVAILABLE" basis without warranties of any kind.
-                            </p>
-                            <ul className="mt-3 list-disc space-y-2 pl-5 text-sm text-slate-600 dark:text-slate-300">
-                                <li>
-                                    <strong>No Guarantee of Employment:</strong> Aplayan is an independent tracking tool. We do not guarantee job callbacks, interview invitations, or employment offers from third-party employers.
-                                </li>
-                                <li>
-                                    <strong>Third-Party Dependencies:</strong> We are not liable for temporary service interruptions caused by third-party providers (such as Google Gemini, Cloudflare, or hosting infrastructure).
-                                </li>
-                                <li>
-                                    <strong>Limitation of Liability:</strong> To the maximum extent permitted by applicable law, the independent developer of Aplayan shall not be liable for any indirect, incidental, or consequential damages arising from your use of the platform.
-                                </li>
-                            </ul>
-                        </section>
+                                <section className="mb-8 border-t border-slate-100 pt-6 dark:border-slate-800/80">
+                                    <h2 className="flex items-center gap-2 text-xl font-bold text-slate-900 dark:text-white">
+                                        <AlertTriangle className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
+                                        3. Disclaimer of Warranties & Limitation of Liability
+                                    </h2>
+                                    <p className="text-sm leading-relaxed text-slate-600 dark:text-slate-300">
+                                        Aplayan is provided on an "AS IS" and "AS AVAILABLE" basis without warranties of any kind.
+                                    </p>
+                                    <ul className="mt-3 list-disc space-y-2 pl-5 text-sm text-slate-600 dark:text-slate-300">
+                                        <li>
+                                            <strong>No Guarantee of Employment:</strong> Aplayan is an independent tracking tool. We do not guarantee job callbacks, interview invitations, or employment offers from third-party employers.
+                                        </li>
+                                        <li>
+                                            <strong>Third-Party Dependencies:</strong> We are not liable for temporary service interruptions caused by third-party providers (such as Google Gemini, Cloudflare, or hosting infrastructure).
+                                        </li>
+                                        <li>
+                                            <strong>Limitation of Liability:</strong> To the maximum extent permitted by applicable law, the independent developer of Aplayan shall not be liable for any indirect, incidental, or consequential damages arising from your use of the platform.
+                                        </li>
+                                    </ul>
+                                </section>
 
-                        <section className="mb-8 border-t border-slate-100 pt-6 dark:border-slate-800/80">
-                            <h2 className="flex items-center gap-2 text-xl font-bold text-slate-900 dark:text-white">
-                                <Scale className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
-                                4. Account Termination & Acceptable Use
-                            </h2>
-                            <p className="text-sm leading-relaxed text-slate-600 dark:text-slate-300">
-                                We reserve the right to suspend or terminate account access if a user engages in abusive behavior, attempts to breach system security, or violates these Terms of Service.
-                            </p>
-                        </section>
+                                <section className="mb-8 border-t border-slate-100 pt-6 dark:border-slate-800/80">
+                                    <h2 className="flex items-center gap-2 text-xl font-bold text-slate-900 dark:text-white">
+                                        <Scale className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
+                                        4. Account Termination & Acceptable Use
+                                    </h2>
+                                    <p className="text-sm leading-relaxed text-slate-600 dark:text-slate-300">
+                                        We reserve the right to suspend or terminate account access if a user engages in abusive behavior, attempts to breach system security, or violates these Terms of Service.
+                                    </p>
+                                </section>
 
-                        <section className="border-t border-slate-100 pt-6 dark:border-slate-800/80">
-                            <h2 className="text-xl font-bold text-slate-900 dark:text-white">
-                                5. Questions & Support
-                            </h2>
-                            <p className="mt-2 text-sm leading-relaxed text-slate-600 dark:text-slate-300">
-                                For inquiries regarding these Terms of Service, please contact us at{' '}
-                                <a href="mailto:kenthosila@gmail.com" className="font-medium text-emerald-600 hover:underline dark:text-emerald-400">
-                                    kenthosila@gmail.com
-                                </a>.
-                            </p>
-                        </section>
+                                <section className="border-t border-slate-100 pt-6 dark:border-slate-800/80">
+                                    <h2 className="text-xl font-bold text-slate-900 dark:text-white">
+                                        5. Questions & Support
+                                    </h2>
+                                    <p className="mt-2 text-sm leading-relaxed text-slate-600 dark:text-slate-300">
+                                        For inquiries regarding these Terms of Service, please contact us at{' '}
+                                        <a href="mailto:kenthosila@gmail.com" className="font-medium text-emerald-600 hover:underline dark:text-emerald-400">
+                                            kenthosila@gmail.com
+                                        </a>.
+                                    </p>
+                                </section>
+                            </>
+                        )}
                     </div>
                 </main>
 

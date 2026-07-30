@@ -5,8 +5,15 @@ import SeoHead from '@/components/ui/seo-head';
 import { ArrowLeft, Shield, Lock, Eye, Database, Cpu, FileText } from 'lucide-react';
 import { home, termsOfService, privacyPolicy } from '@/routes';
 
-export default function PrivacyPolicy() {
-    const lastUpdated = 'July 30, 2026';
+interface LegalDocument {
+    key: string;
+    title: string;
+    content: string;
+    version: number;
+}
+
+export default function PrivacyPolicy({ document }: { document?: LegalDocument | null }) {
+    const lastUpdated = document ? `Version ${document.version}` : 'July 30, 2026';
 
     return (
         <>
@@ -82,90 +89,98 @@ export default function PrivacyPolicy() {
 
                     {/* Full Privacy Document Body */}
                     <div className="prose prose-slate max-w-none rounded-2xl border border-slate-200 bg-white p-6 sm:p-10 dark:prose-invert dark:border-slate-800 dark:bg-slate-900">
-                        <section className="mb-8">
-                            <h2 className="flex items-center gap-2 text-xl font-bold text-slate-900 dark:text-white">
-                                <FileText className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
-                                1. Overview
-                            </h2>
-                            <p className="text-sm leading-relaxed text-slate-600 dark:text-slate-300">
-                                Welcome to <strong>Aplayan</strong> ("we", "us", "the Service"). Aplayan is an independent AI-powered job application tracking and resume tailoring platform designed to help job seekers organize their career applications efficiently. We respect your privacy and are committed to protecting the personal data you entrust to us.
-                            </p>
-                        </section>
+                        {document ? (
+                            <div className="whitespace-pre-line text-sm leading-relaxed text-slate-600 dark:text-slate-300">
+                                {document.content}
+                            </div>
+                        ) : (
+                            <>
+                                <section className="mb-8">
+                                    <h2 className="flex items-center gap-2 text-xl font-bold text-slate-900 dark:text-white">
+                                        <FileText className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
+                                        1. Overview
+                                    </h2>
+                                    <p className="text-sm leading-relaxed text-slate-600 dark:text-slate-300">
+                                        Welcome to <strong>Aplayan</strong> ("we", "us", "the Service"). Aplayan is an independent AI-powered job application tracking and resume tailoring platform designed to help job seekers organize their career applications efficiently. We respect your privacy and are committed to protecting the personal data you entrust to us.
+                                    </p>
+                                </section>
 
-                        <section className="mb-8 border-t border-slate-100 pt-6 dark:border-slate-800/80">
-                            <h2 className="flex items-center gap-2 text-xl font-bold text-slate-900 dark:text-white">
-                                <Database className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
-                                2. Information We Collect
-                            </h2>
-                            <p className="text-sm leading-relaxed text-slate-600 dark:text-slate-300">
-                                To provide job application tracking and document generation features, we collect the following categories of information:
-                            </p>
-                            <ul className="mt-3 list-disc space-y-2 pl-5 text-sm text-slate-600 dark:text-slate-300">
-                                <li>
-                                    <strong>Account Data:</strong> Name, email address, password hash, and Google OAuth profile information when you register or sign in via Google.
-                                </li>
-                                <li>
-                                    <strong>Career & Application Data:</strong> Resumes, work history, education records, cover letters, contacts, job application titles, salary preferences, and application status logs.
-                                </li>
-                                <li>
-                                    <strong>Technical & Security Metadata:</strong> IP addresses, browser user-agent data, session tokens, and Cloudflare Turnstile anti-bot verification tokens.
-                                </li>
-                            </ul>
-                        </section>
+                                <section className="mb-8 border-t border-slate-100 pt-6 dark:border-slate-800/80">
+                                    <h2 className="flex items-center gap-2 text-xl font-bold text-slate-900 dark:text-white">
+                                        <Database className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
+                                        2. Information We Collect
+                                    </h2>
+                                    <p className="text-sm leading-relaxed text-slate-600 dark:text-slate-300">
+                                        To provide job application tracking and document generation features, we collect the following categories of information:
+                                    </p>
+                                    <ul className="mt-3 list-disc space-y-2 pl-5 text-sm text-slate-600 dark:text-slate-300">
+                                        <li>
+                                            <strong>Account Data:</strong> Name, email address, password hash, and Google OAuth profile information when you register or sign in via Google.
+                                        </li>
+                                        <li>
+                                            <strong>Career & Application Data:</strong> Resumes, work history, education records, cover letters, contacts, job application titles, salary preferences, and application status logs.
+                                        </li>
+                                        <li>
+                                            <strong>Technical & Security Metadata:</strong> IP addresses, browser user-agent data, session tokens, and Cloudflare Turnstile anti-bot verification tokens.
+                                        </li>
+                                    </ul>
+                                </section>
 
-                        <section className="mb-8 border-t border-slate-100 pt-6 dark:border-slate-800/80">
-                            <h2 className="flex items-center gap-2 text-xl font-bold text-slate-900 dark:text-white">
-                                <Cpu className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
-                                3. How We Use & Process Your Data
-                            </h2>
-                            <p className="text-sm leading-relaxed text-slate-600 dark:text-slate-300">
-                                We utilize your information strictly to operate, maintain, and improve Aplayan services:
-                            </p>
-                            <ul className="mt-3 list-disc space-y-2 pl-5 text-sm text-slate-600 dark:text-slate-300">
-                                <li><strong>Job Tracking:</strong> Rendering your Kanban boards, application calendars, and analytics dashboard.</li>
-                                <li>
-                                    <strong>Third-Party AI Generation (Google Gemini API):</strong> When you request AI resume matching, cover letter drafting, or salary evaluations, the relevant job description and resume text are sent to the <strong>Google Gemini API</strong> solely to process your request.
-                                </li>
-                                <li><strong>Security & Authentication:</strong> Preventing bot attacks, authenticating user sessions, and maintaining system integrity via Cloudflare.</li>
-                            </ul>
-                        </section>
+                                <section className="mb-8 border-t border-slate-100 pt-6 dark:border-slate-800/80">
+                                    <h2 className="flex items-center gap-2 text-xl font-bold text-slate-900 dark:text-white">
+                                        <Cpu className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
+                                        3. How We Use & Process Your Data
+                                    </h2>
+                                    <p className="text-sm leading-relaxed text-slate-600 dark:text-slate-300">
+                                        We utilize your information strictly to operate, maintain, and improve Aplayan services:
+                                    </p>
+                                    <ul className="mt-3 list-disc space-y-2 pl-5 text-sm text-slate-600 dark:text-slate-300">
+                                        <li><strong>Job Tracking:</strong> Rendering your Kanban boards, application calendars, and analytics dashboard.</li>
+                                        <li>
+                                            <strong>Third-Party AI Generation (Google Gemini API):</strong> When you request AI resume matching, cover letter drafting, or salary evaluations, the relevant job description and resume text are sent to the <strong>Google Gemini API</strong> solely to process your request.
+                                        </li>
+                                        <li><strong>Security & Authentication:</strong> Preventing bot attacks, authenticating user sessions, and maintaining system integrity via Cloudflare.</li>
+                                    </ul>
+                                </section>
 
-                        <section className="mb-8 border-t border-slate-100 pt-6 dark:border-slate-800/80">
-                            <h2 className="flex items-center gap-2 text-xl font-bold text-slate-900 dark:text-white">
-                                <Lock className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
-                                4. Data Ownership & User Rights
-                            </h2>
-                            <p className="text-sm leading-relaxed text-slate-600 dark:text-slate-300">
-                                You own your career data. In accordance with core privacy principles (including the Philippine Data Privacy Act of 2012 / RA 10173), you have the right to:
-                            </p>
-                            <ul className="mt-3 list-disc space-y-2 pl-5 text-sm text-slate-600 dark:text-slate-300">
-                                <li>Access, review, and edit your profile, resumes, and job records at any time.</li>
-                                <li>Export your job applications as CSV files from your dashboard.</li>
-                                <li>Delete specific job records, saved resumes, or your entire account data upon request.</li>
-                            </ul>
-                        </section>
+                                <section className="mb-8 border-t border-slate-100 pt-6 dark:border-slate-800/80">
+                                    <h2 className="flex items-center gap-2 text-xl font-bold text-slate-900 dark:text-white">
+                                        <Lock className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
+                                        4. Data Ownership & User Rights
+                                    </h2>
+                                    <p className="text-sm leading-relaxed text-slate-600 dark:text-slate-300">
+                                        You own your career data. In accordance with core privacy principles (including the Philippine Data Privacy Act of 2012 / RA 10173), you have the right to:
+                                    </p>
+                                    <ul className="mt-3 list-disc space-y-2 pl-5 text-sm text-slate-600 dark:text-slate-300">
+                                        <li>Access, review, and edit your profile, resumes, and job records at any time.</li>
+                                        <li>Export your job applications as CSV files from your dashboard.</li>
+                                        <li>Delete specific job records, saved resumes, or your entire account data upon request.</li>
+                                    </ul>
+                                </section>
 
-                        <section className="mb-8 border-t border-slate-100 pt-6 dark:border-slate-800/80">
-                            <h2 className="flex items-center gap-2 text-xl font-bold text-slate-900 dark:text-white">
-                                <Lock className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
-                                5. Data Storage & Encryption
-                            </h2>
-                            <p className="text-sm leading-relaxed text-slate-600 dark:text-slate-300">
-                                Your data is stored on secured cloud infrastructure with encryption in transit (TLS 1.3) and at rest using AES-256. We do not sell, rent, or trade your personal career information to third parties. Your resumes, application records, and profile data remain strictly within the platform and are never shared with recruiters, advertisers, or external data brokers.
-                            </p>
-                        </section>
+                                <section className="mb-8 border-t border-slate-100 pt-6 dark:border-slate-800/80">
+                                    <h2 className="flex items-center gap-2 text-xl font-bold text-slate-900 dark:text-white">
+                                        <Lock className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
+                                        5. Data Storage & Encryption
+                                    </h2>
+                                    <p className="text-sm leading-relaxed text-slate-600 dark:text-slate-300">
+                                        Your data is stored on secured cloud infrastructure with encryption in transit (TLS 1.3) and at rest using AES-256. We do not sell, rent, or trade your personal career information to third parties. Your resumes, application records, and profile data remain strictly within the platform and are never shared with recruiters, advertisers, or external data brokers.
+                                    </p>
+                                </section>
 
-                        <section className="border-t border-slate-100 pt-6 dark:border-slate-800/80">
-                            <h2 className="text-xl font-bold text-slate-900 dark:text-white">
-                                6. Contact & Support
-                            </h2>
-                            <p className="mt-2 text-sm leading-relaxed text-slate-600 dark:text-slate-300">
-                                If you have questions about this Privacy Policy or wish to exercise your data privacy rights, please reach out to us at{' '}
-                                <a href="mailto:kenthosila@gmail.com" className="font-medium text-emerald-600 hover:underline dark:text-emerald-400">
-                                    kenthosila@gmail.com
-                                </a>.
-                            </p>
-                        </section>
+                                <section className="border-t border-slate-100 pt-6 dark:border-slate-800/80">
+                                    <h2 className="text-xl font-bold text-slate-900 dark:text-white">
+                                        6. Contact & Support
+                                    </h2>
+                                    <p className="mt-2 text-sm leading-relaxed text-slate-600 dark:text-slate-300">
+                                        If you have questions about this Privacy Policy or wish to exercise your data privacy rights, please reach out to us at{' '}
+                                        <a href="mailto:kenthosila@gmail.com" className="font-medium text-emerald-600 hover:underline dark:text-emerald-400">
+                                            kenthosila@gmail.com
+                                        </a>.
+                                    </p>
+                                </section>
+                            </>
+                        )}
                     </div>
                 </main>
 

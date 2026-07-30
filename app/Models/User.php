@@ -32,12 +32,17 @@ use Illuminate\Support\Carbon;
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  */
-#[Fillable(['name', 'email', 'password', 'google_id', 'avatar', 'expected_salary', 'base_currency', 'job_search_preferences', 'theme', 'color_theme', 'weekly_goal', 'goal_streak', 'tax_settings'])]
+#[Fillable(['name', 'email', 'password', 'google_id', 'avatar', 'expected_salary', 'base_currency', 'job_search_preferences', 'theme', 'color_theme', 'weekly_goal', 'goal_streak', 'tax_settings', 'role'])]
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable implements MustVerifyEmail
 {
     /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable;
+
+    public function isAdmin(): bool
+    {
+        return $this->role === 'admin';
+    }
 
     public function jobApplications(): HasMany
     {
@@ -82,6 +87,7 @@ class User extends Authenticatable implements MustVerifyEmail
             'expected_salary' => 'integer',
             'job_search_preferences' => 'array',
             'tax_settings' => 'array',
+            'role' => 'string',
         ];
     }
 }

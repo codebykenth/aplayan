@@ -1,5 +1,8 @@
 <?php
 
+use App\Http\Controllers\Admin\AiUsageController;
+use App\Http\Controllers\Admin\LegalDocumentController;
+use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\AnalyticsController;
 use App\Http\Controllers\ApplicationTemplateController;
 use App\Http\Controllers\Auth\AuthController;
@@ -31,7 +34,7 @@ Route::inertia('/', 'welcome')->name('home');
 
 Route::get('sitemap.xml', SitemapController::class)->name('sitemap');
 Route::get('robots.txt', function () {
-    $sitemapUrl = rtrim((string) config('app.url'), '/') . '/sitemap.xml';
+    $sitemapUrl = rtrim((string) config('app.url'), '/').'/sitemap.xml';
     $content = "User-agent: *\n\n";
     $content .= "# Public pages - allow all\n";
     $content .= "Allow: /\n";
@@ -156,4 +159,14 @@ Route::middleware('auth')->group(function () {
     Route::post('documents/save-cover-letter', [DocumentController::class, 'saveCoverLetter'])->name('documents.save-cover-letter')->middleware('throttle:write');
     Route::delete('documents/resume-versions/{savedResume}', [DocumentController::class, 'destroyResumeVersion'])->name('documents.resume-versions.destroy')->middleware('throttle:delete');
     Route::delete('documents/cover-letters/{savedCoverLetter}', [DocumentController::class, 'destroyCoverLetter'])->name('documents.cover-letters.destroy')->middleware('throttle:delete');
+});
+
+Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
+    Route::get('dashboard', App\Http\Controllers\Admin\DashboardController::class)->name('dashboard')->middleware('throttle:read');
+    Route::get('users', [UserController::class, 'index'])->name('users.index')->middleware('throttle:read');
+    Route::post('users/{user}/toggle-role', [UserController::class, 'toggleRole'])->name('users.toggle-role')->middleware('throttle:write');
+    Route::delete('users/{user}', [UserController::class, 'destroy'])->name('users.destroy')->middleware('throttle:delete');
+    Route::get('ai-usage', AiUsageController::class)->name('ai-usage')->middleware('throttle:read');
+    Route::get('legal-documents', [LegalDocumentController::class, 'index'])->name('legal-documents.index')->middleware('throttle:read');
+    Route::put('legal-documents/{legalDocument}', [LegalDocumentController::class, 'update'])->name('legal-documents.update')->middleware('throttle:write');
 });
