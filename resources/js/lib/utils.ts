@@ -19,7 +19,7 @@ export function formatPhone(phone: string): string {
     }
 
     if (digits.startsWith('09') && digits.length === 11) {
-        return `09${digits.slice(2, 5)} ${digits.slice(5, 8)} ${digits.slice(8)}`;
+        return `09${digits.slice(2, 4)} ${digits.slice(4, 7)} ${digits.slice(7, 11)}`;
     }
 
     return phone;

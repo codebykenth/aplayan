@@ -6658,6 +6658,8 @@ export default function DocumentsIndex({
             preserveState: true,
             onSuccess: () => {
                 initialSnapshot.current = JSON.stringify(data);
+                setIsDirty(false);
+                setActiveView('resume-preview');
             },
         });
         setLastSaved(new Date());
