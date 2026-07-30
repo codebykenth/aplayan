@@ -1083,7 +1083,6 @@ function PersonalInfoTab({
                                               ),
                                               '',
                                           )
-                                          .replace(/\s+/g, '')
                                     : ''
                             }
                             onChange={(e) => {
