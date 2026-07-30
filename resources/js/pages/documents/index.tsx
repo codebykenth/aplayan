@@ -89,6 +89,7 @@ import {
     TooltipProvider,
     TooltipTrigger,
 } from '@/components/ui/tooltip';
+import { formatPhone } from '@/lib/utils';
 import AppLayout from '@/layouts/app-layout';
 
 type WorkExperience = {
@@ -2811,7 +2812,7 @@ function ResumePreview({
                                         ) : null,
                                         data.phone ? (
                                             <span key="phone">
-                                                {data.phone}
+                                                {formatPhone(data.phone)}
                                             </span>
                                         ) : null,
                                         data.email ? (
@@ -3058,7 +3059,7 @@ function ResumePreview({
                                         ) : null,
                                         data.phone ? (
                                             <span key="phone">
-                                                {data.phone}
+                                                {formatPhone(data.phone)}
                                             </span>
                                         ) : null,
                                         data.email ? (
@@ -3305,7 +3306,7 @@ function ResumePreview({
                                         ) : null,
                                         data.phone ? (
                                             <span key="phone">
-                                                {data.phone}
+                                                {formatPhone(data.phone)}
                                             </span>
                                         ) : null,
                                         data.email ? (
@@ -3572,7 +3573,7 @@ function ResumePreview({
                                         {data.email}
                                     </a>
                                 )}
-                                {data.phone && <span>{data.phone}</span>}
+                                {data.phone && <span>{formatPhone(data.phone)}</span>}
                                 {data.location && <span>{data.location}</span>}
                                 {data.linkedin_url && (
                                     <span>{renderLink(data.linkedin_url)}</span>
@@ -3801,7 +3802,7 @@ function ResumePreview({
                                         {data.email}
                                     </a>
                                 )}
-                                {data.phone && <span>{data.phone}</span>}
+                                {data.phone && <span>{formatPhone(data.phone)}</span>}
                                 {data.location && <span>{data.location}</span>}
                             </div>
                             {data.linkedin_url && (
@@ -4040,7 +4041,7 @@ function ResumePreview({
                                     {data.location && (
                                         <span>{data.location}</span>
                                     )}
-                                    {data.phone && <span>{data.phone}</span>}
+                                    {data.phone && <span>{formatPhone(data.phone)}</span>}
                                     {data.email && (
                                         <a
                                             href={`mailto:${data.email}`}
@@ -4362,7 +4363,7 @@ function ResumePreview({
                                     {[
                                         data.phone ? (
                                             <span key="phone">
-                                                {data.phone}
+                                                {formatPhone(data.phone)}
                                             </span>
                                         ) : null,
                                         data.email ? (
@@ -4887,7 +4888,7 @@ function ResumePreview({
                                     {[
                                         data.phone ? (
                                             <span key="phone">
-                                                {data.phone}
+                                                {formatPhone(data.phone)}
                                             </span>
                                         ) : null,
                                         data.email ? (
