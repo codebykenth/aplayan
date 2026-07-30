@@ -44,7 +44,7 @@ The authenticated account owner tracking their job hunt.
 
 ### Job Application
 A record of a user's application to a specific job opening.
-- **Core Fields**: `company_name`, `job_title`, `job_url` (optional), `job_description` (optional text for AI analysis), `location` (Metro Manila, Cebu, Davao, Remote, etc.), `status`, `date_applied`, `currency` (ISO 4217 code, e.g., `PHP`, `USD`, `EUR`, default `PHP`), `expected_salary`, `offered_salary`, `notes`.
+- **Core Fields**: `company_name`, `job_title`, `job_url` (optional), `job_description` (optional text for AI analysis), `location` (Metro Manila, Cebu, Davao, Remote, etc.), `status`, `date_applied`, `currency` (ISO 4217 code, e.g., `PHP`, `USD`, `EUR`, default `PHP`), `expected_salary` (job seeker's target/asking salary, prefilled from User Profile default), `offered_salary` (final formal gross salary offer received from employer), `notes`.
 - **Statuses**: `wishlist`, `applied`, `interviewing`, `offer`, `rejected`, `withdrawn`.
 - **AI Evaluation Fields**:
   - `ai_match_percentage` (0–100, nullable)

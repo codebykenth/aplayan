@@ -24,8 +24,11 @@ declare global {
 const SCRIPT_SRC =
     'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit';
 
-const Turnstile = forwardRef<TurnstileInstance, { siteKey: string }>(
-    function Turnstile({ siteKey }, ref) {
+const Turnstile = forwardRef<
+    TurnstileInstance,
+    { siteKey: string; onVerify?: (token: string) => void }
+>(
+    function Turnstile({ siteKey, onVerify }, ref) {
         const containerRef = useRef<HTMLDivElement>(null);
         const widgetIdRef = useRef<string | null>(null);
         const resolveRef = useRef<((token: string | null) => void) | null>(
@@ -58,6 +61,9 @@ const Turnstile = forwardRef<TurnstileInstance, { siteKey: string }>(
                     {
                         sitekey: siteKey,
                         callback: (token: string) => {
+                            if (onVerify) {
+                                onVerify(token);
+                            }
                             if (resolveRef.current) {
                                 resolveRef.current(token);
                                 resolveRef.current = null;

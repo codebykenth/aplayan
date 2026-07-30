@@ -18,6 +18,9 @@ export const registerSchema = z
         email: z.string().email('Please enter a valid email address'),
         password: z.string().min(8, 'Password must be at least 8 characters'),
         password_confirmation: z.string(),
+        terms: z.literal(true, {
+            errorMap: () => ({ message: 'You must accept the Terms of Service' }),
+        }),
     })
     .refine((data) => data.password === data.password_confirmation, {
         message: 'Passwords do not match',
@@ -36,7 +39,10 @@ export const jobApplicationSchema = z.object({
     location: z
         .string()
         .transform(sanitize)
-        .pipe(z.string().min(1, 'Location is required').max(255)),
+        .pipe(z.string().max(255))
+        .or(z.literal(''))
+        .optional(),
+    work_setup: z.string().min(1, 'Work setup is required'),
     status: z.string().min(1, 'Status is required'),
     job_url: z.string().url('Invalid URL').or(z.literal('')).optional(),
     job_description: z.string().optional(),
@@ -69,6 +75,13 @@ export const profileSchema = z.object({
     email: z.string().email('Invalid email address'),
     expected_salary: z.coerce.number().min(0).optional(),
     base_currency: z.string().optional(),
+    job_search_preferences: z
+        .object({
+            target_roles: z.string().optional(),
+            work_setup: z.string().optional(),
+            target_industry: z.string().optional(),
+        })
+        .optional(),
 });
 
 export const passwordSchema = z

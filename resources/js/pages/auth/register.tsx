@@ -18,6 +18,8 @@ export default function Register() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [passwordConfirmation, setPasswordConfirmation] = useState('');
+    const [terms, setTerms] = useState(false);
+    const [isSubmitting, setIsSubmitting] = useState(false);
     const [clientErrors, setClientErrors] = useState<Record<string, string>>(
         {},
     );
@@ -30,6 +32,7 @@ export default function Register() {
             email,
             password,
             password_confirmation: passwordConfirmation,
+            terms,
         });
 
         if (!validation.success) {
@@ -38,7 +41,8 @@ export default function Register() {
         }
 
         setClientErrors({});
-        submitForm();
+        setIsSubmitting(true);
+        submitForm().catch(() => setIsSubmitting(false));
     }
 
     async function submitForm() {
@@ -61,6 +65,16 @@ export default function Register() {
         form.submit();
     }
 
+    const siteKey = usePage().props.turnstile_site_key as string;
+    const [isTurnstileVerified, setIsTurnstileVerified] = useState(!siteKey);
+
+    const isFormValid =
+        name.trim() !== '' &&
+        email.trim() !== '' &&
+        password.length >= 8 &&
+        passwordConfirmation === password &&
+        terms;
+
     return (
         <>
             <SeoHead
@@ -69,7 +83,7 @@ export default function Register() {
                 canonicalPath="/register"
             />
 
-            <div className="mx-auto mt-16 w-full max-w-sm">
+            <div className="mx-auto w-full max-w-sm px-4 py-12 sm:py-20">
                 <h1 className="mb-6 text-2xl font-semibold text-foreground">
                     Create your account
                 </h1>
@@ -86,12 +100,16 @@ export default function Register() {
                         value={usePage().props.csrf_token as string}
                     />
 
+                    <p className="text-xs text-muted-foreground">
+                        Fields marked with <span className="text-red-500">*</span> are required.
+                    </p>
+
                     <div>
                         <label
                             htmlFor="name"
                             className="block text-sm font-medium text-foreground"
                         >
-                            Name
+                            Name <span className="text-red-500">*</span>
                         </label>
                         <input
                             id="name"
@@ -116,7 +134,7 @@ export default function Register() {
                             htmlFor="email"
                             className="block text-sm font-medium text-foreground"
                         >
-                            Email
+                            Email <span className="text-red-500">*</span>
                         </label>
                         <input
                             id="email"
@@ -140,7 +158,7 @@ export default function Register() {
                             htmlFor="password"
                             className="mb-1 block text-sm font-medium text-foreground"
                         >
-                            Password
+                            Password <span className="text-red-500">*</span>
                         </label>
                         <PasswordInput
                             id="password"
@@ -163,7 +181,7 @@ export default function Register() {
                             htmlFor="password_confirmation"
                             className="mb-1 block text-sm font-medium text-foreground"
                         >
-                            Confirm Password
+                            Confirm Password <span className="text-red-500">*</span>
                         </label>
                         <PasswordInput
                             id="password_confirmation"
@@ -182,20 +200,55 @@ export default function Register() {
                         )}
                     </div>
 
+                    <div className="flex items-start gap-2 pt-1">
+                        <input
+                            id="terms"
+                            name="terms"
+                            type="checkbox"
+                            required
+                            checked={terms}
+                            onChange={(e) => setTerms(e.target.checked)}
+                            className="mt-0.5 h-4 w-4 rounded border-input text-primary focus:ring-ring"
+                        />
+                        <label htmlFor="terms" className="text-xs text-muted-foreground">
+                            I accept the{' '}
+                            <Link
+                                href="/terms"
+                                target="_blank"
+                                className="font-medium text-primary underline underline-offset-2 hover:text-primary/80"
+                            >
+                                Terms of Service
+                            </Link>{' '}
+                            and{' '}
+                            <Link
+                                href="/privacy"
+                                target="_blank"
+                                className="font-medium text-primary underline underline-offset-2 hover:text-primary/80"
+                            >
+                                Privacy Policy
+                            </Link>
+                        </label>
+                    </div>
+                    {(clientErrors.terms || pageErrors?.terms) && (
+                        <p className="mt-1 text-sm text-destructive">
+                            {clientErrors.terms || pageErrors?.terms}
+                        </p>
+                    )}
+
                     <div className="mt-4">
                         <Turnstile
-                            siteKey={
-                                usePage().props.turnstile_site_key as string
-                            }
+                            siteKey={siteKey}
                             ref={turnstileRef}
+                            onVerify={() => setIsTurnstileVerified(true)}
                         />
                     </div>
 
                     <button
                         type="submit"
-                        className="w-full rounded-lg border border-foreground bg-foreground px-5 py-2 text-sm text-background hover:bg-foreground/90"
+                        disabled={!isFormValid || isSubmitting || !isTurnstileVerified}
+                        className="w-full rounded-lg border border-foreground bg-foreground px-5 py-2 text-sm text-background transition-opacity hover:bg-foreground/90 disabled:pointer-events-none disabled:opacity-50"
                     >
-                        Register
+                        {isSubmitting ? 'Registering...' : 'Register'}
                     </button>
                 </form>
 
@@ -211,8 +264,13 @@ export default function Register() {
                 </div>
 
                 <a
-                    href="/auth/google/redirect"
-                    className="flex w-full items-center justify-center gap-3 rounded-lg border border-border bg-background px-5 py-2 text-sm text-foreground hover:bg-muted"
+                    href={isTurnstileVerified ? '/auth/google/redirect' : undefined}
+                    aria-disabled={!isTurnstileVerified}
+                    className={`flex w-full items-center justify-center gap-3 rounded-lg border border-border bg-background px-5 py-2 text-sm text-foreground transition-opacity ${
+                        !isTurnstileVerified
+                            ? 'pointer-events-none opacity-50 cursor-not-allowed'
+                            : 'hover:bg-muted'
+                    }`}
                 >
                     <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none">
                         <path

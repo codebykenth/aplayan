@@ -5,6 +5,7 @@ export type User = {
     avatar?: string;
     expected_salary?: number | null;
     base_currency?: string;
+    role?: 'admin' | 'user' | string;
     email_verified_at: string | null;
     created_at: string;
     updated_at: string;

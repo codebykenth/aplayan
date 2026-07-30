@@ -42,7 +42,7 @@ export default function ForgotPassword() {
         <>
             <Head title="Forgot Password" />
 
-            <div className="mx-auto mt-16 w-full max-w-sm">
+            <div className="mx-auto w-full max-w-sm px-4 py-12 sm:py-20">
                 <h1 className="mb-2 text-2xl font-semibold text-foreground">
                     Reset your password
                 </h1>
@@ -68,12 +68,16 @@ export default function ForgotPassword() {
                         value={usePage().props.csrf_token as string}
                     />
 
+                    <p className="text-xs text-muted-foreground">
+                        Fields marked with <span className="text-red-500">*</span> are required.
+                    </p>
+
                     <div>
                         <label
                             htmlFor="email"
                             className="block text-sm font-medium text-foreground"
                         >
-                            Email
+                            Email <span className="text-red-500">*</span>
                         </label>
                         <input
                             id="email"

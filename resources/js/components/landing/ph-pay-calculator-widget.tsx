@@ -231,7 +231,7 @@ export default function PhPayCalculatorWidget() {
                             htmlFor="monthly-salary"
                             className="text-sm font-semibold text-foreground"
                         >
-                            Monthly Gross Salary (₱)
+                            Monthly Gross Salary (₱) <span className="text-red-500">*</span>
                         </label>
                         <div className="relative mt-1.5">
                             <span className="absolute top-1/2 left-3 -translate-y-1/2 text-zinc-500 dark:text-zinc-400">

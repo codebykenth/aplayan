@@ -81,6 +81,14 @@ export const TAX_REGIMES = [
     },
 ] as const;
 
+export type WorkSetupOption = 'remote' | 'hybrid' | 'onsite';
+
+export const WORK_SETUP_OPTIONS: { value: WorkSetupOption; label: string }[] = [
+    { value: 'remote', label: 'Remote' },
+    { value: 'hybrid', label: 'Hybrid' },
+    { value: 'onsite', label: 'On-site' },
+];
+
 export interface JobApplication {
     id: number;
     user_id: number;
@@ -88,7 +96,8 @@ export interface JobApplication {
     job_title: string;
     job_url: string | null;
     job_description: string | null;
-    location: string;
+    location: string | null;
+    work_setup: WorkSetupOption;
     status: JobApplicationStatus;
     date_applied: string | null;
     expected_salary: number | null;

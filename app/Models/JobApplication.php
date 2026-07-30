@@ -17,7 +17,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property string $job_title
  * @property string|null $job_url
  * @property string|null $job_description
- * @property string $location
+ * @property string|null $location
+ * @property string $work_setup
  * @property string $status
  * @property string|null $date_applied
  * @property int|null $expected_salary
@@ -53,6 +54,7 @@ class JobApplication extends Model
         'job_url',
         'job_description',
         'location',
+        'work_setup',
         'status',
         'date_applied',
         'expected_salary',

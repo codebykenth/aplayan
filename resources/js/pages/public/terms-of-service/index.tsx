@@ -1,9 +1,8 @@
 import React from 'react';
-import { Link } from '@inertiajs/react';
-import ApplicationLogo from '@/components/ui/application-logo';
+import { Link, router } from '@inertiajs/react';
 import SeoHead from '@/components/ui/seo-head';
 import { ArrowLeft, FileCheck, AlertTriangle, Scale, CheckCircle2, UserCheck } from 'lucide-react';
-import { home, termsOfService, privacyPolicy } from '@/routes';
+import { termsOfService, privacyPolicy } from '@/routes';
 
 interface LegalDocument {
     key: string;
@@ -15,6 +14,14 @@ interface LegalDocument {
 export default function TermsOfService({ document }: { document?: LegalDocument | null }) {
     const lastUpdated = document ? `Version ${document.version}` : 'July 30, 2026';
 
+    function handleBack() {
+        if (typeof window !== 'undefined' && window.history.length > 1) {
+            window.history.back();
+        } else {
+            router.visit('/');
+        }
+    }
+
     return (
         <>
             <SeoHead
@@ -23,24 +30,17 @@ export default function TermsOfService({ document }: { document?: LegalDocument 
                 canonicalPath="/terms-of-service"
             />
             <div className="min-h-screen bg-slate-50 font-sans text-slate-800 antialiased dark:bg-slate-950 dark:text-slate-100">
-                {/* Header */}
-                <header className="sticky top-0 z-50 border-b border-slate-200/80 bg-white/80 backdrop-blur-md dark:border-slate-800/80 dark:bg-slate-950/80">
-                    <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-3 sm:px-6">
-                        <Link href={home.url()} className="flex items-center gap-2 transition hover:opacity-90">
-                            <ApplicationLogo size="sm" />
-                        </Link>
-                        <Link
-                            href={home.url()}
+                <main className="mx-auto max-w-4xl px-4 py-8 sm:px-6 sm:py-12">
+                    <div className="mb-6">
+                        <button
+                            onClick={handleBack}
                             className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-600 transition hover:text-emerald-600 dark:text-slate-400 dark:hover:text-emerald-400"
                         >
                             <ArrowLeft className="h-4 w-4" />
-                            Back to Home
-                        </Link>
+                            Back
+                        </button>
                     </div>
-                </header>
 
-                {/* Hero Title */}
-                <main className="mx-auto max-w-4xl px-4 py-10 sm:px-6 sm:py-16">
                     <div className="mb-10 text-center">
                         <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-3 py-1 text-xs font-medium text-emerald-600 dark:text-emerald-400">
                             <Scale className="h-3.5 w-3.5" />
@@ -169,21 +169,6 @@ export default function TermsOfService({ document }: { document?: LegalDocument 
                         )}
                     </div>
                 </main>
-
-                {/* Footer */}
-                <footer className="border-t border-slate-200 bg-white py-6 text-center text-xs text-slate-500 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-400">
-                    <div className="mx-auto flex max-w-4xl flex-wrap items-center justify-between gap-4 px-4">
-                        <p>© {new Date().getFullYear()} Aplayan. All rights reserved.</p>
-                        <div className="flex items-center gap-4 font-medium">
-                            <Link href={termsOfService.url()} className="text-emerald-600 dark:text-emerald-400">
-                                Terms of Service
-                            </Link>
-                            <Link href={privacyPolicy.url()} className="hover:text-emerald-600 dark:hover:text-emerald-400">
-                                Privacy Policy
-                            </Link>
-                        </div>
-                    </div>
-                </footer>
             </div>
         </>
     );

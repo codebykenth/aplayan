@@ -1,11 +1,12 @@
-import { Head, Link } from '@inertiajs/react';
-import { Menu, Moon, PhilippinePeso, Sun, X } from 'lucide-react';
+import { Head, Link, usePage } from '@inertiajs/react';
+import { Menu, Moon, Sun, X } from 'lucide-react';
 import { useState } from 'react';
 import { useTheme } from '@/hooks/use-theme';
-import { Button } from '@/components/ui/button';
+import { buttonVariants } from '@/components/ui/button';
 import ApplicationLogo from '@/components/ui/application-logo';
 import Footer from '@/components/landing/footer';
 import { cn } from '@/lib/utils';
+import type { Auth } from '@/types/auth';
 
 const navLinks = [
     { href: '/#ai-match', label: 'AI Match' },
@@ -36,7 +37,7 @@ function ThemeToggle() {
     );
 }
 
-function MobileMenu({ open, onClose }: { open: boolean; onClose: () => void }) {
+function MobileMenu({ open, onClose, user }: { open: boolean; onClose: () => void; user?: Auth['user'] }) {
     const { mode, setMode } = useTheme();
 
     const isDark = mode === 'dark';
@@ -108,20 +109,32 @@ function MobileMenu({ open, onClose }: { open: boolean; onClose: () => void }) {
                 </div>
 
                 <div className="mt-6 flex flex-col gap-3">
-                    <Link
-                        href="/login"
-                        className="block rounded-lg px-3 py-2 text-center text-sm font-medium text-foreground transition-colors hover:bg-muted"
-                        onClick={onClose}
-                    >
-                        Sign In
-                    </Link>
-                    <Link
-                        href="/register"
-                        className="block rounded-lg bg-foreground px-3 py-2 text-center text-sm font-medium text-background transition-colors hover:bg-foreground/90"
-                        onClick={onClose}
-                    >
-                        Get Started Free
-                    </Link>
+                    {user ? (
+                        <Link
+                            href={user.role === 'admin' ? '/admin/dashboard' : '/dashboard'}
+                            className="block rounded-lg bg-foreground px-3 py-2 text-center text-sm font-medium text-background transition-colors hover:bg-foreground/90"
+                            onClick={onClose}
+                        >
+                            {user.role === 'admin' ? 'Admin Dashboard' : 'Go to Dashboard'}
+                        </Link>
+                    ) : (
+                        <>
+                            <Link
+                                href="/login"
+                                className="block rounded-lg px-3 py-2 text-center text-sm font-medium text-foreground transition-colors hover:bg-muted"
+                                onClick={onClose}
+                            >
+                                Sign In
+                            </Link>
+                            <Link
+                                href="/register"
+                                className="block rounded-lg bg-foreground px-3 py-2 text-center text-sm font-medium text-background transition-colors hover:bg-foreground/90"
+                                onClick={onClose}
+                            >
+                                Get Started Free
+                            </Link>
+                        </>
+                    )}
                 </div>
             </div>
         </>
@@ -133,6 +146,7 @@ export default function GuestLayout({
 }: {
     children: React.ReactNode;
 }) {
+    const { auth } = usePage<{ auth?: Auth }>().props;
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
     return (
@@ -163,24 +177,30 @@ export default function GuestLayout({
                         <div className="hidden items-center gap-2.5 lg:flex">
                             <ThemeToggle />
 
-                            <Link
-                                href="/login"
-                                className="text-sm font-medium whitespace-nowrap text-zinc-600 transition-colors hover:text-foreground dark:text-zinc-300"
-                            >
-                                Sign In
-                            </Link>
-
-                            <Button
-                                as-child
-                                className="shrink-0 px-4 font-semibold"
-                            >
+                            {auth?.user ? (
                                 <Link
-                                    href="/register"
-                                    className="inline-flex items-center justify-center whitespace-nowrap"
+                                    href={auth.user.role === 'admin' ? '/admin/dashboard' : '/dashboard'}
+                                    className={cn(buttonVariants(), 'shrink-0 px-4 font-semibold')}
                                 >
-                                    Get Started Free
+                                    {auth.user.role === 'admin' ? 'Admin Dashboard' : 'Go to Dashboard'}
                                 </Link>
-                            </Button>
+                            ) : (
+                                <>
+                                    <Link
+                                        href="/login"
+                                        className="text-sm font-medium whitespace-nowrap text-zinc-600 transition-colors hover:text-foreground dark:text-zinc-300"
+                                    >
+                                        Sign In
+                                    </Link>
+
+                                    <Link
+                                        href="/register"
+                                        className={cn(buttonVariants(), 'shrink-0 px-4 font-semibold')}
+                                    >
+                                        Get Started Free
+                                    </Link>
+                                </>
+                            )}
                         </div>
 
                         <button
@@ -196,6 +216,7 @@ export default function GuestLayout({
                 <MobileMenu
                     open={mobileMenuOpen}
                     onClose={() => setMobileMenuOpen(false)}
+                    user={auth?.user}
                 />
 
                 <main className="flex-1">{children}</main>

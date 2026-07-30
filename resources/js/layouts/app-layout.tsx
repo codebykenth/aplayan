@@ -18,6 +18,7 @@ import {
     Sun,
     Moon,
     Monitor,
+    Shield,
 } from 'lucide-react';
 import ApplicationLogo from '@/components/ui/application-logo';
 import { useState, useEffect } from 'react';
@@ -134,6 +135,17 @@ function UserProfileMenu({
                             {user?.email}
                         </p>
                     </div>
+
+                    {user?.role === 'admin' && (
+                        <Link
+                            href="/admin/dashboard"
+                            className="flex w-full items-center gap-2 rounded-sm px-3 py-2 text-sm font-medium text-amber-600 dark:text-amber-400 transition-colors hover:bg-amber-50 dark:hover:bg-amber-950/50"
+                            onClick={() => setOpen(false)}
+                        >
+                            <Shield className="h-4 w-4 text-amber-500" />
+                            Admin Management
+                        </Link>
+                    )}
 
                     <Link
                         href="/settings"
@@ -338,6 +350,17 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                                         );
                                     },
                                 )}
+                                {auth.user?.role === 'admin' && (
+                                    <div className="mt-auto border-t border-border pt-2">
+                                        <Link
+                                            href="/admin/dashboard"
+                                            className="flex items-center gap-3 rounded-sm px-3 py-2 text-sm font-medium text-amber-600 dark:text-amber-400 transition-colors hover:bg-amber-50 dark:hover:bg-amber-950/50"
+                                        >
+                                            <Shield className="h-4 w-4 shrink-0 text-amber-500" />
+                                            Admin Management
+                                        </Link>
+                                    </div>
+                                )}
                             </>
                         ) : (
                             <TooltipProvider delay={100}>
@@ -370,6 +393,26 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                                             </Tooltip>
                                         );
                                     },
+                                )}
+                                {auth.user?.role === 'admin' && (
+                                    <Tooltip>
+                                        <TooltipTrigger
+                                            render={
+                                                <Link
+                                                    href="/admin/dashboard"
+                                                    className="mt-auto flex items-center justify-center rounded-sm border-t border-border px-2 pt-2 text-amber-600 dark:text-amber-400 hover:text-amber-500"
+                                                >
+                                                    <Shield className="h-5 w-5 shrink-0 text-amber-500" />
+                                                </Link>
+                                            }
+                                        />
+                                        <TooltipContent
+                                            side="right"
+                                            sideOffset={12}
+                                        >
+                                            Admin Management
+                                        </TooltipContent>
+                                    </Tooltip>
                                 )}
                             </TooltipProvider>
                         );

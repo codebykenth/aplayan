@@ -19,7 +19,7 @@ class SettingsController extends Controller
     {
         return Inertia::render('settings/index', [
             'user' => $request->user()->fresh()->only([
-                'id', 'name', 'email', 'avatar', 'expected_salary', 'base_currency',
+                'id', 'name', 'email', 'email_verified_at', 'avatar', 'expected_salary', 'base_currency',
                 'job_search_preferences', 'theme', 'color_theme', 'tax_settings',
             ]),
         ]);

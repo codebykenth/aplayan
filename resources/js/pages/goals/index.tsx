@@ -131,10 +131,13 @@ function GoalUpdateForm({ currentGoal }: { currentGoal: number }) {
                         Set your weekly application goal.
                     </CardDescription>
                 </CardHeader>
-                <CardContent className="flex flex-col gap-4">
-                    <div className="flex flex-col gap-2">
-                        <Label htmlFor="weekly_goal">
-                            Applications per week
+<CardContent className="flex flex-col gap-4">
+                     <p className="text-xs text-muted-foreground">
+                         Fields marked with <span className="text-red-500">*</span> are required.
+                     </p>
+                     <div className="flex flex-col gap-2">
+                         <Label htmlFor="weekly_goal">
+                            Applications per week <span className="text-red-500">*</span>
                         </Label>
                         <div className="flex gap-2">
                             <Input

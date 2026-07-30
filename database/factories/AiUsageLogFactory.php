@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\Factories\Factory;
  */
 class AiUsageLogFactory extends Factory
 {
-    protected $model = \App\Models\AiUsageLog::class;
+    protected $model = AiUsageLog::class;
 
     public function definition(): array
     {

@@ -108,9 +108,13 @@ export default function QuickApplyDialog({
                     </DialogDescription>
                 </DialogHeader>
 
+                <p className="mt-1 text-xs text-muted-foreground">
+                    Fields marked with <span className="text-red-500">*</span> are required.
+                </p>
+
                 <form onSubmit={submit} className="flex flex-col gap-4">
                     <div className="flex flex-col gap-2">
-                        <Label htmlFor="template_select">Template</Label>
+                        <Label htmlFor="template_select">Template <span className="text-red-500">*</span></Label>
                         <Select
                             value={selectedTemplate?.id.toString() ?? ''}
                             onValueChange={(value: string | null) =>
@@ -134,7 +138,7 @@ export default function QuickApplyDialog({
                     </div>
 
                     <div className="flex flex-col gap-2">
-                        <Label htmlFor="company_name">Company Name</Label>
+                        <Label htmlFor="company_name">Company Name <span className="text-red-500">*</span></Label>
                         <Input
                             id="company_name"
                             value={data.company_name}
@@ -153,7 +157,7 @@ export default function QuickApplyDialog({
                     </div>
 
                     <div className="flex flex-col gap-2">
-                        <Label htmlFor="job_url">Job URL</Label>
+                        <Label htmlFor="job_url">Job URL <span className="text-red-500">*</span></Label>
                         <Input
                             id="job_url"
                             type="url"

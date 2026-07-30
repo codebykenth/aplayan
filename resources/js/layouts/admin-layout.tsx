@@ -341,6 +341,15 @@ export default function AdminLayout({
                                         );
                                     },
                                 )}
+                                <div className="mt-auto border-t border-border pt-2">
+                                    <Link
+                                        href="/dashboard"
+                                        className="flex items-center gap-3 rounded-sm px-3 py-2 text-sm font-medium text-emerald-600 dark:text-emerald-400 transition-colors hover:bg-emerald-50 dark:hover:bg-emerald-950/50"
+                                    >
+                                        <Users className="h-4 w-4 shrink-0 text-emerald-500" />
+                                        User View
+                                    </Link>
+                                </div>
                             </>
                         ) : (
                             <TooltipProvider delay={100}>
@@ -374,6 +383,21 @@ export default function AdminLayout({
                                         );
                                     },
                                 )}
+                                <Tooltip>
+                                    <TooltipTrigger
+                                        render={
+                                            <Link
+                                                href="/dashboard"
+                                                className="mt-auto flex items-center justify-center rounded-sm border-t border-border px-2 pt-2 text-emerald-600 dark:text-emerald-400 hover:text-emerald-500"
+                                            >
+                                                <Users className="h-5 w-5 shrink-0 text-emerald-500" />
+                                            </Link>
+                                        }
+                                    />
+                                    <TooltipContent side="right" sideOffset={12}>
+                                        User View
+                                    </TooltipContent>
+                                </Tooltip>
                             </TooltipProvider>
                         );
                     })()}

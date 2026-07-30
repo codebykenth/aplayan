@@ -25,7 +25,7 @@ export default function ResetPassword({
         <>
             <Head title="Reset Password" />
 
-            <div className="mx-auto mt-16 w-full max-w-sm">
+            <div className="mx-auto w-full max-w-sm px-4 py-12 sm:py-20">
                 <h1 className="mb-6 text-2xl font-semibold text-foreground">
                     Reset your password
                 </h1>
@@ -43,12 +43,16 @@ export default function ResetPassword({
                     />
                     <input type="hidden" name="token" value={token} />
 
+                    <p className="text-xs text-muted-foreground">
+                        Fields marked with <span className="text-red-500">*</span> are required.
+                    </p>
+
                     <div>
                         <label
                             htmlFor="email"
                             className="block text-sm font-medium text-foreground"
                         >
-                            Email
+                            Email <span className="text-red-500">*</span>
                         </label>
                         <input
                             id="email"
@@ -66,7 +70,7 @@ export default function ResetPassword({
                             htmlFor="password"
                             className="mb-1 block text-sm font-medium text-foreground"
                         >
-                            Password
+                            Password <span className="text-red-500">*</span>
                         </label>
                         <PasswordInput
                             id="password"
@@ -90,7 +94,7 @@ export default function ResetPassword({
                             htmlFor="password_confirmation"
                             className="mb-1 block text-sm font-medium text-foreground"
                         >
-                            Confirm Password
+                            Confirm Password <span className="text-red-500">*</span>
                         </label>
                         <PasswordInput
                             id="password_confirmation"

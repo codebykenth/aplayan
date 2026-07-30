@@ -8,8 +8,12 @@ import {
     Timer,
     ServerCrash,
     WifiOff,
+    Home,
+    LayoutDashboard,
 } from 'lucide-react';
+import type { ReactNode } from 'react';
 import { buttonVariants } from '@/components/ui/button';
+import GuestLayout from '@/layouts/guest-layout';
 
 const ERROR_MAP: Record<
     number,
@@ -26,13 +30,13 @@ const ERROR_MAP: Record<
         icon: Lock,
     },
     403: {
-        title: 'Forbidden',
+        title: 'Forbidden Access',
         description: 'You do not have permission to access this resource.',
         icon: ShieldAlert,
     },
     404: {
         title: 'Page Not Found',
-        description: 'The page you are looking for does not exist.',
+        description: 'The page you are looking for does not exist or has been moved.',
         icon: FileQuestion,
     },
     405: {
@@ -42,30 +46,30 @@ const ERROR_MAP: Record<
     },
     419: {
         title: 'Session Expired',
-        description: 'Your session has expired. Please sign in again.',
+        description: 'Your session has expired due to inactivity. Please refresh and sign in again.',
         icon: Timer,
     },
     429: {
         title: 'Too Many Requests',
         description:
-            'You have made too many requests. Please wait before trying again.',
+            'You have made too many requests. Please wait a moment before trying again.',
         icon: Timer,
     },
     500: {
-        title: 'Server Error',
-        description: 'Something went wrong on our end. Please try again later.',
+        title: 'Unexpected Error',
+        description: 'Something went wrong on our server. We are looking into it.',
         icon: ServerCrash,
     },
     502: {
         title: 'Bad Gateway',
         description:
-            'The server received an invalid response from the upstream server.',
+            'The server received an invalid response from the upstream service.',
         icon: WifiOff,
     },
     503: {
         title: 'Service Unavailable',
         description:
-            'The service is temporarily unavailable. Please check back later.',
+            'The service is temporarily down for maintenance. Please check back shortly.',
         icon: WifiOff,
     },
 };
@@ -78,28 +82,37 @@ export default function ErrorPage({ status }: { status: number }) {
         <>
             <Head title={`${status} - ${error.title}`} />
 
-            <div className="flex min-h-screen flex-col items-center justify-center gap-6 px-4">
-                <div className="flex size-20 items-center justify-center rounded-full bg-destructive/10">
-                    <Icon className="size-10 text-destructive" />
+            <div className="mx-auto flex min-h-[70vh] w-full max-w-md flex-col items-center justify-center gap-6 px-4 py-12 text-center">
+                <div className="flex size-20 items-center justify-center rounded-2xl bg-destructive/10 text-destructive">
+                    <Icon className="size-10" />
                 </div>
 
-                <div className="flex flex-col items-center gap-1 text-center">
-                    <p className="text-6xl font-bold text-foreground">
-                        {status}
-                    </p>
-                    <h1 className="text-xl font-semibold text-foreground">
+                <div className="flex flex-col items-center gap-2">
+                    <span className="text-xs font-bold uppercase tracking-widest text-muted-foreground">
+                        Error {status}
+                    </span>
+                    <h1 className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
                         {error.title}
                     </h1>
-                    <p className="mt-1 max-w-sm text-sm text-muted-foreground">
+                    <p className="max-w-sm text-sm text-muted-foreground leading-relaxed">
                         {error.description}
                     </p>
                 </div>
 
-                <Link href="/" className={buttonVariants()}>
-                    <ArrowLeft className="size-4" />
-                    Go Home
-                </Link>
+                <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
+                    <Link href="/" className={buttonVariants({ variant: 'outline' })}>
+                        <Home className="size-4" />
+                        Go Home
+                    </Link>
+
+                    <Link href="/dashboard" className={buttonVariants({ variant: 'default' })}>
+                        <LayoutDashboard className="size-4" />
+                        Go to Dashboard
+                    </Link>
+                </div>
             </div>
         </>
     );
 }
+
+ErrorPage.layout = (page: ReactNode) => <GuestLayout>{page}</GuestLayout>;

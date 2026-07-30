@@ -49,9 +49,7 @@ class AuthController extends Controller
 
         event(new Registered($user));
 
-        Auth::login($user);
-
-        return redirect()->intended(route('dashboard', absolute: false));
+        return redirect()->route('login')->with('status', 'Registration successful! A verification link has been sent to your email address. Please check your inbox and verify your email before logging in.');
     }
 
     public function login(): Response
@@ -78,6 +76,19 @@ class AuthController extends Controller
         $credentials = $request->only('email', 'password');
 
         if (Auth::attempt($credentials, $request->boolean('remember'))) {
+            /** @var User $user */
+            $user = Auth::user();
+
+            if (! $user->hasVerifiedEmail()) {
+                Auth::logout();
+                $request->session()->invalidate();
+                $request->session()->regenerateToken();
+
+                return back()->withErrors([
+                    'email' => 'Your email address is not verified yet. Please check your inbox for the verification link.',
+                ])->onlyInput('email');
+            }
+
             $request->session()->regenerate();
 
             return redirect()->intended(route('dashboard', absolute: false));

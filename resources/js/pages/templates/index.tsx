@@ -304,10 +304,14 @@ function ApplicationTemplatesTab({
                         </DialogDescription>
                     </DialogHeader>
 
+                    <p className="mt-1 text-xs text-muted-foreground">
+                        Fields marked with <span className="text-red-500">*</span> are required.
+                    </p>
+
                     <form onSubmit={submit} className="flex flex-col gap-4">
                         <div className="flex flex-col gap-4">
                             <div className="flex flex-col gap-2">
-                                <Label htmlFor="name">Template Name</Label>
+                                <Label htmlFor="name">Template Name <span className="text-red-500">*</span></Label>
                                 <Input
                                     id="name"
                                     value={data.name}
@@ -325,7 +329,7 @@ function ApplicationTemplatesTab({
                             </div>
 
                             <div className="flex flex-col gap-2">
-                                <Label htmlFor="category">Category</Label>
+                                <Label htmlFor="category">Category <span className="text-red-500">*</span></Label>
                                 <Input
                                     id="category"
                                     value={data.category}
@@ -343,9 +347,7 @@ function ApplicationTemplatesTab({
 
                             <div className="grid grid-cols-2 gap-4">
                                 <div className="flex flex-col gap-2">
-                                    <Label htmlFor="default_location">
-                                        Default Location
-                                    </Label>
+                                    <Label htmlFor="default_location">Default Location <span className="text-red-500">*</span></Label>
                                     <Input
                                         id="default_location"
                                         value={data.default_location}
@@ -360,7 +362,7 @@ function ApplicationTemplatesTab({
                                 </div>
                                 <div className="flex flex-col gap-2">
                                     <Label htmlFor="default_expected_salary">
-                                        Expected Salary (₱)
+                                        Expected Salary (₱) <span className="text-red-500">*</span>
                                     </Label>
                                     <div className="relative">
                                         <span className="pointer-events-none absolute top-1/2 left-2.5 -translate-y-1/2 text-sm text-muted-foreground">
@@ -386,7 +388,7 @@ function ApplicationTemplatesTab({
 
                             <div className="flex flex-col gap-2">
                                 <Label htmlFor="default_job_description_keywords">
-                                    Job Description Keywords
+                                    Job Description Keywords <span className="text-red-500">*</span>
                                 </Label>
                                 <Textarea
                                     id="default_job_description_keywords"
@@ -406,7 +408,7 @@ function ApplicationTemplatesTab({
 
                             <div className="flex flex-col gap-2">
                                 <Label htmlFor="default_notes">
-                                    Default Notes
+                                    Default Notes <span className="text-red-500">*</span>
                                 </Label>
                                 <Textarea
                                     id="default_notes"

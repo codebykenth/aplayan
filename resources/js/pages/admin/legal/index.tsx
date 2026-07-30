@@ -36,8 +36,8 @@ export default function AdminLegal({
 }: {
     documents?: LegalDocument[];
 }) {
-    const privacyDoc = documents.find((d) => d.key === 'privacy_policy');
-    const termsDoc = documents.find((d) => d.key === 'terms_of_service');
+    const privacyDoc = documents.find((d) => d.key === 'privacy-policy');
+    const termsDoc = documents.find((d) => d.key === 'terms-of-service');
 
     const [privacyTitle, setPrivacyTitle] = useState(privacyDoc?.title ?? 'Privacy Policy');
     const [privacyContent, setPrivacyContent] = useState(privacyDoc?.content ?? '');
@@ -48,7 +48,7 @@ export default function AdminLegal({
     function handleSave(key: string) {
         setSaving(key);
 
-        const doc = key === 'privacy_policy'
+        const doc = key === 'privacy-policy'
             ? { title: privacyTitle, content: privacyContent }
             : { title: termsTitle, content: termsContent };
 
@@ -77,25 +77,28 @@ export default function AdminLegal({
                     </Badge>
                 </PageHeader>
 
-                <Tabs defaultValue="privacy_policy">
+                <Tabs defaultValue="privacy-policy">
                     <TabsList>
-                        <TabsTrigger value="privacy_policy">Privacy Policy</TabsTrigger>
-                        <TabsTrigger value="terms_of_service">Terms of Service</TabsTrigger>
+                        <TabsTrigger value="privacy-policy">Privacy Policy</TabsTrigger>
+                        <TabsTrigger value="terms-of-service">Terms of Service</TabsTrigger>
                     </TabsList>
 
-                    <TabsContent value="privacy_policy">
+                    <TabsContent value="privacy-policy">
                         <Card>
-                            <CardHeader>
-                                <CardTitle>Edit Privacy Policy</CardTitle>
-                            </CardHeader>
-                            <CardContent className="space-y-4">
-                                <div>
-                                    <label
-                                        htmlFor="privacy-title"
-                                        className="mb-1.5 block text-sm font-medium text-foreground"
-                                    >
-                                        Title
-                                    </label>
+<CardHeader>
+                                 <CardTitle>Edit Privacy Policy</CardTitle>
+                             </CardHeader>
+                             <CardContent className="space-y-4">
+                                 <p className="text-xs text-muted-foreground">
+                                     Fields marked with <span className="text-red-500">*</span> are required.
+                                 </p>
+                                 <div>
+                                     <label
+                                         htmlFor="privacy-title"
+                                         className="mb-1.5 block text-sm font-medium text-foreground"
+                                     >
+                                         Title <span className="text-red-500">*</span>
+                                     </label>
                                     <Input
                                         id="privacy-title"
                                         value={privacyTitle}
@@ -103,12 +106,12 @@ export default function AdminLegal({
                                     />
                                 </div>
                                 <div>
-                                    <label
-                                        htmlFor="privacy-content"
-                                        className="mb-1.5 block text-sm font-medium text-foreground"
-                                    >
-                                        Content (Markdown supported)
-                                    </label>
+<label
+                                         htmlFor="privacy-content"
+                                         className="mb-1.5 block text-sm font-medium text-foreground"
+                                     >
+                                         Content (Markdown supported) <span className="text-red-500">*</span>
+                                     </label>
                                     <Textarea
                                         id="privacy-content"
                                         value={privacyContent}
@@ -124,29 +127,32 @@ export default function AdminLegal({
                                     {privacyDoc?.updated_at && ` · Last updated ${new Date(privacyDoc.updated_at).toLocaleDateString()}`}
                                 </span>
                                 <Button
-                                    onClick={() => handleSave('privacy_policy')}
-                                    disabled={saving === 'privacy_policy'}
+                                    onClick={() => handleSave('privacy-policy')}
+                                    disabled={saving === 'privacy-policy'}
                                 >
                                     <Save data-icon="inline-start" />
-                                    {saving === 'privacy_policy' ? 'Saving...' : 'Save Changes'}
+                                    {saving === 'privacy-policy' ? 'Saving...' : 'Save Changes'}
                                 </Button>
                             </CardFooter>
                         </Card>
                     </TabsContent>
 
-                    <TabsContent value="terms_of_service">
-                        <Card>
-                            <CardHeader>
-                                <CardTitle>Edit Terms of Service</CardTitle>
-                            </CardHeader>
-                            <CardContent className="space-y-4">
-                                <div>
-                                    <label
-                                        htmlFor="terms-title"
-                                        className="mb-1.5 block text-sm font-medium text-foreground"
-                                    >
-                                        Title
-                                    </label>
+<TabsContent value="terms-of-service">
+                         <Card>
+                             <CardHeader>
+                                 <CardTitle>Edit Terms of Service</CardTitle>
+                             </CardHeader>
+                             <CardContent className="space-y-4">
+                                 <p className="text-xs text-muted-foreground">
+                                     Fields marked with <span className="text-red-500">*</span> are required.
+                                 </p>
+                                 <div>
+                                     <label
+                                         htmlFor="terms-title"
+                                         className="mb-1.5 block text-sm font-medium text-foreground"
+                                     >
+                                         Title <span className="text-red-500">*</span>
+                                     </label>
                                     <Input
                                         id="terms-title"
                                         value={termsTitle}
@@ -154,12 +160,12 @@ export default function AdminLegal({
                                     />
                                 </div>
                                 <div>
-                                    <label
-                                        htmlFor="terms-content"
-                                        className="mb-1.5 block text-sm font-medium text-foreground"
-                                    >
-                                        Content (Markdown supported)
-                                    </label>
+<label
+                                         htmlFor="terms-content"
+                                         className="mb-1.5 block text-sm font-medium text-foreground"
+                                     >
+                                         Content (Markdown supported) <span className="text-red-500">*</span>
+                                     </label>
                                     <Textarea
                                         id="terms-content"
                                         value={termsContent}
@@ -175,11 +181,11 @@ export default function AdminLegal({
                                     {termsDoc?.updated_at && ` · Last updated ${new Date(termsDoc.updated_at).toLocaleDateString()}`}
                                 </span>
                                 <Button
-                                    onClick={() => handleSave('terms_of_service')}
-                                    disabled={saving === 'terms_of_service'}
+                                    onClick={() => handleSave('terms-of-service')}
+                                    disabled={saving === 'terms-of-service'}
                                 >
                                     <Save data-icon="inline-start" />
-                                    {saving === 'terms_of_service' ? 'Saving...' : 'Save Changes'}
+                                    {saving === 'terms-of-service' ? 'Saving...' : 'Save Changes'}
                                 </Button>
                             </CardFooter>
                         </Card>

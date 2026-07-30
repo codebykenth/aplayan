@@ -27,13 +27,20 @@ interface User {
 
 interface PaginatedUsers {
     data: User[];
-    meta: {
+    current_page?: number;
+    last_page?: number;
+    per_page?: number;
+    total?: number;
+    from?: number | null;
+    to?: number | null;
+    links?: { url: string | null; label: string; active: boolean }[];
+    meta?: {
         current_page: number;
         last_page: number;
         per_page: number;
         total: number;
-        from: number;
-        to: number;
+        from: number | null;
+        to: number | null;
         links: { url: string | null; label: string; active: boolean }[];
     };
 }
@@ -47,6 +54,10 @@ export default function AdminUsers({
 }) {
     const [searchValue, setSearchValue] = useState(filters.search ?? '');
     const [deleteUser, setDeleteUser] = useState<User | null>(null);
+
+    const pagination = users.meta ?? users;
+    const links = pagination.links ?? [];
+    const lastPage = pagination.last_page ?? 1;
 
     function handleSearch(e: React.FormEvent) {
         e.preventDefault();
@@ -182,13 +193,13 @@ export default function AdminUsers({
                         )}
 
                         {/* Pagination */}
-                        {users.meta.last_page > 1 && (
+                        {lastPage > 1 && (
                             <div className="mt-4 flex items-center justify-between border-t border-border pt-4 text-xs text-muted-foreground">
                                 <span>
-                                    Showing {users.meta.from} to {users.meta.to} of {users.meta.total}
+                                    Showing {pagination.from ?? 0} to {pagination.to ?? 0} of {pagination.total ?? 0}
                                 </span>
                                 <div className="flex items-center gap-1">
-                                    {users.meta.links.map((link, i) => {
+                                    {links.map((link, i) => {
                                         if (!link.url) {
                                             return (
                                                 <span key={i} className="px-2 py-1 text-muted-foreground/50">

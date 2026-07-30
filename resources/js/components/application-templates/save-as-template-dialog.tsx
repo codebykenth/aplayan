@@ -89,9 +89,13 @@ export default function SaveAsTemplateDialog({
                     </DialogDescription>
                 </DialogHeader>
 
+                <p className="mt-1 text-xs text-muted-foreground">
+                    Fields marked with <span className="text-red-500">*</span> are required.
+                </p>
+
                 <form onSubmit={submit} className="flex flex-col gap-4">
                     <div className="flex flex-col gap-2">
-                        <Label htmlFor="template_name">Template Name</Label>
+                        <Label htmlFor="template_name">Template Name <span className="text-red-500">*</span></Label>
                         <Input
                             id="template_name"
                             value={data.name}
@@ -108,7 +112,7 @@ export default function SaveAsTemplateDialog({
                     </div>
 
                     <div className="flex flex-col gap-2">
-                        <Label htmlFor="template_category">Category</Label>
+                        <Label htmlFor="template_category">Category <span className="text-red-500">*</span></Label>
                         <Input
                             id="template_category"
                             value={data.category}

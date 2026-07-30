@@ -10,7 +10,14 @@ import {
     Receipt,
     PlusIcon,
     TrashIcon,
+    HelpCircle,
 } from 'lucide-react';
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger,
+} from '@/components/ui/tooltip';
 import { useState } from 'react';
 import type { ReactNode } from 'react';
 import { Button } from '@/components/ui/button';
@@ -98,10 +105,40 @@ const COLOR_THEME_OPTIONS = [
     },
 ] as const;
 
+const PREFERRED_WORK_SETUP_OPTIONS = [
+    { value: 'any', label: 'Any / Flexible' },
+    { value: 'remote', label: 'Remote' },
+    { value: 'hybrid', label: 'Hybrid' },
+    { value: 'onsite', label: 'On-site' },
+] as const;
+
+const SUGGESTED_JOB_ROLES = [
+    'Full Stack Developer',
+    'Frontend Developer',
+    'Backend Engineer',
+    'Mobile Developer',
+    'DevOps Engineer',
+    'Data Analyst',
+    'UI/UX Designer',
+    'Product Manager',
+];
+
+const SUGGESTED_INDUSTRIES = [
+    'Software / SaaS',
+    'FinTech',
+    'E-Commerce',
+    'HealthTech',
+    'EdTech',
+    'Artificial Intelligence',
+    'Cybersecurity',
+    'Financial Services',
+];
+
 type UserData = {
     id: number;
     name: string;
     email: string;
+    email_verified_at?: string | null;
     avatar?: string;
     expected_salary: number | null;
     base_currency?: string;
@@ -116,6 +153,13 @@ interface SettingsPageProps {
 }
 
 function ProfileSection({ user }: { user: UserData }) {
+    const isEmailVerified = !!user.email_verified_at;
+    const initialPreferences = (user.job_search_preferences as {
+        target_roles?: string;
+        work_setup?: string;
+        target_industry?: string;
+    }) || {};
+
     const {
         data,
         setData,
@@ -133,7 +177,42 @@ function ProfileSection({ user }: { user: UserData }) {
         base_currency: user.base_currency || 'PHP',
         theme: user.theme,
         color_theme: user.color_theme,
+        job_search_preferences: {
+            target_roles: initialPreferences.target_roles || '',
+            work_setup: initialPreferences.work_setup || 'any',
+            target_industry: initialPreferences.target_industry || '',
+        },
     });
+
+    function addRoleSuggestion(role: string) {
+        const current = data.job_search_preferences.target_roles.trim();
+        if (!current) {
+            setData('job_search_preferences', {
+                ...data.job_search_preferences,
+                target_roles: role,
+            });
+        } else if (!current.toLowerCase().includes(role.toLowerCase())) {
+            setData('job_search_preferences', {
+                ...data.job_search_preferences,
+                target_roles: `${current}, ${role}`,
+            });
+        }
+    }
+
+    function addIndustrySuggestion(industry: string) {
+        const current = data.job_search_preferences.target_industry.trim();
+        if (!current) {
+            setData('job_search_preferences', {
+                ...data.job_search_preferences,
+                target_industry: industry,
+            });
+        } else if (!current.toLowerCase().includes(industry.toLowerCase())) {
+            setData('job_search_preferences', {
+                ...data.job_search_preferences,
+                target_industry: `${current}, ${industry}`,
+            });
+        }
+    }
 
     function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
@@ -143,6 +222,7 @@ function ProfileSection({ user }: { user: UserData }) {
             email: data.email,
             expected_salary: Number(data.expected_salary),
             base_currency: data.base_currency,
+            job_search_preferences: data.job_search_preferences,
         });
 
         if (!result.success) {
@@ -173,12 +253,15 @@ function ProfileSection({ user }: { user: UserData }) {
                     </CardTitle>
                     <CardDescription>
                         Update your public name, email address, default
-                        currency, and target compensation.
+                        currency, target compensation, and career targeting options.
                     </CardDescription>
                 </CardHeader>
-                <CardContent className="flex flex-col gap-4">
-                    <div className="flex flex-col gap-2">
-                        <Label htmlFor="name">Full Name</Label>
+<CardContent className="flex flex-col gap-4">
+                     <p className="text-xs text-muted-foreground">
+                         Fields marked with <span className="text-red-500">*</span> are required.
+                     </p>
+                     <div className="flex flex-col gap-2">
+                         <Label htmlFor="name">Full Name <span className="text-red-500">*</span></Label>
                         <Input
                             id="name"
                             value={data.name}
@@ -193,23 +276,53 @@ function ProfileSection({ user }: { user: UserData }) {
                     </div>
 
                     <div className="flex flex-col gap-2">
-                        <Label htmlFor="email">Email Address</Label>
+                        <div className="flex items-center justify-between">
+                            <Label htmlFor="email">Email Address <span className="text-red-500">*</span></Label>
+                            {isEmailVerified && (
+                                <span className="inline-flex items-center rounded-full bg-emerald-500/10 px-2 py-0.5 text-xs font-medium text-emerald-600 dark:text-emerald-400">
+                                    Verified
+                                </span>
+                            )}
+                        </div>
                         <Input
                             id="email"
                             type="email"
                             value={data.email}
+                            disabled={isEmailVerified}
                             onChange={(e) => setData('email', e.target.value)}
                             aria-invalid={!!errors.email}
+                            className={cn(
+                                isEmailVerified &&
+                                    'cursor-not-allowed bg-muted opacity-80',
+                            )}
                         />
-                        {errors.email && (
-                            <p className="text-xs text-destructive">
-                                {errors.email}
+                        {isEmailVerified ? (
+                            <p className="text-xs text-muted-foreground">
+                                Verified email addresses cannot be changed.
                             </p>
+                        ) : (
+                            errors.email && (
+                                <p className="text-xs text-destructive">
+                                    {errors.email}
+                                </p>
+                            )
                         )}
                     </div>
 
                     <div className="flex flex-col gap-2">
-                        <Label htmlFor="base_currency">Base Currency</Label>
+                        <div className="flex items-center gap-1.5">
+                            <Label htmlFor="base_currency">Base Currency <span className="text-red-500">*</span></Label>
+                            <TooltipProvider>
+                                <Tooltip>
+                                    <TooltipTrigger type="button" className="text-muted-foreground hover:text-foreground cursor-help">
+                                        <HelpCircle className="size-3.5" />
+                                    </TooltipTrigger>
+                                    <TooltipContent side="top">
+                                        <p>Your primary currency. Used as the default currency for new applications and for normalizing multi-currency analytics charts.</p>
+                                    </TooltipContent>
+                                </Tooltip>
+                            </TooltipProvider>
+                        </div>
                         <Select
                             value={data.base_currency || 'PHP'}
                             onValueChange={(val) =>
@@ -238,10 +351,22 @@ function ProfileSection({ user }: { user: UserData }) {
                     </div>
 
                     <div className="flex flex-col gap-2">
-                        <Label htmlFor="expected_salary">
-                            Expected Target Salary (
-                            {getCurrencySymbol(data.base_currency || 'PHP')})
-                        </Label>
+                        <div className="flex items-center gap-1.5">
+<Label htmlFor="expected_salary">
+                                 Default Target / Asking Salary (
+                                 {getCurrencySymbol(data.base_currency || 'PHP')}) <span className="text-red-500">*</span>
+                             </Label>
+                            <TooltipProvider>
+                                <Tooltip>
+                                    <TooltipTrigger type="button" className="text-muted-foreground hover:text-foreground cursor-help">
+                                        <HelpCircle className="size-3.5" />
+                                    </TooltipTrigger>
+                                    <TooltipContent side="top">
+                                        <p>Your default monthly target salary. Automatically prefilled when creating new job applications.</p>
+                                    </TooltipContent>
+                                </Tooltip>
+                            </TooltipProvider>
+                        </div>
                         <div className="relative">
                             <span className="pointer-events-none absolute top-1/2 left-2.5 -translate-y-1/2 text-sm text-muted-foreground">
                                 {getCurrencySymbol(data.base_currency || 'PHP')}
@@ -263,6 +388,150 @@ function ProfileSection({ user }: { user: UserData }) {
                                 {errors.expected_salary}
                             </p>
                         )}
+                    </div>
+
+                    <div className="flex flex-col gap-3 border-t border-border pt-4">
+                        <div>
+                            <Label className="text-sm font-semibold">
+                                Job Search Preferences
+                            </Label>
+                            <p className="text-xs text-muted-foreground">
+                                Help AI tailor your resume, cover letter, and career recommendations.
+                            </p>
+                        </div>
+
+                        <div className="flex flex-col gap-2">
+                            <div className="flex items-center gap-1.5">
+<Label htmlFor="target_roles" className="text-xs">
+                                     Target Job Roles / Titles <span className="text-red-500">*</span>
+                                 </Label>
+                                <TooltipProvider>
+                                    <Tooltip>
+                                        <TooltipTrigger type="button" className="text-muted-foreground hover:text-foreground cursor-help">
+                                            <HelpCircle className="size-3.5" />
+                                        </TooltipTrigger>
+                                        <TooltipContent side="top">
+                                            <p>Used as 1-click preset chips when creating new job applications, and for AI Resume target headlines.</p>
+                                        </TooltipContent>
+                                    </Tooltip>
+                                </TooltipProvider>
+                            </div>
+                            <Input
+                                id="target_roles"
+                                value={data.job_search_preferences.target_roles}
+                                onChange={(e) =>
+                                    setData('job_search_preferences', {
+                                        ...data.job_search_preferences,
+                                        target_roles: e.target.value,
+                                    })
+                                }
+                                placeholder="e.g. Full Stack Developer, React Engineer"
+                            />
+                            <div className="flex flex-wrap items-center gap-1.5 pt-1">
+                                <span className="text-[11px] font-medium text-muted-foreground">Suggested:</span>
+                                {SUGGESTED_JOB_ROLES.map((role) => (
+                                    <button
+                                        key={role}
+                                        type="button"
+                                        onClick={() => addRoleSuggestion(role)}
+                                        className="rounded-md border border-border/60 bg-muted/50 px-2 py-0.5 text-[11px] font-medium text-muted-foreground transition-colors hover:border-primary/40 hover:bg-primary/10 hover:text-primary"
+                                    >
+                                        + {role}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+
+                        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                            <div className="flex flex-col gap-2">
+                                <div className="flex items-center gap-1.5">
+<Label htmlFor="work_setup" className="text-xs">
+                                         Preferred Work Arrangement <span className="text-red-500">*</span>
+                                     </Label>
+                                    <TooltipProvider>
+                                        <Tooltip>
+                                            <TooltipTrigger type="button" className="text-muted-foreground hover:text-foreground cursor-help">
+                                                <HelpCircle className="size-3.5" />
+                                            </TooltipTrigger>
+                                            <TooltipContent side="top">
+                                                <p>Default work setup (Remote, Hybrid, On-site) prefilled when adding new job applications.</p>
+                                            </TooltipContent>
+                                        </Tooltip>
+                                    </TooltipProvider>
+                                </div>
+                                <Select
+                                    value={data.job_search_preferences.work_setup}
+                                    onValueChange={(val) =>
+                                        setData('job_search_preferences', {
+                                            ...data.job_search_preferences,
+                                            work_setup: val ?? 'any',
+                                        })
+                                    }
+                                >
+                                    <SelectTrigger id="work_setup">
+                                        <SelectValue>
+                                            {PREFERRED_WORK_SETUP_OPTIONS.find(
+                                                (o) =>
+                                                    o.value ===
+                                                    data.job_search_preferences.work_setup,
+                                            )?.label ?? 'Select work setup'}
+                                        </SelectValue>
+                                    </SelectTrigger>
+                                    <SelectContent side="bottom">
+                                        {PREFERRED_WORK_SETUP_OPTIONS.map((option) => (
+                                            <SelectItem
+                                                key={option.value}
+                                                value={option.value}
+                                            >
+                                                {option.label}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </div>
+
+                            <div className="flex flex-col gap-2">
+                                <div className="flex items-center gap-1.5">
+<Label htmlFor="target_industry" className="text-xs">
+                                         Target Industry / Specialization <span className="text-red-500">*</span>
+                                     </Label>
+                                    <TooltipProvider>
+                                        <Tooltip>
+                                            <TooltipTrigger type="button" className="text-muted-foreground hover:text-foreground cursor-help">
+                                                <HelpCircle className="size-3.5" />
+                                            </TooltipTrigger>
+                                            <TooltipContent side="top">
+                                                <p>Used by AI Resume Match & Cover Letter Copilot to provide domain-specific insights for your industry.</p>
+                                            </TooltipContent>
+                                        </Tooltip>
+                                    </TooltipProvider>
+                                </div>
+                                <Input
+                                    id="target_industry"
+                                    value={data.job_search_preferences.target_industry}
+                                    onChange={(e) =>
+                                        setData('job_search_preferences', {
+                                            ...data.job_search_preferences,
+                                            target_industry: e.target.value,
+                                        })
+                                    }
+                                    placeholder="e.g. Software/SaaS, FinTech, E-Commerce"
+                                />
+                                <div className="flex flex-wrap items-center gap-1.5 pt-1">
+                                    <span className="text-[11px] font-medium text-muted-foreground">Suggested:</span>
+                                    {SUGGESTED_INDUSTRIES.map((industry) => (
+                                        <button
+                                            key={industry}
+                                            type="button"
+                                            onClick={() => addIndustrySuggestion(industry)}
+                                            className="rounded-md border border-border/60 bg-muted/50 px-2 py-0.5 text-[11px] font-medium text-muted-foreground transition-colors hover:border-primary/40 hover:bg-primary/10 hover:text-primary"
+                                        >
+                                            + {industry}
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </CardContent>
                 <div className="flex items-center justify-end border-t px-(--card-spacing) py-(--card-spacing)">
@@ -321,11 +590,14 @@ function PasswordSection() {
                         Update your password to keep your account secure.
                     </CardDescription>
                 </CardHeader>
-                <CardContent className="flex flex-col gap-4">
-                    <div className="flex flex-col gap-2">
-                        <Label htmlFor="current_password">
-                            Current Password
-                        </Label>
+<CardContent className="flex flex-col gap-4">
+                     <p className="text-xs text-muted-foreground">
+                         Fields marked with <span className="text-red-500">*</span> are required.
+                     </p>
+                     <div className="flex flex-col gap-2">
+                         <Label htmlFor="current_password">
+                             Current Password <span className="text-red-500">*</span>
+                         </Label>
                         <PasswordInput
                             id="current_password"
                             value={data.current_password}
@@ -343,7 +615,7 @@ function PasswordSection() {
                     </div>
 
                     <div className="flex flex-col gap-2">
-                        <Label htmlFor="password">New Password</Label>
+                        <Label htmlFor="password">New Password <span className="text-red-500">*</span></Label>
                         <PasswordInput
                             id="password"
                             value={data.password}
@@ -361,9 +633,9 @@ function PasswordSection() {
                     </div>
 
                     <div className="flex flex-col gap-2">
-                        <Label htmlFor="password_confirmation">
-                            Confirm New Password
-                        </Label>
+<Label htmlFor="password_confirmation">
+                             Confirm New Password <span className="text-red-500">*</span>
+                         </Label>
                         <PasswordInput
                             id="password_confirmation"
                             value={data.password_confirmation}
@@ -712,9 +984,9 @@ function TaxSettingsSection({ user }: { user: UserData }) {
                     </div>
                     <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                         <div className="flex flex-col gap-1.5">
-                            <Label htmlFor="override_sss" className="text-xs">
-                                SSS Monthly (₱)
-                            </Label>
+<Label htmlFor="override_sss" className="text-xs">
+                                 SSS Monthly (₱) <span className="text-red-500">*</span>
+                             </Label>
                             <Input
                                 id="override_sss"
                                 type="number"
@@ -733,12 +1005,12 @@ function TaxSettingsSection({ user }: { user: UserData }) {
                             />
                         </div>
                         <div className="flex flex-col gap-1.5">
-                            <Label
-                                htmlFor="override_philhealth"
-                                className="text-xs"
-                            >
-                                PhilHealth Monthly (₱)
-                            </Label>
+<Label
+                                 htmlFor="override_philhealth"
+                                 className="text-xs"
+                             >
+                                 PhilHealth Monthly (₱) <span className="text-red-500">*</span>
+                             </Label>
                             <Input
                                 id="override_philhealth"
                                 type="number"
@@ -757,12 +1029,12 @@ function TaxSettingsSection({ user }: { user: UserData }) {
                             />
                         </div>
                         <div className="flex flex-col gap-1.5">
-                            <Label
-                                htmlFor="override_pagibig"
-                                className="text-xs"
-                            >
-                                Pag-IBIG Monthly (₱)
-                            </Label>
+<Label
+                                 htmlFor="override_pagibig"
+                                 className="text-xs"
+                             >
+                                 Pag-IBIG Monthly (₱) <span className="text-red-500">*</span>
+                             </Label>
                             <Input
                                 id="override_pagibig"
                                 type="number"
@@ -781,12 +1053,12 @@ function TaxSettingsSection({ user }: { user: UserData }) {
                             />
                         </div>
                         <div className="flex flex-col gap-1.5">
-                            <Label
-                                htmlFor="override_bir_tax"
-                                className="text-xs"
-                            >
-                                BIR Income Tax Monthly (₱)
-                            </Label>
+<Label
+                                 htmlFor="override_bir_tax"
+                                 className="text-xs"
+                             >
+                                 BIR Income Tax Monthly (₱) <span className="text-red-500">*</span>
+                             </Label>
                             <Input
                                 id="override_bir_tax"
                                 type="number"
@@ -1009,7 +1281,7 @@ function TaxSettingsSection({ user }: { user: UserData }) {
     );
 }
 
-const VALID_TABS = ['appearance', 'profile', 'password', 'tax'] as const;
+const VALID_TABS = ['profile', 'appearance', 'password', 'tax'] as const;
 type SettingsTab = (typeof VALID_TABS)[number];
 
 function getInitialSettingsTab(): SettingsTab {
@@ -1026,7 +1298,7 @@ function getInitialSettingsTab(): SettingsTab {
             return savedTab;
         }
     }
-    return 'appearance';
+    return 'profile';
 }
 
 export default function SettingsIndex({ user }: SettingsPageProps) {
@@ -1058,19 +1330,6 @@ export default function SettingsIndex({ user }: SettingsPageProps) {
                 <div className="flex items-center gap-1 border-b border-border pb-1">
                     <button
                         type="button"
-                        onClick={() => handleTabChange('appearance')}
-                        className={cn(
-                            'flex items-center gap-2 rounded-lg px-3.5 py-2 text-sm font-medium transition-colors',
-                            activeTab === 'appearance'
-                                ? 'bg-primary/10 text-primary'
-                                : 'text-muted-foreground hover:bg-muted hover:text-foreground',
-                        )}
-                    >
-                        <Palette className="size-4" />
-                        Appearance & Theme
-                    </button>
-                    <button
-                        type="button"
                         onClick={() => handleTabChange('profile')}
                         className={cn(
                             'flex items-center gap-2 rounded-lg px-3.5 py-2 text-sm font-medium transition-colors',
@@ -1081,6 +1340,19 @@ export default function SettingsIndex({ user }: SettingsPageProps) {
                     >
                         <User className="size-4" />
                         Profile
+                    </button>
+                    <button
+                        type="button"
+                        onClick={() => handleTabChange('appearance')}
+                        className={cn(
+                            'flex items-center gap-2 rounded-lg px-3.5 py-2 text-sm font-medium transition-colors',
+                            activeTab === 'appearance'
+                                ? 'bg-primary/10 text-primary'
+                                : 'text-muted-foreground hover:bg-muted hover:text-foreground',
+                        )}
+                    >
+                        <Palette className="size-4" />
+                        Appearance & Theme
                     </button>
                     <button
                         type="button"
@@ -1112,8 +1384,8 @@ export default function SettingsIndex({ user }: SettingsPageProps) {
 
                 {/* Main Settings Content Panels */}
                 <div className="w-full flex-1">
-                    {activeTab === 'appearance' && <AppearanceSection />}
                     {activeTab === 'profile' && <ProfileSection user={user} />}
+                    {activeTab === 'appearance' && <AppearanceSection />}
                     {activeTab === 'password' && <PasswordSection />}
                     {activeTab === 'tax' && <TaxSettingsSection user={user} />}
                 </div>
