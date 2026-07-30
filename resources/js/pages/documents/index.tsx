@@ -2199,6 +2199,24 @@ function renderFormattedBullet(text: string): React.ReactNode {
     return parts.length > 0 ? parts : text;
 }
 
+function renderFormattedParagraphs(text?: string | null): React.ReactNode {
+    if (!text || !text.trim()) {
+        return null;
+    }
+
+    const paragraphs = text.split('\n').filter((p) => p.trim().length > 0);
+
+    if (paragraphs.length === 0) {
+        return null;
+    }
+
+    return paragraphs.map((p, i) => (
+        <p key={i} style={{ marginBottom: '6px' }}>
+            {renderFormattedBullet(p)}
+        </p>
+    ));
+}
+
 function renderSkillsWithCategoryBold(
     skills: string[],
     separator: string = ', ',
@@ -2659,7 +2677,7 @@ function ResumePreview({
                                     <div className="ats-section-title">
                                         {getTitle('summary', 'Professional Summary')}
                                     </div>
-                                    <p className="ats-desc">{data.summary}</p>
+                                    {renderFormattedParagraphs(data.summary)}
                                 </>
                             )}
                         </SectionWrapper>
@@ -2683,11 +2701,7 @@ function ResumePreview({
                                             <div className="ats-company">
                                                 {job.company}
                                             </div>
-                                            {job.description && (
-                                                <p className="ats-desc">
-                                                    {job.description}
-                                                </p>
-                                            )}
+                                            {renderFormattedParagraphs(job.description)}
                                         </div>
                                     ))}
                                 </>
@@ -2765,11 +2779,7 @@ function ResumePreview({
                                                     </span>
                                                 )}
                                             </div>
-                                            {project.description && (
-                                                <p className="ats-desc">
-                                                    {project.description}
-                                                </p>
-                                            )}
+                                            {renderFormattedParagraphs(project.description)}
                                         </div>
                                     ))}
                                 </>
@@ -2894,7 +2904,7 @@ function ResumePreview({
                                     <div className="exec-section-title">
                                         Executive Summary
                                     </div>
-                                    <p className="job-desc">{data.summary}</p>
+                                    {renderFormattedParagraphs(data.summary)}
                                 </>
                             )}
                         </SectionWrapper>
@@ -2918,11 +2928,7 @@ function ResumePreview({
                                             <div className="job-company">
                                                 {job.company}
                                             </div>
-                                            {job.description && (
-                                                <p className="job-desc">
-                                                    {job.description}
-                                                </p>
-                                            )}
+                                            {renderFormattedParagraphs(job.description)}
                                         </div>
                                     ))}
                                 </>
@@ -2998,11 +3004,7 @@ function ResumePreview({
                                                     {project.technologies}
                                                 </div>
                                             )}
-                                            {project.description && (
-                                                <p className="project-desc">
-                                                    {project.description}
-                                                </p>
-                                            )}
+                                            {renderFormattedParagraphs(project.description)}
                                         </div>
                                     ))}
                                 </>
@@ -3339,12 +3341,7 @@ function ResumePreview({
                                 )}
                             </div>
 
-                            {data.summary && (
-                                <>
-                                    <h2>Summary</h2>
-                                    <p>{data.summary}</p>
-                                </>
-                            )}
+                            {renderFormattedParagraphs(data.summary)}
                         </SectionWrapper>
 
                         <SectionWrapper id="work">
@@ -3364,11 +3361,7 @@ function ResumePreview({
                                             <div className="job-company">
                                                 {job.company}
                                             </div>
-                                            {job.description && (
-                                                <p className="job-desc">
-                                                    {job.description}
-                                                </p>
-                                            )}
+                                            {renderFormattedParagraphs(job.description)}
                                         </div>
                                     ))}
                                 </>
@@ -3492,11 +3485,7 @@ function ResumePreview({
                                                         )}
                                                 </div>
                                             )}
-                                            {project.description && (
-                                                <p className="project-desc">
-                                                    {project.description}
-                                                </p>
-                                            )}
+                                            {renderFormattedParagraphs(project.description)}
                                         </div>
                                     ))}
                                 </>
@@ -3583,12 +3572,7 @@ function ResumePreview({
 
                         <div className="body">
                             <SectionWrapper id="personal">
-                                {data.summary && (
-                                    <>
-                                        <h2>Summary</h2>
-                                        <p>{data.summary}</p>
-                                    </>
-                                )}
+                                {renderFormattedParagraphs(data.summary)}
                             </SectionWrapper>
 
                             <SectionWrapper id="work">
@@ -3609,11 +3593,7 @@ function ResumePreview({
                                                 <div className="job-company">
                                                     {job.company}
                                                 </div>
-                                                {job.description && (
-                                                    <p className="job-desc">
-                                                        {job.description}
-                                                    </p>
-                                                )}
+                                                {renderFormattedParagraphs(job.description)}
                                             </div>
                                         ))}
                                     </>
@@ -3739,11 +3719,7 @@ function ResumePreview({
                                                             )}
                                                     </div>
                                                 )}
-                                                {project.description && (
-                                                    <p className="project-desc">
-                                                        {project.description}
-                                                    </p>
-                                                )}
+                                                {renderFormattedParagraphs(project.description)}
                                             </div>
                                         ))}
                                     </>
@@ -3840,7 +3816,7 @@ function ResumePreview({
                                 <>
                                     <h2>I. CAREER OBJECTIVE</h2>
                                     <div className="section-line" />
-                                    <p>{data.summary}</p>
+                                    {renderFormattedParagraphs(data.summary)}
                                 </>
                             )}
                         </SectionWrapper>
@@ -3863,11 +3839,7 @@ function ResumePreview({
                                                     {job.duration}
                                                 </span>
                                             </div>
-                                            {job.description && (
-                                                <p className="job-desc">
-                                                    {job.description}
-                                                </p>
-                                            )}
+                                            {renderFormattedParagraphs(job.description)}
                                         </div>
                                     ))}
                                 </>
@@ -3961,11 +3933,7 @@ function ResumePreview({
                                                         .join('  •  ')}
                                                 </div>
                                             )}
-                                            {project.description && (
-                                                <p className="project-desc">
-                                                    {project.description}
-                                                </p>
-                                            )}
+                                            {renderFormattedParagraphs(project.description)}
                                         </div>
                                     ))}
                                 </>
@@ -4201,7 +4169,7 @@ function ResumePreview({
                                     >
                                         {getTitle('summary', 'PROFESSIONAL SUMMARY').toUpperCase()}
                                     </div>
-                                    <p
+                                    <div
                                         style={{
                                             fontSize: '12px',
                                             lineHeight: 1.5,
@@ -4209,8 +4177,8 @@ function ResumePreview({
                                             marginBottom: '12px',
                                         }}
                                     >
-                                        {data.summary}
-                                    </p>
+                                        {renderFormattedParagraphs(data.summary)}
+                                    </div>
                                 </>
                             )}
                         </SectionWrapper>
@@ -4333,41 +4301,10 @@ function ResumePreview({
                                                     ? `, ${job.location}`
                                                     : ''}
                                             </div>
-                                            {job.description && (
-                                                <ul
-                                                    style={{
-                                                        marginTop: '4px',
-                                                        paddingLeft: '18px',
-                                                        listStyleType: 'disc',
-                                                        fontSize: '12px',
-                                                        lineHeight: 1.45,
-                                                        color: '#111827',
-                                                    }}
-                                                >
-                                                    {job.description
-                                                        .split(
-                                                            /\n|(?<=[\.\?!])\s+(?=[A-Z0-9])|•|▪|\*/,
-                                                        )
-                                                        .map((l) =>
-                                                            l
-                                                                .trim()
-                                                                .replace(
-                                                                    /^[-•*▪]\s*/,
-                                                                    '',
-                                                                ),
-                                                        )
-                                                        .filter(
-                                                            (l) => l.length > 0,
-                                                        )
-                                                        .map((line, li) => (
-                                                            <li key={li}>
-                                                                {renderFormattedBullet(
-                                                                    line,
-                                                                )}
-                                                            </li>
-                                                        ))}
-                                                </ul>
-                                            )}
+                                            {job.description &&
+                                                renderAsBullets(
+                                                    job.description,
+                                                )}
                                         </div>
                                     ))}
                                 </>
@@ -4502,41 +4439,10 @@ function ResumePreview({
                                                     {project.technologies}
                                                 </div>
                                             )}
-                                            {project.description && (
-                                                <ul
-                                                    style={{
-                                                        marginTop: '4px',
-                                                        paddingLeft: '18px',
-                                                        listStyleType: 'disc',
-                                                        fontSize: '12px',
-                                                        lineHeight: 1.45,
-                                                        color: '#111827',
-                                                    }}
-                                                >
-                                                    {project.description
-                                                        .split(
-                                                            /\n|(?<=[\.\?!])\s+(?=[A-Z0-9])|•|▪|\*/,
-                                                        )
-                                                        .map((l) =>
-                                                            l
-                                                                .trim()
-                                                                .replace(
-                                                                    /^[-•*▪]\s*/,
-                                                                    '',
-                                                                ),
-                                                        )
-                                                        .filter(
-                                                            (l) => l.length > 0,
-                                                        )
-                                                        .map((line, li) => (
-                                                            <li key={li}>
-                                                                {renderFormattedBullet(
-                                                                    line,
-                                                                )}
-                                                            </li>
-                                                        ))}
-                                                </ul>
-                                            )}
+                                            {project.description &&
+                                                renderAsBullets(
+                                                    project.description,
+                                                )}
                                         </div>
                                     ))}
                                 </>
@@ -4763,7 +4669,7 @@ function ResumePreview({
                                     >
                                         {getTitle('summary', 'PROFESSIONAL SUMMARY').toUpperCase()}
                                     </div>
-                                    <p
+                                    <div
                                         style={{
                                             fontFamily:
                                                 "'Times New Roman', Garamond, Georgia, serif",
@@ -4773,8 +4679,8 @@ function ResumePreview({
                                             marginBottom: '12px',
                                         }}
                                     >
-                                        {data.summary}
-                                    </p>
+                                        {renderFormattedParagraphs(data.summary)}
+                                    </div>
                                 </>
                             )}
                         </SectionWrapper>
@@ -4911,49 +4817,10 @@ function ResumePreview({
                                                     ? `, ${job.location}`
                                                     : ''}
                                             </div>
-                                            {job.description && (
-                                                <ul
-                                                    style={{
-                                                        marginTop: '4px',
-                                                        paddingLeft: '18px',
-                                                        listStyleType: 'disc',
-                                                        fontSize: '12px',
-                                                        lineHeight: 1.45,
-                                                        color: '#111827',
-                                                        fontFamily:
-                                                            "'Times New Roman', Garamond, Georgia, serif",
-                                                    }}
-                                                >
-                                                    {job.description
-                                                        .split(
-                                                            /\n|(?<=[\.\?!])\s+(?=[A-Z0-9])|•|▪|\*/,
-                                                        )
-                                                        .map((l) =>
-                                                            l
-                                                                .trim()
-                                                                .replace(
-                                                                    /^[-•*▪]\s*/,
-                                                                    '',
-                                                                ),
-                                                        )
-                                                        .filter(
-                                                            (l) => l.length > 0,
-                                                        )
-                                                        .map((line, li) => (
-                                                            <li
-                                                                key={li}
-                                                                style={{
-                                                                    marginBottom:
-                                                                        '3px',
-                                                                }}
-                                                            >
-                                                                {renderFormattedBullet(
-                                                                    line,
-                                                                )}
-                                                            </li>
-                                                        ))}
-                                                </ul>
-                                            )}
+                                            {job.description &&
+                                                renderAsBullets(
+                                                    job.description,
+                                                )}
                                         </div>
                                     ))}
                                 </>
@@ -5106,49 +4973,10 @@ function ResumePreview({
                                                     {project.technologies}
                                                 </div>
                                             )}
-                                            {project.description && (
-                                                <ul
-                                                    style={{
-                                                        marginTop: '4px',
-                                                        paddingLeft: '18px',
-                                                        listStyleType: 'disc',
-                                                        fontSize: '12px',
-                                                        lineHeight: 1.45,
-                                                        color: '#111827',
-                                                        fontFamily:
-                                                            "'Times New Roman', Garamond, Georgia, serif",
-                                                    }}
-                                                >
-                                                    {project.description
-                                                        .split(
-                                                            /\n|(?<=[\.\?!])\s+(?=[A-Z0-9])|•|▪|\*/,
-                                                        )
-                                                        .map((l) =>
-                                                            l
-                                                                .trim()
-                                                                .replace(
-                                                                    /^[-•*▪]\s*/,
-                                                                    '',
-                                                                ),
-                                                        )
-                                                        .filter(
-                                                            (l) => l.length > 0,
-                                                        )
-                                                        .map((line, li) => (
-                                                            <li
-                                                                key={li}
-                                                                style={{
-                                                                    marginBottom:
-                                                                        '3px',
-                                                                }}
-                                                            >
-                                                                {renderFormattedBullet(
-                                                                    line,
-                                                                )}
-                                                            </li>
-                                                        ))}
-                                                </ul>
-                                            )}
+                                            {project.description &&
+                                                renderAsBullets(
+                                                    project.description,
+                                                )}
                                         </div>
                                     ))}
                                 </>
