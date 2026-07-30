@@ -2482,8 +2482,8 @@ function ResumePreview({
         }
 
         const lines = text
-            .split(/\n|(?<=[\.\?!])\s+(?=[A-Z0-9])|•|▪|\*/)
-            .map((l) => l.trim().replace(/^[-•*▪]\s*/, ''))
+            .split(/\n|(?<=[\.\?!])\s+(?=[A-Z0-9])|•|▪/)
+            .map((l) => l.trim().replace(/^[-•▪]\s*/, ''))
             .filter((l) => l.length > 0);
 
         if (lines.length === 0) {
