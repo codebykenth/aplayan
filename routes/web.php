@@ -20,6 +20,7 @@ use App\Http\Controllers\JobApplicationSalaryController;
 use App\Http\Controllers\OfferComparisonController;
 use App\Http\Controllers\PrivacyPolicyController;
 use App\Http\Controllers\SettingsController;
+use App\Http\Controllers\SitemapController;
 use App\Http\Controllers\TermsOfServiceController;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\Request;
@@ -27,6 +28,36 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
 Route::inertia('/', 'welcome')->name('home');
+
+Route::get('sitemap.xml', SitemapController::class)->name('sitemap');
+Route::get('robots.txt', function () {
+    $sitemapUrl = rtrim((string) config('app.url'), '/') . '/sitemap.xml';
+    $content = "User-agent: *\n\n";
+    $content .= "# Public pages - allow all\n";
+    $content .= "Allow: /\n";
+    $content .= "Allow: /privacy-policy\n";
+    $content .= "Allow: /terms-of-service\n";
+    $content .= "Allow: /login\n";
+    $content .= "Allow: /register\n";
+    $content .= "Allow: /auth/google/\n\n";
+    $content .= "# Private / authenticated pages - disallow\n";
+    $content .= "Disallow: /dashboard\n";
+    $content .= "Disallow: /job-applications/\n";
+    $content .= "Disallow: /documents/\n";
+    $content .= "Disallow: /settings/\n";
+    $content .= "Disallow: /analytics/\n";
+    $content .= "Disallow: /goals/\n";
+    $content .= "Disallow: /calendar/\n";
+    $content .= "Disallow: /templates/\n";
+    $content .= "Disallow: /contacts/\n";
+    $content .= "Disallow: /email/\n";
+    $content .= "Disallow: /auth/google/callback\n";
+    $content .= "Disallow: /forgot-password\n";
+    $content .= "Disallow: /reset-password/\n\n";
+    $content .= "Sitemap: $sitemapUrl\n";
+
+    return response($content, 200, ['Content-Type' => 'text/plain']);
+})->name('robots');
 
 Route::get('privacy-policy', PrivacyPolicyController::class)->name('privacy-policy');
 Route::get('terms-of-service', TermsOfServiceController::class)->name('terms-of-service');

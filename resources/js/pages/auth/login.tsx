@@ -1,10 +1,11 @@
-import { Head, Link, usePage } from '@inertiajs/react';
+import { Link, usePage } from '@inertiajs/react';
 import { useRef, useState } from 'react';
 import type { FormEvent } from 'react';
 import type { Auth } from '@/types/auth';
 import { loginSchema, validateWithZod } from '@/lib/validations';
 import Turnstile from '@/components/Turnstile';
 import { PasswordInput } from '@/components/ui/password-input';
+import SeoHead from '@/components/ui/seo-head';
 
 export default function Login() {
     const { auth, errors: pageErrors } = usePage<{
@@ -58,7 +59,11 @@ export default function Login() {
 
     return (
         <>
-            <Head title="Login" />
+            <SeoHead
+                title="Sign In"
+                description="Sign in to your Aplayan account to manage your job applications, track resumes, and access AI-powered career insights."
+                canonicalPath="/login"
+            />
 
             <div className="mx-auto mt-16 w-full max-w-sm">
                 <h1 className="mb-6 text-2xl font-semibold text-foreground">

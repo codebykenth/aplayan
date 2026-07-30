@@ -1,10 +1,11 @@
-import { Head, Link, usePage } from '@inertiajs/react';
+import { Link, usePage } from '@inertiajs/react';
 import { useRef, useState } from 'react';
 import type { FormEvent } from 'react';
 import type { Auth } from '@/types/auth';
 import { registerSchema, validateWithZod } from '@/lib/validations';
 import Turnstile from '@/components/Turnstile';
 import { PasswordInput } from '@/components/ui/password-input';
+import SeoHead from '@/components/ui/seo-head';
 
 export default function Register() {
     const { errors: pageErrors } = usePage<{ errors: Record<string, string> }>()
@@ -62,7 +63,11 @@ export default function Register() {
 
     return (
         <>
-            <Head title="Register" />
+            <SeoHead
+                title="Create an Account"
+                description="Create your free Aplayan account and start tracking your job applications with AI-powered resume matching and salary insights."
+                canonicalPath="/register"
+            />
 
             <div className="mx-auto mt-16 w-full max-w-sm">
                 <h1 className="mb-6 text-2xl font-semibold text-foreground">

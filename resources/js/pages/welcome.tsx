@@ -1,4 +1,4 @@
-import { Head, Link } from '@inertiajs/react';
+import { Link } from '@inertiajs/react';
 import {
     ArrowRight,
     BarChart3,
@@ -8,11 +8,36 @@ import {
     Target,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import SeoHead from '@/components/ui/seo-head';
 import AiMatchSimulator from '@/components/landing/ai-match-simulator';
 import PhPayCalculatorWidget from '@/components/landing/ph-pay-calculator-widget';
 import AtsResumePreviewer from '@/components/landing/ats-resume-previewer';
 import ComparisonMatrix from '@/components/landing/comparison-matrix';
 import FaqAccordion from '@/components/landing/faq-accordion';
+
+const softwareApplicationJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'SoftwareApplication',
+    name: 'Aplayan',
+    applicationCategory: 'BusinessApplication',
+    operatingSystem: 'Web',
+    description:
+        'Aplayan analyzes your resume against real job descriptions, gives you an AI match score, reveals salary benchmarks with Philippine statutory tax computation.',
+    offers: {
+        '@type': 'Offer',
+        price: '0',
+        priceCurrency: 'USD',
+    },
+};
+
+const websiteJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    name: 'Aplayan',
+    url: window.location.origin,
+    description:
+        'AI-Powered Job Search & Resume Tracker for Filipino job seekers.',
+};
 
 const features = [
     {
@@ -44,7 +69,10 @@ const features = [
 export default function Welcome() {
     return (
         <>
-            <Head title="Welcome" />
+            <SeoHead
+                title="Welcome"
+                jsonLd={[softwareApplicationJsonLd, websiteJsonLd]}
+            />
 
             {/* Hero section */}
             <section className="relative overflow-hidden px-4 pt-16 pb-20 sm:px-6 sm:pt-24 sm:pb-28 lg:px-8">

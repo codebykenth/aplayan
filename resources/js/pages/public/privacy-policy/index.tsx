@@ -1,6 +1,7 @@
 import React from 'react';
-import { Head, Link } from '@inertiajs/react';
+import { Link } from '@inertiajs/react';
 import ApplicationLogo from '@/components/ui/application-logo';
+import SeoHead from '@/components/ui/seo-head';
 import { ArrowLeft, Shield, Lock, Eye, Database, Cpu, FileText } from 'lucide-react';
 import { home, termsOfService, privacyPolicy } from '@/routes';
 
@@ -9,7 +10,11 @@ export default function PrivacyPolicy() {
 
     return (
         <>
-            <Head title="Privacy Policy - Aplayan" />
+            <SeoHead
+                title="Privacy Policy"
+                description="Read how Aplayan protects your personal data. Learn about our privacy practices, data ownership, and your rights under the Philippine Data Privacy Act."
+                canonicalPath="/privacy-policy"
+            />
             <div className="min-h-screen bg-slate-50 font-sans text-slate-800 antialiased dark:bg-slate-950 dark:text-slate-100">
                 {/* Header */}
                 <header className="sticky top-0 z-50 border-b border-slate-200/80 bg-white/80 backdrop-blur-md dark:border-slate-800/80 dark:bg-slate-950/80">

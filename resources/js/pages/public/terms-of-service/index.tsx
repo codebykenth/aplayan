@@ -1,6 +1,7 @@
 import React from 'react';
-import { Head, Link } from '@inertiajs/react';
+import { Link } from '@inertiajs/react';
 import ApplicationLogo from '@/components/ui/application-logo';
+import SeoHead from '@/components/ui/seo-head';
 import { ArrowLeft, FileCheck, AlertTriangle, Scale, CheckCircle2, UserCheck } from 'lucide-react';
 import { home, termsOfService, privacyPolicy } from '@/routes';
 
@@ -9,7 +10,11 @@ export default function TermsOfService() {
 
     return (
         <>
-            <Head title="Terms of Service - Aplayan" />
+            <SeoHead
+                title="Terms of Service"
+                description="Review the terms and conditions for using Aplayan. Understand your responsibilities, AI content generation policies, and our service limitations."
+                canonicalPath="/terms-of-service"
+            />
             <div className="min-h-screen bg-slate-50 font-sans text-slate-800 antialiased dark:bg-slate-950 dark:text-slate-100">
                 {/* Header */}
                 <header className="sticky top-0 z-50 border-b border-slate-200/80 bg-white/80 backdrop-blur-md dark:border-slate-800/80 dark:bg-slate-950/80">

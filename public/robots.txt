@@ -1,2 +1,26 @@
 User-agent: *
-Disallow:
+
+# Public pages - allow all
+Allow: /
+Allow: /privacy-policy
+Allow: /terms-of-service
+Allow: /login
+Allow: /register
+Allow: /auth/google/
+
+# Private / authenticated pages - disallow
+Disallow: /dashboard
+Disallow: /job-applications/
+Disallow: /documents/
+Disallow: /settings/
+Disallow: /analytics/
+Disallow: /goals/
+Disallow: /calendar/
+Disallow: /templates/
+Disallow: /contacts/
+Disallow: /email/
+Disallow: /auth/google/callback
+Disallow: /forgot-password
+Disallow: /reset-password/
+
+Sitemap: https://www.aplayan.com/sitemap.xml
