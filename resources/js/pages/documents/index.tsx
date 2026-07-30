@@ -134,6 +134,8 @@ type ResumeProfile = {
     additional_info?: AdditionalInfo[];
     section_order?: string[];
     section_titles?: SectionTitles;
+    font_size?: string;
+    font_family?: string;
 };
 
 type AdditionalInfo = {
@@ -2397,6 +2399,18 @@ function ResumePreview({
     template: string;
     photoDataUrl: string | null;
 }) {
+    const fontFamilyMap: Record<string, string> = {
+        sans: "'Instrument Sans', Arial, sans-serif",
+        serif: "'Times New Roman', Garamond, Georgia, serif",
+        mono: "'Courier New', Consolas, monospace",
+    };
+    const fontSizeScale: Record<string, number> = {
+        small: 0.9,
+        medium: 1.0,
+        large: 1.1,
+    };
+    const selectedFont = fontFamilyMap[data.font_family || 'sans'] || fontFamilyMap.sans;
+    const selectedScale = fontSizeScale[data.font_size || 'medium'] || fontSizeScale.medium;
     const previewRef = useRef<HTMLDivElement>(null);
     const [saveDialogOpen, setSaveDialogOpen] = useState(false);
     const [versionName, setVersionName] = useState('');
@@ -2423,6 +2437,9 @@ function ResumePreview({
             <head>
                 <title>Resume - ${data.full_name}</title>
                 <style>${printStyles}</style>
+                <style>
+                    body { font-family: ${selectedFont}; zoom: ${selectedScale}; }
+                </style>
             </head>
             <body>
                 ${content}
@@ -2583,6 +2600,10 @@ function ResumePreview({
             <div
                 ref={previewRef}
                 className={`resume-paper-preview template-${template} mx-auto flex min-h-[297mm] w-full max-w-[210mm] min-w-fit shrink-0 flex-col rounded-xl bg-white p-6 text-[#1b1b18] shadow-lg ring-1 ring-black/5 md:min-w-[210mm] md:p-8`}
+                style={{
+                    fontFamily: selectedFont,
+                    zoom: selectedScale,
+                }}
             >
                 <style>{scopedStyles}</style>
 
@@ -6104,6 +6125,8 @@ export default function DocumentsIndex({
                 'additional_info',
             ],
             section_titles: activeProfileData?.section_titles ?? {},
+            font_size: activeProfileData?.font_size ?? 'medium',
+            font_family: activeProfileData?.font_family ?? 'sans',
         });
 
     function handleSubmit(e: React.FormEvent) {
@@ -6681,6 +6704,42 @@ export default function DocumentsIndex({
                                                 {t.name}
                                             </SelectItem>
                                         ))}
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                            <div className="flex shrink-0 items-center justify-between">
+                                <Label>Font Style</Label>
+                                <Select
+                                    value={data.font_family || 'sans'}
+                                    onValueChange={(value: string | null) =>
+                                        value && setData('font_family', value)
+                                    }
+                                >
+                                    <SelectTrigger className="w-auto min-w-[160px] bg-background text-foreground">
+                                        <SelectValue placeholder="Font style" />
+                                    </SelectTrigger>
+                                    <SelectContent align="end">
+                                        <SelectItem value="sans">Sans-serif</SelectItem>
+                                        <SelectItem value="serif">Serif</SelectItem>
+                                        <SelectItem value="mono">Monospace</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                            <div className="flex shrink-0 items-center justify-between">
+                                <Label>Font Size</Label>
+                                <Select
+                                    value={data.font_size || 'medium'}
+                                    onValueChange={(value: string | null) =>
+                                        value && setData('font_size', value)
+                                    }
+                                >
+                                    <SelectTrigger className="w-auto min-w-[160px] bg-background text-foreground">
+                                        <SelectValue placeholder="Font size" />
+                                    </SelectTrigger>
+                                    <SelectContent align="end">
+                                        <SelectItem value="small">Small</SelectItem>
+                                        <SelectItem value="medium">Medium</SelectItem>
+                                        <SelectItem value="large">Large</SelectItem>
                                     </SelectContent>
                                 </Select>
                             </div>
