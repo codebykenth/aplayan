@@ -165,6 +165,8 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('dashboard', App\Http\Controllers\Admin\DashboardController::class)->name('dashboard')->middleware('throttle:read');
     Route::get('users', [UserController::class, 'index'])->name('users.index')->middleware('throttle:read');
     Route::post('users/{user}/toggle-role', [UserController::class, 'toggleRole'])->name('users.toggle-role')->middleware('throttle:write');
+    Route::post('users/{user}/toggle-ai', [UserController::class, 'toggleAi'])->name('users.toggle-ai')->middleware('throttle:write');
+    Route::post('users/{user}/ai-limit', [UserController::class, 'setAiLimit'])->name('users.ai-limit')->middleware('throttle:write');
     Route::delete('users/{user}', [UserController::class, 'destroy'])->name('users.destroy')->middleware('throttle:delete');
     Route::get('ai-usage', AiUsageController::class)->name('ai-usage')->middleware('throttle:read');
     Route::get('legal-documents', [LegalDocumentController::class, 'index'])->name('legal-documents.index')->middleware('throttle:read');

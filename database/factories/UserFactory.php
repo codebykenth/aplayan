@@ -51,4 +51,11 @@ class UserFactory extends Factory
             'role' => 'admin',
         ]);
     }
+
+    public function aiDisabled(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'is_ai_disabled' => true,
+        ]);
+    }
 }

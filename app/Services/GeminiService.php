@@ -17,6 +17,8 @@ class GeminiService
 
     private const int CONNECT_TIMEOUT = 5;
 
+    private ?array $lastUsageMetadata = null;
+
     public function analyzeResumeMatch(string $jobDescription, string $resumeText): array
     {
         $prompt = <<<PROMPT
@@ -211,6 +213,11 @@ PROMPT;
         return $response['candidates'][0]['content']['parts'][0]['text'] ?? 'Unable to improve cover letter.';
     }
 
+    public function getLastUsageMetadata(): ?array
+    {
+        return $this->lastUsageMetadata;
+    }
+
     private function client(): PendingRequest
     {
         return Http::timeout(self::TIMEOUT)
@@ -231,7 +238,7 @@ PROMPT;
         }
 
         try {
-            return $this->client()
+            $response = $this->client()
                 ->retry([100, 500])
                 ->post('/'.$model.':generateContent', [
                     'contents' => [
@@ -244,7 +251,13 @@ PROMPT;
                 ])
                 ->throw()
                 ->json();
+
+            $this->lastUsageMetadata = $response['usageMetadata'] ?? null;
+
+            return $response;
         } catch (RequestException $e) {
+            $this->lastUsageMetadata = null;
+
             $responseBody = $e->response ? $e->response->body() : 'No response body';
             Log::error("Gemini API Request Failed [Model: {$model}]: ".$e->getMessage(), [
                 'status' => $e->response?->status(),
@@ -254,6 +267,8 @@ PROMPT;
 
             throw $e;
         } catch (\Throwable $e) {
+            $this->lastUsageMetadata = null;
+
             Log::error("Gemini API Exception [Model: {$model}]: ".$e->getMessage(), [
                 'exception' => $e,
                 'model' => $model,

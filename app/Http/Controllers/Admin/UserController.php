@@ -41,6 +41,32 @@ class UserController extends Controller
         return back()->with('status', 'User role updated successfully.');
     }
 
+    public function toggleAi(User $user): RedirectResponse
+    {
+        $user->update([
+            'is_ai_disabled' => ! $user->is_ai_disabled,
+        ]);
+
+        $status = $user->is_ai_disabled ? 'AI access disabled for user.' : 'AI access enabled for user.';
+
+        return back()->with('status', $status);
+    }
+
+    public function setAiLimit(Request $request, User $user): RedirectResponse
+    {
+        $validated = $request->validate([
+            'limit' => ['nullable', 'integer', 'min:1', 'max:1000'],
+        ]);
+
+        $user->update([
+            'custom_ai_daily_limit' => $validated['limit'],
+        ]);
+
+        return back()->with('status', $validated['limit']
+            ? "Custom AI daily limit set to {$validated['limit']} for user."
+            : 'Custom AI daily limit removed for user.');
+    }
+
     public function destroy(User $user): RedirectResponse
     {
         if ($user->isAdmin() && User::where('role', 'admin')->count() <= 1) {
