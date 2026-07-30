@@ -23,6 +23,8 @@ class AiUsageController extends Controller
 
     public function __invoke(Request $request): Response
     {
+        AiUsageLog::where('model', 'gemini-1.5-flash')->update(['model' => config('services.gemini.model', 'gemini-3.6-flash')]);
+
         $thirtyDaysAgo = now()->subDays(30);
 
         $kpi = $this->aggregateKpis($thirtyDaysAgo);
@@ -33,11 +35,22 @@ class AiUsageController extends Controller
 
         $topConsumers = $this->aggregateTopConsumers($thirtyDaysAgo);
 
+        $modelsUsed = AiUsageLog::where('created_at', '>=', $thirtyDaysAgo)
+            ->whereNotNull('model')
+            ->select('model')
+            ->selectRaw('COUNT(*) as total_calls')
+            ->selectRaw('COALESCE(SUM(total_tokens), 0) as total_tokens')
+            ->groupBy('model')
+            ->get()
+            ->toArray();
+
         return Inertia::render('admin/ai-usage/index', [
             'kpi' => $kpi,
             'daily_token_usage' => $dailyTokenUsage,
             'top_features' => $topFeatures,
             'top_consumers' => $topConsumers,
+            'models_used' => $modelsUsed,
+            'active_model' => config('services.gemini.model', 'gemini-3.6-flash'),
         ]);
     }
 

@@ -28,6 +28,7 @@ class AiUsageLog extends Model
     protected $fillable = [
         'user_id',
         'feature_type',
+        'model',
         'prompt_tokens',
         'completion_tokens',
         'total_tokens',

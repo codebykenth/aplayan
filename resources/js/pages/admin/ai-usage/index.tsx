@@ -1,4 +1,5 @@
 import { Head, router, usePage } from '@inertiajs/react';
+import type { PageProps as InertiaPageProps } from '@inertiajs/core';
 import { useState, type ReactNode } from 'react';
 import {
     Cpu,
@@ -75,11 +76,19 @@ interface TopConsumer {
     estimated_cost: number;
 }
 
-interface PageProps {
+interface ModelUsage {
+    model: string;
+    total_calls: number;
+    total_tokens: number;
+}
+
+interface PageProps extends InertiaPageProps {
     kpi: Kpi;
     daily_token_usage: DailyUsage[];
     top_features: TopFeature[];
     top_consumers: TopConsumer[];
+    models_used?: ModelUsage[];
+    active_model?: string;
 }
 
 function formatNumber(n: number): string {
@@ -88,39 +97,36 @@ function formatNumber(n: number): string {
     return n.toLocaleString();
 }
 
-function formatCurrency(n: number): string {
-    if (n < 0.01) return `$${n.toFixed(4)}`;
-    return `$${n.toFixed(2)}`;
-}
-
-function Avatar({ name, avatar }: { name: string; avatar?: string | null }) {
-    if (avatar) {
-        return <img src={avatar} alt="" className="size-7 rounded-full" />;
-    }
-
-    return (
-        <div className="flex size-7 items-center justify-center rounded-full bg-muted text-xs font-medium text-muted-foreground">
-            {name.charAt(0).toUpperCase()}
-        </div>
-    );
+function formatCurrency(amount: number): string {
+    return new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: 'USD',
+        minimumFractionDigits: 4,
+    }).format(amount);
 }
 
 function ConsumerRow({ consumer }: { consumer: TopConsumer }) {
-    const [toggling, setToggling] = useState(false);
+    const [updating, setUpdating] = useState(false);
 
-    function handleToggleAi() {
-        setToggling(true);
-        router.post(`/admin/users/${consumer.id}/toggle-ai`, {}, {
-            preserveScroll: true,
-            onFinish: () => setToggling(false),
-        });
+    function toggleAiDisabled() {
+        setUpdating(true);
+        router.patch(
+            `/admin/users/${consumer.id}/ai-status`,
+            { is_ai_disabled: !consumer.is_ai_disabled },
+            {
+                preserveScroll: true,
+                onFinish: () => setUpdating(false),
+            }
+        );
     }
 
     return (
-        <tr className="border-b border-border last:border-0">
-            <td className="py-3 pr-3">
-                <div className="flex items-center gap-2">
-                    <Avatar name={consumer.name} avatar={consumer.avatar} />
+        <tr className="border-b border-border/50 hover:bg-muted/50">
+            <td className="py-3 pr-4 pl-2">
+                <div className="flex items-center gap-3">
+                    <div className="flex size-8 shrink-0 items-center justify-center rounded-full bg-primary/10 text-xs font-semibold text-primary">
+                        {consumer.name.charAt(0).toUpperCase()}
+                    </div>
                     <div className="min-w-0">
                         <p className="truncate text-sm font-medium text-foreground">
                             {consumer.name}
@@ -131,22 +137,22 @@ function ConsumerRow({ consumer }: { consumer: TopConsumer }) {
                     </div>
                 </div>
             </td>
-            <td className="py-3 pr-3 text-right text-sm tabular-nums text-foreground">
+            <td className="py-3 px-4 text-right text-sm font-medium text-foreground">
                 {consumer.total_calls}
             </td>
-            <td className="py-3 pr-3 text-right text-sm tabular-nums text-foreground">
+            <td className="py-3 px-4 text-right text-sm text-muted-foreground">
                 {formatNumber(consumer.total_tokens)}
             </td>
-            <td className="py-3 pr-3 text-right text-sm tabular-nums text-muted-foreground">
+            <td className="py-3 px-4 text-right text-sm font-mono text-foreground">
                 {formatCurrency(consumer.estimated_cost)}
             </td>
-            <td className="py-3 text-right">
+            <td className="py-3 pr-2 pl-4 text-right">
                 <Button
+                    size="sm"
                     variant={consumer.is_ai_disabled ? 'destructive' : 'outline'}
-                    size="xs"
-                    onClick={handleToggleAi}
-                    disabled={toggling}
-                    className="gap-1"
+                    disabled={updating}
+                    onClick={toggleAiDisabled}
+                    className="gap-1 h-7 text-xs"
                 >
                     {consumer.is_ai_disabled ? (
                         <ShieldOff className="size-3" />
@@ -161,7 +167,7 @@ function ConsumerRow({ consumer }: { consumer: TopConsumer }) {
 }
 
 export default function AdminAiUsage() {
-    const { kpi, daily_token_usage, top_features, top_consumers } = usePage<PageProps>().props;
+    const { kpi, daily_token_usage, top_features, top_consumers, models_used, active_model } = usePage<PageProps>().props;
 
     const chartConfig: ChartConfig = {
         prompt_tokens: {
@@ -184,7 +190,14 @@ export default function AdminAiUsage() {
                 <PageHeader
                     title="AI Usage Monitor"
                     description="Track AI API consumption, costs, and per-user access controls"
-                />
+                >
+                    <div className="flex items-center gap-2">
+                        <Badge variant="outline" className="gap-1.5 font-mono text-xs">
+                            <Brain className="size-3.5 text-purple-500" />
+                            Model: {active_model ?? 'gemini-3.6-flash'}
+                        </Badge>
+                    </div>
+                </PageHeader>
 
                 <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
                     <Card>
@@ -351,6 +364,18 @@ export default function AdminAiUsage() {
                                         ))}
                                 </div>
                             )}
+
+                            <div className="mt-6 pt-4 border-t border-border space-y-2">
+                                <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">AI Models Invoked</p>
+                                <div className="flex flex-wrap gap-2">
+                                    {(models_used && models_used.length > 0 ? models_used : [{ model: active_model ?? 'gemini-3.6-flash', total_calls: kpi.calls_today, total_tokens: kpi.token_volume_30d }]).map((m) => (
+                                        <Badge key={m.model} variant="secondary" className="font-mono text-xs gap-1.5 py-1">
+                                            <Brain className="size-3 text-purple-500" />
+                                            {m.model} ({m.total_calls} calls · {formatNumber(m.total_tokens)} tokens)
+                                        </Badge>
+                                    ))}
+                                </div>
+                            </div>
                         </CardContent>
                     </Card>
                 </div>

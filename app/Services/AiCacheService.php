@@ -364,6 +364,7 @@ class AiCacheService
         $promptTokens = 0;
         $completionTokens = 0;
         $totalTokens = 0;
+        $model = config('services.gemini.model', 'gemini-3.6-flash');
 
         if (! $isCacheHit && $usageMetadata !== null) {
             $promptTokens = $usageMetadata['promptTokenCount'] ?? 0;
@@ -371,11 +372,12 @@ class AiCacheService
             $totalTokens = $usageMetadata['totalTokenCount'] ?? 0;
         }
 
-        $estimatedCost = $this->calculateCost($promptTokens, $completionTokens);
+        $estimatedCost = $this->calculateCost($promptTokens, $completionTokens, $model);
 
         AiUsageLog::create([
             'user_id' => $user->id,
             'feature_type' => $featureType,
+            'model' => $model,
             'prompt_tokens' => $promptTokens,
             'completion_tokens' => $completionTokens,
             'total_tokens' => $totalTokens,
@@ -384,10 +386,15 @@ class AiCacheService
         ]);
     }
 
-    private function calculateCost(int $promptTokens, int $completionTokens): float
+    private function calculateCost(int $promptTokens, int $completionTokens, string $model): float
     {
-        $inputCost = ($promptTokens * self::INPUT_TOKEN_COST) / 1_000_000;
-        $outputCost = ($completionTokens * self::OUTPUT_TOKEN_COST) / 1_000_000;
+        $isPro = str_contains(strtolower($model), 'pro');
+
+        $inputRate = $isPro ? 1.25 : self::INPUT_TOKEN_COST;
+        $outputRate = $isPro ? 5.00 : self::OUTPUT_TOKEN_COST;
+
+        $inputCost = ($promptTokens * $inputRate) / 1_000_000;
+        $outputCost = ($completionTokens * $outputRate) / 1_000_000;
 
         return round($inputCost + $outputCost, 6);
     }

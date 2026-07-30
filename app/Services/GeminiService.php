@@ -11,13 +11,16 @@ use JsonException;
 
 class GeminiService
 {
-    private const string MODEL = 'gemini-1.5-flash';
-
     private const int TIMEOUT = 30;
 
     private const int CONNECT_TIMEOUT = 5;
 
     private ?array $lastUsageMetadata = null;
+
+    public function getModel(): string
+    {
+        return config('services.gemini.model', 'gemini-1.5-flash');
+    }
 
     public function analyzeResumeMatch(string $jobDescription, string $resumeText): array
     {

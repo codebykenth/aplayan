@@ -25,7 +25,9 @@ use App\Http\Controllers\PrivacyPolicyController;
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\SitemapController;
 use App\Http\Controllers\TermsOfServiceController;
-use Illuminate\Foundation\Auth\EmailVerificationRequest;
+use App\Models\User;
+use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Auth\Events\Verified;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -81,12 +83,24 @@ Route::middleware('guest')->group(function () {
     Route::post('reset-password', [ForgotPasswordController::class, 'store'])->name('password.update');
 });
 
+Route::get('email/verify/{id}/{hash}', function (Request $request, string $id, string $hash) {
+    $user = User::findOrFail($id);
+
+    if (! hash_equals((string) $hash, sha1($user->getEmailForVerification()))) {
+        throw new AuthorizationException;
+    }
+
+    if (! $user->hasVerifiedEmail()) {
+        $user->markEmailAsVerified();
+        event(new Verified($user));
+    }
+
+    Auth::login($user);
+
+    return redirect()->route('dashboard')->with('status', 'Email verified successfully! Welcome to Aplayan.');
+})->middleware(['signed', 'throttle:6,1'])->name('verification.verify');
+
 Route::middleware('auth')->group(function () {
-    Route::get('dashboard', DashboardController::class)->name('dashboard')->middleware('throttle:read');
-
-    Route::get('calendar', CalendarController::class)->name('calendar')->middleware('throttle:read');
-    Route::get('analytics', AnalyticsController::class)->name('analytics')->middleware('throttle:read');
-
     Route::post('logout', [AuthController::class, 'destroy'])->name('logout');
 
     Route::get('email/verify', function (Request $request) {
@@ -97,17 +111,18 @@ Route::middleware('auth')->group(function () {
         return Inertia::render('auth/verify-email');
     })->name('verification.notice');
 
-    Route::get('email/verify/{id}/{hash}', function (EmailVerificationRequest $request) {
-        $request->fulfill();
-
-        return redirect()->intended(route('job-applications.index', absolute: false));
-    })->middleware('signed')->name('verification.verify');
-
     Route::post('email/verification-notification', function (Request $request) {
         $request->user()->sendEmailVerificationNotification();
 
         return back()->with('status', 'Verification link sent!');
     })->middleware('throttle:6,1')->name('verification.send');
+});
+
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('dashboard', DashboardController::class)->name('dashboard')->middleware('throttle:read');
+
+    Route::get('calendar', CalendarController::class)->name('calendar')->middleware('throttle:read');
+    Route::get('analytics', AnalyticsController::class)->name('analytics')->middleware('throttle:read');
 
     Route::get('goals', [GoalController::class, 'index'])->name('goals.index')->middleware('throttle:read');
     Route::patch('goals', [GoalController::class, 'update'])->name('goals.update')->middleware('throttle:write');
