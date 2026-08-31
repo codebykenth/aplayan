@@ -71,3 +71,21 @@ test('admin cannot delete the last admin user', function () {
     $response->assertSessionHas('status');
     expect(User::find($this->admin->id))->not->toBeNull();
 });
+
+test('admin can view user terms acceptance status', function () {
+    $acceptedUser = User::factory()->create([
+        'terms_accepted_at' => now()->subDays(2),
+    ]);
+
+    $pendingUser = User::factory()->create([
+        'terms_accepted_at' => null,
+    ]);
+
+    $response = $this->actingAs($this->admin)
+        ->get(route('admin.users.index'));
+
+    $response->assertInertia(fn ($page) => $page
+        ->component('admin/users/index')
+        ->has('users.data')
+    );
+});

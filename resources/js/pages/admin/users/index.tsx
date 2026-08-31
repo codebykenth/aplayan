@@ -1,6 +1,6 @@
-import { Head, Link, router, usePage } from '@inertiajs/react';
-import { useState, type ReactNode } from 'react';
-import { Search, Shield, ShieldOff, Trash2, BadgeCheck } from 'lucide-react';
+import { Head, Link, router } from '@inertiajs/react';
+import { ReactNode, useState } from 'react';
+import { Search, Shield, ShieldOff, Trash2, BadgeCheck, CheckCircle2, Clock } from 'lucide-react';
 import {
     Card,
     CardContent,
@@ -22,6 +22,7 @@ interface User {
     email: string;
     role: string;
     created_at: string;
+    terms_accepted_at?: string | null;
     avatar?: string | null;
 }
 
@@ -124,6 +125,7 @@ export default function AdminUsers({
                                             <th className="pb-2 pr-4 font-medium">Name</th>
                                             <th className="pb-2 pr-4 font-medium">Email</th>
                                             <th className="pb-2 pr-4 font-medium">Role</th>
+                                            <th className="pb-2 pr-4 font-medium">Terms Accepted</th>
                                             <th className="pb-2 pr-4 font-medium">Joined</th>
                                             <th className="pb-2 font-medium">Actions</th>
                                         </tr>
@@ -154,6 +156,19 @@ export default function AdminUsers({
                                                         <Badge variant="secondary">User</Badge>
                                                     )}
                                                 </td>
+                                                <td className="py-3 pr-4 text-xs">
+                                                    {user.terms_accepted_at ? (
+                                                        <span className="inline-flex items-center gap-1.5 text-foreground">
+                                                            <CheckCircle2 className="size-3.5 shrink-0 text-emerald-600 dark:text-emerald-400" />
+                                                            {new Date(user.terms_accepted_at).toLocaleDateString()}
+                                                        </span>
+                                                    ) : (
+                                                        <span className="inline-flex items-center gap-1.5 text-muted-foreground">
+                                                            <Clock className="size-3.5 shrink-0" />
+                                                            Pending
+                                                        </span>
+                                                    )}
+                                                </td>
                                                 <td className="py-3 pr-4 text-muted-foreground">
                                                     {new Date(user.created_at).toLocaleDateString()}
                                                 </td>
@@ -164,15 +179,13 @@ export default function AdminUsers({
                                                             size="xs"
                                                             onClick={() => handleToggleRole(user.id)}
                                                             title={user.role === 'admin' ? 'Remove admin' : 'Make admin'}
+                                                            aria-label={user.role === 'admin' ? 'Remove admin' : 'Make admin'}
                                                         >
                                                             {user.role === 'admin' ? (
                                                                 <ShieldOff className="size-3.5" />
                                                             ) : (
                                                                 <Shield className="size-3.5" />
                                                             )}
-                                                            <span className="ml-1">
-                                                                {user.role === 'admin' ? 'Demote' : 'Promote'}
-                                                            </span>
                                                         </Button>
                                                         <Button
                                                             variant="ghost"
@@ -200,10 +213,15 @@ export default function AdminUsers({
                                 </span>
                                 <div className="flex items-center gap-1">
                                     {links.map((link, i) => {
+                                        const cleanLabel = link.label
+                                            .replace('&laquo;', '«')
+                                            .replace('&raquo;', '»')
+                                            .trim();
+
                                         if (!link.url) {
                                             return (
                                                 <span key={i} className="px-2 py-1 text-muted-foreground/50">
-                                                    {link.label}
+                                                    {cleanLabel}
                                                 </span>
                                             );
                                         }
@@ -219,7 +237,7 @@ export default function AdminUsers({
                                                 preserveState
                                                 preserveScroll
                                             >
-                                                {link.label}
+                                                {cleanLabel}
                                             </Link>
                                         );
                                     })}

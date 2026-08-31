@@ -5,6 +5,7 @@ use App\Http\Controllers\Admin\LegalDocumentController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\AnalyticsController;
 use App\Http\Controllers\ApplicationTemplateController;
+use App\Http\Controllers\Auth\AcceptTermsController;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\SocialiteController;
@@ -116,6 +117,8 @@ Route::middleware('auth')->group(function () {
 
         return back()->with('status', 'Verification link sent!');
     })->middleware('throttle:6,1')->name('verification.send');
+
+    Route::post('terms/accept', AcceptTermsController::class)->name('terms.accept');
 });
 
 Route::middleware(['auth', 'verified'])->group(function () {

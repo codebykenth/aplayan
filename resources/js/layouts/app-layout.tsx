@@ -30,6 +30,7 @@ import {
 } from '@/components/ui/tooltip';
 import { useTheme } from '@/hooks/use-theme';
 import { privacyPolicy, termsOfService } from '@/routes';
+import { AcceptTermsModal } from '@/components/domain/accept-terms-modal';
 import type { Auth } from '@/types/auth';
 
 const sidebarLinks = [
@@ -468,6 +469,8 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                     {children}
                 </main>
             </div>
+
+            <AcceptTermsModal />
         </div>
     );
 }

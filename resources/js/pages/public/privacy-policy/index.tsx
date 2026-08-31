@@ -3,16 +3,37 @@ import { Link, router } from '@inertiajs/react';
 import SeoHead from '@/components/ui/seo-head';
 import { ArrowLeft, Shield, Lock, Eye, Database, Cpu, FileText } from 'lucide-react';
 import { termsOfService, privacyPolicy } from '@/routes';
+import { MarkdownRenderer } from '@/components/ui/markdown-renderer';
 
 interface LegalDocument {
+    id?: number;
     key: string;
     title: string;
     content: string;
     version: number;
+    created_at?: string;
+    updated_at?: string;
+}
+
+function formatLegalDate(dateStr?: string | null): string {
+    if (!dateStr) return 'July 30, 2026';
+    try {
+        const date = new Date(dateStr);
+        if (isNaN(date.getTime())) return 'July 30, 2026';
+        return new Intl.DateTimeFormat('en-US', {
+            month: 'long',
+            day: 'numeric',
+            year: 'numeric',
+        }).format(date);
+    } catch {
+        return 'July 30, 2026';
+    }
 }
 
 export default function PrivacyPolicy({ document }: { document?: LegalDocument | null }) {
-    const lastUpdated = document ? `Version ${document.version}` : 'July 30, 2026';
+    const lastUpdated = document?.updated_at
+        ? formatLegalDate(document.updated_at)
+        : 'July 30, 2026';
 
     function handleBack() {
         if (typeof window !== 'undefined' && window.history.length > 1) {
@@ -88,11 +109,9 @@ export default function PrivacyPolicy({ document }: { document?: LegalDocument |
                     </div>
 
                     {/* Full Privacy Document Body */}
-                    <div className="prose prose-slate max-w-none rounded-2xl border border-slate-200 bg-white p-6 sm:p-10 dark:prose-invert dark:border-slate-800 dark:bg-slate-900">
-                        {document ? (
-                            <div className="whitespace-pre-line text-sm leading-relaxed text-slate-600 dark:text-slate-300">
-                                {document.content}
-                            </div>
+                    <div className="rounded-2xl border border-slate-200 bg-white p-6 sm:p-10 dark:border-slate-800 dark:bg-slate-900">
+                        {document?.content ? (
+                            <MarkdownRenderer content={document.content} />
                         ) : (
                             <>
                                 <section className="mb-8">

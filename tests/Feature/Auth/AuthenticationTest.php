@@ -39,7 +39,7 @@ it('registers a new user and dispatches Registered event', function () {
         'password' => 'Password123!',
         'password_confirmation' => 'Password123!',
         'turnstile' => 'valid-turnstile-token',
-    ])->assertRedirect(route('job-applications.index', absolute: false));
+    ])->assertRedirect(route('login'));
 
     $this->assertDatabaseHas('users', [
         'email' => 'test@example.com',

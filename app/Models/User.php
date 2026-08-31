@@ -18,6 +18,7 @@ use Illuminate\Support\Carbon;
  * @property string $name
  * @property string $email
  * @property Carbon|null $email_verified_at
+ * @property Carbon|null $terms_accepted_at
  * @property string $password
  * @property string|null $google_id
  * @property string|null $avatar
@@ -34,7 +35,7 @@ use Illuminate\Support\Carbon;
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  */
-#[Fillable(['name', 'email', 'password', 'google_id', 'avatar', 'expected_salary', 'base_currency', 'job_search_preferences', 'theme', 'color_theme', 'weekly_goal', 'goal_streak', 'tax_settings', 'role', 'is_ai_disabled', 'custom_ai_daily_limit'])]
+#[Fillable(['name', 'email', 'password', 'google_id', 'avatar', 'expected_salary', 'base_currency', 'job_search_preferences', 'theme', 'color_theme', 'weekly_goal', 'goal_streak', 'tax_settings', 'role', 'is_ai_disabled', 'custom_ai_daily_limit', 'terms_accepted_at'])]
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable implements MustVerifyEmail
 {
@@ -90,6 +91,7 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return [
             'email_verified_at' => 'datetime',
+            'terms_accepted_at' => 'datetime',
             'password' => 'hashed',
             'expected_salary' => 'integer',
             'job_search_preferences' => 'array',
@@ -98,5 +100,10 @@ class User extends Authenticatable implements MustVerifyEmail
             'is_ai_disabled' => 'boolean',
             'custom_ai_daily_limit' => 'integer',
         ];
+    }
+
+    public function hasAcceptedTerms(): bool
+    {
+        return $this->terms_accepted_at !== null;
     }
 }

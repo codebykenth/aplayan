@@ -1,12 +1,91 @@
-import { Head, usePage } from '@inertiajs/react';
-import { Mail, LogOut, CheckCircle2 } from 'lucide-react';
-import type { ReactNode } from 'react';
+import { router, usePage } from '@inertiajs/react';
+import { Mail, LogOut, CheckCircle2, Clock, Loader2, AlertCircle } from 'lucide-react';
+import { useEffect, useState, type FormEvent, type ReactNode } from 'react';
 import GuestLayout from '@/layouts/guest-layout';
 import { Button } from '@/components/ui/button';
 import SeoHead from '@/components/ui/seo-head';
+import { send } from '@/routes/verification';
+import { logout } from '@/routes';
+
+const COOLDOWN_KEY = 'aplayan_verification_resend_cooldown';
+const COOLDOWN_DURATION = 60;
+
+function getRemainingCooldown(): number {
+    if (typeof window === 'undefined') return 0;
+    const stored = window.sessionStorage.getItem(COOLDOWN_KEY);
+    if (!stored) return 0;
+    const expiry = parseInt(stored, 10);
+    const diff = Math.ceil((expiry - Date.now()) / 1000);
+    return diff > 0 ? diff : 0;
+}
+
+function setCooldownExpiry(seconds: number) {
+    if (typeof window === 'undefined') return;
+    window.sessionStorage.setItem(
+        COOLDOWN_KEY,
+        (Date.now() + seconds * 1000).toString(),
+    );
+}
 
 export default function VerifyEmail() {
-    const { status } = usePage<{ status?: string }>().props;
+    const { status, errors } = usePage<{
+        status?: string;
+        errors?: Record<string, string>;
+    }>().props;
+
+    const [cooldown, setCooldown] = useState<number>(() => getRemainingCooldown());
+    const [isProcessing, setIsProcessing] = useState(false);
+    const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+    useEffect(() => {
+        if (cooldown <= 0) return;
+
+        const interval = setInterval(() => {
+            const remaining = getRemainingCooldown();
+            setCooldown(remaining);
+            if (remaining <= 0) {
+                clearInterval(interval);
+            }
+        }, 1000);
+
+        return () => clearInterval(interval);
+    }, [cooldown]);
+
+    function handleResend(e: FormEvent) {
+        e.preventDefault();
+        if (cooldown > 0 || isProcessing) return;
+
+        setIsProcessing(true);
+        setErrorMessage(null);
+
+        router.post(
+            send.url(),
+            {},
+            {
+                preserveScroll: true,
+                onSuccess: () => {
+                    setCooldownExpiry(COOLDOWN_DURATION);
+                    setCooldown(COOLDOWN_DURATION);
+                },
+                onError: (err) => {
+                    const message =
+                        err?.email ||
+                        err?.message ||
+                        errors?.email ||
+                        'Too many requests. Please wait a moment before trying again.';
+                    setErrorMessage(message);
+                },
+                onFinish: () => {
+                    setIsProcessing(false);
+                },
+            },
+        );
+    }
+
+    function handleLogout(e: FormEvent) {
+        e.preventDefault();
+        router.post(logout.url());
+    }
 
     return (
         <>
@@ -30,31 +109,51 @@ export default function VerifyEmail() {
                     </p>
 
                     {status && (
-                        <div className="mb-6 flex w-full items-center gap-2.5 rounded-xl border border-emerald-500/20 bg-emerald-500/10 p-4 text-left text-sm font-medium text-emerald-600 dark:text-emerald-400">
+                        <div
+                            role="status"
+                            aria-live="polite"
+                            className="mb-6 flex w-full items-center gap-2.5 rounded-xl border border-emerald-500/20 bg-emerald-500/10 p-4 text-left text-sm font-medium text-emerald-600 dark:text-emerald-400"
+                        >
                             <CheckCircle2 className="size-5 shrink-0" />
                             <span>{status}</span>
                         </div>
                     )}
 
-                    <form action="/email/verification-notification" method="POST" className="w-full">
-                        <input
-                            type="hidden"
-                            name="_token"
-                            value={usePage().props.csrf_token as string}
-                        />
+                    {errorMessage && (
+                        <div
+                            role="alert"
+                            aria-live="assertive"
+                            className="mb-6 flex w-full items-center gap-2.5 rounded-xl border border-destructive/20 bg-destructive/10 p-4 text-left text-sm font-medium text-destructive"
+                        >
+                            <AlertCircle className="size-5 shrink-0" />
+                            <span>{errorMessage}</span>
+                        </div>
+                    )}
 
-                        <Button type="submit" size="lg" className="w-full font-semibold">
-                            Resend Verification Email
+                    <form onSubmit={handleResend} className="w-full">
+                        <Button
+                            type="submit"
+                            size="lg"
+                            disabled={isProcessing || cooldown > 0}
+                            className="w-full font-semibold"
+                        >
+                            {isProcessing ? (
+                                <>
+                                    <Loader2 className="size-4 animate-spin" />
+                                    <span>Sending verification email...</span>
+                                </>
+                            ) : cooldown > 0 ? (
+                                <>
+                                    <Clock className="size-4" />
+                                    <span>Resend in {cooldown}s</span>
+                                </>
+                            ) : (
+                                <span>Resend Verification Email</span>
+                            )}
                         </Button>
                     </form>
 
-                    <form action="/logout" method="POST" className="mt-4 w-full">
-                        <input
-                            type="hidden"
-                            name="_token"
-                            value={usePage().props.csrf_token as string}
-                        />
-
+                    <form onSubmit={handleLogout} className="mt-4 w-full">
                         <button
                             type="submit"
                             className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors"

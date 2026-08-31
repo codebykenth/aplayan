@@ -7,6 +7,7 @@ export type User = {
     base_currency?: string;
     role?: 'admin' | 'user' | string;
     email_verified_at: string | null;
+    terms_accepted_at?: string | null;
     created_at: string;
     updated_at: string;
     [key: string]: unknown; // This allows for additional properties...
