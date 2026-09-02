@@ -1,14 +1,5 @@
 import { Head, router, useForm } from '@inertiajs/react';
-import {
-    FileText,
-    PlusIcon,
-    Trash2Icon,
-    PencilIcon,
-    SaveIcon,
-    XIcon,
-    BookmarkIcon,
-    Mail,
-} from 'lucide-react';
+import { PlusIcon, Trash2Icon, PencilIcon, BookmarkIcon } from 'lucide-react';
 import { useState } from 'react';
 import type { ReactNode } from 'react';
 import { Button } from '@/components/ui/button';
@@ -305,13 +296,17 @@ function ApplicationTemplatesTab({
                     </DialogHeader>
 
                     <p className="mt-1 text-xs text-muted-foreground">
-                        Fields marked with <span className="text-red-500">*</span> are required.
+                        Fields marked with{' '}
+                        <span className="text-red-500">*</span> are required.
                     </p>
 
                     <form onSubmit={submit} className="flex flex-col gap-4">
                         <div className="flex flex-col gap-4">
                             <div className="flex flex-col gap-2">
-                                <Label htmlFor="name">Template Name <span className="text-red-500">*</span></Label>
+                                <Label htmlFor="name">
+                                    Template Name{' '}
+                                    <span className="text-red-500">*</span>
+                                </Label>
                                 <Input
                                     id="name"
                                     value={data.name}
@@ -329,7 +324,10 @@ function ApplicationTemplatesTab({
                             </div>
 
                             <div className="flex flex-col gap-2">
-                                <Label htmlFor="category">Category <span className="text-red-500">*</span></Label>
+                                <Label htmlFor="category">
+                                    Category{' '}
+                                    <span className="text-red-500">*</span>
+                                </Label>
                                 <Input
                                     id="category"
                                     value={data.category}
@@ -347,7 +345,10 @@ function ApplicationTemplatesTab({
 
                             <div className="grid grid-cols-2 gap-4">
                                 <div className="flex flex-col gap-2">
-                                    <Label htmlFor="default_location">Default Location <span className="text-red-500">*</span></Label>
+                                    <Label htmlFor="default_location">
+                                        Default Location{' '}
+                                        <span className="text-red-500">*</span>
+                                    </Label>
                                     <Input
                                         id="default_location"
                                         value={data.default_location}
@@ -362,7 +363,8 @@ function ApplicationTemplatesTab({
                                 </div>
                                 <div className="flex flex-col gap-2">
                                     <Label htmlFor="default_expected_salary">
-                                        Expected Salary (₱) <span className="text-red-500">*</span>
+                                        Expected Salary (₱){' '}
+                                        <span className="text-red-500">*</span>
                                     </Label>
                                     <div className="relative">
                                         <span className="pointer-events-none absolute top-1/2 left-2.5 -translate-y-1/2 text-sm text-muted-foreground">
@@ -388,7 +390,8 @@ function ApplicationTemplatesTab({
 
                             <div className="flex flex-col gap-2">
                                 <Label htmlFor="default_job_description_keywords">
-                                    Job Description Keywords <span className="text-red-500">*</span>
+                                    Job Description Keywords{' '}
+                                    <span className="text-red-500">*</span>
                                 </Label>
                                 <Textarea
                                     id="default_job_description_keywords"
@@ -408,7 +411,8 @@ function ApplicationTemplatesTab({
 
                             <div className="flex flex-col gap-2">
                                 <Label htmlFor="default_notes">
-                                    Default Notes <span className="text-red-500">*</span>
+                                    Default Notes{' '}
+                                    <span className="text-red-500">*</span>
                                 </Label>
                                 <Textarea
                                     id="default_notes"

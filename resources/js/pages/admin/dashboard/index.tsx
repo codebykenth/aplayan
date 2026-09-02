@@ -1,12 +1,7 @@
 import { Head } from '@inertiajs/react';
 import { Users, Briefcase, FileText, Cpu } from 'lucide-react';
 import type { ReactNode } from 'react';
-import {
-    Card,
-    CardContent,
-    CardHeader,
-    CardTitle,
-} from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { PageHeader } from '@/components/ui/page-header';
 import AdminLayout from '@/layouts/admin-layout';
 

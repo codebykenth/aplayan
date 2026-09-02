@@ -2,18 +2,17 @@ import { Link } from '@inertiajs/react';
 import {
     ArrowRight,
     BarChart3,
-    Briefcase,
     LayoutDashboard,
     Sparkles,
     Target,
 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import SeoHead from '@/components/ui/seo-head';
 import AiMatchSimulator from '@/components/landing/ai-match-simulator';
-import PhPayCalculatorWidget from '@/components/landing/ph-pay-calculator-widget';
 import AtsResumePreviewer from '@/components/landing/ats-resume-previewer';
 import ComparisonMatrix from '@/components/landing/comparison-matrix';
 import FaqAccordion from '@/components/landing/faq-accordion';
+import PhPayCalculatorWidget from '@/components/landing/ph-pay-calculator-widget';
+import { Button } from '@/components/ui/button';
+import SeoHead from '@/components/ui/seo-head';
 
 const softwareApplicationJsonLd = {
     '@context': 'https://schema.org',

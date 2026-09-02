@@ -27,7 +27,7 @@ const paddingAroundControl = [
 /** @type {import('eslint').Linter.Config[]} */
 export default [
     js.configs.recommended,
-    reactHooks.configs.flat['recommended-latest'],
+    reactHooks.configs['recommended-latest'],
     ...typescript.configs.recommended,
     {
         ...react.configs.flat.recommended,

@@ -12,12 +12,6 @@ import {
     TrashIcon,
     HelpCircle,
 } from 'lucide-react';
-import {
-    Tooltip,
-    TooltipContent,
-    TooltipProvider,
-    TooltipTrigger,
-} from '@/components/ui/tooltip';
 import { useState } from 'react';
 import type { ReactNode } from 'react';
 import { Button } from '@/components/ui/button';
@@ -29,9 +23,9 @@ import {
     CardContent,
 } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { PasswordInput } from '@/components/ui/password-input';
 import { Label } from '@/components/ui/label';
 import { PageHeader } from '@/components/ui/page-header';
+import { PasswordInput } from '@/components/ui/password-input';
 import {
     Select,
     SelectContent,
@@ -39,6 +33,12 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger,
+} from '@/components/ui/tooltip';
 import { useTheme, useColorTheme } from '@/hooks/use-theme';
 import AppLayout from '@/layouts/app-layout';
 import { cn } from '@/lib/utils';
@@ -154,11 +154,12 @@ interface SettingsPageProps {
 
 function ProfileSection({ user }: { user: UserData }) {
     const isEmailVerified = !!user.email_verified_at;
-    const initialPreferences = (user.job_search_preferences as {
-        target_roles?: string;
-        work_setup?: string;
-        target_industry?: string;
-    }) || {};
+    const initialPreferences =
+        (user.job_search_preferences as {
+            target_roles?: string;
+            work_setup?: string;
+            target_industry?: string;
+        }) || {};
 
     const {
         data,
@@ -186,6 +187,7 @@ function ProfileSection({ user }: { user: UserData }) {
 
     function addRoleSuggestion(role: string) {
         const current = data.job_search_preferences.target_roles.trim();
+
         if (!current) {
             setData('job_search_preferences', {
                 ...data.job_search_preferences,
@@ -201,6 +203,7 @@ function ProfileSection({ user }: { user: UserData }) {
 
     function addIndustrySuggestion(industry: string) {
         const current = data.job_search_preferences.target_industry.trim();
+
         if (!current) {
             setData('job_search_preferences', {
                 ...data.job_search_preferences,
@@ -227,9 +230,11 @@ function ProfileSection({ user }: { user: UserData }) {
 
         if (!result.success) {
             clearErrors();
+
             for (const [field, message] of Object.entries(result.errors)) {
                 setError(field as keyof typeof data, message);
             }
+
             return;
         }
 
@@ -253,15 +258,19 @@ function ProfileSection({ user }: { user: UserData }) {
                     </CardTitle>
                     <CardDescription>
                         Update your public name, email address, default
-                        currency, target compensation, and career targeting options.
+                        currency, target compensation, and career targeting
+                        options.
                     </CardDescription>
                 </CardHeader>
-<CardContent className="flex flex-col gap-4">
-                     <p className="text-xs text-muted-foreground">
-                         Fields marked with <span className="text-red-500">*</span> are required.
-                     </p>
-                     <div className="flex flex-col gap-2">
-                         <Label htmlFor="name">Full Name <span className="text-red-500">*</span></Label>
+                <CardContent className="flex flex-col gap-4">
+                    <p className="text-xs text-muted-foreground">
+                        Fields marked with{' '}
+                        <span className="text-red-500">*</span> are required.
+                    </p>
+                    <div className="flex flex-col gap-2">
+                        <Label htmlFor="name">
+                            Full Name <span className="text-red-500">*</span>
+                        </Label>
                         <Input
                             id="name"
                             value={data.name}
@@ -277,7 +286,10 @@ function ProfileSection({ user }: { user: UserData }) {
 
                     <div className="flex flex-col gap-2">
                         <div className="flex items-center justify-between">
-                            <Label htmlFor="email">Email Address <span className="text-red-500">*</span></Label>
+                            <Label htmlFor="email">
+                                Email Address{' '}
+                                <span className="text-red-500">*</span>
+                            </Label>
                             {isEmailVerified && (
                                 <span className="inline-flex items-center rounded-full bg-emerald-500/10 px-2 py-0.5 text-xs font-medium text-emerald-600 dark:text-emerald-400">
                                     Verified
@@ -311,14 +323,25 @@ function ProfileSection({ user }: { user: UserData }) {
 
                     <div className="flex flex-col gap-2">
                         <div className="flex items-center gap-1.5">
-                            <Label htmlFor="base_currency">Base Currency <span className="text-red-500">*</span></Label>
+                            <Label htmlFor="base_currency">
+                                Base Currency{' '}
+                                <span className="text-red-500">*</span>
+                            </Label>
                             <TooltipProvider>
                                 <Tooltip>
-                                    <TooltipTrigger type="button" className="text-muted-foreground hover:text-foreground cursor-help">
+                                    <TooltipTrigger
+                                        type="button"
+                                        className="cursor-help text-muted-foreground hover:text-foreground"
+                                    >
                                         <HelpCircle className="size-3.5" />
                                     </TooltipTrigger>
                                     <TooltipContent side="top">
-                                        <p>Your primary currency. Used as the default currency for new applications and for normalizing multi-currency analytics charts.</p>
+                                        <p>
+                                            Your primary currency. Used as the
+                                            default currency for new
+                                            applications and for normalizing
+                                            multi-currency analytics charts.
+                                        </p>
                                     </TooltipContent>
                                 </Tooltip>
                             </TooltipProvider>
@@ -352,17 +375,25 @@ function ProfileSection({ user }: { user: UserData }) {
 
                     <div className="flex flex-col gap-2">
                         <div className="flex items-center gap-1.5">
-<Label htmlFor="expected_salary">
-                                 Default Target / Asking Salary (
-                                 {getCurrencySymbol(data.base_currency || 'PHP')}) <span className="text-red-500">*</span>
-                             </Label>
+                            <Label htmlFor="expected_salary">
+                                Default Target / Asking Salary (
+                                {getCurrencySymbol(data.base_currency || 'PHP')}
+                                ) <span className="text-red-500">*</span>
+                            </Label>
                             <TooltipProvider>
                                 <Tooltip>
-                                    <TooltipTrigger type="button" className="text-muted-foreground hover:text-foreground cursor-help">
+                                    <TooltipTrigger
+                                        type="button"
+                                        className="cursor-help text-muted-foreground hover:text-foreground"
+                                    >
                                         <HelpCircle className="size-3.5" />
                                     </TooltipTrigger>
                                     <TooltipContent side="top">
-                                        <p>Your default monthly target salary. Automatically prefilled when creating new job applications.</p>
+                                        <p>
+                                            Your default monthly target salary.
+                                            Automatically prefilled when
+                                            creating new job applications.
+                                        </p>
                                     </TooltipContent>
                                 </Tooltip>
                             </TooltipProvider>
@@ -396,22 +427,35 @@ function ProfileSection({ user }: { user: UserData }) {
                                 Job Search Preferences
                             </Label>
                             <p className="text-xs text-muted-foreground">
-                                Help AI tailor your resume, cover letter, and career recommendations.
+                                Help AI tailor your resume, cover letter, and
+                                career recommendations.
                             </p>
                         </div>
 
                         <div className="flex flex-col gap-2">
                             <div className="flex items-center gap-1.5">
-<Label htmlFor="target_roles" className="text-xs">
-                                     Target Job Roles / Titles <span className="text-red-500">*</span>
-                                 </Label>
+                                <Label
+                                    htmlFor="target_roles"
+                                    className="text-xs"
+                                >
+                                    Target Job Roles / Titles{' '}
+                                    <span className="text-red-500">*</span>
+                                </Label>
                                 <TooltipProvider>
                                     <Tooltip>
-                                        <TooltipTrigger type="button" className="text-muted-foreground hover:text-foreground cursor-help">
+                                        <TooltipTrigger
+                                            type="button"
+                                            className="cursor-help text-muted-foreground hover:text-foreground"
+                                        >
                                             <HelpCircle className="size-3.5" />
                                         </TooltipTrigger>
                                         <TooltipContent side="top">
-                                            <p>Used as 1-click preset chips when creating new job applications, and for AI Resume target headlines.</p>
+                                            <p>
+                                                Used as 1-click preset chips
+                                                when creating new job
+                                                applications, and for AI Resume
+                                                target headlines.
+                                            </p>
                                         </TooltipContent>
                                     </Tooltip>
                                 </TooltipProvider>
@@ -428,7 +472,9 @@ function ProfileSection({ user }: { user: UserData }) {
                                 placeholder="e.g. Full Stack Developer, React Engineer"
                             />
                             <div className="flex flex-wrap items-center gap-1.5 pt-1">
-                                <span className="text-[11px] font-medium text-muted-foreground">Suggested:</span>
+                                <span className="text-[11px] font-medium text-muted-foreground">
+                                    Suggested:
+                                </span>
                                 {SUGGESTED_JOB_ROLES.map((role) => (
                                     <button
                                         key={role}
@@ -445,22 +491,36 @@ function ProfileSection({ user }: { user: UserData }) {
                         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                             <div className="flex flex-col gap-2">
                                 <div className="flex items-center gap-1.5">
-<Label htmlFor="work_setup" className="text-xs">
-                                         Preferred Work Arrangement <span className="text-red-500">*</span>
-                                     </Label>
+                                    <Label
+                                        htmlFor="work_setup"
+                                        className="text-xs"
+                                    >
+                                        Preferred Work Arrangement{' '}
+                                        <span className="text-red-500">*</span>
+                                    </Label>
                                     <TooltipProvider>
                                         <Tooltip>
-                                            <TooltipTrigger type="button" className="text-muted-foreground hover:text-foreground cursor-help">
+                                            <TooltipTrigger
+                                                type="button"
+                                                className="cursor-help text-muted-foreground hover:text-foreground"
+                                            >
                                                 <HelpCircle className="size-3.5" />
                                             </TooltipTrigger>
                                             <TooltipContent side="top">
-                                                <p>Default work setup (Remote, Hybrid, On-site) prefilled when adding new job applications.</p>
+                                                <p>
+                                                    Default work setup (Remote,
+                                                    Hybrid, On-site) prefilled
+                                                    when adding new job
+                                                    applications.
+                                                </p>
                                             </TooltipContent>
                                         </Tooltip>
                                     </TooltipProvider>
                                 </div>
                                 <Select
-                                    value={data.job_search_preferences.work_setup}
+                                    value={
+                                        data.job_search_preferences.work_setup
+                                    }
                                     onValueChange={(val) =>
                                         setData('job_search_preferences', {
                                             ...data.job_search_preferences,
@@ -473,42 +533,60 @@ function ProfileSection({ user }: { user: UserData }) {
                                             {PREFERRED_WORK_SETUP_OPTIONS.find(
                                                 (o) =>
                                                     o.value ===
-                                                    data.job_search_preferences.work_setup,
+                                                    data.job_search_preferences
+                                                        .work_setup,
                                             )?.label ?? 'Select work setup'}
                                         </SelectValue>
                                     </SelectTrigger>
                                     <SelectContent side="bottom">
-                                        {PREFERRED_WORK_SETUP_OPTIONS.map((option) => (
-                                            <SelectItem
-                                                key={option.value}
-                                                value={option.value}
-                                            >
-                                                {option.label}
-                                            </SelectItem>
-                                        ))}
+                                        {PREFERRED_WORK_SETUP_OPTIONS.map(
+                                            (option) => (
+                                                <SelectItem
+                                                    key={option.value}
+                                                    value={option.value}
+                                                >
+                                                    {option.label}
+                                                </SelectItem>
+                                            ),
+                                        )}
                                     </SelectContent>
                                 </Select>
                             </div>
 
                             <div className="flex flex-col gap-2">
                                 <div className="flex items-center gap-1.5">
-<Label htmlFor="target_industry" className="text-xs">
-                                         Target Industry / Specialization <span className="text-red-500">*</span>
-                                     </Label>
+                                    <Label
+                                        htmlFor="target_industry"
+                                        className="text-xs"
+                                    >
+                                        Target Industry / Specialization{' '}
+                                        <span className="text-red-500">*</span>
+                                    </Label>
                                     <TooltipProvider>
                                         <Tooltip>
-                                            <TooltipTrigger type="button" className="text-muted-foreground hover:text-foreground cursor-help">
+                                            <TooltipTrigger
+                                                type="button"
+                                                className="cursor-help text-muted-foreground hover:text-foreground"
+                                            >
                                                 <HelpCircle className="size-3.5" />
                                             </TooltipTrigger>
                                             <TooltipContent side="top">
-                                                <p>Used by AI Resume Match & Cover Letter Copilot to provide domain-specific insights for your industry.</p>
+                                                <p>
+                                                    Used by AI Resume Match &
+                                                    Cover Letter Copilot to
+                                                    provide domain-specific
+                                                    insights for your industry.
+                                                </p>
                                             </TooltipContent>
                                         </Tooltip>
                                     </TooltipProvider>
                                 </div>
                                 <Input
                                     id="target_industry"
-                                    value={data.job_search_preferences.target_industry}
+                                    value={
+                                        data.job_search_preferences
+                                            .target_industry
+                                    }
                                     onChange={(e) =>
                                         setData('job_search_preferences', {
                                             ...data.job_search_preferences,
@@ -518,12 +596,16 @@ function ProfileSection({ user }: { user: UserData }) {
                                     placeholder="e.g. Software/SaaS, FinTech, E-Commerce"
                                 />
                                 <div className="flex flex-wrap items-center gap-1.5 pt-1">
-                                    <span className="text-[11px] font-medium text-muted-foreground">Suggested:</span>
+                                    <span className="text-[11px] font-medium text-muted-foreground">
+                                        Suggested:
+                                    </span>
                                     {SUGGESTED_INDUSTRIES.map((industry) => (
                                         <button
                                             key={industry}
                                             type="button"
-                                            onClick={() => addIndustrySuggestion(industry)}
+                                            onClick={() =>
+                                                addIndustrySuggestion(industry)
+                                            }
                                             className="rounded-md border border-border/60 bg-muted/50 px-2 py-0.5 text-[11px] font-medium text-muted-foreground transition-colors hover:border-primary/40 hover:bg-primary/10 hover:text-primary"
                                         >
                                             + {industry}
@@ -567,9 +649,11 @@ function PasswordSection() {
 
         if (!result.success) {
             clearErrors();
+
             for (const [field, message] of Object.entries(result.errors)) {
                 setError(field as keyof typeof data, message);
             }
+
             return;
         }
 
@@ -590,14 +674,16 @@ function PasswordSection() {
                         Update your password to keep your account secure.
                     </CardDescription>
                 </CardHeader>
-<CardContent className="flex flex-col gap-4">
-                     <p className="text-xs text-muted-foreground">
-                         Fields marked with <span className="text-red-500">*</span> are required.
-                     </p>
-                     <div className="flex flex-col gap-2">
-                         <Label htmlFor="current_password">
-                             Current Password <span className="text-red-500">*</span>
-                         </Label>
+                <CardContent className="flex flex-col gap-4">
+                    <p className="text-xs text-muted-foreground">
+                        Fields marked with{' '}
+                        <span className="text-red-500">*</span> are required.
+                    </p>
+                    <div className="flex flex-col gap-2">
+                        <Label htmlFor="current_password">
+                            Current Password{' '}
+                            <span className="text-red-500">*</span>
+                        </Label>
                         <PasswordInput
                             id="current_password"
                             value={data.current_password}
@@ -615,7 +701,9 @@ function PasswordSection() {
                     </div>
 
                     <div className="flex flex-col gap-2">
-                        <Label htmlFor="password">New Password <span className="text-red-500">*</span></Label>
+                        <Label htmlFor="password">
+                            New Password <span className="text-red-500">*</span>
+                        </Label>
                         <PasswordInput
                             id="password"
                             value={data.password}
@@ -633,9 +721,10 @@ function PasswordSection() {
                     </div>
 
                     <div className="flex flex-col gap-2">
-<Label htmlFor="password_confirmation">
-                             Confirm New Password <span className="text-red-500">*</span>
-                         </Label>
+                        <Label htmlFor="password_confirmation">
+                            Confirm New Password{' '}
+                            <span className="text-red-500">*</span>
+                        </Label>
                         <PasswordInput
                             id="password_confirmation"
                             value={data.password_confirmation}
@@ -984,9 +1073,10 @@ function TaxSettingsSection({ user }: { user: UserData }) {
                     </div>
                     <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                         <div className="flex flex-col gap-1.5">
-<Label htmlFor="override_sss" className="text-xs">
-                                 SSS Monthly (₱) <span className="text-red-500">*</span>
-                             </Label>
+                            <Label htmlFor="override_sss" className="text-xs">
+                                SSS Monthly (₱){' '}
+                                <span className="text-red-500">*</span>
+                            </Label>
                             <Input
                                 id="override_sss"
                                 type="number"
@@ -1005,12 +1095,13 @@ function TaxSettingsSection({ user }: { user: UserData }) {
                             />
                         </div>
                         <div className="flex flex-col gap-1.5">
-<Label
-                                 htmlFor="override_philhealth"
-                                 className="text-xs"
-                             >
-                                 PhilHealth Monthly (₱) <span className="text-red-500">*</span>
-                             </Label>
+                            <Label
+                                htmlFor="override_philhealth"
+                                className="text-xs"
+                            >
+                                PhilHealth Monthly (₱){' '}
+                                <span className="text-red-500">*</span>
+                            </Label>
                             <Input
                                 id="override_philhealth"
                                 type="number"
@@ -1029,12 +1120,13 @@ function TaxSettingsSection({ user }: { user: UserData }) {
                             />
                         </div>
                         <div className="flex flex-col gap-1.5">
-<Label
-                                 htmlFor="override_pagibig"
-                                 className="text-xs"
-                             >
-                                 Pag-IBIG Monthly (₱) <span className="text-red-500">*</span>
-                             </Label>
+                            <Label
+                                htmlFor="override_pagibig"
+                                className="text-xs"
+                            >
+                                Pag-IBIG Monthly (₱){' '}
+                                <span className="text-red-500">*</span>
+                            </Label>
                             <Input
                                 id="override_pagibig"
                                 type="number"
@@ -1053,12 +1145,13 @@ function TaxSettingsSection({ user }: { user: UserData }) {
                             />
                         </div>
                         <div className="flex flex-col gap-1.5">
-<Label
-                                 htmlFor="override_bir_tax"
-                                 className="text-xs"
-                             >
-                                 BIR Income Tax Monthly (₱) <span className="text-red-500">*</span>
-                             </Label>
+                            <Label
+                                htmlFor="override_bir_tax"
+                                className="text-xs"
+                            >
+                                BIR Income Tax Monthly (₱){' '}
+                                <span className="text-red-500">*</span>
+                            </Label>
                             <Input
                                 id="override_bir_tax"
                                 type="number"
@@ -1288,16 +1381,20 @@ function getInitialSettingsTab(): SettingsTab {
     if (typeof window !== 'undefined') {
         const urlParams = new URLSearchParams(window.location.search);
         const urlTab = urlParams.get('tab') as SettingsTab | null;
+
         if (urlTab && VALID_TABS.includes(urlTab)) {
             return urlTab;
         }
+
         const savedTab = localStorage.getItem(
             'settings_active_tab',
         ) as SettingsTab | null;
+
         if (savedTab && VALID_TABS.includes(savedTab)) {
             return savedTab;
         }
     }
+
     return 'profile';
 }
 
@@ -1308,6 +1405,7 @@ export default function SettingsIndex({ user }: SettingsPageProps) {
 
     const handleTabChange = (tab: SettingsTab) => {
         setActiveTabState(tab);
+
         if (typeof window !== 'undefined') {
             localStorage.setItem('settings_active_tab', tab);
             const url = new URL(window.location.href);

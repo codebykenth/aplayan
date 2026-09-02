@@ -40,9 +40,9 @@ it('stores a new job application for the authenticated user', function () {
 it('updates an existing job application owned by the user', function () {
     $application = JobApplication::factory()->create(['user_id' => $this->user->id]);
 
-    $response = $this->actingAs($this->user)->put(
+    $response = $this->actingAs($this->user)->from(route('job-applications.index'))->put(
         route('job-applications.update', $application),
-        ['company_name' => 'Updated Corp', 'job_title' => 'New Role', 'location' => 'Remote', 'status' => 'applied'],
+        ['company_name' => 'Updated Corp', 'job_title' => 'New Role', 'location' => 'Remote', 'work_setup' => 'remote', 'status' => 'applied'],
     );
 
     $response->assertRedirect(route('job-applications.index'));
@@ -85,7 +85,7 @@ it('returns 403 when deleting another users application', function () {
 it('validates required fields on store', function () {
     $response = $this->actingAs($this->user)->postJson(route('job-applications.store'), []);
 
-    $response->assertJsonValidationErrors(['company_name', 'job_title', 'location', 'status']);
+    $response->assertJsonValidationErrors(['company_name', 'job_title', 'work_setup', 'status']);
 });
 
 it('validates company name is a string on store', function () {
@@ -93,6 +93,7 @@ it('validates company name is a string on store', function () {
         'company_name' => 123,
         'job_title' => 'Engineer',
         'location' => 'Remote',
+        'work_setup' => 'remote',
         'status' => 'applied',
     ]);
 
@@ -104,6 +105,7 @@ it('validates status is a valid value', function () {
         'company_name' => 'Acme',
         'job_title' => 'Engineer',
         'location' => 'Remote',
+        'work_setup' => 'remote',
         'status' => 'invalid-status',
     ]);
 
@@ -113,9 +115,14 @@ it('validates status is a valid value', function () {
 it('validates required fields on update', function () {
     $application = JobApplication::factory()->create(['user_id' => $this->user->id]);
 
-    $response = $this->actingAs($this->user)->putJson(route('job-applications.update', $application), []);
+    $response = $this->actingAs($this->user)->putJson(route('job-applications.update', $application), [
+        'company_name' => '',
+        'job_title' => '',
+        'work_setup' => '',
+        'status' => '',
+    ]);
 
-    $response->assertJsonValidationErrors(['company_name', 'job_title', 'location', 'status']);
+    $response->assertJsonValidationErrors(['company_name', 'job_title', 'work_setup', 'status']);
 });
 
 it('updates status of an application owned by the user', function () {
@@ -124,7 +131,7 @@ it('updates status of an application owned by the user', function () {
         'status' => 'wishlist',
     ]);
 
-    $response = $this->actingAs($this->user)->patchJson(
+    $response = $this->actingAs($this->user)->from(route('job-applications.index'))->patchJson(
         route('job-applications.status', $application),
         ['status' => 'applied'],
     );

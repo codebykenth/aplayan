@@ -20,8 +20,9 @@ import {
     Monitor,
     Shield,
 } from 'lucide-react';
-import ApplicationLogo from '@/components/ui/application-logo';
 import { useState, useEffect } from 'react';
+import { AcceptTermsModal } from '@/components/domain/accept-terms-modal';
+import ApplicationLogo from '@/components/ui/application-logo';
 import {
     Tooltip,
     TooltipContent,
@@ -30,7 +31,6 @@ import {
 } from '@/components/ui/tooltip';
 import { useTheme } from '@/hooks/use-theme';
 import { privacyPolicy, termsOfService } from '@/routes';
-import { AcceptTermsModal } from '@/components/domain/accept-terms-modal';
 import type { Auth } from '@/types/auth';
 
 const sidebarLinks = [
@@ -86,7 +86,10 @@ function UserProfileMenu({
     const { mode, setMode } = useTheme();
 
     useEffect(() => {
-        if (!open) return;
+        if (!open) {
+            return;
+        }
+
         const close = (e: MouseEvent) => {
             if (
                 !(e.target as Element).closest('.user-profile-menu-container')
@@ -95,6 +98,7 @@ function UserProfileMenu({
             }
         };
         document.addEventListener('click', close);
+
         return () => document.removeEventListener('click', close);
     }, [open]);
 
@@ -140,7 +144,7 @@ function UserProfileMenu({
                     {user?.role === 'admin' && (
                         <Link
                             href="/admin/dashboard"
-                            className="flex w-full items-center gap-2 rounded-sm px-3 py-2 text-sm font-medium text-amber-600 dark:text-amber-400 transition-colors hover:bg-amber-50 dark:hover:bg-amber-950/50"
+                            className="flex w-full items-center gap-2 rounded-sm px-3 py-2 text-sm font-medium text-amber-600 transition-colors hover:bg-amber-50 dark:text-amber-400 dark:hover:bg-amber-950/50"
                             onClick={() => setOpen(false)}
                         >
                             <Shield className="h-4 w-4 text-amber-500" />
@@ -355,7 +359,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                                     <div className="mt-auto border-t border-border pt-2">
                                         <Link
                                             href="/admin/dashboard"
-                                            className="flex items-center gap-3 rounded-sm px-3 py-2 text-sm font-medium text-amber-600 dark:text-amber-400 transition-colors hover:bg-amber-50 dark:hover:bg-amber-950/50"
+                                            className="flex items-center gap-3 rounded-sm px-3 py-2 text-sm font-medium text-amber-600 transition-colors hover:bg-amber-50 dark:text-amber-400 dark:hover:bg-amber-950/50"
                                         >
                                             <Shield className="h-4 w-4 shrink-0 text-amber-500" />
                                             Admin Management
@@ -401,7 +405,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                                             render={
                                                 <Link
                                                     href="/admin/dashboard"
-                                                    className="mt-auto flex items-center justify-center rounded-sm border-t border-border px-2 pt-2 text-amber-600 dark:text-amber-400 hover:text-amber-500"
+                                                    className="mt-auto flex items-center justify-center rounded-sm border-t border-border px-2 pt-2 text-amber-600 hover:text-amber-500 dark:text-amber-400"
                                                 >
                                                     <Shield className="h-5 w-5 shrink-0 text-amber-500" />
                                                 </Link>
@@ -432,11 +436,17 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                     className={`shrink-0 border-t border-border px-3 py-2 text-xs text-muted-foreground ${isExpanded ? '' : 'hidden'}`}
                 >
                     <div className="flex items-center justify-center gap-3">
-                        <Link href={privacyPolicy.url()} className="hover:text-foreground transition-colors">
+                        <Link
+                            href={privacyPolicy.url()}
+                            className="transition-colors hover:text-foreground"
+                        >
                             Privacy
                         </Link>
                         <span className="text-border">|</span>
-                        <Link href={termsOfService.url()} className="hover:text-foreground transition-colors">
+                        <Link
+                            href={termsOfService.url()}
+                            className="transition-colors hover:text-foreground"
+                        >
                             Terms
                         </Link>
                     </div>
@@ -457,10 +467,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                     >
                         <Menu className="h-5 w-5 text-foreground" />
                     </button>
-                    <Link
-                        href="/"
-                        className="flex items-center"
-                    >
+                    <Link href="/" className="flex items-center">
                         <ApplicationLogo />
                     </Link>
                 </header>

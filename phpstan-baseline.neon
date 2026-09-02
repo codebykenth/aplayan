@@ -1,0 +1,1477 @@
+parameters:
+	ignoreErrors:
+		-
+			message: '#^Access to an undefined property App\\Models\\AiUsageLog\:\:\$calls\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Admin/AiUsageController.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\AiUsageLog\:\:\$total_calls\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Admin/AiUsageController.php
+
+		-
+			message: '#^Method App\\Http\\Controllers\\Admin\\AiUsageController\:\:aggregateDailyTokenUsage\(\) has parameter \$thirtyDaysAgo with no type specified\.$#'
+			identifier: missingType.parameter
+			count: 1
+			path: app/Http/Controllers/Admin/AiUsageController.php
+
+		-
+			message: '#^Method App\\Http\\Controllers\\Admin\\AiUsageController\:\:aggregateDailyTokenUsage\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Http/Controllers/Admin/AiUsageController.php
+
+		-
+			message: '#^Method App\\Http\\Controllers\\Admin\\AiUsageController\:\:aggregateKpis\(\) has parameter \$thirtyDaysAgo with no type specified\.$#'
+			identifier: missingType.parameter
+			count: 1
+			path: app/Http/Controllers/Admin/AiUsageController.php
+
+		-
+			message: '#^Method App\\Http\\Controllers\\Admin\\AiUsageController\:\:aggregateKpis\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Http/Controllers/Admin/AiUsageController.php
+
+		-
+			message: '#^Method App\\Http\\Controllers\\Admin\\AiUsageController\:\:aggregateTopConsumers\(\) has parameter \$thirtyDaysAgo with no type specified\.$#'
+			identifier: missingType.parameter
+			count: 1
+			path: app/Http/Controllers/Admin/AiUsageController.php
+
+		-
+			message: '#^Method App\\Http\\Controllers\\Admin\\AiUsageController\:\:aggregateTopConsumers\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Http/Controllers/Admin/AiUsageController.php
+
+		-
+			message: '#^Method App\\Http\\Controllers\\Admin\\AiUsageController\:\:aggregateTopFeatures\(\) has parameter \$thirtyDaysAgo with no type specified\.$#'
+			identifier: missingType.parameter
+			count: 1
+			path: app/Http/Controllers/Admin/AiUsageController.php
+
+		-
+			message: '#^Method App\\Http\\Controllers\\Admin\\AiUsageController\:\:aggregateTopFeatures\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Http/Controllers/Admin/AiUsageController.php
+
+		-
+			message: '#^Using nullsafe property access "\?\-\>email" on left side of \?\? is unnecessary\. Use \-\> instead\.$#'
+			identifier: nullsafe.neverNull
+			count: 1
+			path: app/Http/Controllers/Admin/AiUsageController.php
+
+		-
+			message: '#^Using nullsafe property access "\?\-\>is_ai_disabled" on left side of \?\? is unnecessary\. Use \-\> instead\.$#'
+			identifier: nullsafe.neverNull
+			count: 1
+			path: app/Http/Controllers/Admin/AiUsageController.php
+
+		-
+			message: '#^Using nullsafe property access "\?\-\>name" on left side of \?\? is unnecessary\. Use \-\> instead\.$#'
+			identifier: nullsafe.neverNull
+			count: 1
+			path: app/Http/Controllers/Admin/AiUsageController.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\JobApplication\|Illuminate\\Database\\Eloquent\\Collection\<int, App\\Models\\JobApplication\>\:\:\$user_id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/ContactController.php
+
+		-
+			message: '#^Parameter \#2 \$jobApplication of method App\\Services\\ContactService\:\:linkToApplication\(\) expects App\\Models\\JobApplication, App\\Models\\JobApplication\|Illuminate\\Database\\Eloquent\\Collection\<int, App\\Models\\JobApplication\> given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Http/Controllers/ContactController.php
+
+		-
+			message: '#^Parameter \#2 \$jobApplication of method App\\Services\\ContactService\:\:unlinkFromApplication\(\) expects App\\Models\\JobApplication, App\\Models\\JobApplication\|Illuminate\\Database\\Eloquent\\Collection\<int, App\\Models\\JobApplication\> given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Http/Controllers/ContactController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$content\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/DocumentController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$created_at\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Http/Controllers/DocumentController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$id\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Http/Controllers/DocumentController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$name\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/DocumentController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$profile_data\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/DocumentController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$target_company\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/DocumentController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$target_job_title\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/DocumentController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$template\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/DocumentController.php
+
+		-
+			message: '#^Method App\\Http\\Controllers\\DocumentController\:\:saveCoverLetter\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: app/Http/Controllers/DocumentController.php
+
+		-
+			message: '#^Parameter \#1 \$callback of method Illuminate\\Database\\Eloquent\\Collection\<int,Illuminate\\Database\\Eloquent\\Model\>\:\:map\(\) contains unresolvable type\.$#'
+			identifier: argument.unresolvableType
+			count: 2
+			path: app/Http/Controllers/DocumentController.php
+
+		-
+			message: '#^Parameter \#1 \$profile of method App\\Services\\ResumeProfileService\:\:buildProfileText\(\) expects App\\Models\\ResumeProfile, Illuminate\\Database\\Eloquent\\Model given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Http/Controllers/DocumentController.php
+
+		-
+			message: '#^Return type of call to method Illuminate\\Database\\Eloquent\\Collection\<int,Illuminate\\Database\\Eloquent\\Model\>\:\:map\(\) contains unresolvable type\.$#'
+			identifier: method.unresolvableReturnType
+			count: 2
+			path: app/Http/Controllers/DocumentController.php
+
+		-
+			message: '#^Parameter \#3 \$daysSinceContact of method App\\Services\\AiCacheService\:\:followUpEmail\(\) expects int, float\|int given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Http/Controllers/FollowUpEmailController.php
+
+		-
+			message: '#^Method App\\Http\\Controllers\\GoalController\:\:update\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: app/Http/Controllers/GoalController.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Contracts\\Pagination\\LengthAwarePaginator\:\:load\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: app/Http/Controllers/JobApplicationController.php
+
+		-
+			message: '#^Method App\\Http\\Controllers\\JobApplicationExportController\:\:buildCsv\(\) has parameter \$applications with no value type specified in iterable type iterable\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Http/Controllers/JobApplicationExportController.php
+
+		-
+			message: '#^Parameter \#1 \$applications of method App\\Http\\Controllers\\JobApplicationExportController\:\:buildCsv\(\) expects iterable, Illuminate\\Contracts\\Pagination\\LengthAwarePaginator given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Http/Controllers/JobApplicationExportController.php
+
+		-
+			message: '#^Parameter \#1 \$stream of function fclose expects resource, resource\|false given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Http/Controllers/JobApplicationExportController.php
+
+		-
+			message: '#^Parameter \#1 \$stream of function fputcsv expects resource, resource\|false given\.$#'
+			identifier: argument.type
+			count: 2
+			path: app/Http/Controllers/JobApplicationExportController.php
+
+		-
+			message: '#^Parameter \#1 \$stream of function rewind expects resource, resource\|false given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Http/Controllers/JobApplicationExportController.php
+
+		-
+			message: '#^Parameter \#1 \$stream of function stream_get_contents expects resource, resource\|false given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Http/Controllers/JobApplicationExportController.php
+
+		-
+			message: '#^Method App\\Http\\Requests\\AiImproveCoverLetterRequest\:\:rules\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Http/Requests/AiImproveCoverLetterRequest.php
+
+		-
+			message: '#^Method App\\Http\\Requests\\AiMatchRequest\:\:rules\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Http/Requests/AiMatchRequest.php
+
+		-
+			message: '#^Method App\\Http\\Requests\\AiPolishResumeRequest\:\:rules\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Http/Requests/AiPolishResumeRequest.php
+
+		-
+			message: '#^Method App\\Http\\Requests\\GenerateCoverLetterRequest\:\:rules\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Http/Requests/GenerateCoverLetterRequest.php
+
+		-
+			message: '#^Method App\\Http\\Requests\\JobApplicationImportRequest\:\:getCsvHeaders\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Http/Requests/JobApplicationImportRequest.php
+
+		-
+			message: '#^Method App\\Http\\Requests\\JobApplicationImportRequest\:\:rules\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Http/Requests/JobApplicationImportRequest.php
+
+		-
+			message: '#^Parameter \#1 \$callback of function array_map expects \(callable\(string\|null\)\: mixed\)\|null, ''trim'' given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Http/Requests/JobApplicationImportRequest.php
+
+		-
+			message: '#^Method App\\Http\\Requests\\LinkContactRequest\:\:rules\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Http/Requests/LinkContactRequest.php
+
+		-
+			message: '#^Method App\\Http\\Requests\\MarkAsContactedRequest\:\:rules\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Http/Requests/MarkAsContactedRequest.php
+
+		-
+			message: '#^Method App\\Http\\Requests\\SaveCoverLetterRequest\:\:rules\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Http/Requests/SaveCoverLetterRequest.php
+
+		-
+			message: '#^Method App\\Http\\Requests\\SaveResumeRequest\:\:rules\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Http/Requests/SaveResumeRequest.php
+
+		-
+			message: '#^Method App\\Http\\Requests\\StoreApplicationTemplateRequest\:\:rules\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Http/Requests/StoreApplicationTemplateRequest.php
+
+		-
+			message: '#^Method App\\Http\\Requests\\StoreContactRequest\:\:rules\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Http/Requests/StoreContactRequest.php
+
+		-
+			message: '#^Method App\\Http\\Requests\\StoreJobApplicationRequest\:\:rules\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Http/Requests/StoreJobApplicationRequest.php
+
+		-
+			message: '#^Method App\\Http\\Requests\\UpdateApplicationTemplateRequest\:\:rules\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Http/Requests/UpdateApplicationTemplateRequest.php
+
+		-
+			message: '#^Method App\\Http\\Requests\\UpdateColorThemeRequest\:\:rules\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Http/Requests/UpdateColorThemeRequest.php
+
+		-
+			message: '#^Method App\\Http\\Requests\\UpdateContactRequest\:\:rules\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Http/Requests/UpdateContactRequest.php
+
+		-
+			message: '#^Method App\\Http\\Requests\\UpdateGoalRequest\:\:rules\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Http/Requests/UpdateGoalRequest.php
+
+		-
+			message: '#^Method App\\Http\\Requests\\UpdateInterviewDateRequest\:\:rules\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Http/Requests/UpdateInterviewDateRequest.php
+
+		-
+			message: '#^Method App\\Http\\Requests\\UpdateJobApplicationRequest\:\:rules\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Http/Requests/UpdateJobApplicationRequest.php
+
+		-
+			message: '#^Method App\\Http\\Requests\\UpdateJobApplicationStatusRequest\:\:rules\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Http/Requests/UpdateJobApplicationStatusRequest.php
+
+		-
+			message: '#^Method App\\Http\\Requests\\UpdatePasswordRequest\:\:rules\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Http/Requests/UpdatePasswordRequest.php
+
+		-
+			message: '#^Method App\\Http\\Requests\\UpdateProfileRequest\:\:rules\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Http/Requests/UpdateProfileRequest.php
+
+		-
+			message: '#^Method App\\Http\\Requests\\UpdateResumeProfileRequest\:\:rules\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Http/Requests/UpdateResumeProfileRequest.php
+
+		-
+			message: '#^Method App\\Http\\Requests\\UpdateTaxSettingsRequest\:\:rules\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Http/Requests/UpdateTaxSettingsRequest.php
+
+		-
+			message: '#^Method App\\Http\\Requests\\UpdateThemeRequest\:\:rules\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Http/Requests/UpdateThemeRequest.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$base_currency\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/JobApplicationResource.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$company_name\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/JobApplicationResource.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$created_at\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/JobApplicationResource.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$description\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/JobApplicationResource.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$email\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/JobApplicationResource.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$id\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Http/Resources/JobApplicationResource.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$name\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/JobApplicationResource.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$phone\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/JobApplicationResource.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$role\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/JobApplicationResource.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$tax_settings\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/JobApplicationResource.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$type\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/JobApplicationResource.php
+
+		-
+			message: '#^Cannot call method toDateString\(\) on string\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: app/Http/Resources/JobApplicationResource.php
+
+		-
+			message: '#^Method App\\Http\\Resources\\JobApplicationResource\:\:toArray\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Http/Resources/JobApplicationResource.php
+
+		-
+			message: '#^Parameter \#1 \$callback of method Illuminate\\Database\\Eloquent\\Collection\<int,Illuminate\\Database\\Eloquent\\Model\>\:\:map\(\) contains unresolvable type\.$#'
+			identifier: argument.unresolvableType
+			count: 2
+			path: app/Http/Resources/JobApplicationResource.php
+
+		-
+			message: '#^Parameter \#2 \$taxConfig of method App\\Services\\PhilippineTaxCalculatorService\:\:computeMonthlyNetPay\(\) expects array\|null, string\|null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Http/Resources/JobApplicationResource.php
+
+		-
+			message: '#^Return type of call to method Illuminate\\Database\\Eloquent\\Collection\<int,Illuminate\\Database\\Eloquent\\Model\>\:\:map\(\) contains unresolvable type\.$#'
+			identifier: method.unresolvableReturnType
+			count: 2
+			path: app/Http/Resources/JobApplicationResource.php
+
+		-
+			message: '#^Using nullsafe property access "\?\-\>base_currency" on left side of \?\? is unnecessary\. Use \-\> instead\.$#'
+			identifier: nullsafe.neverNull
+			count: 1
+			path: app/Http/Resources/JobApplicationResource.php
+
+		-
+			message: '#^Class App\\Models\\AiResponseCache has PHPDoc tag @property for property \$response_data with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Models/AiResponseCache.php
+
+		-
+			message: '#^Method App\\Models\\AiResponseCache\:\:scopeByCanonicalKey\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: app/Models/AiResponseCache.php
+
+		-
+			message: '#^Method App\\Models\\AiResponseCache\:\:scopeByCanonicalKey\(\) has parameter \$query with no type specified\.$#'
+			identifier: missingType.parameter
+			count: 1
+			path: app/Models/AiResponseCache.php
+
+		-
+			message: '#^Method App\\Models\\AiUsageLog\:\:user\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\BelongsTo does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/AiUsageLog.php
+
+		-
+			message: '#^Method App\\Models\\ApplicationTemplate\:\:user\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\BelongsTo does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/ApplicationTemplate.php
+
+		-
+			message: '#^PHPDoc tag @property for property App\\Models\\ApplicationTemplate\:\:\$created_at contains unknown class App\\Models\\Carbon\.$#'
+			identifier: class.notFound
+			count: 1
+			path: app/Models/ApplicationTemplate.php
+
+		-
+			message: '#^PHPDoc tag @property for property App\\Models\\ApplicationTemplate\:\:\$updated_at contains unknown class App\\Models\\Carbon\.$#'
+			identifier: class.notFound
+			count: 1
+			path: app/Models/ApplicationTemplate.php
+
+		-
+			message: '#^Method App\\Models\\Contact\:\:getJobApplicationIdsAttribute\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Models/Contact.php
+
+		-
+			message: '#^Method App\\Models\\Contact\:\:jobApplications\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\BelongsToMany does not specify its types\: TRelatedModel, TDeclaringModel, TPivotModel, TAccessor \(2\-4 required\)$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/Contact.php
+
+		-
+			message: '#^Method App\\Models\\Contact\:\:user\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\BelongsTo does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/Contact.php
+
+		-
+			message: '#^Class App\\Models\\JobApplication has PHPDoc tag @property for property \$ai_gaps with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Models/JobApplication.php
+
+		-
+			message: '#^Class App\\Models\\JobApplication has PHPDoc tag @property for property \$ai_interview_prep with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Models/JobApplication.php
+
+		-
+			message: '#^Class App\\Models\\JobApplication has PHPDoc tag @property for property \$ai_strengths with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Models/JobApplication.php
+
+		-
+			message: '#^Method App\\Models\\JobApplication\:\:activities\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\HasMany does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/JobApplication.php
+
+		-
+			message: '#^Method App\\Models\\JobApplication\:\:contacts\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\BelongsToMany does not specify its types\: TRelatedModel, TDeclaringModel, TPivotModel, TAccessor \(2\-4 required\)$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/JobApplication.php
+
+		-
+			message: '#^Method App\\Models\\JobApplication\:\:user\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\BelongsTo does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/JobApplication.php
+
+		-
+			message: '#^Method App\\Models\\JobApplicationActivity\:\:jobApplication\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\BelongsTo does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/JobApplicationActivity.php
+
+		-
+			message: '#^Class App\\Models\\ResumeProfile has PHPDoc tag @property for property \$additional_info with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Models/ResumeProfile.php
+
+		-
+			message: '#^Class App\\Models\\ResumeProfile has PHPDoc tag @property for property \$certifications with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Models/ResumeProfile.php
+
+		-
+			message: '#^Class App\\Models\\ResumeProfile has PHPDoc tag @property for property \$education with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Models/ResumeProfile.php
+
+		-
+			message: '#^Class App\\Models\\ResumeProfile has PHPDoc tag @property for property \$projects with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Models/ResumeProfile.php
+
+		-
+			message: '#^Class App\\Models\\ResumeProfile has PHPDoc tag @property for property \$skills with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Models/ResumeProfile.php
+
+		-
+			message: '#^Class App\\Models\\ResumeProfile has PHPDoc tag @property for property \$work_experience with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Models/ResumeProfile.php
+
+		-
+			message: '#^Method App\\Models\\ResumeProfile\:\:user\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\BelongsTo does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/ResumeProfile.php
+
+		-
+			message: '#^Method App\\Models\\SavedCoverLetter\:\:user\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\BelongsTo does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/SavedCoverLetter.php
+
+		-
+			message: '#^Method App\\Models\\SavedResume\:\:user\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\BelongsTo does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/SavedResume.php
+
+		-
+			message: '#^Class App\\Models\\User has PHPDoc tag @property for property \$job_search_preferences with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Models/User.php
+
+		-
+			message: '#^Method App\\Models\\User\:\:aiUsageLogs\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\HasMany does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/User.php
+
+		-
+			message: '#^Method App\\Models\\User\:\:applicationTemplates\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\HasMany does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/User.php
+
+		-
+			message: '#^Method App\\Models\\User\:\:contacts\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\HasMany does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/User.php
+
+		-
+			message: '#^Method App\\Models\\User\:\:jobApplications\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\HasMany does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/User.php
+
+		-
+			message: '#^Method App\\Models\\User\:\:resumeProfile\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\HasOne does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/User.php
+
+		-
+			message: '#^Method App\\Models\\User\:\:savedCoverLetters\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\HasMany does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/User.php
+
+		-
+			message: '#^Method App\\Models\\User\:\:savedResumes\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\HasMany does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/User.php
+
+		-
+			message: '#^Using nullsafe property access "\?\-\>id" on left side of \?\? is unnecessary\. Use \-\> instead\.$#'
+			identifier: nullsafe.neverNull
+			count: 4
+			path: app/Providers/AppServiceProvider.php
+
+		-
+			message: '#^Method App\\Services\\ActionFeedService\:\:buildItem\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Services/ActionFeedService.php
+
+		-
+			message: '#^Method App\\Services\\ActionFeedService\:\:computeActionItems\(\) return type with generic class Illuminate\\Support\\Collection does not specify its types\: TKey, TValue$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Services/ActionFeedService.php
+
+		-
+			message: '#^Method App\\Services\\ActionFeedService\:\:forUser\(\) return type with generic class Illuminate\\Support\\Collection does not specify its types\: TKey, TValue$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Services/ActionFeedService.php
+
+		-
+			message: '#^Method App\\Services\\ActionFeedService\:\:highMatchWishlist\(\) has parameter \$applications with generic class Illuminate\\Support\\Collection but does not specify its types\: TKey, TValue$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Services/ActionFeedService.php
+
+		-
+			message: '#^Method App\\Services\\ActionFeedService\:\:highMatchWishlist\(\) return type with generic class Illuminate\\Support\\Collection does not specify its types\: TKey, TValue$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Services/ActionFeedService.php
+
+		-
+			message: '#^Method App\\Services\\ActionFeedService\:\:rejectionMomentum\(\) has parameter \$applications with generic class Illuminate\\Support\\Collection but does not specify its types\: TKey, TValue$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Services/ActionFeedService.php
+
+		-
+			message: '#^Method App\\Services\\ActionFeedService\:\:rejectionMomentum\(\) return type with generic class Illuminate\\Support\\Collection does not specify its types\: TKey, TValue$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Services/ActionFeedService.php
+
+		-
+			message: '#^Method App\\Services\\ActionFeedService\:\:salaryNegotiations\(\) has parameter \$applications with generic class Illuminate\\Support\\Collection but does not specify its types\: TKey, TValue$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Services/ActionFeedService.php
+
+		-
+			message: '#^Method App\\Services\\ActionFeedService\:\:salaryNegotiations\(\) return type with generic class Illuminate\\Support\\Collection does not specify its types\: TKey, TValue$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Services/ActionFeedService.php
+
+		-
+			message: '#^Method App\\Services\\ActionFeedService\:\:staleFollowUps\(\) has parameter \$applications with generic class Illuminate\\Support\\Collection but does not specify its types\: TKey, TValue$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Services/ActionFeedService.php
+
+		-
+			message: '#^Method App\\Services\\ActionFeedService\:\:staleFollowUps\(\) return type with generic class Illuminate\\Support\\Collection does not specify its types\: TKey, TValue$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Services/ActionFeedService.php
+
+		-
+			message: '#^Method App\\Services\\ActionFeedService\:\:upcomingInterviews\(\) has parameter \$applications with generic class Illuminate\\Support\\Collection but does not specify its types\: TKey, TValue$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Services/ActionFeedService.php
+
+		-
+			message: '#^Method App\\Services\\ActionFeedService\:\:upcomingInterviews\(\) return type with generic class Illuminate\\Support\\Collection does not specify its types\: TKey, TValue$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Services/ActionFeedService.php
+
+		-
+			message: '#^Strict comparison using \=\=\= between float and 0 will always evaluate to false\.$#'
+			identifier: identical.alwaysFalse
+			count: 1
+			path: app/Services/ActionFeedService.php
+
+		-
+			message: '#^Strict comparison using \=\=\= between float and 1 will always evaluate to false\.$#'
+			identifier: identical.alwaysFalse
+			count: 1
+			path: app/Services/ActionFeedService.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$company_name\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Services/ActivityService.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Services/ActivityService.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$job_title\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Services/ActivityService.php
+
+		-
+			message: '#^Method App\\Services\\ActivityService\:\:recentForUser\(\) return type with generic class Illuminate\\Support\\Collection does not specify its types\: TKey, TValue$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Services/ActivityService.php
+
+		-
+			message: '#^Parameter \#1 \$callback of method Illuminate\\Database\\Eloquent\\Collection\<int,App\\Models\\JobApplicationActivity\>\:\:map\(\) contains unresolvable type\.$#'
+			identifier: argument.unresolvableType
+			count: 1
+			path: app/Services/ActivityService.php
+
+		-
+			message: '#^Return type of call to method Illuminate\\Database\\Eloquent\\Collection\<int,App\\Models\\JobApplicationActivity\>\:\:map\(\) contains unresolvable type\.$#'
+			identifier: method.unresolvableReturnType
+			count: 1
+			path: app/Services/ActivityService.php
+
+		-
+			message: '#^Method App\\Services\\AiCacheService\:\:getFromCache\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Services/AiCacheService.php
+
+		-
+			message: '#^Method App\\Services\\AiCacheService\:\:getRateLimitInfo\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Services/AiCacheService.php
+
+		-
+			message: '#^Method App\\Services\\AiCacheService\:\:interviewPrep\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Services/AiCacheService.php
+
+		-
+			message: '#^Method App\\Services\\AiCacheService\:\:logUsage\(\) has parameter \$usageMetadata with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Services/AiCacheService.php
+
+		-
+			message: '#^Method App\\Services\\AiCacheService\:\:resumeMatch\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Services/AiCacheService.php
+
+		-
+			message: '#^Method App\\Services\\AiCacheService\:\:salaryCheck\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Services/AiCacheService.php
+
+		-
+			message: '#^Method App\\Services\\AiCacheService\:\:storeInCache\(\) has parameter \$responseData with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Services/AiCacheService.php
+
+		-
+			message: '#^Using nullsafe property access "\?\-\>custom_ai_daily_limit" on left side of \?\? is unnecessary\. Use \-\> instead\.$#'
+			identifier: nullsafe.neverNull
+			count: 1
+			path: app/Services/AiCacheService.php
+
+		-
+			message: '#^Method App\\Services\\AiFallbackService\:\:computeJobMatchScore\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Services/AiFallbackService.php
+
+		-
+			message: '#^Method App\\Services\\AiFallbackService\:\:extractSignificantWords\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Services/AiFallbackService.php
+
+		-
+			message: '#^Parameter \#1 \$array of function array_filter expects array, list\<string\>\|false given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Services/AiFallbackService.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$activities\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Services/AnalyticsService.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$company_name\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Services/AnalyticsService.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$date\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Services/AnalyticsService.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$date_applied\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Services/AnalyticsService.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$expected_salary\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Services/AnalyticsService.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$job_title\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Services/AnalyticsService.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$last_contacted_at\.$#'
+			identifier: property.notFound
+			count: 3
+			path: app/Services/AnalyticsService.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$offered_salary\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Services/AnalyticsService.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$status\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Services/AnalyticsService.php
+
+		-
+			message: '#^Method App\\Services\\AnalyticsService\:\:bandLabel\(\) has parameter \$bands with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Services/AnalyticsService.php
+
+		-
+			message: '#^Method App\\Services\\AnalyticsService\:\:funnel\(\) return type with generic class Illuminate\\Support\\Collection does not specify its types\: TKey, TValue$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Services/AnalyticsService.php
+
+		-
+			message: '#^Method App\\Services\\AnalyticsService\:\:salaryBands\(\) return type with generic class Illuminate\\Support\\Collection does not specify its types\: TKey, TValue$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Services/AnalyticsService.php
+
+		-
+			message: '#^Method App\\Services\\AnalyticsService\:\:salaryInsights\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Services/AnalyticsService.php
+
+		-
+			message: '#^Method App\\Services\\AnalyticsService\:\:statusOverTime\(\) return type with generic class Illuminate\\Support\\Collection does not specify its types\: TKey, TValue$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Services/AnalyticsService.php
+
+		-
+			message: '#^Method App\\Services\\AnalyticsService\:\:timeToResponse\(\) return type with generic class Illuminate\\Support\\Collection does not specify its types\: TKey, TValue$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Services/AnalyticsService.php
+
+		-
+			message: '#^Method App\\Services\\AnalyticsService\:\:weeklyVolume\(\) return type with generic class Illuminate\\Support\\Collection does not specify its types\: TKey, TValue$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Services/AnalyticsService.php
+
+		-
+			message: '#^Parameter \#1 \$array of function array_values contains unresolvable type\.$#'
+			identifier: argument.unresolvableType
+			count: 1
+			path: app/Services/AnalyticsService.php
+
+		-
+			message: '#^Parameter \#1 \$callback of method Illuminate\\Database\\Eloquent\\Collection\<int,Illuminate\\Database\\Eloquent\\Model\>\:\:map\(\) contains unresolvable type\.$#'
+			identifier: argument.unresolvableType
+			count: 1
+			path: app/Services/AnalyticsService.php
+
+		-
+			message: '#^Parameter \#1 \$value of function collect contains unresolvable type\.$#'
+			identifier: argument.unresolvableType
+			count: 1
+			path: app/Services/AnalyticsService.php
+
+		-
+			message: '#^Parameter \#3 \$callback of static method Illuminate\\Cache\\Repository\:\:remember\(\) contains unresolvable type\.$#'
+			identifier: argument.unresolvableType
+			count: 1
+			path: app/Services/AnalyticsService.php
+
+		-
+			message: '#^Return type of call to function array_values contains unresolvable type\.$#'
+			identifier: function.unresolvableReturnType
+			count: 1
+			path: app/Services/AnalyticsService.php
+
+		-
+			message: '#^Return type of call to function collect contains unresolvable type\.$#'
+			identifier: function.unresolvableReturnType
+			count: 1
+			path: app/Services/AnalyticsService.php
+
+		-
+			message: '#^Return type of call to method Illuminate\\Database\\Eloquent\\Collection\<int,Illuminate\\Database\\Eloquent\\Model\>\:\:map\(\) contains unresolvable type\.$#'
+			identifier: method.unresolvableReturnType
+			count: 1
+			path: app/Services/AnalyticsService.php
+
+		-
+			message: '#^Return type of call to static method Illuminate\\Cache\\Repository\:\:remember\(\) contains unresolvable type\.$#'
+			identifier: staticMethod.unresolvableReturnType
+			count: 1
+			path: app/Services/AnalyticsService.php
+
+		-
+			message: '#^Method App\\Services\\ApplicationTemplateService\:\:createForUser\(\) has parameter \$data with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Services/ApplicationTemplateService.php
+
+		-
+			message: '#^Method App\\Services\\ApplicationTemplateService\:\:createForUser\(\) should return App\\Models\\ApplicationTemplate but returns Illuminate\\Database\\Eloquent\\Model\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Services/ApplicationTemplateService.php
+
+		-
+			message: '#^Method App\\Services\\ApplicationTemplateService\:\:listForUser\(\) return type with generic class Illuminate\\Support\\Collection does not specify its types\: TKey, TValue$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Services/ApplicationTemplateService.php
+
+		-
+			message: '#^Method App\\Services\\ApplicationTemplateService\:\:prefillData\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Services/ApplicationTemplateService.php
+
+		-
+			message: '#^Method App\\Services\\ApplicationTemplateService\:\:updateForUser\(\) has parameter \$data with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Services/ApplicationTemplateService.php
+
+		-
+			message: '#^Method App\\Services\\CalendarService\:\:eventsForUser\(\) return type with generic class Illuminate\\Support\\Collection does not specify its types\: TKey, TValue$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Services/CalendarService.php
+
+		-
+			message: '#^Method App\\Services\\CalendarService\:\:getMonthRange\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Services/CalendarService.php
+
+		-
+			message: '#^Method App\\Services\\CalendarService\:\:transformToEvents\(\) has parameter \$applications with generic class Illuminate\\Support\\Collection but does not specify its types\: TKey, TValue$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Services/CalendarService.php
+
+		-
+			message: '#^Method App\\Services\\CalendarService\:\:transformToEvents\(\) return type with generic class Illuminate\\Support\\Collection does not specify its types\: TKey, TValue$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Services/CalendarService.php
+
+		-
+			message: '#^Method App\\Services\\ContactService\:\:createForUser\(\) has parameter \$data with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Services/ContactService.php
+
+		-
+			message: '#^Method App\\Services\\ContactService\:\:createForUser\(\) should return App\\Models\\Contact but returns Illuminate\\Database\\Eloquent\\Model\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Services/ContactService.php
+
+		-
+			message: '#^Method App\\Services\\ContactService\:\:listForUser\(\) return type with generic class Illuminate\\Database\\Eloquent\\Collection does not specify its types\: TKey, TModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Services/ContactService.php
+
+		-
+			message: '#^Method App\\Services\\ContactService\:\:updateForUser\(\) has parameter \$data with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Services/ContactService.php
+
+		-
+			message: '#^Parameter \#1 \$contact of method App\\Services\\ContactService\:\:linkToApplication\(\) expects App\\Models\\Contact, Illuminate\\Database\\Eloquent\\Model given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Services/ContactService.php
+
+		-
+			message: '#^Parameter \#2 \$jobApplication of method App\\Services\\ContactService\:\:linkToApplication\(\) expects App\\Models\\JobApplication, Illuminate\\Database\\Eloquent\\Collection\<int, Illuminate\\Database\\Eloquent\\Model\>\|Illuminate\\Database\\Eloquent\\Model given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Services/ContactService.php
+
+		-
+			message: '#^Method App\\Services\\DashboardMetricsService\:\:avgMatchScoreForUser\(\) should return int\|null but returns float\|null\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Services/DashboardMetricsService.php
+
+		-
+			message: '#^Method App\\Services\\DashboardMetricsService\:\:statusCountsForUser\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Services/DashboardMetricsService.php
+
+		-
+			message: '#^Method App\\Services\\DashboardMetricsService\:\:trendForUser\(\) return type with generic class Illuminate\\Support\\Collection does not specify its types\: TKey, TValue$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Services/DashboardMetricsService.php
+
+		-
+			message: '#^Method App\\Services\\FxExchangeService\:\:fetchRates\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Services/FxExchangeService.php
+
+		-
+			message: '#^Method App\\Services\\FxExchangeService\:\:getRates\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Services/FxExchangeService.php
+
+		-
+			message: '#^Method App\\Services\\FxExchangeService\:\:getSupportedCurrencies\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Services/FxExchangeService.php
+
+		-
+			message: '#^Method App\\Services\\GeminiService\:\:analyzeResumeMatch\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Services/GeminiService.php
+
+		-
+			message: '#^Method App\\Services\\GeminiService\:\:estimateSalary\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Services/GeminiService.php
+
+		-
+			message: '#^Method App\\Services\\GeminiService\:\:extractJson\(\) has parameter \$expectedKeys with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Services/GeminiService.php
+
+		-
+			message: '#^Method App\\Services\\GeminiService\:\:extractJson\(\) has parameter \$response with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Services/GeminiService.php
+
+		-
+			message: '#^Method App\\Services\\GeminiService\:\:extractJson\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Services/GeminiService.php
+
+		-
+			message: '#^Method App\\Services\\GeminiService\:\:generateInterviewPrep\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Services/GeminiService.php
+
+		-
+			message: '#^Method App\\Services\\GeminiService\:\:getLastUsageMetadata\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Services/GeminiService.php
+
+		-
+			message: '#^Method App\\Services\\GeminiService\:\:sendRequest\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Services/GeminiService.php
+
+		-
+			message: '#^Property App\\Services\\GeminiService\:\:\$lastUsageMetadata type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Services/GeminiService.php
+
+		-
+			message: '#^Ternary operator condition is always true\.$#'
+			identifier: ternary.alwaysTrue
+			count: 1
+			path: app/Services/GeminiService.php
+
+		-
+			message: '#^Using nullsafe method call on non\-nullable type Illuminate\\Http\\Client\\Response\. Use \-\> instead\.$#'
+			identifier: nullsafe.neverNull
+			count: 1
+			path: app/Services/GeminiService.php
+
+		-
+			message: '#^Method App\\Services\\GoalService\:\:forUser\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Services/GoalService.php
+
+		-
+			message: '#^Method App\\Services\\GoalService\:\:weeklyHistory\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Services/GoalService.php
+
+		-
+			message: '#^Method App\\Services\\JobApplicationImportService\:\:import\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Services/JobApplicationImportService.php
+
+		-
+			message: '#^Method App\\Services\\JobApplicationImportService\:\:isValid\(\) has parameter \$data with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Services/JobApplicationImportService.php
+
+		-
+			message: '#^Method App\\Services\\JobApplicationImportService\:\:mapRow\(\) has parameter \$row with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Services/JobApplicationImportService.php
+
+		-
+			message: '#^Method App\\Services\\JobApplicationImportService\:\:mapRow\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Services/JobApplicationImportService.php
+
+		-
+			message: '#^Method App\\Services\\JobApplicationImportService\:\:parseCsv\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Services/JobApplicationImportService.php
+
+		-
+			message: '#^Method App\\Services\\JobApplicationImportService\:\:parseJson\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Services/JobApplicationImportService.php
+
+		-
+			message: '#^Parameter \#1 \$callback of function array_map expects \(callable\(string\|null\)\: mixed\)\|null, ''trim'' given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Services/JobApplicationImportService.php
+
+		-
+			message: '#^Constant App\\Services\\JobApplicationService\:\:STATUS_ORDER is unused\.$#'
+			identifier: classConstant.unused
+			count: 1
+			path: app/Services/JobApplicationService.php
+
+		-
+			message: '#^Method App\\Services\\JobApplicationService\:\:createForUser\(\) has parameter \$data with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Services/JobApplicationService.php
+
+		-
+			message: '#^Method App\\Services\\JobApplicationService\:\:createForUser\(\) should return App\\Models\\JobApplication but returns Illuminate\\Database\\Eloquent\\Model\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Services/JobApplicationService.php
+
+		-
+			message: '#^Method App\\Services\\JobApplicationService\:\:daysSinceLastUpdate\(\) should return int but returns float\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Services/JobApplicationService.php
+
+		-
+			message: '#^Method App\\Services\\JobApplicationService\:\:daysSinceLastUpdate\(\) should return int but returns float\|int\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Services/JobApplicationService.php
+
+		-
+			message: '#^Method App\\Services\\JobApplicationService\:\:listForUser\(\) return type with generic interface Illuminate\\Contracts\\Pagination\\LengthAwarePaginator does not specify its types\: TKey, TValue$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Services/JobApplicationService.php
+
+		-
+			message: '#^Method App\\Services\\JobApplicationService\:\:updateForUser\(\) has parameter \$data with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Services/JobApplicationService.php
+
+		-
+			message: '#^Constant App\\Services\\PhilippineTaxCalculatorService\:\:PHILHEALTH_RATE is unused\.$#'
+			identifier: classConstant.unused
+			count: 1
+			path: app/Services/PhilippineTaxCalculatorService.php
+
+		-
+			message: '#^Method App\\Services\\PhilippineTaxCalculatorService\:\:buildResult\(\) has parameter \$allowances with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Services/PhilippineTaxCalculatorService.php
+
+		-
+			message: '#^Method App\\Services\\PhilippineTaxCalculatorService\:\:buildResult\(\) has parameter \$customDeductions with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Services/PhilippineTaxCalculatorService.php
+
+		-
+			message: '#^Method App\\Services\\PhilippineTaxCalculatorService\:\:buildResult\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Services/PhilippineTaxCalculatorService.php
+
+		-
+			message: '#^Method App\\Services\\PhilippineTaxCalculatorService\:\:computeFreelanceEmployee\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Services/PhilippineTaxCalculatorService.php
+
+		-
+			message: '#^Method App\\Services\\PhilippineTaxCalculatorService\:\:computeMonthlyNetPay\(\) has parameter \$taxConfig with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Services/PhilippineTaxCalculatorService.php
+
+		-
+			message: '#^Method App\\Services\\PhilippineTaxCalculatorService\:\:computeMonthlyNetPay\(\) has parameter \$userDefaults with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Services/PhilippineTaxCalculatorService.php
+
+		-
+			message: '#^Method App\\Services\\PhilippineTaxCalculatorService\:\:computeMonthlyNetPay\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Services/PhilippineTaxCalculatorService.php
+
+		-
+			message: '#^Method App\\Services\\PhilippineTaxCalculatorService\:\:computeRegularEmployee\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Services/PhilippineTaxCalculatorService.php
+
+		-
+			message: '#^Method App\\Services\\PhilippineTaxCalculatorService\:\:resolveTaxConfig\(\) has parameter \$offerConfig with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Services/PhilippineTaxCalculatorService.php
+
+		-
+			message: '#^Method App\\Services\\PhilippineTaxCalculatorService\:\:resolveTaxConfig\(\) has parameter \$userDefaults with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Services/PhilippineTaxCalculatorService.php
+
+		-
+			message: '#^Method App\\Services\\PhilippineTaxCalculatorService\:\:resolveTaxConfig\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Services/PhilippineTaxCalculatorService.php
+
+		-
+			message: '#^Method App\\Services\\PhilippineTaxCalculatorService\:\:sumAllowances\(\) has parameter \$allowances with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Services/PhilippineTaxCalculatorService.php
+
+		-
+			message: '#^Method App\\Services\\PhilippineTaxCalculatorService\:\:sumCustomDeductions\(\) has parameter \$deductions with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Services/PhilippineTaxCalculatorService.php
+
+		-
+			message: '#^Parameter \#1 \$array of function end is passed by reference, so it expects variables only\.$#'
+			identifier: argument.byRef
+			count: 2
+			path: app/Services/PhilippineTaxCalculatorService.php
+
+		-
+			message: '#^Strict comparison using \!\=\= between mixed and null will always evaluate to true\.$#'
+			identifier: notIdentical.alwaysTrue
+			count: 4
+			path: app/Services/PhilippineTaxCalculatorService.php
+
+		-
+			message: '#^Method App\\Services\\ResumeProfileService\:\:getOrCreateProfile\(\) should return App\\Models\\ResumeProfile\|null but returns Illuminate\\Database\\Eloquent\\Model\|null\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Services/ResumeProfileService.php
+
+		-
+			message: '#^Method App\\Services\\ResumeProfileService\:\:updateProfile\(\) has parameter \$data with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Services/ResumeProfileService.php
+
+		-
+			message: '#^Method App\\Services\\ResumeProfileService\:\:updateProfile\(\) should return App\\Models\\ResumeProfile but returns Illuminate\\Database\\Eloquent\\Model\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Services/ResumeProfileService.php
+
+		-
+			message: '#^Method App\\Support\\Sanitizer\:\:sanitizeArray\(\) has parameter \$data with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Support/Sanitizer.php
+
+		-
+			message: '#^Method App\\Support\\Sanitizer\:\:sanitizeArray\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Support/Sanitizer.php
+
+		-
+			message: '#^Expression on left side of \?\? is not nullable\.$#'
+			identifier: nullCoalesce.expr
+			count: 1
+			path: database/factories/ResumeProfileFactory.php
+
+		-
+			message: '#^Binary operation "\." between ''Dear Hiring Manager…'' and array\|string results in an error\.$#'
+			identifier: binaryOp.invalid
+			count: 1
+			path: database/factories/SavedCoverLetterFactory.php
+
+		-
+			message: '#^Class Database\\Factories\\SavedCoverLetterFactory extends generic class Illuminate\\Database\\Eloquent\\Factories\\Factory but does not specify its types\: TModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: database/factories/SavedCoverLetterFactory.php
+
+		-
+			message: '#^Class Database\\Factories\\SavedResumeFactory extends generic class Illuminate\\Database\\Eloquent\\Factories\\Factory but does not specify its types\: TModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: database/factories/SavedResumeFactory.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Schema\\ForeignKeyDefinition\:\:index\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: database/migrations/2026_07_30_053548_create_ai_usage_logs_table.php
+
+		-
+			message: '#^If condition is always true\.$#'
+			identifier: if.alwaysTrue
+			count: 1
+			path: database/seeders/LegalDocumentSeeder.php

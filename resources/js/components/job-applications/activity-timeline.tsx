@@ -9,7 +9,6 @@ import {
     XCircleIcon,
     XIcon,
 } from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
 import { STATUS_COLORS } from '@/types/job-application';
 import type {
     JobApplicationActivity,
@@ -52,17 +51,21 @@ function getStatusFromDescription(
     const match = description.match(
         /Status changed to (Wishlist|Applied|Interviewing|Offer|Rejected|Withdrawn)/i,
     );
+
     if (match) {
         return match[1].toLowerCase() as JobApplicationStatus;
     }
+
     return null;
 }
 
 function getActivityTextColor(type: string, description: string) {
     if (type === 'status_update') {
         const status = getStatusFromDescription(description);
+
         if (status) {
             const classes = STATUS_COLORS[status];
+
             return classes
                 .split(' ')
                 .filter(
@@ -72,6 +75,7 @@ function getActivityTextColor(type: string, description: string) {
                 .join(' ');
         }
     }
+
     return (
         ACTIVITY_TEXT_COLORS[type as keyof typeof ACTIVITY_TEXT_COLORS] ??
         'text-foreground'
@@ -87,10 +91,12 @@ function ActivityIcon({
 }) {
     if (type === 'status_update') {
         const status = getStatusFromDescription(description);
+
         if (status) {
             const Icon = STATUS_ICONS[status] ?? RefreshCwIcon;
             const colors =
                 STATUS_COLORS[status] ?? ACTIVITY_COLORS.status_update;
+
             return (
                 <div
                     className={`flex size-8 shrink-0 items-center justify-center rounded-full ${colors}`}

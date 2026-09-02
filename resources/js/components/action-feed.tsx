@@ -131,9 +131,6 @@ export default function ActionFeed({
     items: ActionItem[];
     onSelectApplication?: (id: number) => void;
 }) {
-    const filteredItems = items.filter(
-        (item) => item.type !== 'missing_ai_evaluation',
-    );
     const scrollContainerRef = useRef<HTMLDivElement>(null);
     const [canScrollLeft, setCanScrollLeft] = useState(false);
     const [canScrollRight, setCanScrollRight] = useState(false);

@@ -1,6 +1,5 @@
 import { Head, Link } from '@inertiajs/react';
 import {
-    ArrowLeft,
     AlertTriangle,
     ShieldAlert,
     FileQuestion,
@@ -36,7 +35,8 @@ const ERROR_MAP: Record<
     },
     404: {
         title: 'Page Not Found',
-        description: 'The page you are looking for does not exist or has been moved.',
+        description:
+            'The page you are looking for does not exist or has been moved.',
         icon: FileQuestion,
     },
     405: {
@@ -46,7 +46,8 @@ const ERROR_MAP: Record<
     },
     419: {
         title: 'Session Expired',
-        description: 'Your session has expired due to inactivity. Please refresh and sign in again.',
+        description:
+            'Your session has expired due to inactivity. Please refresh and sign in again.',
         icon: Timer,
     },
     429: {
@@ -57,7 +58,8 @@ const ERROR_MAP: Record<
     },
     500: {
         title: 'Unexpected Error',
-        description: 'Something went wrong on our server. We are looking into it.',
+        description:
+            'Something went wrong on our server. We are looking into it.',
         icon: ServerCrash,
     },
     502: {
@@ -88,24 +90,30 @@ export default function ErrorPage({ status }: { status: number }) {
                 </div>
 
                 <div className="flex flex-col items-center gap-2">
-                    <span className="text-xs font-bold uppercase tracking-widest text-muted-foreground">
+                    <span className="text-xs font-bold tracking-widest text-muted-foreground uppercase">
                         Error {status}
                     </span>
                     <h1 className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
                         {error.title}
                     </h1>
-                    <p className="max-w-sm text-sm text-muted-foreground leading-relaxed">
+                    <p className="max-w-sm text-sm leading-relaxed text-muted-foreground">
                         {error.description}
                     </p>
                 </div>
 
                 <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
-                    <Link href="/" className={buttonVariants({ variant: 'outline' })}>
+                    <Link
+                        href="/"
+                        className={buttonVariants({ variant: 'outline' })}
+                    >
                         <Home className="size-4" />
                         Go Home
                     </Link>
 
-                    <Link href="/dashboard" className={buttonVariants({ variant: 'default' })}>
+                    <Link
+                        href="/dashboard"
+                        className={buttonVariants({ variant: 'default' })}
+                    >
                         <LayoutDashboard className="size-4" />
                         Go to Dashboard
                     </Link>

@@ -94,6 +94,7 @@ function computeMonthlySss(salary: number): number {
     const bracket = SSS_BRACKETS.find(
         (b) => salary >= b.min && salary <= b.max,
     );
+
     return bracket?.employee ?? 1350;
 }
 
@@ -105,29 +106,38 @@ function computeMonthlyPagIbig(salary: number): number {
     if (salary < 1_500) {
         return Math.round(salary * 0.01 * 100) / 100;
     }
+
     return Math.min(Math.round(salary * 0.02 * 100) / 100, 100);
 }
 
 function computeAnnualTaxableIncome(salary: number): number {
     const annualBasic = salary * 12;
     const taxable13th = Math.max(0, salary - THIRTEENTH_MONTH_EXEMPTION);
+
     return annualBasic + taxable13th;
 }
 
 function computeAnnualBirTax(annualIncome: number): number {
-    if (annualIncome <= 250_000) return 0;
+    if (annualIncome <= 250_000) {
+        return 0;
+    }
+
     const bracket = BIR_BRACKETS.find(
         (b) => annualIncome > b.min && annualIncome <= b.max,
     );
+
     if (!bracket) {
         const last = BIR_BRACKETS[BIR_BRACKETS.length - 1];
+
         return last.base + (annualIncome - last.excessMin) * last.rate;
     }
+
     return bracket.base + (annualIncome - bracket.excessMin) * bracket.rate;
 }
 
 function computeMonthlyBirTax(salary: number): number {
     const annualIncome = computeAnnualTaxableIncome(salary);
+
     return Math.round((computeAnnualBirTax(annualIncome) / 12) * 100) / 100;
 }
 
@@ -160,7 +170,9 @@ export default function PhPayCalculatorWidget() {
     const salary = Math.max(0, parseFloat(salaryInput.replace(/,/g, '')) || 0);
 
     const breakdown = useMemo(() => {
-        if (salary <= 0) return null;
+        if (salary <= 0) {
+            return null;
+        }
 
         let sss = 0;
         let philHealth = 0;
@@ -231,7 +243,8 @@ export default function PhPayCalculatorWidget() {
                             htmlFor="monthly-salary"
                             className="text-sm font-semibold text-foreground"
                         >
-                            Monthly Gross Salary (₱) <span className="text-red-500">*</span>
+                            Monthly Gross Salary (₱){' '}
+                            <span className="text-red-500">*</span>
                         </label>
                         <div className="relative mt-1.5">
                             <span className="absolute top-1/2 left-3 -translate-y-1/2 text-zinc-500 dark:text-zinc-400">

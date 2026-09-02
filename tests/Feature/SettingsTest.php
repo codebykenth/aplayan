@@ -27,10 +27,10 @@ it('shows the settings page for authenticated users', function () {
         );
 });
 
-it('updates the profile name and email', function () {
+it('updates the profile name and settings', function () {
     $this->actingAs($this->user)->patch(route('settings.profile.update'), [
         'name' => 'New Name',
-        'email' => 'new@example.com',
+        'email' => $this->user->email,
         'theme' => 'system',
         'color_theme' => 'zinc',
     ])->assertRedirect(route('settings.index'));
@@ -38,7 +38,7 @@ it('updates the profile name and email', function () {
     $this->assertDatabaseHas('users', [
         'id' => $this->user->id,
         'name' => 'New Name',
-        'email' => 'new@example.com',
+        'email' => $this->user->email,
     ]);
 });
 

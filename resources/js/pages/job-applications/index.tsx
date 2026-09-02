@@ -5,7 +5,6 @@ import {
     DownloadIcon,
     UploadIcon,
     ZapIcon,
-    Trash2,
 } from 'lucide-react';
 import { useState, useMemo, useEffect } from 'react';
 import type { ReactNode } from 'react';
@@ -25,23 +24,7 @@ import {
 } from '@/routes/job-applications';
 import type { ApplicationTemplate } from '@/types/application-template';
 import type { Contact } from '@/types/contact';
-import {
-    STATUS_COLORS,
-    JOB_APPLICATION_STATUSES,
-} from '@/types/job-application';
-import type {
-    JobApplication,
-    JobApplicationStatus,
-} from '@/types/job-application';
-
-const ALL_STATUS = 'all' as const;
-
-type FilterStatus = JobApplicationStatus | typeof ALL_STATUS;
-
-const STATUS_FILTERS: { value: FilterStatus; label: string }[] = [
-    { value: ALL_STATUS, label: 'All' },
-    ...JOB_APPLICATION_STATUSES,
-];
+import type { JobApplication } from '@/types/job-application';
 
 export default function JobApplicationsIndex({
     applications,
@@ -52,12 +35,15 @@ export default function JobApplicationsIndex({
     templates?: ApplicationTemplate[];
     contacts?: Contact[];
 }) {
-    const applicationList = Array.isArray(applications)
-        ? applications
-        : (applications?.data ?? []);
+    const applicationList = useMemo(
+        () =>
+            Array.isArray(applications)
+                ? applications
+                : (applications?.data ?? []),
+        [applications],
+    );
 
     const [search, setSearch] = useState('');
-    const [statusFilter, setStatusFilter] = useState<FilterStatus>(ALL_STATUS);
     const [formOpen, setFormOpen] = useState(false);
     const [editingApplication, setEditingApplication] =
         useState<JobApplication | null>(null);
@@ -72,10 +58,12 @@ export default function JobApplicationsIndex({
     useEffect(() => {
         const params = new URLSearchParams(window.location.search);
         const selectedId = params.get('selected');
+
         if (selectedId) {
             const found = applicationList.find(
                 (app) => app.id === Number(selectedId),
             );
+
             if (found) {
                 setViewingApplication(found);
             }
@@ -104,12 +92,9 @@ export default function JobApplicationsIndex({
                 app.job_title.toLowerCase().includes(search.toLowerCase()) ||
                 app.location?.toLowerCase().includes(search.toLowerCase());
 
-            const matchesStatus =
-                statusFilter === ALL_STATUS || app.status === statusFilter;
-
-            return matchesSearch && matchesStatus;
+            return matchesSearch;
         });
-    }, [applicationList, search, statusFilter]);
+    }, [applicationList, search]);
 
     function openCreate() {
         setEditingApplication(null);

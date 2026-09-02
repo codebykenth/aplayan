@@ -1,10 +1,10 @@
 import { Head, Link, usePage } from '@inertiajs/react';
 import { Menu, Moon, Sun, X } from 'lucide-react';
 import { useState } from 'react';
-import { useTheme } from '@/hooks/use-theme';
-import { buttonVariants } from '@/components/ui/button';
-import ApplicationLogo from '@/components/ui/application-logo';
 import Footer from '@/components/landing/footer';
+import ApplicationLogo from '@/components/ui/application-logo';
+import { buttonVariants } from '@/components/ui/button';
+import { useTheme } from '@/hooks/use-theme';
 import { cn } from '@/lib/utils';
 import type { Auth } from '@/types/auth';
 
@@ -37,7 +37,15 @@ function ThemeToggle() {
     );
 }
 
-function MobileMenu({ open, onClose, user }: { open: boolean; onClose: () => void; user?: Auth['user'] }) {
+function MobileMenu({
+    open,
+    onClose,
+    user,
+}: {
+    open: boolean;
+    onClose: () => void;
+    user?: Auth['user'];
+}) {
     const { mode, setMode } = useTheme();
 
     const isDark = mode === 'dark';
@@ -111,11 +119,17 @@ function MobileMenu({ open, onClose, user }: { open: boolean; onClose: () => voi
                 <div className="mt-6 flex flex-col gap-3">
                     {user ? (
                         <Link
-                            href={user.role === 'admin' ? '/admin/dashboard' : '/dashboard'}
+                            href={
+                                user.role === 'admin'
+                                    ? '/admin/dashboard'
+                                    : '/dashboard'
+                            }
                             className="block rounded-lg bg-foreground px-3 py-2 text-center text-sm font-medium text-background transition-colors hover:bg-foreground/90"
                             onClick={onClose}
                         >
-                            {user.role === 'admin' ? 'Admin Dashboard' : 'Go to Dashboard'}
+                            {user.role === 'admin'
+                                ? 'Admin Dashboard'
+                                : 'Go to Dashboard'}
                         </Link>
                     ) : (
                         <>
@@ -155,10 +169,7 @@ export default function GuestLayout({
             <div className="flex min-h-screen flex-col bg-background">
                 <header className="sticky top-0 z-30 border-b border-border bg-background/80 backdrop-blur-md">
                     <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-                        <Link
-                            href="/"
-                            className="flex shrink-0 items-center"
-                        >
+                        <Link href="/" className="flex shrink-0 items-center">
                             <ApplicationLogo />
                         </Link>
 
@@ -179,10 +190,19 @@ export default function GuestLayout({
 
                             {auth?.user ? (
                                 <Link
-                                    href={auth.user.role === 'admin' ? '/admin/dashboard' : '/dashboard'}
-                                    className={cn(buttonVariants(), 'shrink-0 px-4 font-semibold')}
+                                    href={
+                                        auth.user.role === 'admin'
+                                            ? '/admin/dashboard'
+                                            : '/dashboard'
+                                    }
+                                    className={cn(
+                                        buttonVariants(),
+                                        'shrink-0 px-4 font-semibold',
+                                    )}
                                 >
-                                    {auth.user.role === 'admin' ? 'Admin Dashboard' : 'Go to Dashboard'}
+                                    {auth.user.role === 'admin'
+                                        ? 'Admin Dashboard'
+                                        : 'Go to Dashboard'}
                                 </Link>
                             ) : (
                                 <>
@@ -195,7 +215,10 @@ export default function GuestLayout({
 
                                     <Link
                                         href="/register"
-                                        className={cn(buttonVariants(), 'shrink-0 px-4 font-semibold')}
+                                        className={cn(
+                                            buttonVariants(),
+                                            'shrink-0 px-4 font-semibold',
+                                        )}
                                     >
                                         Get Started Free
                                     </Link>

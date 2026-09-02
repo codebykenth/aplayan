@@ -1,4 +1,5 @@
 import { usePage } from '@inertiajs/react';
+import { HelpCircle } from 'lucide-react';
 import { useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import {
@@ -18,28 +19,27 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
-import { HelpCircle } from 'lucide-react';
 import {
     Tooltip,
     TooltipContent,
     TooltipProvider,
     TooltipTrigger,
 } from '@/components/ui/tooltip';
+import { useFormSubmit } from '@/hooks/use-form-submit';
 import {
     store as jobAppStore,
     update as jobAppUpdate,
 } from '@/routes/job-applications';
 import {
-    CURRENCIES,
-    getCurrencySymbol,
-    convertCurrency,
-} from '@/utils/currency';
-import {
     JOB_APPLICATION_STATUSES,
     WORK_SETUP_OPTIONS,
 } from '@/types/job-application';
 import type { JobApplication } from '@/types/job-application';
-import { useFormSubmit } from '@/hooks/use-form-submit';
+import {
+    CURRENCIES,
+    getCurrencySymbol,
+    convertCurrency,
+} from '@/utils/currency';
 
 interface FormData {
     company_name: string;
@@ -81,7 +81,9 @@ export default function JobApplicationForm({
     }>().props;
     const userBaseCurrency = auth?.user?.base_currency || 'PHP';
     const userDefaultExpectedSalary =
-        auth?.user?.expected_salary != null ? String(auth.user.expected_salary) : '';
+        auth?.user?.expected_salary != null
+            ? String(auth.user.expected_salary)
+            : '';
     const userDefaultWorkSetup =
         auth?.user?.job_search_preferences?.work_setup &&
         auth.user.job_search_preferences.work_setup !== 'any'
@@ -94,7 +96,8 @@ export default function JobApplicationForm({
               .map((r) => r.trim())
               .filter(Boolean)
         : [];
-    const userDefaultJobTitle = targetRolesList.length === 1 ? targetRolesList[0] : '';
+    const userDefaultJobTitle =
+        targetRolesList.length === 1 ? targetRolesList[0] : '';
 
     const {
         data,
@@ -166,7 +169,15 @@ export default function JobApplicationForm({
                 });
             }
         }
-    }, [open, application, userDefaultExpectedSalary, userDefaultWorkSetup, userDefaultJobTitle, userBaseCurrency, setData]);
+    }, [
+        open,
+        application,
+        userDefaultExpectedSalary,
+        userDefaultWorkSetup,
+        userDefaultJobTitle,
+        userBaseCurrency,
+        setData,
+    ]);
 
     function handleClose() {
         reset();
@@ -205,7 +216,7 @@ export default function JobApplicationForm({
 
     return (
         <Dialog open={open} onOpenChange={(open) => !open && handleClose()}>
-            <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto">
+            <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-lg">
                 <DialogHeader>
                     <DialogTitle>
                         {isEditing ? 'Edit Application' : 'New Application'}
@@ -218,16 +229,18 @@ export default function JobApplicationForm({
                 </DialogHeader>
 
                 <p className="mt-1 text-xs text-muted-foreground">
-                    Fields marked with <span className="text-red-500">*</span> are required.
+                    Fields marked with <span className="text-red-500">*</span>{' '}
+                    are required.
                 </p>
 
                 <form onSubmit={submit} className="flex flex-col gap-4">
                     <div className="flex flex-col gap-4">
                         <div className="grid grid-cols-2 gap-4">
                             <div className="flex flex-col gap-2">
-                            <Label htmlFor="company_name">
-                                Company Name <span className="text-red-500">*</span>
-                            </Label>
+                                <Label htmlFor="company_name">
+                                    Company Name{' '}
+                                    <span className="text-red-500">*</span>
+                                </Label>
                                 <Input
                                     id="company_name"
                                     value={data.company_name}
@@ -245,7 +258,10 @@ export default function JobApplicationForm({
                             </div>
 
                             <div className="flex flex-col gap-2">
-                                <Label htmlFor="job_title">Job Title <span className="text-red-500">*</span></Label>
+                                <Label htmlFor="job_title">
+                                    Job Title{' '}
+                                    <span className="text-red-500">*</span>
+                                </Label>
                                 <Input
                                     id="job_title"
                                     value={data.job_title}
@@ -256,22 +272,33 @@ export default function JobApplicationForm({
                                     placeholder="Software Engineer"
                                 />
                                 {(() => {
-                                    const targetRolesList = auth?.user?.job_search_preferences?.target_roles
+                                    const targetRolesList = auth?.user
+                                        ?.job_search_preferences?.target_roles
                                         ? auth.user.job_search_preferences.target_roles
                                               .split(',')
                                               .map((r) => r.trim())
                                               .filter(Boolean)
                                         : [];
 
-                                    if (!data.job_title && targetRolesList.length > 0) {
+                                    if (
+                                        !data.job_title &&
+                                        targetRolesList.length > 0
+                                    ) {
                                         return (
                                             <div className="flex flex-wrap items-center gap-1.5 pt-0.5">
-                                                <span className="text-[11px] font-medium text-muted-foreground">Preset:</span>
+                                                <span className="text-[11px] font-medium text-muted-foreground">
+                                                    Preset:
+                                                </span>
                                                 {targetRolesList.map((role) => (
                                                     <button
                                                         key={role}
                                                         type="button"
-                                                        onClick={() => setData('job_title', role)}
+                                                        onClick={() =>
+                                                            setData(
+                                                                'job_title',
+                                                                role,
+                                                            )
+                                                        }
                                                         className="rounded-md border border-border/60 bg-muted/50 px-2 py-0.5 text-[11px] font-medium text-muted-foreground transition-colors hover:border-primary/40 hover:bg-primary/10 hover:text-primary"
                                                     >
                                                         + {role}
@@ -280,6 +307,7 @@ export default function JobApplicationForm({
                                             </div>
                                         );
                                     }
+
                                     return null;
                                 })()}
                                 {errors.job_title && (
@@ -292,7 +320,10 @@ export default function JobApplicationForm({
 
                         <div className="grid grid-cols-2 gap-4">
                             <div className="flex flex-col gap-2">
-                                <Label htmlFor="work_setup">Work Setup <span className="text-red-500">*</span></Label>
+                                <Label htmlFor="work_setup">
+                                    Work Setup{' '}
+                                    <span className="text-red-500">*</span>
+                                </Label>
                                 <Select
                                     value={data.work_setup}
                                     onValueChange={(value: string | null) => {
@@ -307,7 +338,8 @@ export default function JobApplicationForm({
                                     >
                                         <SelectValue>
                                             {WORK_SETUP_OPTIONS.find(
-                                                (w) => w.value === data.work_setup,
+                                                (w) =>
+                                                    w.value === data.work_setup,
                                             )?.label ?? 'Select work setup'}
                                         </SelectValue>
                                     </SelectTrigger>
@@ -330,7 +362,10 @@ export default function JobApplicationForm({
                             </div>
 
                             <div className="flex flex-col gap-2">
-                                <Label htmlFor="status">Status <span className="text-red-500">*</span></Label>
+                                <Label htmlFor="status">
+                                    Status{' '}
+                                    <span className="text-red-500">*</span>
+                                </Label>
                                 <Select
                                     value={data.status}
                                     onValueChange={(value: string | null) => {
@@ -370,7 +405,9 @@ export default function JobApplicationForm({
                         </div>
 
                         <div className="flex flex-col gap-2">
-                            <Label htmlFor="location">Location (City / Address)</Label>
+                            <Label htmlFor="location">
+                                Location (City / Address)
+                            </Label>
                             <Input
                                 id="location"
                                 value={data.location}
@@ -392,9 +429,15 @@ export default function JobApplicationForm({
                             <Select
                                 value={data.currency}
                                 onValueChange={(newCurrency: string | null) => {
-                                    if (!newCurrency) return;
+                                    if (!newCurrency) {
+                                        return;
+                                    }
+
                                     const oldCurrency = data.currency || 'PHP';
-                                    if (oldCurrency === newCurrency) return;
+
+                                    if (oldCurrency === newCurrency) {
+                                        return;
+                                    }
 
                                     let newExpected = data.expected_salary;
                                     let newOffered = data.offered_salary;
@@ -406,6 +449,7 @@ export default function JobApplicationForm({
                                         const val = Number(
                                             data.expected_salary,
                                         );
+
                                         if (val > 0) {
                                             newExpected = String(
                                                 convertCurrency(
@@ -422,6 +466,7 @@ export default function JobApplicationForm({
                                         !isNaN(Number(data.offered_salary))
                                     ) {
                                         const val = Number(data.offered_salary);
+
                                         if (val > 0) {
                                             newOffered = String(
                                                 convertCurrency(
@@ -470,27 +515,47 @@ export default function JobApplicationForm({
                                 Boolean(data.offered_salary);
 
                             return (
-                                <div className={showOfferedSalary ? 'grid grid-cols-2 gap-4' : 'grid grid-cols-1 gap-4'}>
+                                <div
+                                    className={
+                                        showOfferedSalary
+                                            ? 'grid grid-cols-2 gap-4'
+                                            : 'grid grid-cols-1 gap-4'
+                                    }
+                                >
                                     <div className="flex flex-col gap-2">
                                         <div className="flex items-center gap-1.5">
-                                             <Label htmlFor="expected_salary">
-                                                 Target / Asking Salary (
-                                                 {getCurrencySymbol(data.currency)})
-                                             </Label>
+                                            <Label htmlFor="expected_salary">
+                                                Target / Asking Salary (
+                                                {getCurrencySymbol(
+                                                    data.currency,
+                                                )}
+                                                )
+                                            </Label>
                                             <TooltipProvider>
                                                 <Tooltip>
-                                                    <TooltipTrigger type="button" className="text-muted-foreground hover:text-foreground cursor-help">
+                                                    <TooltipTrigger
+                                                        type="button"
+                                                        className="cursor-help text-muted-foreground hover:text-foreground"
+                                                    >
                                                         <HelpCircle className="size-3.5" />
                                                     </TooltipTrigger>
                                                     <TooltipContent side="top">
-                                                        <p>Your desired target monthly salary for this role. Prefilled from your Profile settings.</p>
+                                                        <p>
+                                                            Your desired target
+                                                            monthly salary for
+                                                            this role. Prefilled
+                                                            from your Profile
+                                                            settings.
+                                                        </p>
                                                     </TooltipContent>
                                                 </Tooltip>
                                             </TooltipProvider>
                                         </div>
                                         <div className="relative">
                                             <span className="pointer-events-none absolute top-1/2 left-2.5 -translate-y-1/2 text-sm text-muted-foreground">
-                                                {getCurrencySymbol(data.currency)}
+                                                {getCurrencySymbol(
+                                                    data.currency,
+                                                )}
                                             </span>
                                             <Input
                                                 id="expected_salary"
@@ -517,24 +582,41 @@ export default function JobApplicationForm({
                                     {showOfferedSalary && (
                                         <div className="flex flex-col gap-2">
                                             <div className="flex items-center gap-1.5">
-                                                 <Label htmlFor="offered_salary">
-                                                     Final Offered Salary (
-                                                     {getCurrencySymbol(data.currency)})
-                                                 </Label>
+                                                <Label htmlFor="offered_salary">
+                                                    Final Offered Salary (
+                                                    {getCurrencySymbol(
+                                                        data.currency,
+                                                    )}
+                                                    )
+                                                </Label>
                                                 <TooltipProvider>
                                                     <Tooltip>
-                                                        <TooltipTrigger type="button" className="text-muted-foreground hover:text-foreground cursor-help">
+                                                        <TooltipTrigger
+                                                            type="button"
+                                                            className="cursor-help text-muted-foreground hover:text-foreground"
+                                                        >
                                                             <HelpCircle className="size-3.5" />
                                                         </TooltipTrigger>
                                                         <TooltipContent side="top">
-                                                            <p>The gross monthly salary offered by the employer. Powers your Net Take-Home Pay & Offer Comparison tools.</p>
+                                                            <p>
+                                                                The gross
+                                                                monthly salary
+                                                                offered by the
+                                                                employer. Powers
+                                                                your Net
+                                                                Take-Home Pay &
+                                                                Offer Comparison
+                                                                tools.
+                                                            </p>
                                                         </TooltipContent>
                                                     </Tooltip>
                                                 </TooltipProvider>
                                             </div>
                                             <div className="relative">
                                                 <span className="pointer-events-none absolute top-1/2 left-2.5 -translate-y-1/2 text-sm text-muted-foreground">
-                                                    {getCurrencySymbol(data.currency)}
+                                                    {getCurrencySymbol(
+                                                        data.currency,
+                                                    )}
                                                 </span>
                                                 <Input
                                                     id="offered_salary"
@@ -582,9 +664,9 @@ export default function JobApplicationForm({
                             </div>
 
                             <div className="flex flex-col gap-2">
-<Label htmlFor="date_applied">
-                                     Date Applied
-                                 </Label>
+                                <Label htmlFor="date_applied">
+                                    Date Applied
+                                </Label>
                                 <Input
                                     id="date_applied"
                                     type="date"
@@ -602,9 +684,9 @@ export default function JobApplicationForm({
                         </div>
 
                         <div className="flex flex-col gap-2">
-<Label htmlFor="job_description">
-                                 Job Description
-                             </Label>
+                            <Label htmlFor="job_description">
+                                Job Description
+                            </Label>
                             <textarea
                                 id="job_description"
                                 rows={3}
@@ -612,7 +694,7 @@ export default function JobApplicationForm({
                                 onChange={(e) =>
                                     setData('job_description', e.target.value)
                                 }
-                                className="h-20 w-full min-w-0 rounded-lg border border-input bg-transparent px-2.5 py-1.5 text-sm transition-colors outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 aria-invalid:border-destructive md:text-sm dark:bg-input/30 max-h-32 overflow-y-auto"
+                                className="h-20 max-h-32 w-full min-w-0 overflow-y-auto rounded-lg border border-input bg-transparent px-2.5 py-1.5 text-sm transition-colors outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 aria-invalid:border-destructive md:text-sm dark:bg-input/30"
                                 placeholder="Paste the job description here..."
                             />
                             {errors.job_description && (
@@ -631,7 +713,7 @@ export default function JobApplicationForm({
                                 onChange={(e) =>
                                     setData('notes', e.target.value)
                                 }
-                                className="h-16 w-full min-w-0 rounded-lg border border-input bg-transparent px-2.5 py-1.5 text-sm transition-colors outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 aria-invalid:border-destructive md:text-sm dark:bg-input/30 max-h-24 overflow-y-auto"
+                                className="h-16 max-h-24 w-full min-w-0 overflow-y-auto rounded-lg border border-input bg-transparent px-2.5 py-1.5 text-sm transition-colors outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 aria-invalid:border-destructive md:text-sm dark:bg-input/30"
                                 placeholder="Any additional notes..."
                             />
                             {errors.notes && (

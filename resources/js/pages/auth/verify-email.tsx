@@ -1,26 +1,45 @@
 import { router, usePage } from '@inertiajs/react';
-import { Mail, LogOut, CheckCircle2, Clock, Loader2, AlertCircle } from 'lucide-react';
-import { useEffect, useState, type FormEvent, type ReactNode } from 'react';
-import GuestLayout from '@/layouts/guest-layout';
+import {
+    Mail,
+    LogOut,
+    CheckCircle2,
+    Clock,
+    Loader2,
+    AlertCircle,
+} from 'lucide-react';
+import { useEffect, useState } from 'react';
+import type { FormEvent, ReactNode } from 'react';
 import { Button } from '@/components/ui/button';
 import SeoHead from '@/components/ui/seo-head';
-import { send } from '@/routes/verification';
+import GuestLayout from '@/layouts/guest-layout';
 import { logout } from '@/routes';
+import { send } from '@/routes/verification';
 
 const COOLDOWN_KEY = 'aplayan_verification_resend_cooldown';
 const COOLDOWN_DURATION = 60;
 
 function getRemainingCooldown(): number {
-    if (typeof window === 'undefined') return 0;
+    if (typeof window === 'undefined') {
+        return 0;
+    }
+
     const stored = window.sessionStorage.getItem(COOLDOWN_KEY);
-    if (!stored) return 0;
+
+    if (!stored) {
+        return 0;
+    }
+
     const expiry = parseInt(stored, 10);
     const diff = Math.ceil((expiry - Date.now()) / 1000);
+
     return diff > 0 ? diff : 0;
 }
 
 function setCooldownExpiry(seconds: number) {
-    if (typeof window === 'undefined') return;
+    if (typeof window === 'undefined') {
+        return;
+    }
+
     window.sessionStorage.setItem(
         COOLDOWN_KEY,
         (Date.now() + seconds * 1000).toString(),
@@ -33,16 +52,21 @@ export default function VerifyEmail() {
         errors?: Record<string, string>;
     }>().props;
 
-    const [cooldown, setCooldown] = useState<number>(() => getRemainingCooldown());
+    const [cooldown, setCooldown] = useState<number>(() =>
+        getRemainingCooldown(),
+    );
     const [isProcessing, setIsProcessing] = useState(false);
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
     useEffect(() => {
-        if (cooldown <= 0) return;
+        if (cooldown <= 0) {
+            return;
+        }
 
         const interval = setInterval(() => {
             const remaining = getRemainingCooldown();
             setCooldown(remaining);
+
             if (remaining <= 0) {
                 clearInterval(interval);
             }
@@ -53,7 +77,10 @@ export default function VerifyEmail() {
 
     function handleResend(e: FormEvent) {
         e.preventDefault();
-        if (cooldown > 0 || isProcessing) return;
+
+        if (cooldown > 0 || isProcessing) {
+            return;
+        }
 
         setIsProcessing(true);
         setErrorMessage(null);
@@ -104,8 +131,10 @@ export default function VerifyEmail() {
                     <h1 className="mb-2 text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
                         Check your inbox
                     </h1>
-                    <p className="mb-6 text-sm text-muted-foreground leading-relaxed">
-                        We sent a verification link to your email address. Please click the link in your email to verify your account and get started.
+                    <p className="mb-6 text-sm leading-relaxed text-muted-foreground">
+                        We sent a verification link to your email address.
+                        Please click the link in your email to verify your
+                        account and get started.
                     </p>
 
                     {status && (
@@ -156,7 +185,7 @@ export default function VerifyEmail() {
                     <form onSubmit={handleLogout} className="mt-4 w-full">
                         <button
                             type="submit"
-                            className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors"
+                            className="inline-flex items-center gap-1.5 text-xs text-muted-foreground transition-colors hover:text-foreground"
                         >
                             <LogOut className="size-3.5" />
                             Sign out of this account

@@ -25,7 +25,6 @@ import {
     FolderGit2,
     FileText,
     Download,
-    Mail,
     Camera,
     Save,
     Sparkles,
@@ -39,19 +38,9 @@ import {
     ArrowUp,
     ArrowDown,
     GripVertical,
-    BookmarkIcon,
-    Trash2,
 } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { useState, useRef, useEffect, useMemo } from 'react';
-import { Button } from '@/components/ui/button';
-import {
-    Card,
-    CardHeader,
-    CardTitle,
-    CardDescription,
-    CardContent,
-} from '@/components/ui/card';
 import {
     AlertDialog,
     AlertDialogAction,
@@ -63,6 +52,14 @@ import {
     AlertDialogMedia,
     AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import { Button } from '@/components/ui/button';
+import {
+    Card,
+    CardHeader,
+    CardTitle,
+    CardDescription,
+    CardContent,
+} from '@/components/ui/card';
 import { ConfirmDestructiveDialog } from '@/components/ui/confirm-destructive-dialog';
 import {
     Dialog,
@@ -89,8 +86,8 @@ import {
     TooltipProvider,
     TooltipTrigger,
 } from '@/components/ui/tooltip';
-import { formatPhone } from '@/lib/utils';
 import AppLayout from '@/layouts/app-layout';
+import { formatPhone } from '@/lib/utils';
 
 type WorkExperience = {
     company: string;
@@ -954,11 +951,22 @@ function PersonalInfoTab({
                     <div className="flex items-center gap-1.5">
                         <Label htmlFor="photo_url">Photo URL (optional)</Label>
                         <Tooltip>
-                            <TooltipTrigger type="button" className="inline-flex cursor-help items-center rounded-full bg-muted px-1.5 text-[10px] font-medium text-muted-foreground">
+                            <TooltipTrigger
+                                type="button"
+                                className="inline-flex cursor-help items-center rounded-full bg-muted px-1.5 text-[10px] font-medium text-muted-foreground"
+                            >
                                 ?
                             </TooltipTrigger>
-                            <TooltipContent side="top" className="max-w-[260px] text-xs leading-relaxed">
-                                <p>You can paste a Google Drive file link. Make sure the file's sharing setting is set to <strong>"Anyone with the link"</strong> and access is <strong>"Viewer"</strong>.</p>
+                            <TooltipContent
+                                side="top"
+                                className="max-w-[260px] text-xs leading-relaxed"
+                            >
+                                <p>
+                                    You can paste a Google Drive file link. Make
+                                    sure the file's sharing setting is set to{' '}
+                                    <strong>"Anyone with the link"</strong> and
+                                    access is <strong>"Viewer"</strong>.
+                                </p>
                             </TooltipContent>
                         </Tooltip>
                     </div>
@@ -970,13 +978,16 @@ function PersonalInfoTab({
                         placeholder="https://drive.google.com/file/d/..."
                     />
                     <p className="text-xs text-muted-foreground">
-                        Paste a direct image URL or a Google Drive file link for your profile photo.
+                        Paste a direct image URL or a Google Drive file link for
+                        your profile photo.
                     </p>
                 </div>
             )}
 
             <div className={fieldCn('full_name')}>
-                    <Label htmlFor="full_name">Full Name <span className="text-red-500">*</span></Label>
+                <Label htmlFor="full_name">
+                    Full Name <span className="text-red-500">*</span>
+                </Label>
                 <Input
                     id="full_name"
                     value={data.full_name}
@@ -1019,7 +1030,9 @@ function PersonalInfoTab({
 
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div className={fieldCn('email')}>
-                    <Label htmlFor="email">Email <span className="text-red-500">*</span></Label>
+                    <Label htmlFor="email">
+                        Email <span className="text-red-500">*</span>
+                    </Label>
                     <Input
                         id="email"
                         type="email"
@@ -1041,12 +1054,19 @@ function PersonalInfoTab({
                 </div>
 
                 <div className={fieldCn('phone')}>
-                    <Label htmlFor="phone">Phone <span className="text-red-500">*</span></Label>
+                    <Label htmlFor="phone">
+                        Phone <span className="text-red-500">*</span>
+                    </Label>
                     <div className="flex gap-1.5">
                         <button
                             type="button"
                             onClick={() => {
-                                setPhoneMode((phoneMode === '+63' && !data.phone) ? '09' : '+63');
+                                setPhoneMode(
+                                    phoneMode === '+63' && !data.phone
+                                        ? '09'
+                                        : '+63',
+                                );
+
                                 if (data.phone) {
                                     setData('phone', '');
                                 }
@@ -1058,7 +1078,12 @@ function PersonalInfoTab({
                         <button
                             type="button"
                             onClick={() => {
-                                setPhoneMode((phoneMode === '09' && !data.phone) ? '+63' : '09');
+                                setPhoneMode(
+                                    phoneMode === '09' && !data.phone
+                                        ? '+63'
+                                        : '09',
+                                );
+
                                 if (data.phone) {
                                     setData('phone', '');
                                 }
@@ -1076,45 +1101,40 @@ function PersonalInfoTab({
                             id="phone"
                             value={
                                 data.phone
-                                    ? data.phone
-                                          .replace(
-                                              new RegExp(
-                                                  `^${phoneMode.replace('+', '\\+')}\\s*`,
-                                              ),
-                                              '',
-                                          )
+                                    ? data.phone.replace(
+                                          new RegExp(
+                                              `^${phoneMode.replace('+', '\\+')}\\s*`,
+                                          ),
+                                          '',
+                                      )
                                     : ''
                             }
                             onChange={(e) => {
-                                const max =
-                                    phoneMode === '+63' ? 10 : 9;
+                                const max = phoneMode === '+63' ? 10 : 9;
                                 const digits = e.target.value
                                     .replace(/\D/g, '')
                                     .slice(0, max);
+
                                 if (!digits) {
                                     setData('phone', '');
+
                                     return;
                                 }
+
                                 if (phoneMode === '+63') {
                                     const parts = [
                                         digits.slice(0, 3),
                                         digits.slice(3, 6),
                                         digits.slice(6, 10),
                                     ].filter(Boolean);
-                                    setData(
-                                        'phone',
-                                        `+63 ${parts.join(' ')}`,
-                                    );
+                                    setData('phone', `+63 ${parts.join(' ')}`);
                                 } else {
                                     const parts = [
                                         digits.slice(0, 2),
                                         digits.slice(2, 5),
                                         digits.slice(5, 9),
                                     ].filter(Boolean);
-                                    setData(
-                                        'phone',
-                                        `09${parts.join(' ')}`,
-                                    );
+                                    setData('phone', `09${parts.join(' ')}`);
                                 }
                             }}
                             placeholder={
@@ -1135,7 +1155,9 @@ function PersonalInfoTab({
             </div>
 
             <div className={fieldCn('location')}>
-                    <Label htmlFor="location">Location <span className="text-red-500">*</span></Label>
+                <Label htmlFor="location">
+                    Location <span className="text-red-500">*</span>
+                </Label>
                 <Input
                     id="location"
                     value={data.location}
@@ -1192,7 +1214,9 @@ function PersonalInfoTab({
             </div>
 
             <div className={fieldCn('website_url')}>
-                <Label htmlFor="website_url">Website / Portfolio URL (optional)</Label>
+                <Label htmlFor="website_url">
+                    Website / Portfolio URL (optional)
+                </Label>
                 <Input
                     id="website_url"
                     value={data.website_url ?? ''}
@@ -1237,20 +1261,30 @@ function PersonalInfoTab({
                     placeholder="Experienced software developer with expertise in building scalable web applications..."
                 />
                 <p className="text-xs text-muted-foreground">
-                    Use <code className="rounded bg-muted px-1">**bold text**</code> for emphasis. Press Enter to start a new paragraph.
+                    Use{' '}
+                    <code className="rounded bg-muted px-1">**bold text**</code>{' '}
+                    for emphasis. Press Enter to start a new paragraph.
                 </p>
             </div>
 
             <div className="flex flex-col gap-2">
-                <Label htmlFor="summary_title" className="text-xs text-muted-foreground">Summary Section Title (optional)</Label>
+                <Label
+                    htmlFor="summary_title"
+                    className="text-xs text-muted-foreground"
+                >
+                    Summary Section Title (optional)
+                </Label>
                 <Input
                     id="summary_title"
                     value={data.section_titles?.summary ?? ''}
                     onChange={(e) =>
-                        setData('section_titles' as never, {
-                            ...(data.section_titles || {}),
-                            summary: e.target.value,
-                        } as never)
+                        setData(
+                            'section_titles' as never,
+                            {
+                                ...(data.section_titles || {}),
+                                summary: e.target.value,
+                            } as never,
+                        )
                     }
                     placeholder="e.g. Professional Summary, Executive Summary, About Me"
                 />
@@ -1273,7 +1307,9 @@ function WorkExperienceTab({
     const experiences = data.work_experience ?? [];
 
     function fieldCn(index: number, field: string) {
-        const itemDirty = detailDirty.work_experience as Record<number, Set<string>> | undefined;
+        const itemDirty = detailDirty.work_experience as
+            Record<number, Set<string>> | undefined;
+
         return itemDirty && itemDirty[index]?.has(field)
             ? 'flex flex-col gap-2 border-l-2 border-amber-400 pl-3'
             : 'flex flex-col gap-2';
@@ -1319,7 +1355,9 @@ function WorkExperienceTab({
         <div className="flex flex-col gap-6">
             <div className="rounded-xl border border-border bg-card p-4">
                 <div className="flex flex-col gap-2">
-                    <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Section Title (optional)</Label>
+                    <Label className="text-xs font-semibold tracking-wider text-muted-foreground uppercase">
+                        Section Title (optional)
+                    </Label>
                     <Input
                         value={data.section_titles?.work ?? ''}
                         onChange={(e) =>
@@ -1464,7 +1502,12 @@ function WorkExperienceTab({
                                 rows={3}
                             />
                             <p className="text-xs text-muted-foreground">
-                                Use <code className="rounded bg-muted px-1">**bold text**</code> for emphasis. Press Enter to start a new bullet point.
+                                Use{' '}
+                                <code className="rounded bg-muted px-1">
+                                    **bold text**
+                                </code>{' '}
+                                for emphasis. Press Enter to start a new bullet
+                                point.
                             </p>
                         </div>
                     </div>
@@ -1516,7 +1559,9 @@ function EducationTab({
     const education = data.education ?? [];
 
     function fieldCn(index: number, field: string) {
-        const itemDirty = detailDirty.education as Record<number, Set<string>> | undefined;
+        const itemDirty = detailDirty.education as
+            Record<number, Set<string>> | undefined;
+
         return itemDirty && itemDirty[index]?.has(field)
             ? 'flex flex-col gap-2 border-l-2 border-amber-400 pl-3'
             : 'flex flex-col gap-2';
@@ -1562,7 +1607,9 @@ function EducationTab({
         <div className="flex flex-col gap-6">
             <div className="rounded-xl border border-border bg-card p-4">
                 <div className="flex flex-col gap-2">
-                    <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Section Title (optional)</Label>
+                    <Label className="text-xs font-semibold tracking-wider text-muted-foreground uppercase">
+                        Section Title (optional)
+                    </Label>
                     <Input
                         value={data.section_titles?.education ?? ''}
                         onChange={(e) =>
@@ -1750,7 +1797,9 @@ function SkillsTab({
         <div className={sectionCn}>
             <div className="rounded-xl border border-border bg-card p-4">
                 <div className="flex flex-col gap-2">
-                    <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Section Title (optional)</Label>
+                    <Label className="text-xs font-semibold tracking-wider text-muted-foreground uppercase">
+                        Section Title (optional)
+                    </Label>
                     <Input
                         value={data.section_titles?.skills ?? ''}
                         onChange={(e) =>
@@ -1781,12 +1830,23 @@ function SkillsTab({
                     </Button>
                 </div>
                 <p className="text-xs text-muted-foreground">
-                    Tip: Use <code className="rounded bg-muted px-1">Category: Skill 1, Skill 2</code> (e.g., <code className="rounded bg-muted px-1">Languages: PHP, Python</code>) to display bold category headers like on the landing page preview.
+                    Tip: Use{' '}
+                    <code className="rounded bg-muted px-1">
+                        Category: Skill 1, Skill 2
+                    </code>{' '}
+                    (e.g.,{' '}
+                    <code className="rounded bg-muted px-1">
+                        Languages: PHP, Python
+                    </code>
+                    ) to display bold category headers like on the landing page
+                    preview.
                 </p>
             </div>
 
             <div className="flex flex-col gap-2">
-                <Label className="text-xs text-muted-foreground">Quick Add Sample Categories:</Label>
+                <Label className="text-xs text-muted-foreground">
+                    Quick Add Sample Categories:
+                </Label>
                 <div className="flex flex-wrap gap-2">
                     {sampleCategories.map((preset) => {
                         const categoryName = preset.split(':')[0];
@@ -1828,7 +1888,8 @@ function SkillsTab({
             </div>
             {skills.length === 0 && (
                 <p className="text-sm text-muted-foreground">
-                    No skills added yet. Add individual skills or categorized items above.
+                    No skills added yet. Add individual skills or categorized
+                    items above.
                 </p>
             )}
         </div>
@@ -1871,7 +1932,9 @@ function CertificationsTab({
         <div className={sectionCn}>
             <div className="rounded-xl border border-border bg-card p-4">
                 <div className="flex flex-col gap-2">
-                    <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Section Title (optional)</Label>
+                    <Label className="text-xs font-semibold tracking-wider text-muted-foreground uppercase">
+                        Section Title (optional)
+                    </Label>
                     <Input
                         value={data.section_titles?.certifications ?? ''}
                         onChange={(e) =>
@@ -1945,7 +2008,9 @@ function ProjectsTab({
     const projects = data.projects ?? [];
 
     function fieldCn(index: number, field: string) {
-        const itemDirty = detailDirty.projects as Record<number, Set<string>> | undefined;
+        const itemDirty = detailDirty.projects as
+            Record<number, Set<string>> | undefined;
+
         return itemDirty && itemDirty[index]?.has(field)
             ? 'flex flex-col gap-2 border-l-2 border-amber-400 pl-3'
             : 'flex flex-col gap-2';
@@ -1993,7 +2058,9 @@ function ProjectsTab({
         <div className="flex flex-col gap-6">
             <div className="rounded-xl border border-border bg-card p-4">
                 <div className="flex flex-col gap-2">
-                    <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Section Title (optional)</Label>
+                    <Label className="text-xs font-semibold tracking-wider text-muted-foreground uppercase">
+                        Section Title (optional)
+                    </Label>
                     <Input
                         value={data.section_titles?.projects ?? ''}
                         onChange={(e) =>
@@ -2085,7 +2152,12 @@ function ProjectsTab({
                                 rows={3}
                             />
                             <p className="text-xs text-muted-foreground">
-                                Use <code className="rounded bg-muted px-1">**bold text**</code> for emphasis. Press Enter to start a new bullet point.
+                                Use{' '}
+                                <code className="rounded bg-muted px-1">
+                                    **bold text**
+                                </code>{' '}
+                                for emphasis. Press Enter to start a new bullet
+                                point.
                             </p>
                         </div>
                         <div className={fieldCn(index, 'technologies')}>
@@ -2193,7 +2265,9 @@ function AdditionalInfoTab({
     const items = data.additional_info ?? [];
 
     function fieldCn(index: number, field: string) {
-        const itemDirty = detailDirty.additional_info as Record<number, Set<string>> | undefined;
+        const itemDirty = detailDirty.additional_info as
+            Record<number, Set<string>> | undefined;
+
         return itemDirty && itemDirty[index]?.has(field)
             ? 'flex flex-col gap-2 border-l-2 border-amber-400 pl-3'
             : 'flex flex-col gap-2';
@@ -2236,7 +2310,9 @@ function AdditionalInfoTab({
         <div className="flex flex-col gap-6">
             <div className="rounded-xl border border-border bg-card p-4">
                 <div className="flex flex-col gap-2">
-                    <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Section Title (optional)</Label>
+                    <Label className="text-xs font-semibold tracking-wider text-muted-foreground uppercase">
+                        Section Title (optional)
+                    </Label>
                     <Input
                         value={data.section_titles?.additional_info ?? ''}
                         onChange={(e) =>
@@ -2561,8 +2637,10 @@ function ResumePreview({
         medium: '13px',
         large: '15px',
     };
-    const selectedFont = fontFamilyMap[data.font_family || 'sans'] || fontFamilyMap.sans;
-    const selectedFontSize = fontSizeMap[data.font_size || 'medium'] || fontSizeMap.medium;
+    const selectedFont =
+        fontFamilyMap[data.font_family || 'sans'] || fontFamilyMap.sans;
+    const selectedFontSize =
+        fontSizeMap[data.font_size || 'medium'] || fontSizeMap.medium;
     const previewRef = useRef<HTMLDivElement>(null);
     const [saveDialogOpen, setSaveDialogOpen] = useState(false);
     const [versionName, setVersionName] = useState('');
@@ -2670,7 +2748,7 @@ function ResumePreview({
         }
 
         const lines = text
-            .split(/\n|(?<=[\.\?!])\s+(?=[A-Z0-9])|•|▪/)
+            .split(/\n|(?<=[.?!])\s+(?=[A-Z0-9])|•|▪/)
             .map((l) => l.trim().replace(/^[-•▪]\s*/, ''))
             .filter((l) => l.length > 0);
 
@@ -2724,7 +2802,8 @@ function ResumePreview({
             ]);
 
     const sectionOrder =
-        (template === 'ats_single_column' || template === 'ats_classic_serif') &&
+        (template === 'ats_single_column' ||
+            template === 'ats_classic_serif') &&
         isDefaultStandardOrder
             ? defaultSectionOrder
             : data.section_order || defaultSectionOrder;
@@ -2750,7 +2829,7 @@ function ResumePreview({
 
     return (
         <div className="flex max-w-full min-w-0 flex-col gap-4 overflow-x-auto overflow-y-hidden pb-4">
-            <div className="flex w-full max-w-[210mm] justify-end gap-2 mx-auto">
+            <div className="mx-auto flex w-full max-w-[210mm] justify-end gap-2">
                 <Button variant="outline" onClick={handleSaveVersion}>
                     <Save className="mr-2 size-4" />
                     Save Version
@@ -2854,7 +2933,12 @@ function ResumePreview({
 
                                                 if (i < arr.length - 1) {
                                                     acc.push(
-                                                        <span key={`sep-${i}`} style={{ margin: '0 4px' }}>
+                                                        <span
+                                                            key={`sep-${i}`}
+                                                            style={{
+                                                                margin: '0 4px',
+                                                            }}
+                                                        >
                                                             •
                                                         </span>,
                                                     );
@@ -2870,7 +2954,10 @@ function ResumePreview({
                             {data.summary && (
                                 <>
                                     <div className="ats-section-title">
-                                        {getTitle('summary', 'Professional Summary')}
+                                        {getTitle(
+                                            'summary',
+                                            'Professional Summary',
+                                        )}
                                     </div>
                                     {renderFormattedParagraphs(data.summary)}
                                 </>
@@ -2896,7 +2983,9 @@ function ResumePreview({
                                             <div className="ats-company">
                                                 {job.company}
                                             </div>
-                                            {renderFormattedParagraphs(job.description)}
+                                            {renderFormattedParagraphs(
+                                                job.description,
+                                            )}
                                         </div>
                                     ))}
                                 </>
@@ -2932,7 +3021,10 @@ function ResumePreview({
                             {(data.skills?.length ?? 0) > 0 && (
                                 <>
                                     <div className="ats-section-title">
-                                        {getTitle('skills', 'Skills & Technologies')}
+                                        {getTitle(
+                                            'skills',
+                                            'Skills & Technologies',
+                                        )}
                                     </div>
                                     <div className="ats-desc">
                                         {renderSkillsWithCategoryBold(
@@ -2947,7 +3039,10 @@ function ResumePreview({
                             {(data.certifications?.length ?? 0) > 0 && (
                                 <>
                                     <div className="ats-section-title">
-                                        {getTitle('certifications', 'Certifications')}
+                                        {getTitle(
+                                            'certifications',
+                                            'Certifications',
+                                        )}
                                     </div>
                                     <div className="ats-desc">
                                         {data.certifications?.join(' | ')}
@@ -2979,23 +3074,62 @@ function ResumePreview({
                                                     {project.technologies}
                                                 </div>
                                             )}
-                                            {(project.url || project.github_url) && (
-                                                <div className="ats-company" style={{ fontSize: '11px' }}>
+                                            {(project.url ||
+                                                project.github_url) && (
+                                                <div
+                                                    className="ats-company"
+                                                    style={{ fontSize: '11px' }}
+                                                >
                                                     {[
-                                                        project.url ? <span key="demo">{renderLink(project.url)}</span> : null,
-                                                        project.github_url ? <span key="gh">{renderLink(project.github_url)}</span> : null,
+                                                        project.url ? (
+                                                            <span key="demo">
+                                                                {renderLink(
+                                                                    project.url,
+                                                                )}
+                                                            </span>
+                                                        ) : null,
+                                                        project.github_url ? (
+                                                            <span key="gh">
+                                                                {renderLink(
+                                                                    project.github_url,
+                                                                )}
+                                                            </span>
+                                                        ) : null,
                                                     ]
                                                         .filter(Boolean)
-                                                        .reduce((acc: React.ReactNode[], curr, i, arr) => {
-                                                            acc.push(curr);
-                                                            if (i < arr.length - 1) {
-                                                                acc.push(<span key={`psep-${i}`}> • </span>);
-                                                            }
-                                                            return acc;
-                                                        }, [])}
+                                                        .reduce(
+                                                            (
+                                                                acc: React.ReactNode[],
+                                                                curr,
+                                                                i,
+                                                                arr,
+                                                            ) => {
+                                                                acc.push(curr);
+
+                                                                if (
+                                                                    i <
+                                                                    arr.length -
+                                                                        1
+                                                                ) {
+                                                                    acc.push(
+                                                                        <span
+                                                                            key={`psep-${i}`}
+                                                                        >
+                                                                            {' '}
+                                                                            •{' '}
+                                                                        </span>,
+                                                                    );
+                                                                }
+
+                                                                return acc;
+                                                            },
+                                                            [],
+                                                        )}
                                                 </div>
                                             )}
-                                            {renderFormattedParagraphs(project.description)}
+                                            {renderFormattedParagraphs(
+                                                project.description,
+                                            )}
                                         </div>
                                     ))}
                                 </>
@@ -3006,7 +3140,10 @@ function ResumePreview({
                             {(data.additional_info?.length ?? 0) > 0 && (
                                 <>
                                     <div className="ats-section-title">
-                                        {getTitle('additional_info', 'Additional Information')}
+                                        {getTitle(
+                                            'additional_info',
+                                            'Additional Information',
+                                        )}
                                     </div>
                                     {data.additional_info?.map((item, i) => (
                                         <div
@@ -3101,7 +3238,12 @@ function ResumePreview({
 
                                                 if (i < arr.length - 1) {
                                                     acc.push(
-                                                        <span key={`sep-${i}`} style={{ margin: '0 4px' }}>
+                                                        <span
+                                                            key={`sep-${i}`}
+                                                            style={{
+                                                                margin: '0 4px',
+                                                            }}
+                                                        >
                                                             |
                                                         </span>,
                                                     );
@@ -3143,7 +3285,9 @@ function ResumePreview({
                                             <div className="job-company">
                                                 {job.company}
                                             </div>
-                                            {renderFormattedParagraphs(job.description)}
+                                            {renderFormattedParagraphs(
+                                                job.description,
+                                            )}
                                         </div>
                                     ))}
                                 </>
@@ -3226,23 +3370,62 @@ function ResumePreview({
                                                     {project.technologies}
                                                 </div>
                                             )}
-                                            {(project.url || project.github_url) && (
-                                                <div className="project-tech" style={{ fontSize: '11px' }}>
+                                            {(project.url ||
+                                                project.github_url) && (
+                                                <div
+                                                    className="project-tech"
+                                                    style={{ fontSize: '11px' }}
+                                                >
                                                     {[
-                                                        project.url ? <span key="demo">{renderLink(project.url)}</span> : null,
-                                                        project.github_url ? <span key="gh">{renderLink(project.github_url)}</span> : null,
+                                                        project.url ? (
+                                                            <span key="demo">
+                                                                {renderLink(
+                                                                    project.url,
+                                                                )}
+                                                            </span>
+                                                        ) : null,
+                                                        project.github_url ? (
+                                                            <span key="gh">
+                                                                {renderLink(
+                                                                    project.github_url,
+                                                                )}
+                                                            </span>
+                                                        ) : null,
                                                     ]
                                                         .filter(Boolean)
-                                                        .reduce((acc: React.ReactNode[], curr, i, arr) => {
-                                                            acc.push(curr);
-                                                            if (i < arr.length - 1) {
-                                                                acc.push(<span key={`psep-${i}`}> • </span>);
-                                                            }
-                                                            return acc;
-                                                        }, [])}
+                                                        .reduce(
+                                                            (
+                                                                acc: React.ReactNode[],
+                                                                curr,
+                                                                i,
+                                                                arr,
+                                                            ) => {
+                                                                acc.push(curr);
+
+                                                                if (
+                                                                    i <
+                                                                    arr.length -
+                                                                        1
+                                                                ) {
+                                                                    acc.push(
+                                                                        <span
+                                                                            key={`psep-${i}`}
+                                                                        >
+                                                                            {' '}
+                                                                            •{' '}
+                                                                        </span>,
+                                                                    );
+                                                                }
+
+                                                                return acc;
+                                                            },
+                                                            [],
+                                                        )}
                                                 </div>
                                             )}
-                                            {renderFormattedParagraphs(project.description)}
+                                            {renderFormattedParagraphs(
+                                                project.description,
+                                            )}
                                         </div>
                                     ))}
                                 </>
@@ -3348,7 +3531,12 @@ function ResumePreview({
 
                                                 if (i < arr.length - 1) {
                                                     acc.push(
-                                                        <span key={`sep-${i}`} style={{ margin: '0 4px' }}>
+                                                        <span
+                                                            key={`sep-${i}`}
+                                                            style={{
+                                                                margin: '0 4px',
+                                                            }}
+                                                        >
                                                             •
                                                         </span>,
                                                     );
@@ -3474,7 +3662,10 @@ function ResumePreview({
                                                 )}
                                             </div>
                                             {project.technologies && (
-                                                <div className="bullet-company" style={{ fontSize: '12px' }}>
+                                                <div
+                                                    className="bullet-company"
+                                                    style={{ fontSize: '12px' }}
+                                                >
                                                     {project.technologies}
                                                 </div>
                                             )}
@@ -3485,17 +3676,50 @@ function ResumePreview({
                                                     style={{ fontSize: '11px' }}
                                                 >
                                                     {[
-                                                        project.url ? <span key="demo">{renderLink(project.url)}</span> : null,
-                                                        project.github_url ? <span key="gh">{renderLink(project.github_url)}</span> : null,
+                                                        project.url ? (
+                                                            <span key="demo">
+                                                                {renderLink(
+                                                                    project.url,
+                                                                )}
+                                                            </span>
+                                                        ) : null,
+                                                        project.github_url ? (
+                                                            <span key="gh">
+                                                                {renderLink(
+                                                                    project.github_url,
+                                                                )}
+                                                            </span>
+                                                        ) : null,
                                                     ]
                                                         .filter(Boolean)
-                                                        .reduce((acc: React.ReactNode[], curr, i, arr) => {
-                                                            acc.push(curr);
-                                                            if (i < arr.length - 1) {
-                                                                acc.push(<span key={`psep-${i}`}> • </span>);
-                                                            }
-                                                            return acc;
-                                                        }, [])}
+                                                        .reduce(
+                                                            (
+                                                                acc: React.ReactNode[],
+                                                                curr,
+                                                                i,
+                                                                arr,
+                                                            ) => {
+                                                                acc.push(curr);
+
+                                                                if (
+                                                                    i <
+                                                                    arr.length -
+                                                                        1
+                                                                ) {
+                                                                    acc.push(
+                                                                        <span
+                                                                            key={`psep-${i}`}
+                                                                        >
+                                                                            {' '}
+                                                                            •{' '}
+                                                                        </span>,
+                                                                    );
+                                                                }
+
+                                                                return acc;
+                                                            },
+                                                            [],
+                                                        )}
                                                 </div>
                                             )}
                                             {project.description &&
@@ -3572,7 +3796,9 @@ function ResumePreview({
                                         {data.email}
                                     </a>
                                 )}
-                                {data.phone && <span>{formatPhone(data.phone)}</span>}
+                                {data.phone && (
+                                    <span>{formatPhone(data.phone)}</span>
+                                )}
                                 {data.location && <span>{data.location}</span>}
                                 {data.linkedin_url && (
                                     <span>{renderLink(data.linkedin_url)}</span>
@@ -3605,7 +3831,9 @@ function ResumePreview({
                                             <div className="job-company">
                                                 {job.company}
                                             </div>
-                                            {renderFormattedParagraphs(job.description)}
+                                            {renderFormattedParagraphs(
+                                                job.description,
+                                            )}
                                         </div>
                                     ))}
                                 </>
@@ -3736,7 +3964,9 @@ function ResumePreview({
                                                         )}
                                                 </div>
                                             )}
-                                            {renderFormattedParagraphs(project.description)}
+                                            {renderFormattedParagraphs(
+                                                project.description,
+                                            )}
                                         </div>
                                     ))}
                                 </>
@@ -3801,7 +4031,9 @@ function ResumePreview({
                                         {data.email}
                                     </a>
                                 )}
-                                {data.phone && <span>{formatPhone(data.phone)}</span>}
+                                {data.phone && (
+                                    <span>{formatPhone(data.phone)}</span>
+                                )}
                                 {data.location && <span>{data.location}</span>}
                             </div>
                             {data.linkedin_url && (
@@ -3844,7 +4076,9 @@ function ResumePreview({
                                                 <div className="job-company">
                                                     {job.company}
                                                 </div>
-                                                {renderFormattedParagraphs(job.description)}
+                                                {renderFormattedParagraphs(
+                                                    job.description,
+                                                )}
                                             </div>
                                         ))}
                                     </>
@@ -3977,7 +4211,9 @@ function ResumePreview({
                                                             )}
                                                     </div>
                                                 )}
-                                                {renderFormattedParagraphs(project.description)}
+                                                {renderFormattedParagraphs(
+                                                    project.description,
+                                                )}
                                             </div>
                                         ))}
                                     </>
@@ -4040,7 +4276,9 @@ function ResumePreview({
                                     {data.location && (
                                         <span>{data.location}</span>
                                     )}
-                                    {data.phone && <span>{formatPhone(data.phone)}</span>}
+                                    {data.phone && (
+                                        <span>{formatPhone(data.phone)}</span>
+                                    )}
                                     {data.email && (
                                         <a
                                             href={`mailto:${data.email}`}
@@ -4097,7 +4335,9 @@ function ResumePreview({
                                                     {job.duration}
                                                 </span>
                                             </div>
-                                            {renderFormattedParagraphs(job.description)}
+                                            {renderFormattedParagraphs(
+                                                job.description,
+                                            )}
                                         </div>
                                     ))}
                                 </>
@@ -4187,20 +4427,55 @@ function ResumePreview({
                                                     }}
                                                 >
                                                     {[
-                                                        project.url ? <span key="demo">{renderLink(project.url)}</span> : null,
-                                                        project.github_url ? <span key="gh">{renderLink(project.github_url)}</span> : null,
+                                                        project.url ? (
+                                                            <span key="demo">
+                                                                {renderLink(
+                                                                    project.url,
+                                                                )}
+                                                            </span>
+                                                        ) : null,
+                                                        project.github_url ? (
+                                                            <span key="gh">
+                                                                {renderLink(
+                                                                    project.github_url,
+                                                                )}
+                                                            </span>
+                                                        ) : null,
                                                     ]
                                                         .filter(Boolean)
-                                                        .reduce((acc: React.ReactNode[], curr, i, arr) => {
-                                                            acc.push(curr);
-                                                            if (i < arr.length - 1) {
-                                                                acc.push(<span key={`psep-${i}`}> • </span>);
-                                                            }
-                                                            return acc;
-                                                        }, [])}
+                                                        .reduce(
+                                                            (
+                                                                acc: React.ReactNode[],
+                                                                curr,
+                                                                i,
+                                                                arr,
+                                                            ) => {
+                                                                acc.push(curr);
+
+                                                                if (
+                                                                    i <
+                                                                    arr.length -
+                                                                        1
+                                                                ) {
+                                                                    acc.push(
+                                                                        <span
+                                                                            key={`psep-${i}`}
+                                                                        >
+                                                                            {' '}
+                                                                            •{' '}
+                                                                        </span>,
+                                                                    );
+                                                                }
+
+                                                                return acc;
+                                                            },
+                                                            [],
+                                                        )}
                                                 </div>
                                             )}
-                                            {renderFormattedParagraphs(project.description)}
+                                            {renderFormattedParagraphs(
+                                                project.description,
+                                            )}
                                         </div>
                                     ))}
                                 </>
@@ -4410,7 +4685,12 @@ function ResumePreview({
 
                                                 if (i < arr.length - 1) {
                                                     acc.push(
-                                                        <span key={`sep-${i}`} style={{ margin: '0 4px' }}>
+                                                        <span
+                                                            key={`sep-${i}`}
+                                                            style={{
+                                                                margin: '0 4px',
+                                                            }}
+                                                        >
                                                             |
                                                         </span>,
                                                     );
@@ -4437,7 +4717,10 @@ function ResumePreview({
                                             paddingBottom: '3px',
                                         }}
                                     >
-                                        {getTitle('summary', 'PROFESSIONAL SUMMARY').toUpperCase()}
+                                        {getTitle(
+                                            'summary',
+                                            'PROFESSIONAL SUMMARY',
+                                        ).toUpperCase()}
                                     </div>
                                     <div
                                         style={{
@@ -4447,7 +4730,9 @@ function ResumePreview({
                                             marginBottom: '12px',
                                         }}
                                     >
-                                        {renderFormattedParagraphs(data.summary)}
+                                        {renderFormattedParagraphs(
+                                            data.summary,
+                                        )}
                                     </div>
                                 </>
                             )}
@@ -4468,7 +4753,10 @@ function ResumePreview({
                                             paddingBottom: '3px',
                                         }}
                                     >
-                                        {getTitle('skills', 'TECHNICAL SKILLS').toUpperCase()}
+                                        {getTitle(
+                                            'skills',
+                                            'TECHNICAL SKILLS',
+                                        ).toUpperCase()}
                                     </div>
                                     <div
                                         style={{
@@ -4495,16 +4783,38 @@ function ResumePreview({
                                                 );
 
                                                 return (
-                                                    <div key={i} style={{ marginBottom: '3px' }}>
-                                                        <strong style={{ fontWeight: 600 }}>
+                                                    <div
+                                                        key={i}
+                                                        style={{
+                                                            marginBottom: '3px',
+                                                        }}
+                                                    >
+                                                        <strong
+                                                            style={{
+                                                                fontWeight: 600,
+                                                            }}
+                                                        >
                                                             {prefix}:
                                                         </strong>
-                                                        {renderFormattedBullet(rest)}
+                                                        {renderFormattedBullet(
+                                                            rest,
+                                                        )}
                                                     </div>
                                                 );
                                             }
 
-                                            return <div key={i} style={{ marginBottom: '3px' }}>{renderFormattedBullet(skill)}</div>;
+                                            return (
+                                                <div
+                                                    key={i}
+                                                    style={{
+                                                        marginBottom: '3px',
+                                                    }}
+                                                >
+                                                    {renderFormattedBullet(
+                                                        skill,
+                                                    )}
+                                                </div>
+                                            );
                                         })}
                                     </div>
                                 </>
@@ -4526,7 +4836,10 @@ function ResumePreview({
                                             paddingBottom: '3px',
                                         }}
                                     >
-                                        {getTitle('work', 'EXPERIENCE').toUpperCase()}
+                                        {getTitle(
+                                            'work',
+                                            'EXPERIENCE',
+                                        ).toUpperCase()}
                                     </div>
                                     {data.work_experience?.map((job, i) => (
                                         <div
@@ -4596,7 +4909,10 @@ function ResumePreview({
                                             paddingBottom: '3px',
                                         }}
                                     >
-                                        {getTitle('education', 'EDUCATION').toUpperCase()}
+                                        {getTitle(
+                                            'education',
+                                            'EDUCATION',
+                                        ).toUpperCase()}
                                     </div>
                                     {data.education?.map((edu, i) => (
                                         <div
@@ -4662,7 +4978,10 @@ function ResumePreview({
                                             paddingBottom: '3px',
                                         }}
                                     >
-                                        {getTitle('projects', 'PROJECTS').toUpperCase()}
+                                        {getTitle(
+                                            'projects',
+                                            'PROJECTS',
+                                        ).toUpperCase()}
                                     </div>
                                     {data.projects?.map((project, i) => (
                                         <div
@@ -4709,7 +5028,8 @@ function ResumePreview({
                                                     {project.technologies}
                                                 </div>
                                             )}
-                                            {(project.url || project.github_url) && (
+                                            {(project.url ||
+                                                project.github_url) && (
                                                 <div
                                                     style={{
                                                         fontSize: '11px',
@@ -4718,17 +5038,50 @@ function ResumePreview({
                                                     }}
                                                 >
                                                     {[
-                                                        project.url ? <span key="demo">{renderLink(project.url)}</span> : null,
-                                                        project.github_url ? <span key="gh">{renderLink(project.github_url)}</span> : null,
+                                                        project.url ? (
+                                                            <span key="demo">
+                                                                {renderLink(
+                                                                    project.url,
+                                                                )}
+                                                            </span>
+                                                        ) : null,
+                                                        project.github_url ? (
+                                                            <span key="gh">
+                                                                {renderLink(
+                                                                    project.github_url,
+                                                                )}
+                                                            </span>
+                                                        ) : null,
                                                     ]
                                                         .filter(Boolean)
-                                                        .reduce((acc: React.ReactNode[], curr, i, arr) => {
-                                                            acc.push(curr);
-                                                            if (i < arr.length - 1) {
-                                                                acc.push(<span key={`psep-${i}`}> | </span>);
-                                                            }
-                                                            return acc;
-                                                        }, [])}
+                                                        .reduce(
+                                                            (
+                                                                acc: React.ReactNode[],
+                                                                curr,
+                                                                i,
+                                                                arr,
+                                                            ) => {
+                                                                acc.push(curr);
+
+                                                                if (
+                                                                    i <
+                                                                    arr.length -
+                                                                        1
+                                                                ) {
+                                                                    acc.push(
+                                                                        <span
+                                                                            key={`psep-${i}`}
+                                                                        >
+                                                                            {' '}
+                                                                            |{' '}
+                                                                        </span>,
+                                                                    );
+                                                                }
+
+                                                                return acc;
+                                                            },
+                                                            [],
+                                                        )}
                                                 </div>
                                             )}
                                             {project.description &&
@@ -4756,7 +5109,10 @@ function ResumePreview({
                                             paddingBottom: '3px',
                                         }}
                                     >
-                                        {getTitle('certifications', 'CERTIFICATIONS').toUpperCase()}
+                                        {getTitle(
+                                            'certifications',
+                                            'CERTIFICATIONS',
+                                        ).toUpperCase()}
                                     </div>
                                     <ul
                                         style={{
@@ -4790,7 +5146,10 @@ function ResumePreview({
                                             paddingBottom: '3px',
                                         }}
                                     >
-                                        {getTitle('additional_info', 'ADDITIONAL INFORMATION').toUpperCase()}
+                                        {getTitle(
+                                            'additional_info',
+                                            'ADDITIONAL INFORMATION',
+                                        ).toUpperCase()}
                                     </div>
                                     {data.additional_info?.map((item, i) => (
                                         <div
@@ -4935,7 +5294,12 @@ function ResumePreview({
 
                                                 if (i < arr.length - 1) {
                                                     acc.push(
-                                                        <span key={`sep-${i}`} style={{ margin: '0 4px' }}>
+                                                        <span
+                                                            key={`sep-${i}`}
+                                                            style={{
+                                                                margin: '0 4px',
+                                                            }}
+                                                        >
                                                             |
                                                         </span>,
                                                     );
@@ -4963,7 +5327,10 @@ function ResumePreview({
                                             marginTop: '12px',
                                         }}
                                     >
-                                        {getTitle('summary', 'PROFESSIONAL SUMMARY').toUpperCase()}
+                                        {getTitle(
+                                            'summary',
+                                            'PROFESSIONAL SUMMARY',
+                                        ).toUpperCase()}
                                     </div>
                                     <div
                                         style={{
@@ -4975,7 +5342,9 @@ function ResumePreview({
                                             marginBottom: '12px',
                                         }}
                                     >
-                                        {renderFormattedParagraphs(data.summary)}
+                                        {renderFormattedParagraphs(
+                                            data.summary,
+                                        )}
                                     </div>
                                 </>
                             )}
@@ -4999,7 +5368,10 @@ function ResumePreview({
                                             paddingBottom: '3px',
                                         }}
                                     >
-                                        {getTitle('skills', 'TECHNICAL SKILLS').toUpperCase()}
+                                        {getTitle(
+                                            'skills',
+                                            'TECHNICAL SKILLS',
+                                        ).toUpperCase()}
                                     </div>
                                     <div
                                         style={{
@@ -5028,16 +5400,38 @@ function ResumePreview({
                                                 );
 
                                                 return (
-                                                    <div key={i} style={{ marginBottom: '3px' }}>
-                                                        <strong style={{ fontWeight: 600 }}>
+                                                    <div
+                                                        key={i}
+                                                        style={{
+                                                            marginBottom: '3px',
+                                                        }}
+                                                    >
+                                                        <strong
+                                                            style={{
+                                                                fontWeight: 600,
+                                                            }}
+                                                        >
                                                             {prefix}:
                                                         </strong>
-                                                        {renderFormattedBullet(rest)}
+                                                        {renderFormattedBullet(
+                                                            rest,
+                                                        )}
                                                     </div>
                                                 );
                                             }
 
-                                            return <div key={i} style={{ marginBottom: '3px' }}>{renderFormattedBullet(skill)}</div>;
+                                            return (
+                                                <div
+                                                    key={i}
+                                                    style={{
+                                                        marginBottom: '3px',
+                                                    }}
+                                                >
+                                                    {renderFormattedBullet(
+                                                        skill,
+                                                    )}
+                                                </div>
+                                            );
                                         })}
                                     </div>
                                 </>
@@ -5062,7 +5456,10 @@ function ResumePreview({
                                             paddingBottom: '3px',
                                         }}
                                     >
-                                        {getTitle('work', 'PROFESSIONAL EXPERIENCE').toUpperCase()}
+                                        {getTitle(
+                                            'work',
+                                            'PROFESSIONAL EXPERIENCE',
+                                        ).toUpperCase()}
                                     </div>
                                     {data.work_experience?.map((job, i) => (
                                         <div
@@ -5141,7 +5538,10 @@ function ResumePreview({
                                             paddingBottom: '3px',
                                         }}
                                     >
-                                        {getTitle('education', 'EDUCATION').toUpperCase()}
+                                        {getTitle(
+                                            'education',
+                                            'EDUCATION',
+                                        ).toUpperCase()}
                                     </div>
                                     {data.education?.map((edu, i) => (
                                         <div
@@ -5216,7 +5616,10 @@ function ResumePreview({
                                             paddingBottom: '3px',
                                         }}
                                     >
-                                        {getTitle('projects', 'PROJECTS').toUpperCase()}
+                                        {getTitle(
+                                            'projects',
+                                            'PROJECTS',
+                                        ).toUpperCase()}
                                     </div>
                                     {data.projects?.map((project, i) => (
                                         <div
@@ -5269,7 +5672,8 @@ function ResumePreview({
                                                     {project.technologies}
                                                 </div>
                                             )}
-                                            {(project.url || project.github_url) && (
+                                            {(project.url ||
+                                                project.github_url) && (
                                                 <div
                                                     style={{
                                                         fontFamily:
@@ -5280,17 +5684,50 @@ function ResumePreview({
                                                     }}
                                                 >
                                                     {[
-                                                        project.url ? <span key="demo">{renderLink(project.url)}</span> : null,
-                                                        project.github_url ? <span key="gh">{renderLink(project.github_url)}</span> : null,
+                                                        project.url ? (
+                                                            <span key="demo">
+                                                                {renderLink(
+                                                                    project.url,
+                                                                )}
+                                                            </span>
+                                                        ) : null,
+                                                        project.github_url ? (
+                                                            <span key="gh">
+                                                                {renderLink(
+                                                                    project.github_url,
+                                                                )}
+                                                            </span>
+                                                        ) : null,
                                                     ]
                                                         .filter(Boolean)
-                                                        .reduce((acc: React.ReactNode[], curr, i, arr) => {
-                                                            acc.push(curr);
-                                                            if (i < arr.length - 1) {
-                                                                acc.push(<span key={`psep-${i}`}> | </span>);
-                                                            }
-                                                            return acc;
-                                                        }, [])}
+                                                        .reduce(
+                                                            (
+                                                                acc: React.ReactNode[],
+                                                                curr,
+                                                                i,
+                                                                arr,
+                                                            ) => {
+                                                                acc.push(curr);
+
+                                                                if (
+                                                                    i <
+                                                                    arr.length -
+                                                                        1
+                                                                ) {
+                                                                    acc.push(
+                                                                        <span
+                                                                            key={`psep-${i}`}
+                                                                        >
+                                                                            {' '}
+                                                                            |{' '}
+                                                                        </span>,
+                                                                    );
+                                                                }
+
+                                                                return acc;
+                                                            },
+                                                            [],
+                                                        )}
                                                 </div>
                                             )}
                                             {project.description &&
@@ -5321,7 +5758,10 @@ function ResumePreview({
                                             paddingBottom: '3px',
                                         }}
                                     >
-                                        {getTitle('certifications', 'CERTIFICATIONS').toUpperCase()}
+                                        {getTitle(
+                                            'certifications',
+                                            'CERTIFICATIONS',
+                                        ).toUpperCase()}
                                     </div>
                                     <div
                                         style={{
@@ -5357,7 +5797,10 @@ function ResumePreview({
                                             paddingBottom: '3px',
                                         }}
                                     >
-                                        {getTitle('additional_info', 'ADDITIONAL INFORMATION').toUpperCase()}
+                                        {getTitle(
+                                            'additional_info',
+                                            'ADDITIONAL INFORMATION',
+                                        ).toUpperCase()}
                                     </div>
                                     {data.additional_info?.map((item, i) => (
                                         <div
@@ -5397,7 +5840,10 @@ function ResumePreview({
                     </DialogHeader>
                     <div className="flex flex-col gap-4">
                         <div className="flex flex-col gap-2">
-                            <Label htmlFor="version_name">Version Name <span className="text-red-500">*</span></Label>
+                            <Label htmlFor="version_name">
+                                Version Name{' '}
+                                <span className="text-red-500">*</span>
+                            </Label>
                             <Input
                                 id="version_name"
                                 value={versionName}
@@ -5522,7 +5968,7 @@ function CoverLetterPreview({
 
     return (
         <div className="flex max-w-full min-w-0 flex-col gap-4 overflow-x-auto overflow-y-hidden pb-4">
-            <div className="flex w-full max-w-[210mm] justify-end gap-2 mx-auto">
+            <div className="mx-auto flex w-full max-w-[210mm] justify-end gap-2">
                 <Button variant="outline" onClick={handleSaveVersion}>
                     <Save className="mr-2 size-4" />
                     Save Version
@@ -5569,7 +6015,9 @@ function CoverLetterPreview({
                         .split('\n')
                         .map((paragraph, i) =>
                             paragraph.trim() ? (
-                                <p key={i}>{renderFormattedBullet(paragraph)}</p>
+                                <p key={i}>
+                                    {renderFormattedBullet(paragraph)}
+                                </p>
                             ) : null,
                         )}
                 </div>
@@ -5894,7 +6342,10 @@ function CoverLetterBuilder({
             <CardContent className="flex min-h-0 flex-1 flex-col gap-4">
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
                     <div className="flex flex-col gap-2">
-<Label htmlFor="target_job_title">Target Job Title <span className="text-red-500">*</span></Label>
+                        <Label htmlFor="target_job_title">
+                            Target Job Title{' '}
+                            <span className="text-red-500">*</span>
+                        </Label>
                         <Input
                             id="target_job_title"
                             value={jobTitle}
@@ -5908,7 +6359,10 @@ function CoverLetterBuilder({
                         />
                     </div>
                     <div className="flex flex-col gap-2">
-                        <Label htmlFor="target_company">Target Company <span className="text-red-500">*</span></Label>
+                        <Label htmlFor="target_company">
+                            Target Company{' '}
+                            <span className="text-red-500">*</span>
+                        </Label>
                         <Input
                             id="target_company"
                             value={companyName}
@@ -5922,7 +6376,10 @@ function CoverLetterBuilder({
                         />
                     </div>
                     <div className="flex flex-col gap-2">
-<Label htmlFor="recipient">Address To / Recipient <span className="text-red-500">*</span></Label>
+                        <Label htmlFor="recipient">
+                            Address To / Recipient{' '}
+                            <span className="text-red-500">*</span>
+                        </Label>
                         <Input
                             id="recipient"
                             value={recipient}
@@ -5962,7 +6419,9 @@ function CoverLetterBuilder({
                 </div>
 
                 <div className="flex flex-col gap-2">
-                    <Label htmlFor="job_description">Job Description <span className="text-red-500">*</span></Label>
+                    <Label htmlFor="job_description">
+                        Job Description <span className="text-red-500">*</span>
+                    </Label>
                     <Textarea
                         id="job_description"
                         value={jobDescription}
@@ -5971,7 +6430,8 @@ function CoverLetterBuilder({
                         placeholder="Paste the job description here to generate a tailored cover letter..."
                     />
                     <p className="text-xs text-muted-foreground">
-                        Paste the full job description for best AI-generated results.
+                        Paste the full job description for best AI-generated
+                        results.
                     </p>
                 </div>
 
@@ -6019,7 +6479,9 @@ function CoverLetterBuilder({
                 </div>
 
                 <div className="flex min-h-0 flex-1 flex-col gap-2">
-                    <Label htmlFor="cover_letter_content">Cover Letter <span className="text-red-500">*</span></Label>
+                    <Label htmlFor="cover_letter_content">
+                        Cover Letter <span className="text-red-500">*</span>
+                    </Label>
                     <Textarea
                         id="cover_letter_content"
                         value={coverLetterContent}
@@ -6030,7 +6492,11 @@ function CoverLetterBuilder({
                         placeholder="Write your cover letter here, or select a template to load predefined text..."
                     />
                     <p className="text-xs text-muted-foreground">
-                        Press Enter to start a new paragraph. Use <code className="rounded bg-muted px-1">**bold text**</code> for emphasis (renders in PDF).
+                        Press Enter to start a new paragraph. Use{' '}
+                        <code className="rounded bg-muted px-1">
+                            **bold text**
+                        </code>{' '}
+                        for emphasis (renders in PDF).
                     </p>
                 </div>
             </CardContent>
@@ -6261,14 +6727,18 @@ function getInitialEditorTab(): string {
     if (typeof window !== 'undefined') {
         const urlParams = new URLSearchParams(window.location.search);
         const urlTab = urlParams.get('tab');
+
         if (urlTab && VALID_EDITOR_TABS.includes(urlTab)) {
             return urlTab;
         }
+
         const savedTab = localStorage.getItem('documents_editor_tab');
+
         if (savedTab && VALID_EDITOR_TABS.includes(savedTab)) {
             return savedTab;
         }
     }
+
     return 'personal';
 }
 
@@ -6276,14 +6746,18 @@ function getInitialView(defaultView: string): string {
     if (typeof window !== 'undefined') {
         const urlParams = new URLSearchParams(window.location.search);
         const urlView = urlParams.get('view');
+
         if (urlView && VALID_VIEWS.includes(urlView)) {
             return urlView;
         }
+
         const savedView = localStorage.getItem('documents_active_view');
+
         if (savedView && VALID_VIEWS.includes(savedView)) {
             return savedView;
         }
     }
+
     return defaultView;
 }
 
@@ -6310,6 +6784,7 @@ export default function DocumentsIndex({
 
     const setActiveEditorTab = (tab: string) => {
         setActiveEditorTabState(tab);
+
         if (typeof window !== 'undefined') {
             localStorage.getItem('documents_editor_tab');
             localStorage.setItem('documents_editor_tab', tab);
@@ -6321,6 +6796,7 @@ export default function DocumentsIndex({
 
     const setActiveView = (view: string) => {
         setActiveViewState(view);
+
         if (typeof window !== 'undefined') {
             localStorage.setItem('documents_active_view', view);
             const url = new URL(window.location.href);
@@ -6371,11 +6847,12 @@ export default function DocumentsIndex({
     const [isDirty, setIsDirty] = useState(false);
     const [clIsDirty, setClIsDirty] = useState(false);
     const combinedDirty = isDirty || clIsDirty;
-    const [lastSaved, setLastSaved] = useState<Date | null>(null);
     const [showUnsavedDialog, setShowUnsavedDialog] = useState(false);
     const pendingVisitUrl = useRef<string | null>(null);
     const userConfirmedLeave = useRef(false);
-    const beforeUnloadHandlerRef = useRef<((e: BeforeUnloadEvent) => void) | null>(null);
+    const beforeUnloadHandlerRef = useRef<
+        ((e: BeforeUnloadEvent) => void) | null
+    >(null);
 
     const { data, setData, put, processing, errors, recentlySuccessful } =
         useForm<ResumeProfile>({
@@ -6464,7 +6941,11 @@ export default function DocumentsIndex({
 
     const dirtySections = useMemo(() => {
         const dirty = new Set<string>();
-        if (!initialSnapshot.current) return dirty;
+
+        if (!initialSnapshot.current) {
+            return dirty;
+        }
+
         const initial = JSON.parse(initialSnapshot.current);
         const personalFields: (keyof ResumeProfile)[] = [
             'full_name',
@@ -6480,56 +6961,62 @@ export default function DocumentsIndex({
             'font_size',
             'font_family',
         ];
+
         if (
             personalFields.some(
-                (f) =>
-                    JSON.stringify(data[f]) !==
-                    JSON.stringify(initial[f]),
+                (f) => JSON.stringify(data[f]) !== JSON.stringify(initial[f]),
             )
         ) {
             dirty.add('personal');
         }
+
         if (
             JSON.stringify(data.work_experience) !==
             JSON.stringify(initial.work_experience)
         ) {
             dirty.add('work');
         }
+
         if (
-            JSON.stringify(data.education) !==
-            JSON.stringify(initial.education)
+            JSON.stringify(data.education) !== JSON.stringify(initial.education)
         ) {
             dirty.add('education');
         }
-        if (
-            JSON.stringify(data.skills) !== JSON.stringify(initial.skills)
-        ) {
+
+        if (JSON.stringify(data.skills) !== JSON.stringify(initial.skills)) {
             dirty.add('skills');
         }
+
         if (
-            JSON.stringify(data.projects) !==
-            JSON.stringify(initial.projects)
+            JSON.stringify(data.projects) !== JSON.stringify(initial.projects)
         ) {
             dirty.add('projects');
         }
+
         if (
             JSON.stringify(data.certifications) !==
             JSON.stringify(initial.certifications)
         ) {
             dirty.add('certifications');
         }
+
         if (
             JSON.stringify(data.additional_info) !==
             JSON.stringify(initial.additional_info)
         ) {
             dirty.add('additional_info');
         }
+
         return dirty;
     }, [data, initialSnapshot.current]);
 
     const dirtyFields = useMemo(() => {
         const dirty = new Set<string>();
-        if (!initialSnapshot.current) return dirty;
+
+        if (!initialSnapshot.current) {
+            return dirty;
+        }
+
         const initial = JSON.parse(initialSnapshot.current);
         const allFields: (keyof ResumeProfile)[] = [
             'full_name',
@@ -6551,20 +7038,25 @@ export default function DocumentsIndex({
             'certifications',
             'additional_info',
         ];
+
         for (const field of allFields) {
             if (
-                JSON.stringify(data[field]) !==
-                JSON.stringify(initial[field])
+                JSON.stringify(data[field]) !== JSON.stringify(initial[field])
             ) {
                 dirty.add(field);
             }
         }
+
         return dirty;
     }, [data, initialSnapshot.current]);
 
     const detailDirty = useMemo<DetailDirty>(() => {
         const result: DetailDirty = {};
-        if (!initialSnapshot.current) return result;
+
+        if (!initialSnapshot.current) {
+            return result;
+        }
+
         const initial = JSON.parse(initialSnapshot.current);
 
         function compareArray<T extends Record<string, unknown>>(
@@ -6573,22 +7065,28 @@ export default function DocumentsIndex({
         ) {
             const current = data[key as keyof ResumeProfile] as T[] | undefined;
             const initArr = initial[key] as T[] | undefined;
+
             if (!current || !initArr) {
                 if (JSON.stringify(current) !== JSON.stringify(initArr)) {
                     result[key] = true;
                 }
+
                 return;
             }
+
             const max = Math.max(current.length, initArr.length);
             const itemMap: Record<number, Set<string>> = {};
             let hasDirty = false;
+
             for (let i = 0; i < max; i++) {
                 const dirtyFields = new Set<string>();
+
                 if (i >= current.length || i >= initArr.length) {
                     hasDirty = true;
                     itemMap[i] = new Set(fields as string[]);
                     continue;
                 }
+
                 for (const field of fields) {
                     if (
                         JSON.stringify(current[i][field]) !==
@@ -6597,31 +7095,43 @@ export default function DocumentsIndex({
                         dirtyFields.add(field as string);
                     }
                 }
+
                 if (dirtyFields.size > 0) {
                     hasDirty = true;
                     itemMap[i] = dirtyFields;
                 }
             }
-            if (hasDirty) result[key] = itemMap;
+
+            if (hasDirty) {
+                result[key] = itemMap;
+            }
         }
 
         compareArray<WorkExperience>('work_experience', [
-            'company', 'position', 'duration', 'description', 'location',
+            'company',
+            'position',
+            'duration',
+            'description',
+            'location',
         ]);
         compareArray<Education>('education', [
-            'institution', 'degree', 'year', 'location',
+            'institution',
+            'degree',
+            'year',
+            'location',
         ]);
         compareArray<Project>('projects', [
-            'title', 'description', 'url', 'github_url', 'technologies', 'duration',
+            'title',
+            'description',
+            'url',
+            'github_url',
+            'technologies',
+            'duration',
         ]);
-        compareArray<AdditionalInfo>('additional_info', [
-            'label', 'value',
-        ]);
+        compareArray<AdditionalInfo>('additional_info', ['label', 'value']);
 
         for (const key of ['skills', 'certifications'] as const) {
-            if (
-                JSON.stringify(data[key]) !== JSON.stringify(initial[key])
-            ) {
+            if (JSON.stringify(data[key]) !== JSON.stringify(initial[key])) {
                 result[key] = true;
             }
         }
@@ -6639,6 +7149,7 @@ export default function DocumentsIndex({
             template: clTemplate,
         });
         setClIsDirty(false);
+
         try {
             localStorage.removeItem('cover_letter_draft');
         } catch {
@@ -6648,10 +7159,15 @@ export default function DocumentsIndex({
 
     function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
+
         if (beforeUnloadHandlerRef.current) {
-            window.removeEventListener('beforeunload', beforeUnloadHandlerRef.current);
+            window.removeEventListener(
+                'beforeunload',
+                beforeUnloadHandlerRef.current,
+            );
             beforeUnloadHandlerRef.current = null;
         }
+
         setIsDirty(false);
         put('/documents/profile', {
             preserveScroll: true,
@@ -6662,7 +7178,7 @@ export default function DocumentsIndex({
                 setActiveView('resume-preview');
             },
         });
-        setLastSaved(new Date());
+
         try {
             localStorage.removeItem('resume_draft');
             localStorage.removeItem('resume_draft_template');
@@ -6673,10 +7189,15 @@ export default function DocumentsIndex({
 
     function handleConfirmLeave() {
         userConfirmedLeave.current = true;
+
         if (beforeUnloadHandlerRef.current) {
-            window.removeEventListener('beforeunload', beforeUnloadHandlerRef.current);
+            window.removeEventListener(
+                'beforeunload',
+                beforeUnloadHandlerRef.current,
+            );
             beforeUnloadHandlerRef.current = null;
         }
+
         try {
             localStorage.removeItem('resume_draft');
             localStorage.removeItem('resume_draft_template');
@@ -6684,23 +7205,32 @@ export default function DocumentsIndex({
         } catch {
             /* ignore */
         }
+
         if (pendingVisitUrl.current) {
             router.visit(pendingVisitUrl.current);
         }
+
         setShowUnsavedDialog(false);
         pendingVisitUrl.current = null;
     }
 
     useEffect(() => {
-        if (!activeProfileData) return;
+        if (!activeProfileData) {
+            return;
+        }
+
         if (initialSnapshot.current === null) {
             initialSnapshot.current = JSON.stringify(data);
         }
+
         setIsDirty(JSON.stringify(data) !== initialSnapshot.current);
     }, [data, activeProfileData]);
 
     useEffect(() => {
-        if (!activeProfileData) return;
+        if (!activeProfileData) {
+            return;
+        }
+
         if (clInitialSnapshot.current === null) {
             clInitialSnapshot.current = JSON.stringify({
                 content: coverLetterContent,
@@ -6711,8 +7241,13 @@ export default function DocumentsIndex({
                 template: clTemplate,
             });
         }
+
         const snap = clInitialSnapshot.current;
-        if (!snap) return;
+
+        if (!snap) {
+            return;
+        }
+
         const prev = JSON.parse(snap);
         setClIsDirty(
             coverLetterContent !== prev.content ||
@@ -6744,6 +7279,7 @@ export default function DocumentsIndex({
                 setShowUnsavedDialog(true);
             }
         });
+
         return () => unregister();
     }, [combinedDirty]);
 
@@ -6754,6 +7290,7 @@ export default function DocumentsIndex({
             };
             beforeUnloadHandlerRef.current = handler;
             window.addEventListener('beforeunload', handler);
+
             return () => {
                 window.removeEventListener('beforeunload', handler);
                 beforeUnloadHandlerRef.current = null;
@@ -6771,6 +7308,7 @@ export default function DocumentsIndex({
                     /* storage full */
                 }
             }, 1000);
+
             return () => clearTimeout(timer);
         }
     }, [data, isDirty, template]);
@@ -6794,6 +7332,7 @@ export default function DocumentsIndex({
                     /* storage full */
                 }
             }, 1000);
+
             return () => clearTimeout(timer);
         }
     }, [
@@ -6810,28 +7349,55 @@ export default function DocumentsIndex({
         if (!loadedResume && !profile?.id) {
             try {
                 const draft = localStorage.getItem('resume_draft');
-                const draftTemplate = localStorage.getItem('resume_draft_template');
+                const draftTemplate = localStorage.getItem(
+                    'resume_draft_template',
+                );
+
                 if (draft) {
                     const parsed = JSON.parse(draft);
                     setData(parsed);
-                    if (draftTemplate) setTemplate(draftTemplate);
+
+                    if (draftTemplate) {
+                        setTemplate(draftTemplate);
+                    }
+
                     initialSnapshot.current = JSON.stringify(parsed);
                 }
             } catch {
                 /* ignore corrupt data */
             }
         }
+
         if (!loadedCoverLetter) {
             try {
                 const clDraft = localStorage.getItem('cover_letter_draft');
+
                 if (clDraft) {
                     const parsed = JSON.parse(clDraft);
-                    if (parsed.content) setCoverLetterContent(parsed.content);
-                    if (parsed.company) setCoverLetterCompany(parsed.company);
-                    if (parsed.jobTitle) setCoverLetterJobTitle(parsed.jobTitle);
-                    if (parsed.jobDescription) setCoverLetterJobDescription(parsed.jobDescription);
-                    if (parsed.recipient) setCoverLetterRecipient(parsed.recipient);
-                    if (parsed.template) setCLTemplate(parsed.template);
+
+                    if (parsed.content) {
+                        setCoverLetterContent(parsed.content);
+                    }
+
+                    if (parsed.company) {
+                        setCoverLetterCompany(parsed.company);
+                    }
+
+                    if (parsed.jobTitle) {
+                        setCoverLetterJobTitle(parsed.jobTitle);
+                    }
+
+                    if (parsed.jobDescription) {
+                        setCoverLetterJobDescription(parsed.jobDescription);
+                    }
+
+                    if (parsed.recipient) {
+                        setCoverLetterRecipient(parsed.recipient);
+                    }
+
+                    if (parsed.template) {
+                        setCLTemplate(parsed.template);
+                    }
                 }
             } catch {
                 /* ignore corrupt data */
@@ -7092,7 +7658,13 @@ export default function DocumentsIndex({
 
                 <div className="flex shrink-0 gap-1 rounded-lg bg-[#f5f5f4] p-1 dark:bg-[#1C1C1A]">
                     {VIEWS.map(({ id, label, icon: Icon }) => {
-                        const viewDirty = id === 'resume-edit' ? isDirty : id === 'cover-letter-edit' ? clIsDirty : false;
+                        const viewDirty =
+                            id === 'resume-edit'
+                                ? isDirty
+                                : id === 'cover-letter-edit'
+                                  ? clIsDirty
+                                  : false;
+
                         return (
                             <button
                                 key={id}
@@ -7105,8 +7677,12 @@ export default function DocumentsIndex({
                                 }`}
                             >
                                 <Icon className="size-4" />
-                                <span className="hidden sm:inline">{label}</span>
-                                {viewDirty && <span className="absolute -right-0.5 -top-0.5 size-2 rounded-full bg-amber-500" />}
+                                <span className="hidden sm:inline">
+                                    {label}
+                                </span>
+                                {viewDirty && (
+                                    <span className="absolute -top-0.5 -right-0.5 size-2 rounded-full bg-amber-500" />
+                                )}
                             </button>
                         );
                     })}
@@ -7135,7 +7711,9 @@ export default function DocumentsIndex({
                                         </div>
                                     )}
                                     <p className="mt-1 text-xs text-muted-foreground">
-                                        Fields marked with <span className="text-red-500">*</span> are required.
+                                        Fields marked with{' '}
+                                        <span className="text-red-500">*</span>{' '}
+                                        are required.
                                     </p>
                                 </CardHeader>
                                 <CardContent className="flex flex-col gap-4">
@@ -7201,7 +7779,8 @@ export default function DocumentsIndex({
                                                             isDirty={
                                                                 dirtySections.has(
                                                                     id,
-                                                                ) && combinedDirty
+                                                                ) &&
+                                                                combinedDirty
                                                             }
                                                         />
                                                     );
@@ -7427,26 +8006,31 @@ export default function DocumentsIndex({
                                 </div>
                             )}
                             <CoverLetterBuilder
-                            profile={data}
-                            template={clTemplate}
-                            onTemplateChange={setCLTemplate}
-                            aiLimit={aiLimit}
-                            coverLetterContent={coverLetterContent}
-                            onCoverLetterContentChange={setCoverLetterContent}
-                            onCoverLetterMetaChange={(company, jobTitle) => {
-                                setCoverLetterCompany(company);
-                                setCoverLetterJobTitle(jobTitle);
-                            }}
-                            jobDescription={coverLetterJobDescription}
-                            onJobDescriptionChange={
-                                setCoverLetterJobDescription
-                            }
-                            initialCompany={coverLetterCompany}
-                            initialJobTitle={coverLetterJobTitle}
-                            initialRecipient={coverLetterRecipient}
-                            onRecipientChange={setCoverLetterRecipient}
-                            onSaveSuccess={handleCoverLetterSaveSuccess}
-                        />
+                                profile={data}
+                                template={clTemplate}
+                                onTemplateChange={setCLTemplate}
+                                aiLimit={aiLimit}
+                                coverLetterContent={coverLetterContent}
+                                onCoverLetterContentChange={
+                                    setCoverLetterContent
+                                }
+                                onCoverLetterMetaChange={(
+                                    company,
+                                    jobTitle,
+                                ) => {
+                                    setCoverLetterCompany(company);
+                                    setCoverLetterJobTitle(jobTitle);
+                                }}
+                                jobDescription={coverLetterJobDescription}
+                                onJobDescriptionChange={
+                                    setCoverLetterJobDescription
+                                }
+                                initialCompany={coverLetterCompany}
+                                initialJobTitle={coverLetterJobTitle}
+                                initialRecipient={coverLetterRecipient}
+                                onRecipientChange={setCoverLetterRecipient}
+                                onSaveSuccess={handleCoverLetterSaveSuccess}
+                            />
                         </>
                     )}
 
@@ -7486,13 +8070,23 @@ export default function DocumentsIndex({
                                 >
                                     <SelectTrigger className="w-auto min-w-[160px] bg-background text-foreground">
                                         <SelectValue placeholder="Font style">
-                                            {data.font_family === 'serif' ? 'Serif' : data.font_family === 'mono' ? 'Monospace' : 'Sans-serif'}
+                                            {data.font_family === 'serif'
+                                                ? 'Serif'
+                                                : data.font_family === 'mono'
+                                                  ? 'Monospace'
+                                                  : 'Sans-serif'}
                                         </SelectValue>
                                     </SelectTrigger>
                                     <SelectContent align="end">
-                                        <SelectItem value="sans">Sans-serif</SelectItem>
-                                        <SelectItem value="serif">Serif</SelectItem>
-                                        <SelectItem value="mono">Monospace</SelectItem>
+                                        <SelectItem value="sans">
+                                            Sans-serif
+                                        </SelectItem>
+                                        <SelectItem value="serif">
+                                            Serif
+                                        </SelectItem>
+                                        <SelectItem value="mono">
+                                            Monospace
+                                        </SelectItem>
                                     </SelectContent>
                                 </Select>
                             </div>
@@ -7506,13 +8100,23 @@ export default function DocumentsIndex({
                                 >
                                     <SelectTrigger className="w-auto min-w-[160px] bg-background text-foreground">
                                         <SelectValue placeholder="Font size">
-                                            {data.font_size === 'small' ? 'Small' : data.font_size === 'large' ? 'Large' : 'Medium'}
+                                            {data.font_size === 'small'
+                                                ? 'Small'
+                                                : data.font_size === 'large'
+                                                  ? 'Large'
+                                                  : 'Medium'}
                                         </SelectValue>
                                     </SelectTrigger>
                                     <SelectContent align="end">
-                                        <SelectItem value="small">Small</SelectItem>
-                                        <SelectItem value="medium">Medium</SelectItem>
-                                        <SelectItem value="large">Large</SelectItem>
+                                        <SelectItem value="small">
+                                            Small
+                                        </SelectItem>
+                                        <SelectItem value="medium">
+                                            Medium
+                                        </SelectItem>
+                                        <SelectItem value="large">
+                                            Large
+                                        </SelectItem>
                                     </SelectContent>
                                 </Select>
                             </div>
@@ -7560,13 +8164,23 @@ export default function DocumentsIndex({
                                 >
                                     <SelectTrigger className="w-auto min-w-[160px] bg-background text-foreground">
                                         <SelectValue placeholder="Font style">
-                                            {clFontFamily === 'serif' ? 'Serif' : clFontFamily === 'mono' ? 'Monospace' : 'Sans-serif'}
+                                            {clFontFamily === 'serif'
+                                                ? 'Serif'
+                                                : clFontFamily === 'mono'
+                                                  ? 'Monospace'
+                                                  : 'Sans-serif'}
                                         </SelectValue>
                                     </SelectTrigger>
                                     <SelectContent align="end">
-                                        <SelectItem value="sans">Sans-serif</SelectItem>
-                                        <SelectItem value="serif">Serif</SelectItem>
-                                        <SelectItem value="mono">Monospace</SelectItem>
+                                        <SelectItem value="sans">
+                                            Sans-serif
+                                        </SelectItem>
+                                        <SelectItem value="serif">
+                                            Serif
+                                        </SelectItem>
+                                        <SelectItem value="mono">
+                                            Monospace
+                                        </SelectItem>
                                     </SelectContent>
                                 </Select>
                             </div>
@@ -7580,13 +8194,23 @@ export default function DocumentsIndex({
                                 >
                                     <SelectTrigger className="w-auto min-w-[160px] bg-background text-foreground">
                                         <SelectValue placeholder="Font size">
-                                            {clFontSize === 'small' ? 'Small' : clFontSize === 'large' ? 'Large' : 'Medium'}
+                                            {clFontSize === 'small'
+                                                ? 'Small'
+                                                : clFontSize === 'large'
+                                                  ? 'Large'
+                                                  : 'Medium'}
                                         </SelectValue>
                                     </SelectTrigger>
                                     <SelectContent align="end">
-                                        <SelectItem value="small">Small</SelectItem>
-                                        <SelectItem value="medium">Medium</SelectItem>
-                                        <SelectItem value="large">Large</SelectItem>
+                                        <SelectItem value="small">
+                                            Small
+                                        </SelectItem>
+                                        <SelectItem value="medium">
+                                            Medium
+                                        </SelectItem>
+                                        <SelectItem value="large">
+                                            Large
+                                        </SelectItem>
                                     </SelectContent>
                                 </Select>
                             </div>

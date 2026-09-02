@@ -1,34 +1,21 @@
-import { Head, router, usePage } from '@inertiajs/react';
 import type { PageProps as InertiaPageProps } from '@inertiajs/core';
-import { useState, type ReactNode } from 'react';
+import { Head, router, usePage } from '@inertiajs/react';
 import {
     Cpu,
-    TrendingUp,
     DollarSign,
     Database,
     Shield,
     ShieldOff,
-    ChevronDown,
-    ChevronUp,
-    Search,
     Brain,
-    Zap,
     BarChart3,
     Users,
 } from 'lucide-react';
-import {
-    Card,
-    CardContent,
-    CardHeader,
-    CardTitle,
-} from '@/components/ui/card';
-import {
-    BarChart,
-    Bar,
-    XAxis,
-    YAxis,
-    CartesianGrid,
-} from 'recharts';
+import { useState } from 'react';
+import type { ReactNode } from 'react';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid } from 'recharts';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
     ChartContainer,
     ChartTooltip,
@@ -38,9 +25,6 @@ import {
 } from '@/components/ui/chart';
 import type { ChartConfig } from '@/components/ui/chart';
 import { PageHeader } from '@/components/ui/page-header';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import AdminLayout from '@/layouts/admin-layout';
 
 interface Kpi {
@@ -92,8 +76,14 @@ interface PageProps extends InertiaPageProps {
 }
 
 function formatNumber(n: number): string {
-    if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
-    if (n >= 1_000) return `${(n / 1_000).toFixed(1)}K`;
+    if (n >= 1_000_000) {
+        return `${(n / 1_000_000).toFixed(1)}M`;
+    }
+
+    if (n >= 1_000) {
+        return `${(n / 1_000).toFixed(1)}K`;
+    }
+
     return n.toLocaleString();
 }
 
@@ -116,7 +106,7 @@ function ConsumerRow({ consumer }: { consumer: TopConsumer }) {
             {
                 preserveScroll: true,
                 onFinish: () => setUpdating(false),
-            }
+            },
         );
     }
 
@@ -137,22 +127,24 @@ function ConsumerRow({ consumer }: { consumer: TopConsumer }) {
                     </div>
                 </div>
             </td>
-            <td className="py-3 px-4 text-right text-sm font-medium text-foreground">
+            <td className="px-4 py-3 text-right text-sm font-medium text-foreground">
                 {consumer.total_calls}
             </td>
-            <td className="py-3 px-4 text-right text-sm text-muted-foreground">
+            <td className="px-4 py-3 text-right text-sm text-muted-foreground">
                 {formatNumber(consumer.total_tokens)}
             </td>
-            <td className="py-3 px-4 text-right text-sm font-mono text-foreground">
+            <td className="px-4 py-3 text-right font-mono text-sm text-foreground">
                 {formatCurrency(consumer.estimated_cost)}
             </td>
             <td className="py-3 pr-2 pl-4 text-right">
                 <Button
                     size="sm"
-                    variant={consumer.is_ai_disabled ? 'destructive' : 'outline'}
+                    variant={
+                        consumer.is_ai_disabled ? 'destructive' : 'outline'
+                    }
                     disabled={updating}
                     onClick={toggleAiDisabled}
-                    className="gap-1 h-7 text-xs"
+                    className="h-7 gap-1 text-xs"
                 >
                     {consumer.is_ai_disabled ? (
                         <ShieldOff className="size-3" />
@@ -167,7 +159,14 @@ function ConsumerRow({ consumer }: { consumer: TopConsumer }) {
 }
 
 export default function AdminAiUsage() {
-    const { kpi, daily_token_usage, top_features, top_consumers, models_used, active_model } = usePage<PageProps>().props;
+    const {
+        kpi,
+        daily_token_usage,
+        top_features,
+        top_consumers,
+        models_used,
+        active_model,
+    } = usePage<PageProps>().props;
 
     const chartConfig: ChartConfig = {
         prompt_tokens: {
@@ -192,7 +191,10 @@ export default function AdminAiUsage() {
                     description="Track AI API consumption, costs, and per-user access controls"
                 >
                     <div className="flex items-center gap-2">
-                        <Badge variant="outline" className="gap-1.5 font-mono text-xs">
+                        <Badge
+                            variant="outline"
+                            className="gap-1.5 font-mono text-xs"
+                        >
                             <Brain className="size-3.5 text-purple-500" />
                             Model: {active_model ?? 'gemini-3.6-flash'}
                         </Badge>
@@ -292,7 +294,10 @@ export default function AdminAiUsage() {
                                             tickLine={false}
                                             axisLine={false}
                                             tickFormatter={(val: string) => {
-                                                const d = new Date(val + 'T00:00:00');
+                                                const d = new Date(
+                                                    val + 'T00:00:00',
+                                                );
+
                                                 return `${d.getMonth() + 1}/${d.getDate()}`;
                                             }}
                                             fontSize={10}
@@ -354,7 +359,10 @@ export default function AdminAiUsage() {
                                                         {feature.label}
                                                     </p>
                                                     <p className="text-xs text-muted-foreground">
-                                                        {formatNumber(feature.total_tokens)} tokens
+                                                        {formatNumber(
+                                                            feature.total_tokens,
+                                                        )}{' '}
+                                                        tokens
                                                     </p>
                                                 </div>
                                                 <span className="text-sm font-medium text-foreground">
@@ -365,13 +373,33 @@ export default function AdminAiUsage() {
                                 </div>
                             )}
 
-                            <div className="mt-6 pt-4 border-t border-border space-y-2">
-                                <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">AI Models Invoked</p>
+                            <div className="mt-6 space-y-2 border-t border-border pt-4">
+                                <p className="text-xs font-semibold tracking-wider text-muted-foreground uppercase">
+                                    AI Models Invoked
+                                </p>
                                 <div className="flex flex-wrap gap-2">
-                                    {(models_used && models_used.length > 0 ? models_used : [{ model: active_model ?? 'gemini-3.6-flash', total_calls: kpi.calls_today, total_tokens: kpi.token_volume_30d }]).map((m) => (
-                                        <Badge key={m.model} variant="secondary" className="font-mono text-xs gap-1.5 py-1">
+                                    {(models_used && models_used.length > 0
+                                        ? models_used
+                                        : [
+                                              {
+                                                  model:
+                                                      active_model ??
+                                                      'gemini-3.6-flash',
+                                                  total_calls: kpi.calls_today,
+                                                  total_tokens:
+                                                      kpi.token_volume_30d,
+                                              },
+                                          ]
+                                    ).map((m) => (
+                                        <Badge
+                                            key={m.model}
+                                            variant="secondary"
+                                            className="gap-1.5 py-1 font-mono text-xs"
+                                        >
                                             <Brain className="size-3 text-purple-500" />
-                                            {m.model} ({m.total_calls} calls · {formatNumber(m.total_tokens)} tokens)
+                                            {m.model} ({m.total_calls} calls ·{' '}
+                                            {formatNumber(m.total_tokens)}{' '}
+                                            tokens)
                                         </Badge>
                                     ))}
                                 </div>
@@ -397,11 +425,21 @@ export default function AdminAiUsage() {
                                 <table className="w-full text-sm">
                                     <thead>
                                         <tr className="border-b border-border text-left text-xs text-muted-foreground">
-                                            <th className="pb-2 pr-3 font-medium">User</th>
-                                            <th className="pb-2 pr-3 text-right font-medium">Calls</th>
-                                            <th className="pb-2 pr-3 text-right font-medium">Tokens</th>
-                                            <th className="pb-2 pr-3 text-right font-medium">Cost</th>
-                                            <th className="pb-2 text-right font-medium">AI Access</th>
+                                            <th className="pr-3 pb-2 font-medium">
+                                                User
+                                            </th>
+                                            <th className="pr-3 pb-2 text-right font-medium">
+                                                Calls
+                                            </th>
+                                            <th className="pr-3 pb-2 text-right font-medium">
+                                                Tokens
+                                            </th>
+                                            <th className="pr-3 pb-2 text-right font-medium">
+                                                Cost
+                                            </th>
+                                            <th className="pb-2 text-right font-medium">
+                                                AI Access
+                                            </th>
                                         </tr>
                                     </thead>
                                     <tbody>

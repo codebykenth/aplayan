@@ -60,9 +60,11 @@ function getStatusFromDescription(
     const match = description.match(
         /Status changed to (Wishlist|Applied|Interviewing|Offer|Rejected|Withdrawn)/i,
     );
+
     if (match) {
         return match[1].toLowerCase() as JobApplicationStatus;
     }
+
     return null;
 }
 
@@ -141,6 +143,7 @@ function ActivityCard({
 
     if (item.type === 'status_update') {
         const status = getStatusFromDescription(item.description);
+
         if (status) {
             Icon = STATUS_ICONS[status] ?? RefreshCw;
             iconColor = STATUS_COLORS[status] ?? iconColor;

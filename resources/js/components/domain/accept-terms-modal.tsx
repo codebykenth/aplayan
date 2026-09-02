@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
 import { router, usePage } from '@inertiajs/react';
-import { ShieldCheck, ArrowRight, Loader2, LogOut } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
+import React, { useState } from 'react';
+import { Button } from '@/components/ui/button';
 import {
     Dialog,
     DialogContent,
@@ -8,7 +9,6 @@ import {
     DialogTitle,
     DialogDescription,
 } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
 import { logout } from '@/routes';
 import type { Auth } from '@/types/auth';
 
@@ -28,7 +28,9 @@ export function AcceptTermsModal() {
     }
 
     function handleAccept() {
-        if (!agreed || isSubmitting) return;
+        if (!agreed || isSubmitting) {
+            return;
+        }
 
         setIsSubmitting(true);
         router.post(
@@ -37,12 +39,14 @@ export function AcceptTermsModal() {
             {
                 preserveScroll: true,
                 onFinish: () => setIsSubmitting(false),
-            }
+            },
         );
     }
 
     function handleLogout() {
-        if (isLoggingOut) return;
+        if (isLoggingOut) {
+            return;
+        }
 
         setIsLoggingOut(true);
         router.post(logout.url());
@@ -59,17 +63,23 @@ export function AcceptTermsModal() {
                         Accept Terms & Conditions
                     </DialogTitle>
                     <DialogDescription className="text-xs text-muted-foreground">
-                        Please review and accept our policies to continue using Aplayan.
+                        Please review and accept our policies to continue using
+                        Aplayan.
                     </DialogDescription>
                 </DialogHeader>
 
                 {/* Inner Policy Content Card */}
-                <div className="space-y-4 rounded-xl border border-border bg-muted/40 p-4 sm:p-5 text-left text-sm">
+                <div className="space-y-4 rounded-xl border border-border bg-muted/40 p-4 text-left text-sm sm:p-5">
                     {/* Terms of Service */}
                     <div className="space-y-1">
-                        <h3 className="font-semibold text-foreground">Terms of Service</h3>
+                        <h3 className="font-semibold text-foreground">
+                            Terms of Service
+                        </h3>
                         <p className="text-xs leading-relaxed text-muted-foreground">
-                            By using Aplayan, you agree to comply with the terms and policies. You are responsible for maintaining account confidentiality and all activities under your account.{' '}
+                            By using Aplayan, you agree to comply with the terms
+                            and policies. You are responsible for maintaining
+                            account confidentiality and all activities under
+                            your account.{' '}
                             <a
                                 href="/terms-of-service"
                                 target="_blank"
@@ -83,9 +93,14 @@ export function AcceptTermsModal() {
 
                     {/* Privacy Policy */}
                     <div className="space-y-1">
-                        <h3 className="font-semibold text-foreground">Privacy Policy</h3>
+                        <h3 className="font-semibold text-foreground">
+                            Privacy Policy
+                        </h3>
                         <p className="text-xs leading-relaxed text-muted-foreground">
-                            Aplayan collects and processes personal data to provide and improve the services. Your data is protected and will not be shared with third parties without consent.{' '}
+                            Aplayan collects and processes personal data to
+                            provide and improve the services. Your data is
+                            protected and will not be shared with third parties
+                            without consent.{' '}
                             <a
                                 href="/privacy-policy"
                                 target="_blank"
@@ -99,15 +114,19 @@ export function AcceptTermsModal() {
 
                     {/* Your Rights */}
                     <div className="space-y-1">
-                        <h3 className="font-semibold text-foreground">Your Rights</h3>
+                        <h3 className="font-semibold text-foreground">
+                            Your Rights
+                        </h3>
                         <p className="text-xs leading-relaxed text-muted-foreground">
-                            You have the right to access, modify, or delete your personal data at any time through settings or by contacting our support team.
+                            You have the right to access, modify, or delete your
+                            personal data at any time through settings or by
+                            contacting our support team.
                         </p>
                     </div>
                 </div>
 
                 {/* Agreement Checkbox */}
-                <label className="flex cursor-pointer items-start gap-3 select-none text-left">
+                <label className="flex cursor-pointer items-start gap-3 text-left select-none">
                     <input
                         type="checkbox"
                         checked={agreed}
@@ -127,7 +146,7 @@ export function AcceptTermsModal() {
                         size="lg"
                         onClick={handleLogout}
                         disabled={isSubmitting || isLoggingOut}
-                        className="w-full font-semibold uppercase tracking-wide"
+                        className="w-full font-semibold tracking-wide uppercase"
                     >
                         {isLoggingOut ? (
                             <Loader2 className="size-4 animate-spin" />
@@ -141,7 +160,7 @@ export function AcceptTermsModal() {
                         size="lg"
                         onClick={handleAccept}
                         disabled={!agreed || isSubmitting || isLoggingOut}
-                        className="w-full font-semibold uppercase tracking-wide"
+                        className="w-full font-semibold tracking-wide uppercase"
                     >
                         {isSubmitting ? (
                             <>

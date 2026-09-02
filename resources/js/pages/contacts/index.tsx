@@ -278,7 +278,9 @@ export default function ContactsIndex({
     const [search, setSearch] = useState('');
     const [formOpen, setFormOpen] = useState(false);
     const [editingContact, setEditingContact] = useState<Contact | null>(null);
-    const [deletingContact, setDeletingContact] = useState<Contact | null>(null);
+    const [deletingContact, setDeletingContact] = useState<Contact | null>(
+        null,
+    );
 
     const {
         data,
@@ -366,21 +368,13 @@ export default function ContactsIndex({
 
         if (!result.success) {
             clearErrors();
+
             for (const [field, message] of Object.entries(result.errors)) {
                 setError(field as keyof typeof data, message);
             }
+
             return;
         }
-
-        const payload = {
-            ...data,
-            email: data.email || undefined,
-            phone: data.phone || undefined,
-            company_name: data.company_name || undefined,
-            role: data.role || undefined,
-            notes: data.notes || undefined,
-            last_contacted_at: data.last_contacted_at || undefined,
-        };
 
         if (editingContact) {
             put(updateContact.url(editingContact.id), {
@@ -472,13 +466,17 @@ export default function ContactsIndex({
                         </DialogDescription>
                     </DialogHeader>
 
-<form onSubmit={submit} className="flex flex-col gap-4">
-                         <p className="text-xs text-muted-foreground">
-                             Fields marked with <span className="text-red-500">*</span> are required.
-                         </p>
-                         <div className="flex flex-col gap-4">
+                    <form onSubmit={submit} className="flex flex-col gap-4">
+                        <p className="text-xs text-muted-foreground">
+                            Fields marked with{' '}
+                            <span className="text-red-500">*</span> are
+                            required.
+                        </p>
+                        <div className="flex flex-col gap-4">
                             <div className="flex flex-col gap-2">
-                                <Label htmlFor="contact-name">Name <span className="text-red-500">*</span></Label>
+                                <Label htmlFor="contact-name">
+                                    Name <span className="text-red-500">*</span>
+                                </Label>
                                 <Input
                                     id="contact-name"
                                     value={data.name}
@@ -497,7 +495,10 @@ export default function ContactsIndex({
 
                             <div className="grid grid-cols-2 gap-4">
                                 <div className="flex flex-col gap-2">
-                                    <Label htmlFor="contact-email">Email <span className="text-red-500">*</span></Label>
+                                    <Label htmlFor="contact-email">
+                                        Email{' '}
+                                        <span className="text-red-500">*</span>
+                                    </Label>
                                     <Input
                                         id="contact-email"
                                         type="email"
@@ -514,78 +515,96 @@ export default function ContactsIndex({
                                         </p>
                                     )}
                                 </div>
-<div className="flex flex-col gap-2">
-                                     <Label htmlFor="contact-phone">Phone <span className="text-red-500">*</span></Label>
-                                     <div className="flex gap-1.5">
-                                         <button
-                                             type="button"
-                                             onClick={() => {
-                                                 setPhoneMode((phoneMode === '+63' && !data.phone) ? '09' : '+63');
-                                                 if (data.phone) {
-                                                     setData('phone', '');
-                                                 }
-                                             }}
-                                             className={`rounded-md px-2.5 py-1.5 text-xs font-medium transition-colors ${phoneMode === '+63' ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground hover:text-foreground'}`}
-                                         >
-                                             +63
-                                         </button>
-                                         <button
-                                             type="button"
-                                             onClick={() => {
-                                                 setPhoneMode((phoneMode === '09' && !data.phone) ? '+63' : '09');
-                                                 if (data.phone) {
-                                                     setData('phone', '');
-                                                 }
-                                             }}
-                                             className={`rounded-md px-2.5 py-1.5 text-xs font-medium transition-colors ${phoneMode === '09' ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground hover:text-foreground'}`}
-                                         >
-                                             09
-                                         </button>
-                                     </div>
-                                     <div className="flex">
-                                         <div className="flex items-center rounded-l-md border border-r-0 bg-muted px-3 text-sm text-muted-foreground">
-                                             {phoneMode}
-                                         </div>
-                                         <Input
-                                             id="contact-phone"
-                                             value={
-                                                 data.phone
-                                                     ? data.phone
-                                                           .replace(
-                                                               new RegExp(
-                                                                   `^${phoneMode.replace('+', '\\+')}\\s*`,
-                                                               ),
-                                                               '',
-                                                           )
-                                                           .replace(/\s+/g, '')
-                                                     : ''
-                                             }
-                                             onChange={(e) => {
-                                                 const max =
-                                                     phoneMode === '+63' ? 10 : 9;
-                                                 const digits = e.target.value
-                                                     .replace(/\D/g, '')
-                                                     .slice(0, max);
-                                                 setData(
-                                                     'phone',
-                                                     phoneMode + ' ' + digits,
-                                                 );
-                                             }}
-                                             placeholder={
-                                                 phoneMode === '+63'
-                                                     ? '+63 917 123 4567'
-                                                     : '0917 123 4567'
-                                             }
-                                         />
-                                     </div>
-                                 </div>
+                                <div className="flex flex-col gap-2">
+                                    <Label htmlFor="contact-phone">
+                                        Phone{' '}
+                                        <span className="text-red-500">*</span>
+                                    </Label>
+                                    <div className="flex gap-1.5">
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                setPhoneMode(
+                                                    phoneMode === '+63' &&
+                                                        !data.phone
+                                                        ? '09'
+                                                        : '+63',
+                                                );
+
+                                                if (data.phone) {
+                                                    setData('phone', '');
+                                                }
+                                            }}
+                                            className={`rounded-md px-2.5 py-1.5 text-xs font-medium transition-colors ${phoneMode === '+63' ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground hover:text-foreground'}`}
+                                        >
+                                            +63
+                                        </button>
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                setPhoneMode(
+                                                    phoneMode === '09' &&
+                                                        !data.phone
+                                                        ? '+63'
+                                                        : '09',
+                                                );
+
+                                                if (data.phone) {
+                                                    setData('phone', '');
+                                                }
+                                            }}
+                                            className={`rounded-md px-2.5 py-1.5 text-xs font-medium transition-colors ${phoneMode === '09' ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground hover:text-foreground'}`}
+                                        >
+                                            09
+                                        </button>
+                                    </div>
+                                    <div className="flex">
+                                        <div className="flex items-center rounded-l-md border border-r-0 bg-muted px-3 text-sm text-muted-foreground">
+                                            {phoneMode}
+                                        </div>
+                                        <Input
+                                            id="contact-phone"
+                                            value={
+                                                data.phone
+                                                    ? data.phone
+                                                          .replace(
+                                                              new RegExp(
+                                                                  `^${phoneMode.replace('+', '\\+')}\\s*`,
+                                                              ),
+                                                              '',
+                                                          )
+                                                          .replace(/\s+/g, '')
+                                                    : ''
+                                            }
+                                            onChange={(e) => {
+                                                const max =
+                                                    phoneMode === '+63'
+                                                        ? 10
+                                                        : 9;
+                                                const digits = e.target.value
+                                                    .replace(/\D/g, '')
+                                                    .slice(0, max);
+                                                setData(
+                                                    'phone',
+                                                    phoneMode + ' ' + digits,
+                                                );
+                                            }}
+                                            placeholder={
+                                                phoneMode === '+63'
+                                                    ? '+63 917 123 4567'
+                                                    : '0917 123 4567'
+                                            }
+                                        />
+                                    </div>
+                                </div>
                             </div>
 
                             <div className="grid grid-cols-2 gap-4">
                                 <div className="flex flex-col gap-2">
-<Label htmlFor="contact-company">
-                                         Company <span className="text-red-500">*</span>
-                                     </Label>
+                                    <Label htmlFor="contact-company">
+                                        Company{' '}
+                                        <span className="text-red-500">*</span>
+                                    </Label>
                                     <Input
                                         id="contact-company"
                                         value={data.company_name}
@@ -599,7 +618,10 @@ export default function ContactsIndex({
                                     />
                                 </div>
                                 <div className="flex flex-col gap-2">
-                                    <Label htmlFor="contact-role">Role <span className="text-red-500">*</span></Label>
+                                    <Label htmlFor="contact-role">
+                                        Role{' '}
+                                        <span className="text-red-500">*</span>
+                                    </Label>
                                     <Input
                                         id="contact-role"
                                         value={data.role}
@@ -612,9 +634,10 @@ export default function ContactsIndex({
                             </div>
 
                             <div className="flex flex-col gap-2">
-<Label htmlFor="contact-last-contacted">
-                                     Last Contacted <span className="text-red-500">*</span>
-                                 </Label>
+                                <Label htmlFor="contact-last-contacted">
+                                    Last Contacted{' '}
+                                    <span className="text-red-500">*</span>
+                                </Label>
                                 <Input
                                     id="contact-last-contacted"
                                     type="date"
@@ -629,7 +652,10 @@ export default function ContactsIndex({
                             </div>
 
                             <div className="flex flex-col gap-2">
-                                <Label htmlFor="contact-notes">Notes <span className="text-red-500">*</span></Label>
+                                <Label htmlFor="contact-notes">
+                                    Notes{' '}
+                                    <span className="text-red-500">*</span>
+                                </Label>
                                 <Textarea
                                     id="contact-notes"
                                     rows={3}

@@ -1,5 +1,5 @@
 import { Link } from '@inertiajs/react';
-import { ExternalLink, Heart, Sparkles } from 'lucide-react';
+import { Heart, Sparkles } from 'lucide-react';
 import ApplicationLogo from '@/components/ui/application-logo';
 import { privacyPolicy, termsOfService } from '@/routes';
 
@@ -10,10 +10,7 @@ export default function Footer() {
                 <div className="grid grid-cols-1 gap-8 md:grid-cols-4">
                     {/* Brand Column */}
                     <div className="space-y-4 md:col-span-2">
-                        <Link
-                            href="/"
-                            className="inline-flex items-center"
-                        >
+                        <Link href="/" className="inline-flex items-center">
                             <ApplicationLogo />
                         </Link>
                         <p className="max-w-sm text-sm leading-relaxed font-medium text-zinc-600 dark:text-zinc-400">

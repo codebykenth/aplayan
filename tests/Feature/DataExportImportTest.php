@@ -298,7 +298,7 @@ describe('import', function () {
 
     it('imports applications without expected_salary or date_applied', function () {
         $csv = "company_name,job_title,status,location,expected_salary,date_applied\n";
-        $csv .= "Acme Corp,Engineer,applied,Remote,,\n";
+        $csv .= "Acme Corp,Engineer,wishlist,Remote,,\n";
 
         $file = UploadedFile::fake()->createWithContent('applications.csv', $csv);
 

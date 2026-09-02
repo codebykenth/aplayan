@@ -1,9 +1,15 @@
+import { router } from '@inertiajs/react';
+import {
+    ArrowLeft,
+    FileCheck,
+    AlertTriangle,
+    Scale,
+    CheckCircle2,
+    UserCheck,
+} from 'lucide-react';
 import React from 'react';
-import { Link, router } from '@inertiajs/react';
-import SeoHead from '@/components/ui/seo-head';
-import { ArrowLeft, FileCheck, AlertTriangle, Scale, CheckCircle2, UserCheck } from 'lucide-react';
-import { termsOfService, privacyPolicy } from '@/routes';
 import { MarkdownRenderer } from '@/components/ui/markdown-renderer';
+import SeoHead from '@/components/ui/seo-head';
 
 interface LegalDocument {
     id?: number;
@@ -16,10 +22,17 @@ interface LegalDocument {
 }
 
 function formatLegalDate(dateStr?: string | null): string {
-    if (!dateStr) return 'July 30, 2026';
+    if (!dateStr) {
+        return 'July 30, 2026';
+    }
+
     try {
         const date = new Date(dateStr);
-        if (isNaN(date.getTime())) return 'July 30, 2026';
+
+        if (isNaN(date.getTime())) {
+            return 'July 30, 2026';
+        }
+
         return new Intl.DateTimeFormat('en-US', {
             month: 'long',
             day: 'numeric',
@@ -30,7 +43,11 @@ function formatLegalDate(dateStr?: string | null): string {
     }
 }
 
-export default function TermsOfService({ document }: { document?: LegalDocument | null }) {
+export default function TermsOfService({
+    document,
+}: {
+    document?: LegalDocument | null;
+}) {
     const lastUpdated = document?.updated_at
         ? formatLegalDate(document.updated_at)
         : 'July 30, 2026';
@@ -81,9 +98,13 @@ export default function TermsOfService({ document }: { document?: LegalDocument 
                             <div className="mb-2 flex h-9 w-9 items-center justify-center rounded-lg bg-emerald-50 text-emerald-600 dark:bg-emerald-950/50 dark:text-emerald-400">
                                 <UserCheck className="h-5 w-5" />
                             </div>
-                            <h3 className="text-sm font-semibold text-slate-900 dark:text-white">User Verification</h3>
+                            <h3 className="text-sm font-semibold text-slate-900 dark:text-white">
+                                User Verification
+                            </h3>
                             <p className="mt-1 text-xs text-slate-600 dark:text-slate-400">
-                                You are responsible for reviewing and verifying all AI-generated content before submitting resumes to employers.
+                                You are responsible for reviewing and verifying
+                                all AI-generated content before submitting
+                                resumes to employers.
                             </p>
                         </div>
 
@@ -91,9 +112,13 @@ export default function TermsOfService({ document }: { document?: LegalDocument 
                             <div className="mb-2 flex h-9 w-9 items-center justify-center rounded-lg bg-emerald-50 text-emerald-600 dark:bg-emerald-950/50 dark:text-emerald-400">
                                 <AlertTriangle className="h-5 w-5" />
                             </div>
-                            <h3 className="text-sm font-semibold text-slate-900 dark:text-white">No Hiring Guarantees</h3>
+                            <h3 className="text-sm font-semibold text-slate-900 dark:text-white">
+                                No Hiring Guarantees
+                            </h3>
                             <p className="mt-1 text-xs text-slate-600 dark:text-slate-400">
-                                Aplayan provides application organization tools, but does not guarantee job interviews or hiring success.
+                                Aplayan provides application organization tools,
+                                but does not guarantee job interviews or hiring
+                                success.
                             </p>
                         </div>
 
@@ -101,9 +126,13 @@ export default function TermsOfService({ document }: { document?: LegalDocument 
                             <div className="mb-2 flex h-9 w-9 items-center justify-center rounded-lg bg-emerald-50 text-emerald-600 dark:bg-emerald-950/50 dark:text-emerald-400">
                                 <CheckCircle2 className="h-5 w-5" />
                             </div>
-                            <h3 className="text-sm font-semibold text-slate-900 dark:text-white">Fair Usage</h3>
+                            <h3 className="text-sm font-semibold text-slate-900 dark:text-white">
+                                Fair Usage
+                            </h3>
                             <p className="mt-1 text-xs text-slate-600 dark:text-slate-400">
-                                Please use the platform lawfully and respectfully without abusing automated systems or AI quotas.
+                                Please use the platform lawfully and
+                                respectfully without abusing automated systems
+                                or AI quotas.
                             </p>
                         </div>
                     </div>
@@ -120,24 +149,50 @@ export default function TermsOfService({ document }: { document?: LegalDocument 
                                         1. Acceptance of Terms
                                     </h2>
                                     <p className="text-sm leading-relaxed text-slate-600 dark:text-slate-300">
-                                        By accessing or using <strong>Aplayan</strong> ("the Service"), you agree to be bound by these Terms of Service. If you do not agree to these terms, please do not access or use the application.
+                                        By accessing or using{' '}
+                                        <strong>Aplayan</strong> ("the
+                                        Service"), you agree to be bound by
+                                        these Terms of Service. If you do not
+                                        agree to these terms, please do not
+                                        access or use the application.
                                     </p>
                                 </section>
 
                                 <section className="mb-8 border-t border-slate-100 pt-6 dark:border-slate-800/80">
                                     <h2 className="flex items-center gap-2 text-xl font-bold text-slate-900 dark:text-white">
                                         <UserCheck className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
-                                        2. AI Content Generation & User Responsibility
+                                        2. AI Content Generation & User
+                                        Responsibility
                                     </h2>
                                     <p className="text-sm leading-relaxed text-slate-600 dark:text-slate-300">
-                                        Aplayan offers AI-assisted features (such as resume matching, cover letter drafting, and salary insight calculations) powered by third-party language models.
+                                        Aplayan offers AI-assisted features
+                                        (such as resume matching, cover letter
+                                        drafting, and salary insight
+                                        calculations) powered by third-party
+                                        language models.
                                     </p>
                                     <ul className="mt-3 list-disc space-y-2 pl-5 text-sm text-slate-600 dark:text-slate-300">
                                         <li>
-                                            <strong>Verification Required:</strong> AI output is provided for assistance purposes only. You are solely responsible for reviewing, factual checking, and ensuring the accuracy of all resume content, experience descriptions, and emails before sending them to recruiters or employers.
+                                            <strong>
+                                                Verification Required:
+                                            </strong>{' '}
+                                            AI output is provided for assistance
+                                            purposes only. You are solely
+                                            responsible for reviewing, factual
+                                            checking, and ensuring the accuracy
+                                            of all resume content, experience
+                                            descriptions, and emails before
+                                            sending them to recruiters or
+                                            employers.
                                         </li>
                                         <li>
-                                            <strong>No Misrepresentation:</strong> You agree not to use AI generation to create fraudulent career credentials or intentionally mislead potential employers.
+                                            <strong>
+                                                No Misrepresentation:
+                                            </strong>{' '}
+                                            You agree not to use AI generation
+                                            to create fraudulent career
+                                            credentials or intentionally mislead
+                                            potential employers.
                                         </li>
                                     </ul>
                                 </section>
@@ -145,20 +200,45 @@ export default function TermsOfService({ document }: { document?: LegalDocument 
                                 <section className="mb-8 border-t border-slate-100 pt-6 dark:border-slate-800/80">
                                     <h2 className="flex items-center gap-2 text-xl font-bold text-slate-900 dark:text-white">
                                         <AlertTriangle className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
-                                        3. Disclaimer of Warranties & Limitation of Liability
+                                        3. Disclaimer of Warranties & Limitation
+                                        of Liability
                                     </h2>
                                     <p className="text-sm leading-relaxed text-slate-600 dark:text-slate-300">
-                                        Aplayan is provided on an "AS IS" and "AS AVAILABLE" basis without warranties of any kind.
+                                        Aplayan is provided on an "AS IS" and
+                                        "AS AVAILABLE" basis without warranties
+                                        of any kind.
                                     </p>
                                     <ul className="mt-3 list-disc space-y-2 pl-5 text-sm text-slate-600 dark:text-slate-300">
                                         <li>
-                                            <strong>No Guarantee of Employment:</strong> Aplayan is an independent tracking tool. We do not guarantee job callbacks, interview invitations, or employment offers from third-party employers.
+                                            <strong>
+                                                No Guarantee of Employment:
+                                            </strong>{' '}
+                                            Aplayan is an independent tracking
+                                            tool. We do not guarantee job
+                                            callbacks, interview invitations, or
+                                            employment offers from third-party
+                                            employers.
                                         </li>
                                         <li>
-                                            <strong>Third-Party Dependencies:</strong> We are not liable for temporary service interruptions caused by third-party providers (such as Google Gemini, Cloudflare, or hosting infrastructure).
+                                            <strong>
+                                                Third-Party Dependencies:
+                                            </strong>{' '}
+                                            We are not liable for temporary
+                                            service interruptions caused by
+                                            third-party providers (such as
+                                            Google Gemini, Cloudflare, or
+                                            hosting infrastructure).
                                         </li>
                                         <li>
-                                            <strong>Limitation of Liability:</strong> To the maximum extent permitted by applicable law, the independent developer of Aplayan shall not be liable for any indirect, incidental, or consequential damages arising from your use of the platform.
+                                            <strong>
+                                                Limitation of Liability:
+                                            </strong>{' '}
+                                            To the maximum extent permitted by
+                                            applicable law, the independent
+                                            developer of Aplayan shall not be
+                                            liable for any indirect, incidental,
+                                            or consequential damages arising
+                                            from your use of the platform.
                                         </li>
                                     </ul>
                                 </section>
@@ -169,7 +249,11 @@ export default function TermsOfService({ document }: { document?: LegalDocument 
                                         4. Account Termination & Acceptable Use
                                     </h2>
                                     <p className="text-sm leading-relaxed text-slate-600 dark:text-slate-300">
-                                        We reserve the right to suspend or terminate account access if a user engages in abusive behavior, attempts to breach system security, or violates these Terms of Service.
+                                        We reserve the right to suspend or
+                                        terminate account access if a user
+                                        engages in abusive behavior, attempts to
+                                        breach system security, or violates
+                                        these Terms of Service.
                                     </p>
                                 </section>
 
@@ -178,10 +262,15 @@ export default function TermsOfService({ document }: { document?: LegalDocument 
                                         5. Questions & Support
                                     </h2>
                                     <p className="mt-2 text-sm leading-relaxed text-slate-600 dark:text-slate-300">
-                                        For inquiries regarding these Terms of Service, please contact us at{' '}
-                                        <a href="mailto:kenthosila@gmail.com" className="font-medium text-emerald-600 hover:underline dark:text-emerald-400">
+                                        For inquiries regarding these Terms of
+                                        Service, please contact us at{' '}
+                                        <a
+                                            href="mailto:kenthosila@gmail.com"
+                                            className="font-medium text-emerald-600 hover:underline dark:text-emerald-400"
+                                        >
                                             kenthosila@gmail.com
-                                        </a>.
+                                        </a>
+                                        .
                                     </p>
                                 </section>
                             </>

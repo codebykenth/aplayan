@@ -103,27 +103,15 @@ function formatDate(dateString: string): string {
     });
 }
 
-function ResumeCard({
-    resume,
-    onDelete,
-}: {
-    resume: SavedResume;
-    onDelete: (id: number) => void;
-}) {
+function ResumeCard({ resume }: { resume: SavedResume }) {
     const [deleteOpen, setDeleteOpen] = useState(false);
     const [previewOpen, setPreviewOpen] = useState(false);
-    const [viewingContent, setViewingContent] = useState(false);
 
     const data = resume.profile_data;
 
     function handleDelete() {
         router.delete(`/documents/resume-versions/${resume.id}`);
         setDeleteOpen(false);
-    }
-
-    function handlePreview() {
-        setPreviewOpen(true);
-        setViewingContent(true);
     }
 
     return (
@@ -308,13 +296,7 @@ function ResumeCard({
     );
 }
 
-function CoverLetterCard({
-    letter,
-    onDelete,
-}: {
-    letter: SavedCoverLetter;
-    onDelete: (id: number) => void;
-}) {
+function CoverLetterCard({ letter }: { letter: SavedCoverLetter }) {
     const [deleteOpen, setDeleteOpen] = useState(false);
     const [previewOpen, setPreviewOpen] = useState(false);
 
@@ -472,7 +454,6 @@ export default function SavedDocuments({
                                     <ResumeCard
                                         key={resume.id}
                                         resume={resume}
-                                        onDelete={() => {}}
                                     />
                                 ))}
                             </div>
@@ -507,7 +488,6 @@ export default function SavedDocuments({
                                     <CoverLetterCard
                                         key={letter.id}
                                         letter={letter}
-                                        onDelete={() => {}}
                                     />
                                 ))}
                             </div>

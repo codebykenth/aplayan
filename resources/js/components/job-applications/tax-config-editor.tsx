@@ -3,7 +3,6 @@ import {
     ChevronUpIcon,
     PlusIcon,
     Trash2Icon,
-    LoaderIcon,
 } from 'lucide-react';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
@@ -14,7 +13,6 @@ import {
     SelectContent,
     SelectItem,
     SelectTrigger,
-    SelectValue,
 } from '@/components/ui/select';
 import type {
     TaxConfig,

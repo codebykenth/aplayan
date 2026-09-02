@@ -1,12 +1,10 @@
 import { Head, Link, usePage } from '@inertiajs/react';
 import {
-    BarChart3,
     ChevronLeft,
     ChevronRight,
     LayoutDashboard,
     LogOut,
     Menu,
-    Settings,
     Sun,
     Moon,
     Monitor,
@@ -15,8 +13,9 @@ import {
     Cpu,
     FileText,
 } from 'lucide-react';
-import ApplicationLogo from '@/components/ui/application-logo';
 import { useState, useEffect } from 'react';
+import { AcceptTermsModal } from '@/components/domain/accept-terms-modal';
+import ApplicationLogo from '@/components/ui/application-logo';
 import {
     Tooltip,
     TooltipContent,
@@ -25,7 +24,6 @@ import {
 } from '@/components/ui/tooltip';
 import { useTheme } from '@/hooks/use-theme';
 import { privacyPolicy, termsOfService } from '@/routes';
-import { AcceptTermsModal } from '@/components/domain/accept-terms-modal';
 import type { Auth } from '@/types/auth';
 
 const sidebarLinks = [
@@ -71,7 +69,10 @@ function UserProfileMenu({
     const { mode, setMode } = useTheme();
 
     useEffect(() => {
-        if (!open) return;
+        if (!open) {
+            return;
+        }
+
         const close = (e: MouseEvent) => {
             if (
                 !(e.target as Element).closest('.user-profile-menu-container')
@@ -80,6 +81,7 @@ function UserProfileMenu({
             }
         };
         document.addEventListener('click', close);
+
         return () => document.removeEventListener('click', close);
     }, [open]);
 
@@ -345,7 +347,7 @@ export default function AdminLayout({
                                 <div className="mt-auto border-t border-border pt-2">
                                     <Link
                                         href="/dashboard"
-                                        className="flex items-center gap-3 rounded-sm px-3 py-2 text-sm font-medium text-emerald-600 dark:text-emerald-400 transition-colors hover:bg-emerald-50 dark:hover:bg-emerald-950/50"
+                                        className="flex items-center gap-3 rounded-sm px-3 py-2 text-sm font-medium text-emerald-600 transition-colors hover:bg-emerald-50 dark:text-emerald-400 dark:hover:bg-emerald-950/50"
                                     >
                                         <Users className="h-4 w-4 shrink-0 text-emerald-500" />
                                         User View
@@ -389,13 +391,16 @@ export default function AdminLayout({
                                         render={
                                             <Link
                                                 href="/dashboard"
-                                                className="mt-auto flex items-center justify-center rounded-sm border-t border-border px-2 pt-2 text-emerald-600 dark:text-emerald-400 hover:text-emerald-500"
+                                                className="mt-auto flex items-center justify-center rounded-sm border-t border-border px-2 pt-2 text-emerald-600 hover:text-emerald-500 dark:text-emerald-400"
                                             >
                                                 <Users className="h-5 w-5 shrink-0 text-emerald-500" />
                                             </Link>
                                         }
                                     />
-                                    <TooltipContent side="right" sideOffset={12}>
+                                    <TooltipContent
+                                        side="right"
+                                        sideOffset={12}
+                                    >
                                         User View
                                     </TooltipContent>
                                 </Tooltip>
@@ -416,11 +421,17 @@ export default function AdminLayout({
                     className={`shrink-0 border-t border-border px-3 py-2 text-xs text-muted-foreground ${isExpanded ? '' : 'hidden'}`}
                 >
                     <div className="flex items-center justify-center gap-3">
-                        <Link href={privacyPolicy.url()} className="hover:text-foreground transition-colors">
+                        <Link
+                            href={privacyPolicy.url()}
+                            className="transition-colors hover:text-foreground"
+                        >
                             Privacy
                         </Link>
                         <span className="text-border">|</span>
-                        <Link href={termsOfService.url()} className="hover:text-foreground transition-colors">
+                        <Link
+                            href={termsOfService.url()}
+                            className="transition-colors hover:text-foreground"
+                        >
                             Terms
                         </Link>
                     </div>
@@ -441,10 +452,7 @@ export default function AdminLayout({
                     >
                         <Menu className="h-5 w-5 text-foreground" />
                     </button>
-                    <Link
-                        href="/"
-                        className="flex items-center"
-                    >
+                    <Link href="/" className="flex items-center">
                         <ApplicationLogo />
                     </Link>
                 </header>

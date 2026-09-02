@@ -7,7 +7,7 @@ interface SeoHeadProps {
     ogImage?: string;
     ogType?: string;
     noindex?: boolean;
-    jsonLd?: Record<string, unknown>;
+    jsonLd?: Record<string, unknown> | Record<string, unknown>[];
 }
 
 const SITE_NAME = 'Aplayan - AI-Powered Job Search & Resume Tracker';

@@ -23,17 +23,22 @@ export default function ForgotPassword() {
         const form = document.querySelector(
             'form[action="/forgot-password"]',
         ) as HTMLFormElement | null;
-        if (!form) return;
+
+        if (!form) {
+            return;
+        }
 
         let input = form.querySelector(
             'input[name="turnstile"]',
         ) as HTMLInputElement | null;
+
         if (!input) {
             input = document.createElement('input');
             input.type = 'hidden';
             input.name = 'turnstile';
             form.appendChild(input);
         }
+
         input.value = token ?? '';
         form.submit();
     }
@@ -69,7 +74,8 @@ export default function ForgotPassword() {
                     />
 
                     <p className="text-xs text-muted-foreground">
-                        Fields marked with <span className="text-red-500">*</span> are required.
+                        Fields marked with{' '}
+                        <span className="text-red-500">*</span> are required.
                     </p>
 
                     <div>

@@ -47,7 +47,7 @@ function createFormData(application: JobApplication): FormData {
     return {
         company_name: application.company_name,
         job_title: application.job_title,
-        location: application.location,
+        location: application.location ?? '',
         status: application.status,
         date_applied: application.date_applied ?? '',
         expected_salary:
@@ -195,7 +195,8 @@ export default function ApplicationDetailModal({
             }
 
             router.reload();
-        } catch (error) {
+        } catch {
+            // Error handled by form state
         } finally {
             setUpdating(false);
         }

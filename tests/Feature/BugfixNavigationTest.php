@@ -19,7 +19,7 @@ it('passes applications prop as a plain array to the Inertia page', function () 
     // This test ensures the page renders without error.
 });
 
-it('redirects authenticated users to job-applications after login', function () {
+it('redirects authenticated users to dashboard after login', function () {
     Http::preventStrayRequests();
 
     Http::fake([
@@ -37,12 +37,12 @@ it('redirects authenticated users to job-applications after login', function () 
         'email' => 'test@example.com',
         'password' => 'password',
         'turnstile' => 'valid-turnstile-token',
-    ])->assertRedirect(route('job-applications.index'));
+    ])->assertRedirect(route('dashboard'));
 
     $this->assertAuthenticatedAs($user);
 });
 
-it('redirects authenticated users to job-applications after registration', function () {
+it('redirects users to login with verification notice after registration', function () {
     Http::preventStrayRequests();
 
     Http::fake([
@@ -57,9 +57,9 @@ it('redirects authenticated users to job-applications after registration', funct
         'password' => 'Password123!',
         'password_confirmation' => 'Password123!',
         'turnstile' => 'valid-turnstile-token',
-    ])->assertRedirect(route('job-applications.index'));
+    ])->assertRedirect(route('login'));
 
-    $this->assertAuthenticated();
+    $this->assertGuest();
 });
 
 it('redirects authenticated users to job-applications after socialite login', function () {
@@ -91,7 +91,7 @@ it('redirects verified users from verification notice to job-applications', func
         ->assertRedirect(route('job-applications.index'));
 });
 
-it('redirects to job-applications after email verification', function () {
+it('redirects to dashboard after email verification', function () {
     $user = User::factory()->unverified()->create();
 
     $uri = URL::signedRoute('verification.verify', [
@@ -101,5 +101,5 @@ it('redirects to job-applications after email verification', function () {
 
     $this->actingAs($user)
         ->get($uri)
-        ->assertRedirect(route('job-applications.index'));
+        ->assertRedirect(route('dashboard'));
 });

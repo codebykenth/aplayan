@@ -44,7 +44,8 @@ export default function ResetPassword({
                     <input type="hidden" name="token" value={token} />
 
                     <p className="text-xs text-muted-foreground">
-                        Fields marked with <span className="text-red-500">*</span> are required.
+                        Fields marked with{' '}
+                        <span className="text-red-500">*</span> are required.
                     </p>
 
                     <div>
@@ -94,7 +95,8 @@ export default function ResetPassword({
                             htmlFor="password_confirmation"
                             className="mb-1 block text-sm font-medium text-foreground"
                         >
-                            Confirm Password <span className="text-red-500">*</span>
+                            Confirm Password{' '}
+                            <span className="text-red-500">*</span>
                         </label>
                         <PasswordInput
                             id="password_confirmation"

@@ -17,16 +17,24 @@ const INTERNAL_PATTERNS = [
 ];
 
 function extractErrorMessage(error: unknown): string {
-    if (typeof error === 'string') return error;
+    if (typeof error === 'string') {
+        return error;
+    }
 
-    if (error instanceof Error) return error.message;
+    if (error instanceof Error) {
+        return error.message;
+    }
 
     if (error && typeof error === 'object') {
         const obj = error as Record<string, unknown>;
 
-        if (typeof obj.message === 'string') return obj.message;
+        if (typeof obj.message === 'string') {
+            return obj.message;
+        }
 
-        if (typeof obj.error === 'string') return obj.error;
+        if (typeof obj.error === 'string') {
+            return obj.error;
+        }
 
         try {
             return JSON.stringify(obj);

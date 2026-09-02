@@ -71,7 +71,7 @@ export default function CustomizeNetPayModal({
           ? { ...DEFAULT_CONFIG, ...userDefaults }
           : DEFAULT_CONFIG;
 
-    const { data, setData, patch, processing, errors } = useForm({
+    const { data, setData, patch, processing } = useForm({
         tax_config: initialConfig,
     });
     const config = data.tax_config;

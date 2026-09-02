@@ -10,7 +10,7 @@ beforeEach(function () {
 it('returns validation errors as inertia errors when creating a job application with missing fields', function () {
     $this->actingAs($this->user)
         ->post(route('job-applications.store'), [])
-        ->assertSessionHasErrors(['company_name', 'job_title', 'location']);
+        ->assertSessionHasErrors(['company_name', 'job_title', 'work_setup']);
 });
 
 it('returns validation errors as inertia errors when updating a job application with invalid data', function () {

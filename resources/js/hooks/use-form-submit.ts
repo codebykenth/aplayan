@@ -1,16 +1,18 @@
-import { useCallback } from 'react';
-import { useForm } from '@inertiajs/react';
 import type {
     Errors,
     FormDataType,
     HttpExceptionResponse,
     UseFormSubmitOptions,
 } from '@inertiajs/core';
+import { useForm } from '@inertiajs/react';
+import { useCallback } from 'react';
 import { useToastManager } from '@/components/ui/toast';
 import { sanitizeErrorMessage } from '@/lib/error-sanitizer';
 
 function getEnv(): string {
-    if (typeof window === 'undefined') return 'production';
+    if (typeof window === 'undefined') {
+        return 'production';
+    }
 
     return (
         (window as unknown as Record<string, string | undefined>).APP_ENV ||
@@ -22,6 +24,7 @@ function scrollToFirstInvalid(): void {
     const firstInvalid = document.querySelector<HTMLElement>(
         '[aria-invalid="true"]',
     );
+
     if (firstInvalid) {
         firstInvalid.scrollIntoView({
             behavior: 'smooth',
@@ -57,6 +60,7 @@ export function useFormSubmit<TForm extends FormDataType<TForm>>(
                     setTimeout(() => scrollToFirstInvalid(), 100);
 
                     const errorMessages = Object.values(errors).filter(Boolean);
+
                     if (errorMessages.length > 0) {
                         toastManager.add({
                             title: 'Error',

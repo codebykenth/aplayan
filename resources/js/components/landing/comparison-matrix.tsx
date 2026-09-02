@@ -83,9 +83,11 @@ function CellValue({
     if (value === true) {
         return <Check className="h-4.5 w-4.5 text-emerald-500" />;
     }
+
     if (value === false) {
         return <X className="h-4.5 w-4.5 text-zinc-400 dark:text-zinc-500" />;
     }
+
     return (
         <span
             className={cn(

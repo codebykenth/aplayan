@@ -19,7 +19,7 @@ export const registerSchema = z
         password: z.string().min(8, 'Password must be at least 8 characters'),
         password_confirmation: z.string(),
         terms: z.literal(true, {
-            errorMap: () => ({ message: 'You must accept the Terms of Service' }),
+            message: 'You must accept the Terms of Service',
         }),
     })
     .refine((data) => data.password === data.password_confirmation, {
@@ -130,6 +130,7 @@ export function validateWithZod<T extends z.ZodSchema>(
 
     for (const issue of result.error.issues) {
         const path = issue.path.join('.');
+
         if (!errors[path]) {
             errors[path] = issue.message;
         }

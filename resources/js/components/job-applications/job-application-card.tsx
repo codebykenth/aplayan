@@ -6,10 +6,9 @@ import {
     CalendarClockIcon,
 } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
-import { Badge } from '@/components/ui/badge';
 import { StatusBadge } from '@/components/ui/status-badge';
-import { formatSalary } from '@/utils/currency';
 import type { JobApplication } from '@/types/job-application';
+import { formatSalary } from '@/utils/currency';
 
 function formatDate(date: string | null): string | null {
     if (!date) {

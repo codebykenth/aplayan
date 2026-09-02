@@ -50,13 +50,10 @@ export default function ContactsActivityTab({
                     },
                 );
 
-                if (!response.ok) {
-                    throw new Error('Failed to mark as contacted.');
-                }
-
-                const result = await response.json();
+                await response.json();
                 router.reload();
-            } catch (error) {
+            } catch {
+                // Ignore error, handled in component
             } finally {
                 setContacting(false);
             }

@@ -1,4 +1,4 @@
-import { Head, router } from '@inertiajs/react';
+import { Head } from '@inertiajs/react';
 import {
     ChevronLeftIcon,
     ChevronRightIcon,
@@ -8,7 +8,6 @@ import {
 import { useState, useMemo } from 'react';
 import type { ReactNode } from 'react';
 import ApplicationDetailModal from '@/components/job-applications/application-detail-modal';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { PageHeader } from '@/components/ui/page-header';
@@ -141,6 +140,7 @@ export default function Calendar({
             } else {
                 setCurrentMonth(currentMonth - 1);
             }
+
             setCurrentDay(1);
         } else {
             const date = new Date(
@@ -162,6 +162,7 @@ export default function Calendar({
             } else {
                 setCurrentMonth(currentMonth + 1);
             }
+
             setCurrentDay(1);
         } else {
             const date = new Date(
@@ -175,11 +176,7 @@ export default function Calendar({
         }
     };
 
-    const [loadingAppId, setLoadingAppId] = useState<number | null>(null);
-
     const openApplicationDetailById = async (applicationId: number) => {
-        setLoadingAppId(applicationId);
-
         try {
             const response = await fetch(`/job-applications/${applicationId}`, {
                 headers: {
@@ -194,8 +191,6 @@ export default function Calendar({
             }
         } catch {
             // handle error silently
-        } finally {
-            setLoadingAppId(null);
         }
     };
 
@@ -211,6 +206,7 @@ export default function Calendar({
 
     const activeWeekNumber = useMemo(() => {
         const firstDay = new Date(currentYear, currentMonth - 1, 1).getDay();
+
         return Math.ceil((currentDay + firstDay) / 7);
     }, [currentYear, currentMonth, currentDay]);
 

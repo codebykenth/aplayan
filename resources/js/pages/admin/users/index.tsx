@@ -1,19 +1,21 @@
 import { Head, Link, router } from '@inertiajs/react';
-import { ReactNode, useState } from 'react';
-import { Search, Shield, ShieldOff, Trash2, BadgeCheck, CheckCircle2, Clock } from 'lucide-react';
 import {
-    Card,
-    CardContent,
-    CardHeader,
-    CardTitle,
-} from '@/components/ui/card';
-import { PageHeader } from '@/components/ui/page-header';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
+    Search,
+    Shield,
+    ShieldOff,
+    Trash2,
+    BadgeCheck,
+    CheckCircle2,
+    Clock,
+} from 'lucide-react';
+import type { ReactNode } from 'react';
+import { useState } from 'react';
 import { Badge } from '@/components/ui/badge';
-import {
-    ConfirmDestructiveDialog,
-} from '@/components/ui/confirm-destructive-dialog';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { ConfirmDestructiveDialog } from '@/components/ui/confirm-destructive-dialog';
+import { Input } from '@/components/ui/input';
+import { PageHeader } from '@/components/ui/page-header';
 import AdminLayout from '@/layouts/admin-layout';
 
 interface User {
@@ -62,20 +64,31 @@ export default function AdminUsers({
 
     function handleSearch(e: React.FormEvent) {
         e.preventDefault();
-        router.get('/admin/users', { search: searchValue || undefined }, {
-            preserveState: true,
-            replace: true,
-        });
+        router.get(
+            '/admin/users',
+            { search: searchValue || undefined },
+            {
+                preserveState: true,
+                replace: true,
+            },
+        );
     }
 
     function handleToggleRole(userId: number) {
-        router.post(`/admin/users/${userId}/toggle-role`, {}, {
-            preserveScroll: true,
-        });
+        router.post(
+            `/admin/users/${userId}/toggle-role`,
+            {},
+            {
+                preserveScroll: true,
+            },
+        );
     }
 
     function handleDeleteUser() {
-        if (!deleteUser) return;
+        if (!deleteUser) {
+            return;
+        }
+
         router.delete(`/admin/users/${deleteUser.id}`, {
             preserveScroll: true,
             onSuccess: () => setDeleteUser(null),
@@ -97,14 +110,19 @@ export default function AdminUsers({
                         <CardTitle>All Users</CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <form onSubmit={handleSearch} className="mb-4 flex gap-2">
+                        <form
+                            onSubmit={handleSearch}
+                            className="mb-4 flex gap-2"
+                        >
                             <div className="relative flex-1">
-                                <Search className="pointer-events-none absolute left-2.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+                                <Search className="pointer-events-none absolute top-1/2 left-2.5 size-4 -translate-y-1/2 text-muted-foreground" />
                                 <Input
                                     type="text"
                                     placeholder="Search by name or email..."
                                     value={searchValue}
-                                    onChange={(e) => setSearchValue(e.target.value)}
+                                    onChange={(e) =>
+                                        setSearchValue(e.target.value)
+                                    }
                                     className="pl-8"
                                 />
                             </div>
@@ -122,21 +140,38 @@ export default function AdminUsers({
                                 <table className="w-full text-sm">
                                     <thead>
                                         <tr className="border-b border-border text-left text-xs text-muted-foreground">
-                                            <th className="pb-2 pr-4 font-medium">Name</th>
-                                            <th className="pb-2 pr-4 font-medium">Email</th>
-                                            <th className="pb-2 pr-4 font-medium">Role</th>
-                                            <th className="pb-2 pr-4 font-medium">Terms Accepted</th>
-                                            <th className="pb-2 pr-4 font-medium">Joined</th>
-                                            <th className="pb-2 font-medium">Actions</th>
+                                            <th className="pr-4 pb-2 font-medium">
+                                                Name
+                                            </th>
+                                            <th className="pr-4 pb-2 font-medium">
+                                                Email
+                                            </th>
+                                            <th className="pr-4 pb-2 font-medium">
+                                                Role
+                                            </th>
+                                            <th className="pr-4 pb-2 font-medium">
+                                                Terms Accepted
+                                            </th>
+                                            <th className="pr-4 pb-2 font-medium">
+                                                Joined
+                                            </th>
+                                            <th className="pb-2 font-medium">
+                                                Actions
+                                            </th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         {users.data.map((user) => (
-                                            <tr key={user.id} className="border-b border-border last:border-0">
+                                            <tr
+                                                key={user.id}
+                                                className="border-b border-border last:border-0"
+                                            >
                                                 <td className="py-3 pr-4">
                                                     <div className="flex items-center gap-2">
                                                         <div className="flex size-7 items-center justify-center rounded-full bg-muted text-xs font-medium text-muted-foreground">
-                                                            {user.name.charAt(0).toUpperCase()}
+                                                            {user.name
+                                                                .charAt(0)
+                                                                .toUpperCase()}
                                                         </div>
                                                         <span className="font-medium text-foreground">
                                                             {user.name}
@@ -148,19 +183,26 @@ export default function AdminUsers({
                                                 </td>
                                                 <td className="py-3 pr-4">
                                                     {user.role === 'admin' ? (
-                                                        <Badge variant="default" className="gap-1">
+                                                        <Badge
+                                                            variant="default"
+                                                            className="gap-1"
+                                                        >
                                                             <BadgeCheck className="size-3" />
                                                             Admin
                                                         </Badge>
                                                     ) : (
-                                                        <Badge variant="secondary">User</Badge>
+                                                        <Badge variant="secondary">
+                                                            User
+                                                        </Badge>
                                                     )}
                                                 </td>
                                                 <td className="py-3 pr-4 text-xs">
                                                     {user.terms_accepted_at ? (
                                                         <span className="inline-flex items-center gap-1.5 text-foreground">
                                                             <CheckCircle2 className="size-3.5 shrink-0 text-emerald-600 dark:text-emerald-400" />
-                                                            {new Date(user.terms_accepted_at).toLocaleDateString()}
+                                                            {new Date(
+                                                                user.terms_accepted_at,
+                                                            ).toLocaleDateString()}
                                                         </span>
                                                     ) : (
                                                         <span className="inline-flex items-center gap-1.5 text-muted-foreground">
@@ -170,18 +212,35 @@ export default function AdminUsers({
                                                     )}
                                                 </td>
                                                 <td className="py-3 pr-4 text-muted-foreground">
-                                                    {new Date(user.created_at).toLocaleDateString()}
+                                                    {new Date(
+                                                        user.created_at,
+                                                    ).toLocaleDateString()}
                                                 </td>
                                                 <td className="py-3">
                                                     <div className="flex items-center gap-1">
                                                         <Button
                                                             variant="ghost"
                                                             size="xs"
-                                                            onClick={() => handleToggleRole(user.id)}
-                                                            title={user.role === 'admin' ? 'Remove admin' : 'Make admin'}
-                                                            aria-label={user.role === 'admin' ? 'Remove admin' : 'Make admin'}
+                                                            onClick={() =>
+                                                                handleToggleRole(
+                                                                    user.id,
+                                                                )
+                                                            }
+                                                            title={
+                                                                user.role ===
+                                                                'admin'
+                                                                    ? 'Remove admin'
+                                                                    : 'Make admin'
+                                                            }
+                                                            aria-label={
+                                                                user.role ===
+                                                                'admin'
+                                                                    ? 'Remove admin'
+                                                                    : 'Make admin'
+                                                            }
                                                         >
-                                                            {user.role === 'admin' ? (
+                                                            {user.role ===
+                                                            'admin' ? (
                                                                 <ShieldOff className="size-3.5" />
                                                             ) : (
                                                                 <Shield className="size-3.5" />
@@ -191,7 +250,11 @@ export default function AdminUsers({
                                                             variant="ghost"
                                                             size="xs"
                                                             className="text-destructive hover:bg-destructive/10"
-                                                            onClick={() => setDeleteUser(user)}
+                                                            onClick={() =>
+                                                                setDeleteUser(
+                                                                    user,
+                                                                )
+                                                            }
                                                             title="Delete user"
                                                         >
                                                             <Trash2 className="size-3.5" />
@@ -209,7 +272,9 @@ export default function AdminUsers({
                         {lastPage > 1 && (
                             <div className="mt-4 flex items-center justify-between border-t border-border pt-4 text-xs text-muted-foreground">
                                 <span>
-                                    Showing {pagination.from ?? 0} to {pagination.to ?? 0} of {pagination.total ?? 0}
+                                    Showing {pagination.from ?? 0} to{' '}
+                                    {pagination.to ?? 0} of{' '}
+                                    {pagination.total ?? 0}
                                 </span>
                                 <div className="flex items-center gap-1">
                                     {links.map((link, i) => {
@@ -220,19 +285,23 @@ export default function AdminUsers({
 
                                         if (!link.url) {
                                             return (
-                                                <span key={i} className="px-2 py-1 text-muted-foreground/50">
+                                                <span
+                                                    key={i}
+                                                    className="px-2 py-1 text-muted-foreground/50"
+                                                >
                                                     {cleanLabel}
                                                 </span>
                                             );
                                         }
+
                                         return (
                                             <Link
                                                 key={i}
                                                 href={link.url}
-                                                className={`px-2 py-1 rounded transition-colors ${
+                                                className={`rounded px-2 py-1 transition-colors ${
                                                     link.active
                                                         ? 'bg-primary/10 font-medium text-primary'
-                                                        : 'hover:bg-muted text-muted-foreground'
+                                                        : 'text-muted-foreground hover:bg-muted'
                                                 }`}
                                                 preserveState
                                                 preserveScroll
@@ -250,7 +319,11 @@ export default function AdminUsers({
 
             <ConfirmDestructiveDialog
                 open={deleteUser !== null}
-                onOpenChange={(open) => { if (!open) setDeleteUser(null); }}
+                onOpenChange={(open) => {
+                    if (!open) {
+                        setDeleteUser(null);
+                    }
+                }}
                 title="Delete User"
                 description={`Are you sure you want to delete ${deleteUser?.name}? This action cannot be undone.`}
                 confirmLabel="Delete"

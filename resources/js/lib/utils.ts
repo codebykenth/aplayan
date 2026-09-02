@@ -13,6 +13,7 @@ export function formatPhone(phone: string): string {
         if (digits.length === 12) {
             return `+63 ${digits.slice(2, 5)} ${digits.slice(5, 8)} ${digits.slice(8)}`;
         }
+
         if (digits.length === 11 && digits.startsWith('639')) {
             return `+63 ${digits.slice(2)}`;
         }

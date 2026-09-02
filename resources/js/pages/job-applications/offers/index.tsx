@@ -18,9 +18,9 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { PageHeader } from '@/components/ui/page-header';
 import { StatusBadge } from '@/components/ui/status-badge';
 import AppLayout from '@/layouts/app-layout';
-import { formatSalary, getCurrencySymbol } from '@/utils/currency';
 import type { Contact } from '@/types/contact';
 import type { JobApplication, TaxConfig } from '@/types/job-application';
+import { formatSalary } from '@/utils/currency';
 
 function formatDate(date: string | null): string | null {
     if (!date) {

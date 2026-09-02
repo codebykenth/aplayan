@@ -1,11 +1,10 @@
 import { Link, usePage } from '@inertiajs/react';
 import { useRef, useState } from 'react';
 import type { FormEvent } from 'react';
-import type { Auth } from '@/types/auth';
-import { registerSchema, validateWithZod } from '@/lib/validations';
 import Turnstile from '@/components/Turnstile';
 import { PasswordInput } from '@/components/ui/password-input';
 import SeoHead from '@/components/ui/seo-head';
+import { registerSchema, validateWithZod } from '@/lib/validations';
 
 export default function Register() {
     const { errors: pageErrors } = usePage<{ errors: Record<string, string> }>()
@@ -37,6 +36,7 @@ export default function Register() {
 
         if (!validation.success) {
             setClientErrors(validation.errors);
+
             return;
         }
 
@@ -50,17 +50,22 @@ export default function Register() {
         const form = document.querySelector(
             'form[action="/register"]',
         ) as HTMLFormElement | null;
-        if (!form) return;
+
+        if (!form) {
+            return;
+        }
 
         let input = form.querySelector(
             'input[name="turnstile"]',
         ) as HTMLInputElement | null;
+
         if (!input) {
             input = document.createElement('input');
             input.type = 'hidden';
             input.name = 'turnstile';
             form.appendChild(input);
         }
+
         input.value = token ?? '';
         form.submit();
     }
@@ -101,7 +106,8 @@ export default function Register() {
                     />
 
                     <p className="text-xs text-muted-foreground">
-                        Fields marked with <span className="text-red-500">*</span> are required.
+                        Fields marked with{' '}
+                        <span className="text-red-500">*</span> are required.
                     </p>
 
                     <div>
@@ -181,7 +187,8 @@ export default function Register() {
                             htmlFor="password_confirmation"
                             className="mb-1 block text-sm font-medium text-foreground"
                         >
-                            Confirm Password <span className="text-red-500">*</span>
+                            Confirm Password{' '}
+                            <span className="text-red-500">*</span>
                         </label>
                         <PasswordInput
                             id="password_confirmation"
@@ -210,7 +217,10 @@ export default function Register() {
                             onChange={(e) => setTerms(e.target.checked)}
                             className="mt-0.5 h-4 w-4 rounded border-input text-primary focus:ring-ring"
                         />
-                        <label htmlFor="terms" className="text-xs text-muted-foreground">
+                        <label
+                            htmlFor="terms"
+                            className="text-xs text-muted-foreground"
+                        >
                             I accept the{' '}
                             <Link
                                 href="/terms"
@@ -245,7 +255,9 @@ export default function Register() {
 
                     <button
                         type="submit"
-                        disabled={!isFormValid || isSubmitting || !isTurnstileVerified}
+                        disabled={
+                            !isFormValid || isSubmitting || !isTurnstileVerified
+                        }
                         className="w-full rounded-lg border border-foreground bg-foreground px-5 py-2 text-sm text-background transition-opacity hover:bg-foreground/90 disabled:pointer-events-none disabled:opacity-50"
                     >
                         {isSubmitting ? 'Registering...' : 'Register'}
@@ -264,11 +276,15 @@ export default function Register() {
                 </div>
 
                 <a
-                    href={isTurnstileVerified ? '/auth/google/redirect' : undefined}
+                    href={
+                        isTurnstileVerified
+                            ? '/auth/google/redirect'
+                            : undefined
+                    }
                     aria-disabled={!isTurnstileVerified}
                     className={`flex w-full items-center justify-center gap-3 rounded-lg border border-border bg-background px-5 py-2 text-sm text-foreground transition-opacity ${
                         !isTurnstileVerified
-                            ? 'pointer-events-none opacity-50 cursor-not-allowed'
+                            ? 'pointer-events-none cursor-not-allowed opacity-50'
                             : 'hover:bg-muted'
                     }`}
                 >

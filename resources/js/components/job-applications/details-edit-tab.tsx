@@ -7,15 +7,14 @@ import {
     SelectContent,
     SelectItem,
     SelectTrigger,
-    SelectValue,
 } from '@/components/ui/select';
+import { JOB_APPLICATION_STATUSES } from '@/types/job-application';
+import type { JobApplication, TaxConfig } from '@/types/job-application';
 import {
     CURRENCIES,
     getCurrencySymbol,
     convertCurrency,
 } from '@/utils/currency';
-import { JOB_APPLICATION_STATUSES } from '@/types/job-application';
-import type { JobApplication, TaxConfig } from '@/types/job-application';
 
 interface DetailsEditTabProps {
     application: JobApplication;
@@ -53,15 +52,16 @@ export default function DetailsEditTab({
         (formData.offered_salary !== '' && Number(formData.offered_salary) > 0);
 
     return (
-<div className="flex flex-col gap-4">
-                <p className="text-xs text-muted-foreground">
-                    Fields marked with <span className="text-red-500">*</span> are required.
-                </p>
-                <div className="grid grid-cols-2 gap-4">
+        <div className="flex flex-col gap-4">
+            <p className="text-xs text-muted-foreground">
+                Fields marked with <span className="text-red-500">*</span> are
+                required.
+            </p>
+            <div className="grid grid-cols-2 gap-4">
                 <div className="flex flex-col gap-2">
-<Label htmlFor="company_name" className="text-xs">
-                         Company Name <span className="text-red-500">*</span>
-                     </Label>
+                    <Label htmlFor="company_name" className="text-xs">
+                        Company Name <span className="text-red-500">*</span>
+                    </Label>
                     <Input
                         id="company_name"
                         value={formData.company_name}
@@ -81,9 +81,9 @@ export default function DetailsEditTab({
                 </div>
 
                 <div className="flex flex-col gap-2">
-<Label htmlFor="job_title" className="text-xs">
-                         Job Title <span className="text-red-500">*</span>
-                     </Label>
+                    <Label htmlFor="job_title" className="text-xs">
+                        Job Title <span className="text-red-500">*</span>
+                    </Label>
                     <Input
                         id="job_title"
                         value={formData.job_title}
@@ -105,9 +105,9 @@ export default function DetailsEditTab({
 
             <div className="grid grid-cols-2 gap-4">
                 <div className="flex flex-col gap-2">
-<Label htmlFor="location" className="text-xs">
-                         Location
-                     </Label>
+                    <Label htmlFor="location" className="text-xs">
+                        Location
+                    </Label>
                     <Input
                         id="location"
                         value={formData.location}
@@ -167,9 +167,9 @@ export default function DetailsEditTab({
 
             <div className="grid grid-cols-2 gap-4">
                 <div className="flex flex-col gap-2">
-<Label htmlFor="date_applied" className="text-xs">
-                         Date Applied <span className="text-red-500">*</span>
-                     </Label>
+                    <Label htmlFor="date_applied" className="text-xs">
+                        Date Applied <span className="text-red-500">*</span>
+                    </Label>
                     <Input
                         id="date_applied"
                         type="date"
@@ -188,9 +188,9 @@ export default function DetailsEditTab({
                 </div>
 
                 <div className="flex flex-col gap-2">
-<Label htmlFor="interview_date" className="text-xs">
-                         Interview Date <span className="text-red-500">*</span>
-                     </Label>
+                    <Label htmlFor="interview_date" className="text-xs">
+                        Interview Date <span className="text-red-500">*</span>
+                    </Label>
                     <Input
                         id="interview_date"
                         type="date"
@@ -214,9 +214,15 @@ export default function DetailsEditTab({
                 <Select
                     value={formData.currency}
                     onValueChange={(newCurrency) => {
-                        if (!newCurrency) return;
+                        if (!newCurrency) {
+                            return;
+                        }
+
                         const oldCurrency = formData.currency || 'PHP';
-                        if (oldCurrency === newCurrency) return;
+
+                        if (oldCurrency === newCurrency) {
+                            return;
+                        }
 
                         onFieldChange('currency', newCurrency);
 
@@ -225,6 +231,7 @@ export default function DetailsEditTab({
                             !isNaN(Number(formData.expected_salary))
                         ) {
                             const val = Number(formData.expected_salary);
+
                             if (val > 0) {
                                 onFieldChange(
                                     'expected_salary',
@@ -244,6 +251,7 @@ export default function DetailsEditTab({
                             !isNaN(Number(formData.offered_salary))
                         ) {
                             const val = Number(formData.offered_salary);
+
                             if (val > 0) {
                                 onFieldChange(
                                     'offered_salary',
@@ -292,8 +300,9 @@ export default function DetailsEditTab({
             <div className="grid grid-cols-2 gap-4">
                 <div className="flex flex-col gap-2">
                     <Label htmlFor="expected_salary" className="text-xs">
-                         Expected Salary ({getCurrencySymbol(formData.currency)}) <span className="text-red-500">*</span>
-                     </Label>
+                        Expected Salary ({getCurrencySymbol(formData.currency)}){' '}
+                        <span className="text-red-500">*</span>
+                    </Label>
                     <div className="relative">
                         <span className="pointer-events-none absolute top-1/2 left-2.5 -translate-y-1/2 text-sm text-muted-foreground">
                             {getCurrencySymbol(formData.currency)}
@@ -320,8 +329,8 @@ export default function DetailsEditTab({
 
                 <div className="flex flex-col gap-2">
                     <Label htmlFor="offered_salary" className="text-xs">
-                         Offered Salary ({getCurrencySymbol(formData.currency)})
-                     </Label>
+                        Offered Salary ({getCurrencySymbol(formData.currency)})
+                    </Label>
                     <div className="relative">
                         <span className="pointer-events-none absolute top-1/2 left-2.5 -translate-y-1/2 text-sm text-muted-foreground">
                             {getCurrencySymbol(formData.currency)}
@@ -348,9 +357,9 @@ export default function DetailsEditTab({
             </div>
 
             <div className="flex flex-col gap-2">
-<Label htmlFor="job_url" className="text-xs">
-                     Job URL
-                 </Label>
+                <Label htmlFor="job_url" className="text-xs">
+                    Job URL
+                </Label>
                 <Input
                     id="job_url"
                     type="url"
@@ -366,20 +375,20 @@ export default function DetailsEditTab({
             </div>
 
             <div className="flex flex-col gap-2">
-<Label htmlFor="job_description" className="text-xs">
-                     Job Description
-                 </Label>
-<textarea
-                id="job_description"
-                rows={4}
-                value={formData.job_description}
-                onChange={(e) =>
-                    onFieldChange('job_description', e.target.value)
-                }
-                className="w-full resize-none rounded-lg border border-input bg-transparent p-2 text-xs outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-50 max-h-32 overflow-y-auto"
-                placeholder="Paste the job description here..."
-                disabled={disabled}
-            />
+                <Label htmlFor="job_description" className="text-xs">
+                    Job Description
+                </Label>
+                <textarea
+                    id="job_description"
+                    rows={4}
+                    value={formData.job_description}
+                    onChange={(e) =>
+                        onFieldChange('job_description', e.target.value)
+                    }
+                    className="max-h-32 w-full resize-none overflow-y-auto rounded-lg border border-input bg-transparent p-2 text-xs outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-50"
+                    placeholder="Paste the job description here..."
+                    disabled={disabled}
+                />
                 {errors.job_description && (
                     <p className="text-xs text-destructive">
                         {errors.job_description}
@@ -388,18 +397,18 @@ export default function DetailsEditTab({
             </div>
 
             <div className="flex flex-col gap-2">
-<Label htmlFor="notes" className="text-xs">
-                     Notes
-                 </Label>
-<textarea
-                id="notes"
-                rows={3}
-                value={formData.notes}
-                onChange={(e) => onFieldChange('notes', e.target.value)}
-                className="w-full resize-none rounded-lg border border-input bg-transparent p-2 text-xs outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-50 max-h-24 overflow-y-auto"
-                placeholder="Any additional notes..."
-                disabled={disabled}
-            />
+                <Label htmlFor="notes" className="text-xs">
+                    Notes
+                </Label>
+                <textarea
+                    id="notes"
+                    rows={3}
+                    value={formData.notes}
+                    onChange={(e) => onFieldChange('notes', e.target.value)}
+                    className="max-h-24 w-full resize-none overflow-y-auto rounded-lg border border-input bg-transparent p-2 text-xs outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-50"
+                    placeholder="Any additional notes..."
+                    disabled={disabled}
+                />
                 {errors.notes && (
                     <p className="text-xs text-destructive">{errors.notes}</p>
                 )}

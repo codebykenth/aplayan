@@ -78,6 +78,7 @@ function formatResumeToText(profile: any): string {
                     ? `${job.start_date} - ${job.end_date || 'Present'}`
                     : 'N/A');
             lines.push(`• ${title} at ${company} (${dateStr})`);
+
             if (job.description) {
                 const descLines = String(job.description)
                     .split('\n')
@@ -105,6 +106,7 @@ function formatResumeToText(profile: any): string {
 
     if (Array.isArray(profile.skills) && profile.skills.length > 0) {
         const skillList = profile.skills.filter(Boolean).join(', ');
+
         if (skillList) {
             lines.push(`\nSKILLS:\n${skillList}`);
         }
@@ -124,6 +126,7 @@ function formatResumeToText(profile: any): string {
         profile.certifications.length > 0
     ) {
         const certList = profile.certifications.filter(Boolean).join(', ');
+
         if (certList) {
             lines.push(`\nCERTIFICATIONS:\n${certList}`);
         }
@@ -148,6 +151,7 @@ export default function AiCopilotTab({ application }: AiCopilotTabProps) {
             setSelectedResumeId('custom');
         } else if (!resumeText && resumeProfile) {
             const formatted = formatResumeToText(resumeProfile);
+
             if (formatted) {
                 setResumeText(formatted);
                 setSelectedResumeId('master');
@@ -402,8 +406,12 @@ export default function AiCopilotTab({ application }: AiCopilotTabProps) {
                         <Select
                             value={selectedResumeId}
                             onValueChange={(val) => {
-                                if (!val) return;
+                                if (!val) {
+                                    return;
+                                }
+
                                 setSelectedResumeId(val);
+
                                 if (val === 'master' && resumeProfile) {
                                     setResumeText(
                                         formatResumeToText(resumeProfile),
@@ -412,6 +420,7 @@ export default function AiCopilotTab({ application }: AiCopilotTabProps) {
                                     const selectedSaved = savedResumes?.find(
                                         (r: any) => String(r.id) === val,
                                     );
+
                                     if (selectedSaved?.profile_data) {
                                         setResumeText(
                                             formatResumeToText(

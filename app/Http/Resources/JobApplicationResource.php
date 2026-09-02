@@ -2,12 +2,16 @@
 
 namespace App\Http\Resources;
 
+use App\Models\JobApplication;
 use App\Services\FxExchangeService;
 use App\Services\JobApplicationService;
 use App\Services\PhilippineTaxCalculatorService;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
+/**
+ * @mixin JobApplication
+ */
 class JobApplicationResource extends JsonResource
 {
     public function toArray(Request $request): array

@@ -1,6 +1,6 @@
 import { useForm, router } from '@inertiajs/react';
 import { ZapIcon, LoaderIcon } from 'lucide-react';
-import { useState, useCallback } from 'react';
+import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import {
     Dialog,
@@ -109,12 +109,15 @@ export default function QuickApplyDialog({
                 </DialogHeader>
 
                 <p className="mt-1 text-xs text-muted-foreground">
-                    Fields marked with <span className="text-red-500">*</span> are required.
+                    Fields marked with <span className="text-red-500">*</span>{' '}
+                    are required.
                 </p>
 
                 <form onSubmit={submit} className="flex flex-col gap-4">
                     <div className="flex flex-col gap-2">
-                        <Label htmlFor="template_select">Template <span className="text-red-500">*</span></Label>
+                        <Label htmlFor="template_select">
+                            Template <span className="text-red-500">*</span>
+                        </Label>
                         <Select
                             value={selectedTemplate?.id.toString() ?? ''}
                             onValueChange={(value: string | null) =>
@@ -138,7 +141,9 @@ export default function QuickApplyDialog({
                     </div>
 
                     <div className="flex flex-col gap-2">
-                        <Label htmlFor="company_name">Company Name <span className="text-red-500">*</span></Label>
+                        <Label htmlFor="company_name">
+                            Company Name <span className="text-red-500">*</span>
+                        </Label>
                         <Input
                             id="company_name"
                             value={data.company_name}
@@ -157,7 +162,9 @@ export default function QuickApplyDialog({
                     </div>
 
                     <div className="flex flex-col gap-2">
-                        <Label htmlFor="job_url">Job URL <span className="text-red-500">*</span></Label>
+                        <Label htmlFor="job_url">
+                            Job URL <span className="text-red-500">*</span>
+                        </Label>
                         <Input
                             id="job_url"
                             type="url"
