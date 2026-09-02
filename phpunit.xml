@@ -32,5 +32,11 @@
         <env name="PULSE_ENABLED" value="false"/>
         <env name="TELESCOPE_ENABLED" value="false"/>
         <env name="NIGHTWATCH_ENABLED" value="false"/>
+        <env name="GEMINI_API_KEY" value="test-fake-gemini-key"/>
+        <env name="CLOUDFLARE_TURNSTILE_SITE_KEY" value="1x00000000000000000000AA"/>
+        <env name="CLOUDFLARE_TURNSTILE_SECRET_KEY" value="1x0000000000000000000000000000000AA"/>
+        <env name="GOOGLE_CLIENT_ID" value="test-google-client-id"/>
+        <env name="GOOGLE_CLIENT_SECRET" value="test-google-client-secret"/>
+        <env name="GOOGLE_REDIRECT_URI" value="http://localhost/auth/google/callback"/>
     </php>
 </phpunit>

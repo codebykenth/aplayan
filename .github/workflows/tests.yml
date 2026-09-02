@@ -12,6 +12,11 @@ permissions:
 jobs:
   ci:
     runs-on: ubuntu-latest
+    env:
+      GEMINI_API_KEY: test-fake-gemini-key
+      CLOUDFLARE_TURNSTILE_SITE_KEY: 1x00000000000000000000AA
+      CLOUDFLARE_TURNSTILE_SECRET_KEY: 1x0000000000000000000000000000000AA
+
 
     steps:
       - name: Checkout code
