@@ -144,7 +144,7 @@ export default function Welcome() {
                     className="absolute inset-x-0 -top-40 -z-10 transform-gpu overflow-hidden blur-3xl sm:-top-80"
                     aria-hidden="true"
                 >
-                    <div className="relative left-[calc(50%-11rem)] aspect-[1155/678] w-[36.125rem] -translate-x-1/2 rotate-[30deg] bg-gradient-to-tr from-primary to-primary/30 opacity-10 sm:left-[calc(50%-30rem)] sm:w-[72.1875rem]" />
+                    <div className="relative left-[calc(50%-11rem)] aspect-1155/678 w-144.5 -translate-x-1/2 rotate-30 bg-linear-to-tr from-primary to-primary/30 opacity-10 sm:left-[calc(50%-30rem)] sm:w-288.75" />
                 </div>
             </section>
 
@@ -245,7 +245,7 @@ export default function Welcome() {
             {/* Final CTA */}
             <section className="border-t border-border px-4 py-20 sm:px-6 sm:py-28 lg:px-8">
                 <div className="mx-auto max-w-3xl text-center">
-                    <div className="rounded-2xl border border-border bg-gradient-to-br from-card/90 to-card/50 p-8 shadow-sm backdrop-blur-sm sm:p-12">
+                    <div className="rounded-2xl border border-border bg-linear-to-br from-card/90 to-card/50 p-8 shadow-sm backdrop-blur-sm sm:p-12">
                         <h2 className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
                             Ready to take control of your job applications?
                         </h2>
