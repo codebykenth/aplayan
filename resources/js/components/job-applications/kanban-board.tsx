@@ -201,7 +201,9 @@ export default function KanbanBoard({
 
     const needsAttention = (app: JobApplication): boolean => {
         return (
-            (app.status === 'applied' || app.status === 'interviewing') &&
+            (app.status === 'applied' ||
+                app.status === 'interviewing' ||
+                app.status === 'interviewed') &&
             (app.staleness_level === 'warning' ||
                 app.staleness_level === 'alert')
         );

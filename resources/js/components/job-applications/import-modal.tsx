@@ -76,7 +76,9 @@ const STATUS_OPTIONS = [
     'wishlist',
     'applied',
     'interviewing',
+    'interviewed',
     'offer',
+    'accepted',
     'rejected',
     'withdrawn',
 ];

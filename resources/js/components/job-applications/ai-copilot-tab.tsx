@@ -743,7 +743,8 @@ export default function AiCopilotTab({ application }: AiCopilotTabProps) {
                     </div>
                 )}
 
-            {application.status === 'interviewing' && (
+            {(application.status === 'interviewing' ||
+                application.status === 'interviewed') && (
                 <div className="flex flex-col gap-3 border-t border-border pt-4">
                     <span className="text-xs text-muted-foreground">
                         Interview Prep
@@ -825,7 +826,8 @@ export default function AiCopilotTab({ application }: AiCopilotTabProps) {
             )}
 
             {(application.status === 'applied' ||
-                application.status === 'interviewing') &&
+                application.status === 'interviewing' ||
+                application.status === 'interviewed') &&
                 application.staleness_level !== null && (
                     <div className="flex flex-col gap-3 border-t border-border pt-4">
                         <div className="flex items-center justify-between">

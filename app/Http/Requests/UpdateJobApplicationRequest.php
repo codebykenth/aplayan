@@ -13,7 +13,7 @@ class UpdateJobApplicationRequest extends StoreJobApplicationRequest
             'job_description' => ['nullable', 'string'],
             'location' => ['nullable', 'string', 'max:255'],
             'work_setup' => ['sometimes', 'required', 'string', 'in:remote,hybrid,onsite'],
-            'status' => ['sometimes', 'required', 'string', 'in:wishlist,applied,interviewing,offer,rejected,withdrawn'],
+            'status' => ['sometimes', 'required', 'string', 'in:wishlist,applied,interviewing,interviewed,offer,accepted,rejected,withdrawn'],
             'date_applied' => ['nullable', 'date'],
             'expected_salary' => ['nullable', 'integer', 'min:0'],
             'offered_salary' => ['nullable', 'integer', 'min:0'],

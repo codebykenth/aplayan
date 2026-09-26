@@ -28,7 +28,9 @@ it('returns correct funnel data', function () {
     JobApplication::factory()->create(['user_id' => $this->user->id, 'status' => 'wishlist']);
     JobApplication::factory()->create(['user_id' => $this->user->id, 'status' => 'applied']);
     JobApplication::factory()->create(['user_id' => $this->user->id, 'status' => 'interviewing']);
+    JobApplication::factory()->create(['user_id' => $this->user->id, 'status' => 'interviewed']);
     JobApplication::factory()->create(['user_id' => $this->user->id, 'status' => 'offer']);
+    JobApplication::factory()->create(['user_id' => $this->user->id, 'status' => 'accepted']);
 
     $response = $this->actingAs($this->user)
         ->get(route('analytics'));
@@ -42,8 +44,12 @@ it('returns correct funnel data', function () {
         ->where('funnel.1.value', 1)
         ->where('funnel.2.name', JobApplicationStatus::Interviewing->label())
         ->where('funnel.2.value', 1)
-        ->where('funnel.3.name', JobApplicationStatus::Offer->label())
+        ->where('funnel.3.name', JobApplicationStatus::Interviewed->label())
         ->where('funnel.3.value', 1)
+        ->where('funnel.4.name', JobApplicationStatus::Offer->label())
+        ->where('funnel.4.value', 1)
+        ->where('funnel.5.name', JobApplicationStatus::Accepted->label())
+        ->where('funnel.5.value', 1)
     );
 });
 

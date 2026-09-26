@@ -67,10 +67,12 @@ it('computes follow-up deadlines and returns them as events', function () {
 it('only returns events belonging to the authenticated user', function () {
     JobApplication::factory()->create([
         'user_id' => $this->user->id,
+        'date_applied' => null,
         'interview_date' => '2025-08-15 10:00:00',
     ]);
     JobApplication::factory()->create([
         'user_id' => $this->otherUser->id,
+        'date_applied' => null,
         'interview_date' => '2025-08-20 10:00:00',
     ]);
 

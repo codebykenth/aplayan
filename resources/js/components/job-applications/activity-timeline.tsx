@@ -5,7 +5,9 @@ import {
     BookmarkIcon,
     SendIcon,
     UsersIcon,
+    UserCheckIcon,
     CheckCircle2Icon,
+    CheckCheckIcon,
     XCircleIcon,
     XIcon,
 } from 'lucide-react';
@@ -40,7 +42,9 @@ const STATUS_ICONS: Record<JobApplicationStatus, any> = {
     wishlist: BookmarkIcon,
     applied: SendIcon,
     interviewing: UsersIcon,
+    interviewed: UserCheckIcon,
     offer: CheckCircle2Icon,
+    accepted: CheckCheckIcon,
     rejected: XCircleIcon,
     withdrawn: XIcon,
 };
@@ -49,7 +53,7 @@ function getStatusFromDescription(
     description: string,
 ): JobApplicationStatus | null {
     const match = description.match(
-        /Status changed to (Wishlist|Applied|Interviewing|Offer|Rejected|Withdrawn)/i,
+        /Status changed to (Wishlist|Applied|Interviewing|Interviewed|Offer|Accepted|Rejected|Withdrawn)/i,
     );
 
     if (match) {

@@ -21,7 +21,7 @@ class OfferComparisonController extends Controller
 
         $applications = JobApplication::query()
             ->where('user_id', $request->user()->id)
-            ->where('status', 'offer')
+            ->whereIn('status', ['offer', 'accepted'])
             ->with(['activities', 'contacts'])
             ->orderBy('created_at', 'desc')
             ->get();

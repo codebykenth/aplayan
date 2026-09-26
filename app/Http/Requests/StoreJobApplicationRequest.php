@@ -28,7 +28,7 @@ class StoreJobApplicationRequest extends FormRequest
             'job_description' => ['nullable', 'string'],
             'location' => ['nullable', 'string', 'max:255'],
             'work_setup' => ['required', 'string', 'in:remote,hybrid,onsite'],
-            'status' => ['required', 'string', 'in:wishlist,applied,interviewing,offer,rejected,withdrawn'],
+            'status' => ['required', 'string', 'in:wishlist,applied,interviewing,interviewed,offer,accepted,rejected,withdrawn'],
             'date_applied' => ['nullable', 'date'],
             'expected_salary' => ['nullable', 'integer', 'min:0'],
             'offered_salary' => ['nullable', 'integer', 'min:0'],

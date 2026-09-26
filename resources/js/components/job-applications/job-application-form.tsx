@@ -510,6 +510,7 @@ export default function JobApplicationForm({
                         {(() => {
                             const showOfferedSalary =
                                 data.status === 'offer' ||
+                                data.status === 'accepted' ||
                                 data.status === 'rejected' ||
                                 data.status === 'withdrawn' ||
                                 Boolean(data.offered_salary);

@@ -36,12 +36,22 @@ const STATUS_CHART_COLORS: Record<JobApplicationStatus, string> = {
     wishlist: '#94a3b8',
     applied: '#3b82f6',
     interviewing: '#f59e0b',
+    interviewed: '#8b5cf6',
     offer: '#10b981',
+    accepted: '#0d9488',
     rejected: '#ef4444',
     withdrawn: '#64748b',
 };
 
-const FUNNEL_COLORS = ['#94a3b8', '#3b82f6', '#f59e0b', '#10b981', '#ef4444'];
+const FUNNEL_COLORS = [
+    '#94a3b8',
+    '#3b82f6',
+    '#f59e0b',
+    '#8b5cf6',
+    '#10b981',
+    '#0d9488',
+    '#64748b',
+];
 
 const RESPONSE_COLORS = ['#15803d', '#22c55e', '#eab308', '#f97316', '#ef4444'];
 

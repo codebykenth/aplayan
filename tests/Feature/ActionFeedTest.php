@@ -67,6 +67,22 @@ it('marks stale follow-ups as urgent when stagnant over 14 days', function () {
         );
 });
 
+it('flags stale follow-ups for interviewed applications stagnant over 7 days', function () {
+    JobApplication::factory()->create([
+        'user_id' => $this->user->id,
+        'status' => 'interviewed',
+        'last_contacted_at' => now()->subDays(8),
+        'ai_evaluated_at' => now(),
+    ]);
+
+    $this->get(route('dashboard'))
+        ->assertInertia(fn ($page) => $page
+            ->has('action_items', 1)
+            ->where('action_items.0.type', 'stale_follow_up')
+            ->where('action_items.0.message', 'You interviewed recently. Consider following up for feedback.')
+        );
+});
+
 it('flags upcoming interviews', function () {
     JobApplication::factory()->create([
         'user_id' => $this->user->id,

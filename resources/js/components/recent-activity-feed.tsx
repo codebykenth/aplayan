@@ -12,7 +12,9 @@ import {
     Bookmark,
     Send,
     Users,
+    UserCheck,
     CheckCircle2,
+    CheckCheck,
     XCircle,
     X,
 } from 'lucide-react';
@@ -49,7 +51,9 @@ const STATUS_ICONS: Record<JobApplicationStatus, typeof Clock> = {
     wishlist: Bookmark,
     applied: Send,
     interviewing: Users,
+    interviewed: UserCheck,
     offer: CheckCircle2,
+    accepted: CheckCheck,
     rejected: XCircle,
     withdrawn: X,
 };
@@ -58,7 +62,7 @@ function getStatusFromDescription(
     description: string,
 ): JobApplicationStatus | null {
     const match = description.match(
-        /Status changed to (Wishlist|Applied|Interviewing|Offer|Rejected|Withdrawn)/i,
+        /Status changed to (Wishlist|Applied|Interviewing|Interviewed|Offer|Accepted|Rejected|Withdrawn)/i,
     );
 
     if (match) {

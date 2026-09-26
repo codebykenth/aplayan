@@ -40,21 +40,25 @@ class ActionFeedService
         $now = CarbonImmutable::now();
 
         return $applications
-            ->filter(fn (JobApplication $app) => $app->status === 'applied')
+            ->filter(fn (JobApplication $app) => in_array($app->status, ['applied', 'interviewed']))
             ->filter(function (JobApplication $app) use ($now) {
-                $reference = $app->last_contacted_at ?? $app->created_at;
+                $reference = $app->last_contacted_at ?? $app->interview_date ?? $app->created_at;
 
                 return $reference === null || $reference->lte($now->subDays(7));
             })
             ->map(function (JobApplication $app) use ($now) {
-                $reference = $app->last_contacted_at ?? $app->created_at;
+                $reference = $app->last_contacted_at ?? $app->interview_date ?? $app->created_at;
                 $daysSince = $reference !== null ? $reference->diffInDays($now) : 999;
 
                 $priority = $daysSince > 14 ? 'urgent' : 'moderate';
                 $priorityScore = $daysSince > 14 ? 90 : 70;
-                $message = $daysSince > 14
-                    ? 'This application has been stagnant for over 2 weeks. Follow up today.'
-                    : 'No recent activity on this application. Consider following up.';
+                $message = $app->status === 'interviewed'
+                    ? ($daysSince > 14
+                        ? 'It has been over 2 weeks since your interview. Follow up with the recruiter.'
+                        : 'You interviewed recently. Consider following up for feedback.')
+                    : ($daysSince > 14
+                        ? 'This application has been stagnant for over 2 weeks. Follow up today.'
+                        : 'No recent activity on this application. Consider following up.');
 
                 return $this->buildItem(
                     type: 'stale_follow_up',

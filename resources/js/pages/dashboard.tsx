@@ -43,7 +43,9 @@ const STATUS_CHART_COLORS: Record<JobApplicationStatus, string> = {
     wishlist: '#94a3b8',
     applied: '#3b82f6',
     interviewing: '#f59e0b',
+    interviewed: '#8b5cf6',
     offer: '#10b981',
+    accepted: '#0d9488',
     rejected: '#ef4444',
     withdrawn: '#64748b',
 };

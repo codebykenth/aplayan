@@ -17,7 +17,7 @@ class DashboardController extends Controller
     {
         return Inertia::render('admin/dashboard/index', [
             'total_users' => fn () => User::count(),
-            'active_job_applications' => fn () => JobApplication::whereIn('status', ['applied', 'interviewing', 'offer'])->count(),
+            'active_job_applications' => fn () => JobApplication::whereIn('status', ['applied', 'interviewing', 'interviewed', 'offer'])->count(),
             'total_resumes' => fn () => SavedResume::count(),
             'daily_ai_api_calls' => fn () => AiResponseCache::whereDate('created_at', today())->count(),
         ]);

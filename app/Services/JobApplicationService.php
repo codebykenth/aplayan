@@ -86,7 +86,9 @@ class JobApplicationService
         'wishlist',
         'applied',
         'interviewing',
+        'interviewed',
         'offer',
+        'accepted',
     ];
 
     public function updateStatusForUser(JobApplication $jobApplication, JobApplicationStatus $status, ?string $interviewDate = null): JobApplication
@@ -146,7 +148,7 @@ class JobApplicationService
 
     public function stalenessLevel(JobApplication $jobApplication): ?string
     {
-        if (! in_array($jobApplication->status, ['applied', 'interviewing'])) {
+        if (! in_array($jobApplication->status, ['applied', 'interviewing', 'interviewed'])) {
             return null;
         }
 

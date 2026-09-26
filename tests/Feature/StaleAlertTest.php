@@ -75,6 +75,16 @@ describe('staleness computation', function () {
         expect($this->service->stalenessLevel($app->fresh()))->toBe('alert');
     });
 
+    it('returns alert for interviewed status past 14 days', function () {
+        $app = JobApplication::factory()->create([
+            'user_id' => $this->user->id,
+            'status' => 'interviewed',
+        ]);
+        JobApplication::where('id', $app->id)->update(['updated_at' => now()->subDays(16)]);
+
+        expect($this->service->stalenessLevel($app->fresh()))->toBe('alert');
+    });
+
     it('uses last_contacted_at over updated_at when available', function () {
         $app = JobApplication::factory()->create([
             'user_id' => $this->user->id,

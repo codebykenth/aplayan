@@ -140,7 +140,9 @@ export type JobApplicationStatus =
     | 'wishlist'
     | 'applied'
     | 'interviewing'
+    | 'interviewed'
     | 'offer'
+    | 'accepted'
     | 'rejected'
     | 'withdrawn';
 
@@ -151,7 +153,9 @@ export const JOB_APPLICATION_STATUSES: {
     { value: 'wishlist', label: 'Wishlist' },
     { value: 'applied', label: 'Applied' },
     { value: 'interviewing', label: 'Interviewing' },
+    { value: 'interviewed', label: 'Interviewed' },
     { value: 'offer', label: 'Offer' },
+    { value: 'accepted', label: 'Accepted' },
     { value: 'rejected', label: 'Rejected' },
     { value: 'withdrawn', label: 'Withdrawn' },
 ];
@@ -163,7 +167,11 @@ export const STATUS_COLORS: Record<JobApplicationStatus, string> = {
         'bg-blue-100 text-blue-700 dark:bg-blue-950/80 dark:text-blue-200 dark:border dark:border-blue-800/50',
     interviewing:
         'bg-amber-100 text-amber-800 dark:bg-amber-950/80 dark:text-amber-200 dark:border dark:border-amber-800/50',
+    interviewed:
+        'bg-purple-100 text-purple-800 dark:bg-purple-950/80 dark:text-purple-200 dark:border dark:border-purple-800/50',
     offer: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/80 dark:text-emerald-200 dark:border dark:border-emerald-800/50',
+    accepted:
+        'bg-teal-100 text-teal-800 dark:bg-teal-950/80 dark:text-teal-200 dark:border dark:border-teal-800/50',
     rejected:
         'bg-rose-100 text-rose-800 dark:bg-rose-950/80 dark:text-rose-200 dark:border dark:border-rose-800/50',
     withdrawn:
@@ -174,7 +182,9 @@ export const JOB_APPLICATION_STATUS_ORDER: JobApplicationStatus[] = [
     'wishlist',
     'applied',
     'interviewing',
+    'interviewed',
     'offer',
+    'accepted',
 ];
 
 export interface ParsedJobUrl {

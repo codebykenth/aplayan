@@ -93,7 +93,7 @@ it('allows valid status values', function (string $status) {
     $application = JobApplication::factory()->create(['status' => $status]);
 
     expect($application->status)->toBe($status);
-})->with(['wishlist', 'applied', 'interviewing', 'offer', 'rejected']);
+})->with(['wishlist', 'applied', 'interviewing', 'interviewed', 'offer', 'accepted', 'rejected', 'withdrawn']);
 
 it('can be created via factory', function () {
     $application = JobApplication::factory()->create();
