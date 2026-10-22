@@ -96,10 +96,8 @@
             "Illuminate\\Foundation\\ComposerScripts::prePackageUninstall"
         ],
         "vercel": [
-            "rm -f public/hot public/fonts-manifest.dev.json",
-            "pnpm run build",
-            "mkdir -p /vercel/output/static",
-            "cp -r public/build /vercel/output/static/"
+            "@php -v",
+            "rm -f public/hot public/fonts-manifest.dev.json"
         ]
     },
     "extra": {
