@@ -11,7 +11,7 @@
 test('the vercel runtime uses a php build patched for php2shell', function () {
     $config = json_decode(file_get_contents(base_path('vercel.json')), true);
 
-    expect($config['functions']['api/lambda.php']['runtime'])->toBe('vercel-php@0.9.0');
+    expect($config['functions']['api/index.php']['runtime'])->toBe('vercel-php@0.9.0');
 });
 
 test('the vercel php configuration keeps php2shell hardening in place', function () {
@@ -20,6 +20,7 @@ test('the vercel php configuration keeps php2shell hardening in place', function
     expect($ini)
         ->toMatchArray([
             'session.upload_progress.enabled' => 'Off',
+            'fatal_error_backtraces' => 'Off',
             'expose_php' => 'Off',
             'display_errors' => 'Off',
             'allow_url_include' => 'Off',
